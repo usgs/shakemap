@@ -226,6 +226,7 @@ def write_event_file(event, xmlfile):
            - locstring (str, "East of the Poconos")
            - mech (str, "RS", "SS", "NM", or 'ALL') (optional)
            - reference (str, data source: 'Smith et al. 2016') (optional)
+           - event_type (str, 'ACTUAL' or 'SCENARIO') (optional)
            - productcode (str, 'us2000wxyz_zoom')
 
     Returns:
@@ -248,6 +249,13 @@ def write_event_file(event, xmlfile):
             root.attrib['reference'] = event['reference']
         if 'productcode' in event:
             root.attrib['productcode'] = event['productcode']
+        if 'event_type' in event:
+            if event['event_type'] not in ['ACTUAL', 'SCENARIO']:
+                raise AttributeError(
+                    'event_type must be "ACTUAL" or "SCENARIO"')
+            root.attrib['event_type'] = event['event_type']
+        else:
+            root.attrib['event_type'] = 'ACTUAL'
 
         tree = etree.ElementTree(root)
         tree.write(xmlfile, pretty_print=True)

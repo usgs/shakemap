@@ -1410,8 +1410,7 @@ def _save_jpg(fig, filename):
                                                         imtype, topogrid,
                                                         oceanfile,
                                                         datadir,
-                                                        operator, filter_size,
-                                                        is_scenario=False)
+                                                        operator, filter_size)
                 self.logger.debug('Created contour map %s' % contour_pdf)
                 print('Finished %s' % imtype)
 

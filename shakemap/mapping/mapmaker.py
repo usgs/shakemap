@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LightSource
+import matplotlib.patheffects as path_effects
 
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
@@ -20,12 +21,10 @@ from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import GeometryCollection
 from shapely.geometry import mapping
 
-import pyproj
 import fiona
 from openquake.hazardlib import imt
 
 # neic imports
-from mapio.gmt import GMTGrid
 from impactutils.mapping.mercatormap import MercatorMap
 from impactutils.mapping.city import Cities
 from impactutils.colors.cpalette import ColorPalette
@@ -68,6 +67,10 @@ AXES_ZORDER = 3000
 # DEFAULT_FONT = 'DejaVu Sans'
 DEFAULT_FONT = 'Bitstream Vera Sans'
 
+# what color should the scenario watermark be?
+WATERMARK_COLOR = (0.85, 0.85, 0.85)
+WATERMARK_ALPHA = 0.4
+
 # what fraction of the width/height of the map can the contour labels be
 # from the edge before we decide we don't want to draw it there?
 MAP_FRAC = 10
@@ -87,7 +90,17 @@ MMI_LABELS = {'1': 'I',
 DEG2KM = 111.191
 
 
-def get_projected_grids(imtgrid, topobase, projstr):
+def _get_projected_grids(imtgrid, topobase, projstr):
+    """Resample IMT grid to topography, return projected versions of each.
+
+    Args:
+        imtgrid (Grid2D): IMT mean grid.
+        topobase (Grid2D): Topography grid to trim and project.
+        projstr (str): Proj4 initialization string.
+    Returns:
+        Grid2D: projected IMT mean grid, resampled to topography.
+        Grid2D: projected topography grid, trimmed to size of IMT.
+    """
     # resample shakemap to topogrid
     # get the geodict for the topo file
     topodict = topobase.getGeoDict()
@@ -115,7 +128,17 @@ def get_projected_grids(imtgrid, topobase, projstr):
     return (pimtgrid, ptopogrid)
 
 
-def get_map_info(gd, center_lat):
+def _get_map_info(gd, center_lat):
+    """Get the desired bounds of the map and the figure size (in).
+
+    Args:
+        gd (GeoDict): GeoDict to use as basis for map boundaries.
+        center_lat (float): Epicentral latitude.
+
+    Returns:
+        tuple: xmin,xmax,ymin,ymax Extent of map.
+        tuple: Figure size (width,height) in inches.
+    """
     # define the map
     # first cope with stupid 180 meridian
     height = (gd.ymax-gd.ymin)*DEG2KM
@@ -150,7 +173,13 @@ def get_map_info(gd, center_lat):
     return (bounds, figsize)
 
 
-def draw_colorbar(fig, mmimap):
+def _draw_colorbar(fig, mmimap):
+    """Draw an MMI colorbar in a separate axis from the map.
+
+    Args:
+        fig (Figure): Matplotlib Figure object.
+        mmimap (ColorPalette): Impactutils MMI ColorPalette instance.
+    """
     # making up our own colorbar object here because the default
     # pyplot functionality doesn't seem to do the job.
     cax = fig.add_axes([0.1, 0.035, 0.8, 0.035])
@@ -178,7 +207,20 @@ def draw_colorbar(fig, mmimap):
     plt.xticks(locs, labels)
 
 
-def label_close_to_edge(x, y, xmin, xmax, ymin, ymax):
+def _label_close_to_edge(x, y, xmin, xmax, ymin, ymax):
+    """Determine if a contour label is within specified distance of map edge.
+
+    Args:
+        x (float): Proposed X coordinate map label.
+        y (float): Proposed Y coordinate map label.
+        xmin (float): Left edge of map.
+        xmax (float): Right edge of map.
+        ymin (float): Bottom edge of map.
+        ymax (float): Top edge of map.
+
+    Returns:
+        bool: True if label is "close" to edge of map.
+    """
     # get the map width/heights
     width = xmax - xmin
     height = ymax - ymin
@@ -192,7 +234,16 @@ def label_close_to_edge(x, y, xmin, xmax, ymin, ymax):
             dtop < height/MAP_FRAC or dbottom < height/MAP_FRAC)
 
 
-def draw_graticules(ax, xmin, xmax, ymin, ymax):
+def _draw_graticules(ax, xmin, xmax, ymin, ymax):
+    """Draw map graticules, tick labels on map axes.
+
+    Args:
+        ax (GeoAxes): Cartopy GeoAxes.
+        xmin (float): Left edge of map (degrees).
+        xmax (float): Right edge of map (degrees).
+        ymin (float): Bottom edge of map (degrees).
+        ymax (float): Bottom edge of map (degrees).
+    """
     gl = ax.gridlines(draw_labels=True,
                       linewidth=0.5, color='k',
                       alpha=0.5, linestyle='-',
@@ -205,21 +256,25 @@ def draw_graticules(ax, xmin, xmax, ymin, ymax):
 
     # create a dictionary with the intervals we want for a span
     # of degrees.
-    spans = {1: 4,
-             2: 4,
-             3: 2,
-             5: 2,
-             7: 0.5}
+    spans = {1: 0.25,
+             2: 0.5,
+             3: 1.0,
+             5: 1.0,
+             7: 2.0}
 
     span_keys = np.array(sorted(list(spans.keys())))
-    nearest_span_idx = np.argmin(int((xmax-xmin)) - span_keys)
+    nearest_span_idx = np.argmin(np.abs(int((xmax-xmin)) - span_keys))
     interval = spans[span_keys[nearest_span_idx]]
 
     # let's floor/ceil the edges to nearest 1/interval
-    gxmin = np.floor(xmin * interval) / interval
-    gxmax = np.ceil(xmax * interval) / interval
-    gymin = np.floor(ymin * interval) / interval
-    gymax = np.ceil(ymax * interval) / interval
+    # gxmin = np.floor(xmin * interval) / interval
+    # gxmax = np.ceil(xmax * interval) / interval
+    # gymin = np.floor(ymin * interval) / interval
+    # gymax = np.ceil(ymax * interval) / interval
+    gxmin = np.floor(xmin)
+    gxmax = np.ceil(xmax)
+    gymin = np.floor(ymin)
+    gymax = np.ceil(ymax)
 
     # check for meridian crossing
     crosses = False
@@ -228,8 +283,11 @@ def draw_graticules(ax, xmin, xmax, ymin, ymax):
         gxmax += 360
 
     # shakemap way
-    ylocs = np.arange(np.floor(gymin), np.ceil(gymax) + 1/interval, 1/interval)
-    xlocs = np.arange(np.floor(gxmin), np.ceil(gxmax) + 1/interval, 1/interval)
+    # ylocs = np.arange(np.floor(gymin), np.ceil(gymax) + interval, interval)
+    # xlocs = np.arange(np.floor(gxmin), np.ceil(gxmax) + interval, interval)
+    ylocs = np.arange(gymin, gymax+interval, interval)
+    xlocs = np.arange(gxmin, gxmax+interval, interval)
+
     if crosses:
         xlocs[xlocs > 180] -= 360
 
@@ -241,7 +299,16 @@ def draw_graticules(ax, xmin, xmax, ymin, ymax):
     gl.ylabel_style = {'size': 10, 'color': 'black'}
 
 
-def get_shaded(ptopo, contour_colormap):
+def _get_shaded(ptopo, contour_colormap):
+    """Get hill-shaded topo with topo colormap.
+
+    Args:
+        ptopo (ndarray): Projected topography numpy array.
+        contour_colormap (ColorPalette): Topography color palette object.
+
+    Returns:
+        ndarray: Hill-shaded topography RGB image.
+    """
     maxvalue = contour_colormap.vmax
     ls1 = LightSource(azdeg=300, altdeg=45)
     ls2 = LightSource(azdeg=45, altdeg=45)
@@ -258,12 +325,13 @@ def get_shaded(ptopo, contour_colormap):
     return draped_hsv
 
 
-def draw_title(imt, container, operator):
+def _draw_title(imt, container, operator):
     """Draw the map title.
     Args:
         imt (str): IMT that is being drawn on the map ('MMI', 'PGV',
             'PGA', 'SA(x.y)').
-        isContour (bool): If true, use input imt, otherwise use MMI.
+        container (ShakeMapOutputContainer): HDF container of ShakeMap output.
+        operator (str): Configured ShakeMap operator (NEIC, CISN, etc.)
     """
     # Add a title
     edict = container.getMetadata()['input']['event_information']
@@ -299,12 +367,15 @@ def draw_title(imt, container, operator):
     plt.title(tstr, fontsize=10, verticalalignment='bottom')
 
 
-def draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
+def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
     """Draw station locations on the map.
     Args:
-        ax (matplotlib Axes): Axes on which to draw stations.
+        ax (GeoAxes): Axes on which to draw stations.
+        stations (dict): Dictionary containing station data.
+        imt (str): IMT string.
+        intensity_colormap (ColorPalette): MMI color palette object.
+        geoproj (Proj): PlateCarree Pyproj Proj object.
         fill (bool): Whether or not to fill symbols.
-        imt (str): One of ('MMI', 'PGA', 'PGV', or 'SA(x.x)')
     """
     dimt = imt.lower()
 
@@ -403,11 +474,12 @@ def draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
                 markersize=6, zorder=STATIONS_ZORDER, transform=geoproj)
 
 
-def get_draped(data, topodata, colormap):
+def _get_draped(data, topodata, colormap):
     """Get array of data "draped" on topography.
     Args:
         data (ndarray): 2D Numpy array.
         topodata (ndarray): 2D Numpy array.
+        colormap (ColorPalette): MMI color palette object.
     Returns:
         ndarray: Numpy array of data draped on topography.
     """
@@ -438,13 +510,12 @@ def get_draped(data, topodata, colormap):
 def _clip_bounds(bbox, filename):
     """Clip input fiona-compatible vector file to input bounding box.
 
-    :param bbox:
-      Tuple of (xmin,ymin,xmax,ymax) desired clipping bounds.
-    :param filename:
-      Input name of file containing vector data in a format compatible
-      with fiona.
-    :returns:
-      Shapely Geometry object (Polygon or MultiPolygon).
+    Args:
+        bbox (tuple): (xmin,ymin,xmax,ymax) desired clipping bounds.
+        filename (str): Input name of file containing vector data in a
+                        format compatible with fiona.
+    Returns:
+      BaseGeometry: Shapely Polygon or MultiPolygon.
     """
     f = fiona.open(filename, 'r')
     shapes = list(f.items(bbox=bbox))
@@ -466,26 +537,20 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
                    borderfile=None, override_scenario=False):
     """Create a contour map showing MMI contours over greyscale population.
 
-    :param shakegrid:
-      ShakeGrid object.
-    :param popgrid:
-      Grid2D object containing population data.
-    :param oceanfile:
-      String path to file containing ocean vector data in a format compatible
-      with fiona.
-    :param oceangridfile:
-      String path to file containing ocean grid data .
-    :param outpath:
-      String path where output intensity.pdf and intensity.jpg files will
-      be made.
-    :param make_png:
-      Boolean indicating whether a PNG version of the file should also be
-      created in the same output folder as the PDF.
-    :returns:
-      Tuple containing:
-        - Name of PNG file created, or None if PNG output not specified.
-        - Cities object containing the cities that were rendered on the
-          contour map.
+    Args:
+        container (ShakeMapOutputContainer): HDF container of ShakeMap output.
+        topobase (Grid2D): Topography grid to trim and project.
+        oceanfile (str): Path to file containing ocean vector data in a
+                         format compatible with fiona.
+        outpath (str): Directory where output intensity.pdf and
+                       intensity.jpg files will be made.
+        operator (str): Configured ShakeMap operator (NEIC, CISN, etc.)
+        borderfile (str): Shapefile containing country/state borders.
+        override_scenario (bool): Turn off scenario watermark.
+
+    Returns:
+        str: Path to intensity PDF file.
+        str: Path to intensity JPG file.
     """
     # get the geodict for the ShakeMap
     comp = container.getComponents('MMI')[0]
@@ -504,7 +569,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     cities = allcities.limitByBounds((gd.xmin, gd.xmax, gd.ymin, gd.ymax))
 
     # get the map boundaries and figure size
-    bounds, figsize = get_map_info(gd, center_lat)
+    bounds, figsize = _get_map_info(gd, center_lat)
 
     # Create the MercatorMap object, which holds a separate but identical
     # axes object used to determine collisions between city labels.
@@ -529,7 +594,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     projstr = proj.proj4_init
 
     # get the projected MMI and topo grids
-    pmmigrid, ptopogrid = get_projected_grids(mmigrid, topobase, projstr)
+    pmmigrid, ptopogrid = _get_projected_grids(mmigrid, topobase, projstr)
 
     # get the projected geodict
     proj_gd = pmmigrid.getGeoDict()
@@ -540,7 +605,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # drape the intensity data over the topography
     pmmi_data = pmmigrid.getData()
     ptopo_data = ptopogrid.getData()
-    draped_hsv = get_draped(pmmi_data, ptopo_data, mmimap)
+    draped_hsv = _get_draped(pmmi_data, ptopo_data, mmimap)
 
     # set the image extent to that of the data (do we need this?)
     # set the axes border width
@@ -583,7 +648,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # draw the station data on the map
     stations = container.getStationDict()
 
-    draw_stations(ax, stations, 'MMI', mmimap, geoproj)
+    _draw_stations(ax, stations, 'MMI', mmimap, geoproj)
 
     # Draw the epicenter as a black star
     plt.sca(ax)
@@ -591,15 +656,22 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
              zorder=EPICENTER_ZORDER, transform=geoproj)
 
     # draw the map title
-    draw_title('MMI', container, operator)
+    _draw_title('MMI', container, operator)
 
     # is this event a scenario?
-    is_scenario = True
+    info = container.getMetadata()
+    etype = info['input']['event_information']['event_type']
+    is_scenario = etype == 'SCENARIO'
 
-    if is_scenario:
-        plt.text(center_lon, center_lat, 'SCENARIO', fontsize=64,
+    if is_scenario and not override_scenario:
+        plt.text(center_lon, center_lat, 'SCENARIO', fontsize=72,
                  zorder=SCENARIO_ZORDER, transform=geoproj,
-                 alpha=0.2, color='red', horizontalalignment='center')
+                 alpha=WATERMARK_ALPHA, color=WATERMARK_COLOR,
+                 horizontalalignment='center',
+                 verticalalignment='center',
+                 rotation=45,
+                 path_effects=[path_effects.Stroke(linewidth=1,
+                                                   foreground='black')])
 
     # draw the rupture polygon(s) in black, if not point rupture
     rupture = container.getRuptureObject()
@@ -609,10 +681,10 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
         ax.plot(lons, lats, 'k', lw=2, zorder=FAULT_ZORDER, transform=geoproj)
 
     # draw graticules, ticks, tick labels
-    draw_graticules(ax, *bounds)
+    _draw_graticules(ax, *bounds)
 
     # draw a separate intensity colorbar in a separate axes
-    draw_colorbar(fig, mmimap)
+    _draw_colorbar(fig, mmimap)
 
     # # make the map border thicker
     # the left/top edges don't line up here
@@ -633,8 +705,27 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
 
 
 def draw_contour(container, imtype, topobase, oceanfile, outpath,
-                 operator, filter_size, borderfile=None, is_scenario=False):
+                 operator, filter_size, borderfile=None,
+                 override_scenario=False):
+    """Draw IMT contour lines over hill-shaded topography.
 
+    Args:
+        container (ShakeMapOutputContainer): HDF container of ShakeMap output.
+        imtype (str): Type of IMT to be rendered.
+        topobase (Grid2D): Topography grid to trim and project.
+        oceanfile (str): Path to file containing ocean vector data in a
+                         format compatible with fiona.
+        outpath (str): Directory where output intensity.pdf and
+                       intensity.jpg files will be made.
+        operator (str): Configured ShakeMap operator (NEIC, CISN, etc.)
+        filter_size (str): Smoothing filter size for contouring algorithm.
+        borderfile (str): Shapefile containing country/state borders.
+        override_scenario (bool): Turn off scenario watermark.
+
+    Returns:
+        str: Path to intensity PDF file.
+        str: Path to intensity JPG file.
+    """
     comp = container.getComponents(imtype)[0]
     imtdict = container.getIMTGrids(imtype, comp)
     imtgrid = imtdict['mean']
@@ -650,7 +741,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     cities = allcities.limitByBounds((gd.xmin, gd.xmax, gd.ymin, gd.ymax))
 
     # get the map boundaries and figure size
-    bounds, figsize = get_map_info(gd, center_lat)
+    bounds, figsize = _get_map_info(gd, center_lat)
 
     # Create the MercatorMap object, which holds a separate but identical
     # axes object used to determine collisions between city labels.
@@ -670,7 +761,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     projstr = proj.proj4_init
 
     # get the projected MMI and topo grids
-    pimtgrid, ptopogrid = get_projected_grids(imtgrid, topobase, projstr)
+    pimtgrid, ptopogrid = _get_projected_grids(imtgrid, topobase, projstr)
 
     # get the projected geodict
     proj_gd = pimtgrid.getGeoDict()
@@ -686,7 +777,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     # get the draped topo data
     topo_colormap = ColorPalette.fromPreset('shaketopo')
-    hillshade = get_shaded(ptopogrid.getData(), topo_colormap)
+    hillshade = _get_shaded(ptopogrid.getData(), topo_colormap)
 
     # draw the draped intensity data
     plt.sca(ax)
@@ -723,7 +814,6 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     npoints = []
     for contour_object in contour_objects:
         props = contour_object['properties']
-        lw = props['weight']
         multi_lines = sShape(contour_object['geometry'])
         pmulti_lines = proj.project_geometry(multi_lines, src_crs=geoproj)
         for multi_line in pmulti_lines:
@@ -757,12 +847,10 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
                     zorder=CONTOUR_ZORDER)
             if len(x) > min_npoints:
                 # try to label each segment with black text in a white box
-                # xc, yc = choose_label_vertex(x, y, proj_gd.xmin, proj_gd.xmax,
-                #                              proj_gd.ymin, proj_gd.ymax)
                 xc = x[int(len(x)/3)]
                 yc = y[int(len(y)/3)]
-                if label_close_to_edge(xc, yc, proj_gd.xmin, proj_gd.xmax,
-                                       proj_gd.ymin, proj_gd.ymax):
+                if _label_close_to_edge(xc, yc, proj_gd.xmin, proj_gd.xmax,
+                                        proj_gd.ymin, proj_gd.ymax):
                     continue
                 # TODO: figure out if box is going to go outside the map, if so
                 # choose a different point on the line.
@@ -791,7 +879,27 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     ax.add_feature(states_provinces, edgecolor='black', zorder=COAST_ZORDER)
 
     # draw graticules, ticks, tick labels
-    draw_graticules(ax, *bounds)
+    _draw_graticules(ax, *bounds)
+
+    # is this event a scenario?
+    info = container.getMetadata()
+    etype = info['input']['event_information']['event_type']
+    is_scenario = etype == 'SCENARIO'
+
+    # Retrieve the epicenter - this will get used on the map
+    origin = container.getRuptureObject().getOrigin()
+    center_lat = origin.lat
+    center_lon = origin.lon
+
+    if is_scenario and not override_scenario:
+        plt.text(center_lon, center_lat, 'SCENARIO', fontsize=72,
+                 zorder=SCENARIO_ZORDER, transform=geoproj,
+                 alpha=WATERMARK_ALPHA, color=WATERMARK_COLOR,
+                 horizontalalignment='center',
+                 verticalalignment='center',
+                 rotation=45,
+                 path_effects=[path_effects.Stroke(linewidth=1,
+                                                   foreground='black')])
 
     # Draw the map scale in the unoccupied lower corner.
     corner = 'll'
@@ -800,6 +908,11 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     # draw cities
     mmap.drawCities(shadow=True, zorder=CITIES_ZORDER,
                     draw_dots=True)
+
+    # Draw the epicenter as a black star
+    plt.sca(ax)
+    plt.plot(center_lon, center_lat, 'k*', markersize=16,
+             zorder=EPICENTER_ZORDER, transform=geoproj)
 
     # draw the rupture polygon(s) in black, if not point rupture
     rupture = container.getRuptureObject()
@@ -811,12 +924,12 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     # draw the station data on the map
     stations = container.getStationDict()
     mmimap = ColorPalette.fromPreset('mmi')
-    draw_stations(ax, stations, imtype, mmimap, geoproj)
+    _draw_stations(ax, stations, imtype, mmimap, geoproj)
 
-    draw_title(imtype, container, operator)
+    _draw_title(imtype, container, operator)
 
     # draw a separate intensity colorbar in a separate axes
-    draw_colorbar(fig, mmimap)
+    _draw_colorbar(fig, mmimap)
 
     # save plot to file
     fileimt = oq_to_file(imtype)

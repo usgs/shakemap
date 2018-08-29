@@ -1254,7 +1254,16 @@ class ModelModule(CoreModule):
         # This AND locaction?
         info[ip][ei]['event_description'] = origin.locstring
         # This AND src_mech?
-        info[ip][ei]['event_type'] = origin.mech
+        # look at the origin information for indications that this
+        # event is a scenario
+        condition1 = hasattr(
+            origin, 'event_type') and origin.event_type.lower() == 'scenario'
+        condition2 = origin.id.endswith('_se')
+        if condition1 or condition2:
+            info[ip][ei]['event_type'] = 'SCENARIO'
+        else:
+            info[ip][ei]['event_type'] = 'ACTUAL'
+
         info[op] = {}
         info[op][gm] = {}
         for myimt in self.imt_out_set:

@@ -160,9 +160,11 @@ def main(args):
             network = ''
 
         eventid = args.eventid
+        event_type = 'ACTUAL'
         if not args.no_scenario:
             if not args.eventid.endswith('_se'):
                 eventid = eventid + '_se'
+                event_type = 'SCENARIO'
 
         edict = {
             'id': eventid,
@@ -173,6 +175,7 @@ def main(args):
             'lon': lon,
             'depth': depth,
             'mag': mag,
+            'event_type': event_type,
             'locstring': locstring
         }
         detail = None
