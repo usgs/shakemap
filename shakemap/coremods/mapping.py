@@ -1,37 +1,11 @@
-# stdlib
+# stdlib imports
 import os.path
-import time
-from datetime import datetime
 from collections import OrderedDict
 
 # third party
-import fiona
-
 from configobj import ConfigObj
-
-from matplotlib.colors import LightSource
-import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
-import matplotlib.patheffects as path_effects
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-
-import matplotlib
-
-from PIL import Image
-
-from shapely.geometry import MultiPolygon
-from shapely.geometry import MultiLineString
-from shapely.geometry import LineString
-from shapely.geometry import GeometryCollection
-from shapely.geometry import Polygon as sPolygon
-from shapely.geometry import shape as sShape
-
-import numpy as np
-from descartes import PolygonPatch
-from scipy.ndimage import gaussian_filter
-
-from openquake.hazardlib import imt
+from mapio.gmt import GMTGrid
+from mapio.geodict import GeoDict
 
 # local imports
 # from mapio.gmt import GMTGrid
@@ -46,56 +20,14 @@ from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture.factory import rupture_from_dict_and_origin
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.plotting.contour import getContourLevels
+
+
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
 from .base import CoreModule
-from impactutils.time.ancient_time import HistoricTime
-from shakemap.utils.utils import get_object_from_config
-from shakelib.rupture import constants
-
-
-CITY_COLS = 2
-CITY_ROWS = 2
-CITIES_PER_GRID = 10
-FIG_WIDTH = 8
-FIG_HEIGHT = 8
-BASEMAP_RESOLUTION = 'c'
-WATERCOLOR = '#7AA1DA'
-NCONTOURS = 6
-VERT_EXAG = 0.1
-
-# all of the zorder values for different plotted parameters
-# elements with a higher zorder will plot on top of lower elements.
-IMG_ZORDER = 1
-ROAD_ZORDER = 5
-CONTOUR_ZORDER = 800
-DASHED_CONTOUR_ZORDER = 1002
-OCEAN_ZORDER = 1000
-BORDER_ZORDER = 1001
-FAULT_ZORDER = 1100
-EPICENTER_ZORDER = 1100
-STATIONS_ZORDER = 1150
-CITIES_ZORDER = 1200
-GRATICULE_ZORDER = 1200
-SCALE_ZORDER = 1500
-SCENARIO_ZORDER = 2000
-
-THUMBNAIL_WIDTH_PIXELS = 800
-
-MMI_LABELS = {
-    '1': 'I',
-    '2': 'II',
-    '3': 'III',
-    '4': 'IV',
-    '5': 'V',
-    '6': 'VI',
-    '7': 'VII',
-    '8': 'VIII',
-    '9': 'IX',
-    '10': 'X'
-}
+from shakemap.mapping.mapmaker import (draw_intensity, draw_contour)
 
 
 class MappingModule(CoreModule):
@@ -190,29 +122,65 @@ class MappingModule(CoreModule):
         # create contour files
         self.logger.debug('Mapping...')
 
-        # get all of the pieces needed for the mapmaker
-        layerdict = {}
+        # get the contour filter_size setting from config
+        # get the path to the products.conf file, load the config
+        config_file = os.path.join(install_path, 'config', 'products.conf')
+        spec_file = get_configspec('products')
+        validator = get_custom_validator()
+        config = ConfigObj(config_file, configspec=spec_file)
+        results = config.validate(validator)
+        if not isinstance(results, bool) or not results:
+            config_error(config, results)
+
+        # get the filter size from the products.conf
+        filter_size = config['products']['contour']['filter_size']
+
+        # get the operator setting from config
+        operator = config['products']['mapping']['operator']
+
+        # get all of the pieces needed for the mapping functions
         layers = config['products']['mapping']['layers']
-        layerdict['coast'] = layers['coasts']
-        layerdict['ocean'] = layers['oceans']
-        layerdict['lake'] = layers['lakes']
-        layerdict['country'] = layers['countries']
-        layerdict['state'] = layers['states']
+        oceanfile = layers['oceans']
         topofile = layers['topography']
-        cities = layers['cities']
-        mapmaker = MapMaker(container, topofile, layerdict, cities,
-                            self.logger,
-                            config['products']['mapping']['operator'])
+
+        # Reading HDF5 files currently takes a long time, due to poor programming
+        # in MapIO.  To save us some time until that issue is resolved, we'll
+        # coarsely subset the topo grid once here and pass it into both
+        # mapping functions
+        # get the bounds of the map
+        info = container.getMetadata()
+        xmin = info['output']['map_information']['min']['longitude']
+        xmax = info['output']['map_information']['max']['longitude']
+        ymin = info['output']['map_information']['min']['latitude']
+        ymax = info['output']['map_information']['max']['latitude']
+        xmin = float(xmin) - 0.1
+        xmax = float(xmax) + 0.1
+        ymin = float(ymin) - 0.1
+        ymax = float(ymax) + 0.1
+        dy = float(info['output']['map_information']
+                   ['grid_spacing']['latitude'])
+        dx = float(info['output']['map_information']
+                   ['grid_spacing']['longitude'])
+        sampledict = GeoDict.createDictFromBox(xmin, xmax, ymin, ymax, dx, dy)
+        topogrid = GMTGrid.load(
+            topofile, samplegeodict=sampledict, resample=False)
 
         imtlist = container.getIMTs()
         for imtype in imtlist:
             component, imtype = imtype.split('/')
             if imtype == 'MMI':
                 self.logger.debug('Drawing intensity map...')
-                intensity_map = mapmaker.drawIntensityMap(datadir)
-                self.logger.debug('Created intensity map %s' % intensity_map)
+                intensity_pdf, _ = draw_intensity(container,
+                                                  topogrid,
+                                                  oceanfile,
+                                                  datadir,
+                                                  operator)
+                self.logger.debug('Created intensity map %s' % intensity_pdf)
             else:
                 self.logger.debug('Drawing %s contour map...' % imtype)
+
+
+<< << << < HEAD
                 contour_file = mapmaker.drawContourMap(imtype, datadir)
                 self.logger.debug('Created contour map %s' % contour_file)
 
@@ -1437,3 +1405,15 @@ def _save_jpg(fig, filename):
     image = image.reshape(height, width, 3)
     img = Image.fromarray(image, 'RGB')
     img.save(filename)
+=======
+                contour_pdf, contour_png = draw_contour(container,
+                                                        imtype, topogrid,
+                                                        oceanfile,
+                                                        datadir,
+                                                        operator, filter_size,
+                                                        is_scenario=False)
+                self.logger.debug('Created contour map %s' % contour_pdf)
+                print('Finished %s' % imtype)
+
+        container.close()
+>>>>>>> Intermediate commit;Added new mapmaker module and test script;Removed cmd line options from contour coremod;Updated mapping to use new mapmaker module;Updated products.conf to include contour filter_size
