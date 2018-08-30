@@ -126,7 +126,7 @@ class ContourModule(CoreModule):
                                       'gridded data, not sets of points')
 
         # get the filter size from the products.conf
-        filter_size = config['contour']['filter_size']
+        filter_size = config['products']['contour']['filter_size']
 
         # create contour files
         self.logger.debug('Contouring to files...')

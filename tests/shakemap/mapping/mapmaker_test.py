@@ -7,6 +7,9 @@ import shutil
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakemap.mapping.mapmaker import draw_intensity, draw_contour
 
+from mapio.gmt import GMTGrid
+from mapio.geodict import GeoDict
+
 
 def test_mapmaker_intensity():
     homedir = os.path.dirname(os.path.abspath(
@@ -18,19 +21,37 @@ def test_mapmaker_intensity():
     container = ShakeMapOutputContainer.load(out_file)
     topofile = os.path.join(homedir, '..', '..', 'data', 'install', 'data',
                             'mapping', 'CA_topo.grd')
+
+    info = container.getMetadata()
+    xmin = info['output']['map_information']['min']['longitude']
+    xmax = info['output']['map_information']['max']['longitude']
+    ymin = info['output']['map_information']['min']['latitude']
+    ymax = info['output']['map_information']['max']['latitude']
+    xmin = float(xmin) - 0.1
+    xmax = float(xmax) + 0.1
+    ymin = float(ymin) - 0.1
+    ymax = float(ymax) + 0.1
+    dy = float(info['output']['map_information']
+               ['grid_spacing']['latitude'])
+    dx = float(info['output']['map_information']
+               ['grid_spacing']['longitude'])
+    sampledict = GeoDict.createDictFromBox(xmin, xmax, ymin, ymax, dx, dy)
+    topogrid = GMTGrid.load(topofile,
+                            samplegeodict=sampledict,
+                            resample=False)
+
     oceanfile = os.path.join(homedir, '..', '..', 'data', 'install', 'data',
                              'mapping', 'northridge_ocean.json')
-    tdir = mkdtemp()
-    basename = os.path.join(tdir, 'testmap')
-    basename = os.path.join(os.path.expanduser('~'), 'testmap')
+    outpath = mkdtemp()
+
     try:
-        pdf, png, cities = draw_intensity(container, topofile,
-                                          oceanfile, basename, 'NEIC')
+        pdf, png = draw_intensity(container, topogrid, oceanfile,
+                                  outpath, 'NEIC')
         print(pdf)
     except Exception:
         assert 1 == 2
     finally:
-        shutil.rmtree(tdir)
+        shutil.rmtree(outpath)
 
 
 def test_mapmaker_contour():
@@ -43,23 +64,37 @@ def test_mapmaker_contour():
     container = ShakeMapOutputContainer.load(out_file)
     topofile = os.path.join(homedir, '..', '..', 'data', 'install', 'data',
                             'mapping', 'CA_topo.grd')
+
+    info = container.getMetadata()
+    xmin = info['output']['map_information']['min']['longitude']
+    xmax = info['output']['map_information']['max']['longitude']
+    ymin = info['output']['map_information']['min']['latitude']
+    ymax = info['output']['map_information']['max']['latitude']
+    xmin = float(xmin) - 0.1
+    xmax = float(xmax) + 0.1
+    ymin = float(ymin) - 0.1
+    ymax = float(ymax) + 0.1
+    dy = float(info['output']['map_information']
+               ['grid_spacing']['latitude'])
+    dx = float(info['output']['map_information']
+               ['grid_spacing']['longitude'])
+    sampledict = GeoDict.createDictFromBox(xmin, xmax, ymin, ymax, dx, dy)
+    topogrid = GMTGrid.load(topofile,
+                            samplegeodict=sampledict,
+                            resample=False)
+
     oceanfile = os.path.join(homedir, '..', '..', 'data', 'install', 'data',
                              'mapping', 'northridge_ocean.json')
-    tdir = mkdtemp()
-    # basename = os.path.join(tdir, 'testmap')
-    basename = os.path.join(os.path.expanduser('~'), 'testmap')
+    outpath = mkdtemp()
     filter_size = 10
     try:
-        pdf = draw_contour(container, 'PGA', topofile, oceanfile, basename,
-                           'NEIC', filter_size, borderfile=None,
-                           is_scenario=False)
+        pdf, png = draw_contour(container, 'PGA', topogrid, oceanfile,
+                                outpath, 'NEIC', filter_size)
         print(pdf)
-        print()
-    except Exception as e:
-        print(e)
+    except Exception:
         assert 1 == 2
     finally:
-        shutil.rmtree(tdir)
+        shutil.rmtree(outpath)
 
 
 if __name__ == '__main__':
