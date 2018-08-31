@@ -16,10 +16,10 @@ import numpy as np
 TABLES = OrderedDict((
     ('station',
      OrderedDict((
-         ('id', 'str primary key'),  # id is net.sta
-         ('network', 'str'),
-         ('code', 'str'),
-         ('name', 'str'),
+         ('id', 'text primary key'),  # id is net.sta
+         ('network', 'text'),
+         ('code', 'text'),
+         ('name', 'text'),
          ('lat', 'float'),
          ('lon', 'float'),
          ('elev', 'float'),
@@ -31,19 +31,19 @@ TABLES = OrderedDict((
     ('imt',
      OrderedDict((
          ('id', 'integer primary key'),
-         ('imt_type', 'str')
+         ('imt_type', 'text')
      ))
      ),
     ('amp',
      OrderedDict((
          ('id', 'integer primary key'),
-         ('station_id', 'str'),
+         ('station_id', 'text'),
          ('imt_id', 'int'),
-         ('original_channel', 'str'),
-         ('orientation', 'str'),
+         ('original_channel', 'text'),
+         ('orientation', 'text'),
          ('amp', 'float'),
          ('stddev', 'float'),
-         ('flag', 'str')
+         ('flag', 'text')
      ))
      )
 ))
@@ -361,13 +361,9 @@ class StationList(object):
         sta_rows = self.cursor.fetchall()
 
         for sta in sta_rows:
-            if str(sta[2]).startswith(sta[1] + '.'):
-                myid = str(sta[2])
-            else:
-                myid = sta[1] + '.' + str(sta[2])
             feature = {
                 'type': 'Feature',
-                'id': myid,
+                'id': sta[0],
                 'properties': {
                     'code': str(sta[2]),
                     'name': sta[3],
