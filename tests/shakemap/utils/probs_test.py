@@ -109,10 +109,9 @@ def test_probs():
 
     org.depth = 20.0
     gmmodel, strec_results = get_weights(org, config)
-    assert np.allclose(gmmodel['weightlist'], [0.63, 0.3, 0.07])
+    assert np.allclose(gmmodel['weightlist'], [0.7, 0.3])
     assert gmmodel['gmpelist'] == ['subduction_crustal',
-                                   'subduction_interface_nshmp2014',
-                                   'subduction_slab_nshmp2014']
+                                   'subduction_interface_nshmp2014']
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'
     assert gmmodel['ccf'] == 'LB13'
