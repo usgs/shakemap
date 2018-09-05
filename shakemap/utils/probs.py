@@ -353,6 +353,29 @@ def get_subduction_probs(strec_results, depth, mag, config,
 
         # Calculate combined probability of interface
         p_int = p_int_hypo * p_int_kagan * p_int_sz
+
+        # Calculate probability that the earthquake lies above the slab
+        # and is thus crustal.
+        x1 = subcfg['p_crust_slab']['x1']
+        x2 = subcfg['p_crust_slab']['x2']
+        p1 = subcfg['p_crust_slab']['p1']
+        p2 = subcfg['p_crust_slab']['p2']
+
+        p_crust_slab = get_probability((depth - slab_depth), x1, p1, x2, p2)
+
+        # Calculate probability that the earthquake lies within the crust
+        x1 = subcfg['p_crust_hypo']['x1']
+        x2 = subcfg['p_crust_hypo']['x2']
+        p1 = subcfg['p_crust_hypo']['p1']
+        p2 = subcfg['p_crust_hypo']['p2']
+        p_crust_hypo = get_probability(depth, x1, p1, x2, p2)
+
+        # Calculate probability of crustal
+        p_crustal = (1 - p_int) * p_crust_slab * p_crust_hypo
+
+        # Calculate probability of intraslab
+        p_slab = 1 - (p_int + p_crustal)
+
     else:
         slab_depth = subcfg['default_slab_depth']
         # Calculate the probability that an earthquake is interface
@@ -387,27 +410,12 @@ def get_subduction_probs(strec_results, depth, mag, config,
         # and 1 at large magnitudes.
         p_int = p_int_depth + (1 - p_int_depth)*p_int_mag
 
-    # Calculate probability that the earthquake lies above the slab
-    # and is thus crustal.
-    x1 = subcfg['p_crust_slab']['x1']
-    x2 = subcfg['p_crust_slab']['x2']
-    p1 = subcfg['p_crust_slab']['p1']
-    p2 = subcfg['p_crust_slab']['p2']
-
-    p_crust_slab = get_probability((depth - slab_depth), x1, p1, x2, p2)
-
-    # Calculate probability that the earthquake lies within the crust
-    x1 = subcfg['p_crust_hypo']['x1']
-    x2 = subcfg['p_crust_hypo']['x2']
-    p1 = subcfg['p_crust_hypo']['p1']
-    p2 = subcfg['p_crust_hypo']['p2']
-    p_crust_hypo = get_probability(depth, x1, p1, x2, p2)
-
-    # Calculate probability of crustal
-    p_crustal = (1 - p_int) * p_crust_slab * p_crust_hypo
-
-    # Calculate probability of intraslab
-    p_slab = 1 - (p_int + p_crustal)
+        if depth > slab_depth:
+            p_crustal = 0.0
+            p_slab = 1 - p_int
+        else:
+            p_crustal = 1 - p_int
+            p_slab = 0.0
 
     probs = {
         'crustal': p_crustal,
