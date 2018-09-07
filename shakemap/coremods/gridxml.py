@@ -152,7 +152,7 @@ class GridXMLModule(CoreModule):
                     field_keys['STD' + imt_field] = (units, digits)
 
             if xml_type == 'grid':
-                grid_data, vs30_metadata = container.getArray([], 'vs30')
+                grid_data, _ = container.getArray([], 'vs30')
                 units = metadata['units']
                 digits = metadata['digits']
                 layers['SVEL'] = grid_data

@@ -1640,7 +1640,6 @@ class ModelModule(CoreModule):
             std_layername, units, digits = _get_layer_info(key + '_sd')
             std_metadata['units'] = units
             std_metadata['digits'] = digits
-            self.outsd[key]
             oc.setIMTGrids(key, value, metadata, self.outsd[key],
                            std_metadata, component)
         #

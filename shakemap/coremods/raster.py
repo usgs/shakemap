@@ -76,7 +76,7 @@ class RasterModule(CoreModule):
 
         files_written = []
         for layer in layers:
-            component, layer = layer.split('/')
+            _, layer = layer.split('/')
             fileimt = oq_to_file(layer)
             # This is a bit hacky -- we only produce the raster for the
             # first IMC returned. It should work as long as we only have
