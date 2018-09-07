@@ -3,14 +3,13 @@
 import os
 import os.path
 
-import pytest
 import numpy as np
 
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.model import ModelModule
 from shakemap.coremods.assemble import AssembleModule
 from shakemap.coremods.plotregr import PlotRegr
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from common import clear_files, set_files
 
 ########################################################################
@@ -101,7 +100,7 @@ def test_directivity():
     hdf_file = os.path.join(event_path, 'products', 'shake_result.hdf')
     oc = ShakeMapOutputContainer.load(hdf_file)
     sa3 = np.exp(oc.getIMTGrids(
-        'SA(3.0)', 'GREATER_OF_TWO_HORIZONTAL')['mean'].getData())
+        'SA(3.0)', 'GREATER_OF_TWO_HORIZONTAL')['mean'])
     np.testing.assert_allclose(np.max(sa3), 1.15864273)
     np.testing.assert_allclose(np.min(sa3), 0.9278920)
 

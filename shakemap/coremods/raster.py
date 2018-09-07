@@ -4,8 +4,10 @@ import zipfile
 from collections import OrderedDict
 
 # third party imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from mapio.gdal import GDALGrid
+from mapio.geodict import GeoDict
+from mapio.grid2d import Grid2D
 
 # local imports
 from .base import CoreModule
@@ -74,14 +76,17 @@ class RasterModule(CoreModule):
 
         files_written = []
         for layer in layers:
+            _, layer = layer.split('/')
             fileimt = oq_to_file(layer)
             # This is a bit hacky -- we only produce the raster for the
             # first IMC returned. It should work as long as we only have
             # one IMC produced per ShakeMap run.
             imclist = container.getComponents(layer)
             imtdict = container.getIMTGrids(layer, imclist[0])
-            mean_grid = imtdict['mean']
-            std_grid = imtdict['std']
+            mean_grid = Grid2D(imtdict['mean'],
+                               GeoDict(imtdict['mean_metadata']))
+            std_grid = Grid2D(imtdict['std'],
+                              GeoDict(imtdict['std_metadata']))
             mean_gdal = GDALGrid.copyFromGrid(mean_grid)
             std_gdal = GDALGrid.copyFromGrid(std_grid)
             mean_fname = os.path.join(datadir, '%s_mean.flt' % fileimt)

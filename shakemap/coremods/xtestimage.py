@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # neic imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
 from shakemap.utils.config import get_config_paths
@@ -68,9 +68,8 @@ class XTestImage(CoreModule):
             # Do the ground motion plots
             #
             data = datadict[myimt]
-            gridobj = data['mean']
-            grddata = gridobj.getData()
-            metadata = gridobj.getGeoDict().asDict()
+            grddata = data['mean']
+            metadata = data['mean_metadata']
 
             fig = plt.figure(figsize=(10, 10))
             gs = plt.GridSpec(4, 4, hspace=0.2, wspace=0.1)
@@ -104,8 +103,7 @@ class XTestImage(CoreModule):
             #
             # Do the stddev plots
             #
-            gridobj = data['std']
-            grddata = gridobj.getData()
+            grddata = data['std']
 
             fig = plt.figure(figsize=(10, 10))
             gs = plt.GridSpec(4, 4, hspace=0.2, wspace=0.1)

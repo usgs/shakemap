@@ -18,7 +18,7 @@ from shakemap.utils.config import get_config_paths
 from shakemap.utils.logging import get_logging_config
 from shakelib.plotting.contour import contour
 from shakemap.utils.utils import get_object_from_config
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
 
 FORMATS = {
@@ -164,8 +164,6 @@ def contour_to_files(container, output_dir, logger,
         LookupError: When configured file format is not supported
     """
 
-    imtlist = container.getIMTs()
-
     # Right now geojson is all we support; if that changes, we'll have
     # to add a configuration or command-line option
     file_format = 'geojson'
@@ -201,10 +199,11 @@ def contour_to_files(container, output_dir, logger,
     gmice_imts = gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
     gmice_pers = gmice.DEFINED_FOR_SA_PERIODS
 
+    imtlist = container.getIMTs()
     for imtype in imtlist:
+        component, imtype = imtype.split('/')
         fileimt = oq_to_file(imtype)
         oqimt = imt.from_string(imtype)
-        component = container.getComponents(imtype)[0]
         if component == 'GREATER_OF_TWO_HORIZONTAL':
             fname = 'cont_%s.%s' % (fileimt, extension)
         else:

@@ -15,7 +15,7 @@ from shakemap.coremods.mapping import MapMaker
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.assemble import AssembleModule
 from shakemap.coremods.model import ModelModule
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakemap.utils.config import (get_configspec,
                                    get_custom_validator,
                                    config_error)
@@ -105,7 +105,7 @@ def test_mapmaker():
         'time': HistoricTime.utcfromtimestamp(time.time())
     })
     rupt = get_rupture(origin)
-    container.setRupture(rupt)
+    container.setRuptureDict(rupt._geojson)
     mapmod = MapMaker(container, topofile, layerdict, cities, logger,
                       config['products']['mapping']['operator'])
 

@@ -7,8 +7,9 @@ from collections import OrderedDict
 
 # third party imports
 import numpy as np
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from mapio.shake import ShakeGrid
+from mapio.geodict import GeoDict
 
 # local imports
 from .base import CoreModule
@@ -124,15 +125,14 @@ class GridXMLModule(CoreModule):
                 imt_field = _oq_to_gridxml(gridname)
                 imtdict = container.getIMTGrids(gridname, COMPONENT)
                 if xml_type == 'grid':
-                    grid = imtdict['mean']
+                    grid_data = imtdict['mean']
                     metadata = imtdict['mean_metadata']
                 elif xml_type == 'uncertainty':
-                    grid = imtdict['std']
+                    grid_data = imtdict['std']
                     metadata = imtdict['std_metadata']
 
                 units = metadata['units']
                 digits = metadata['digits']
-                grid_data = grid.getData()
                 # convert from HDF units to legacy grid.xml units
                 if xml_type == 'grid':
                     if units == 'ln(cm/s)':
@@ -152,14 +152,13 @@ class GridXMLModule(CoreModule):
                     field_keys['STD' + imt_field] = (units, digits)
 
             if xml_type == 'grid':
-                gridobj, metadata = container.getGrid('vs30')
-                grid_data = gridobj.getData()
+                grid_data, _ = container.getArray([], 'vs30')
                 units = metadata['units']
                 digits = metadata['digits']
                 layers['SVEL'] = grid_data
                 field_keys['SVEL'] = (units, digits)
 
-            geodict = grid.getGeoDict()
+            geodict = GeoDict(metadata)
 
             config = container.getConfig()
 

@@ -6,7 +6,7 @@ import os.path
 import matplotlib.pyplot as plt
 
 # neic imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
 from shakemap.utils.config import get_config_paths

@@ -35,9 +35,11 @@ from openquake.hazardlib import imt
 
 # local imports
 from mapio.gmt import GMTGrid
+from mapio.geodict import GeoDict
+from mapio.grid2d import Grid2D
 from impactutils.colors.cpalette import ColorPalette
 from mapio.basemapcity import BasemapCities
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.rupture.origin import Origin
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture.factory import rupture_from_dict_and_origin
@@ -203,6 +205,7 @@ class MappingModule(CoreModule):
 
         imtlist = container.getIMTs()
         for imtype in imtlist:
+            component, imtype = imtype.split('/')
             if imtype == 'MMI':
                 self.logger.debug('Drawing intensity map...')
                 intensity_map = mapmaker.drawIntensityMap(datadir)
@@ -221,7 +224,7 @@ class MappingModule(CoreModule):
             return
         component = components[0]
         imt_dict = container.getIMTGrids('PGA', component)
-        im = plt.imshow(imt_dict['std'].getData(), interpolation='none',
+        im = plt.imshow(imt_dict['std'], interpolation='none',
                         cmap='jet', vmin=0, vmax=1.25)
         plt.title('PGA Standard Deviation')
         ax = plt.gca()  # get the current axes object
@@ -417,7 +420,7 @@ class MapMaker(object):
         # returns a list of GeoJSON-like mapping objects
         comp = self.container.getComponents('MMI')[0]
         imtdict = self.container.getIMTGrids('MMI', comp)
-        geodict = imtdict['mean'].getGeoDict()
+        geodict = GeoDict(imtdict['mean_metadata'])
         xmin, xmax, ymin, ymax = (geodict.xmin, geodict.xmax,
                                   geodict.ymin, geodict.ymax)
         bbox = (xmin, ymin, xmax, ymax)
@@ -949,7 +952,7 @@ class MapMaker(object):
         # get the geodict for the ShakeMap
         comp = self.container.getComponents('MMI')[0]
         imtdict = self.container.getIMTGrids('MMI', comp)
-        mmigrid = imtdict['mean']
+        mmigrid = Grid2D(imtdict['mean'], GeoDict(imtdict['mean_metadata']))
         smdict = mmigrid.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
         sampledict = topodict.getBoundsWithin(smdict)
@@ -1150,7 +1153,7 @@ class MapMaker(object):
         # get the geodict for the ShakeMap
         comp = self.container.getComponents(imtype)[0]
         imtdict = self.container.getIMTGrids(imtype, comp)
-        imtgrid = imtdict['mean']
+        imtgrid = Grid2D(imtdict['mean'], GeoDict(imtdict['mean_metadata']))
         smdict = imtgrid.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
         sampledict = topodict.getBoundsWithin(smdict)

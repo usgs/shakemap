@@ -2,7 +2,7 @@
 
 import os.path
 
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakemap.mapping.mapmaker import draw_intensity
 
 

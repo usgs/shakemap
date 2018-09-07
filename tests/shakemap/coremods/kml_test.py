@@ -14,7 +14,7 @@ from shakemap.utils.config import (get_config_paths,
                                    get_custom_validator,
                                    config_error)
 from shakemap.coremods.kml import (create_kmz)
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 
 def test_create_kmz():
@@ -58,7 +58,7 @@ def test_create_kmz():
                                  'Instrumented Stations',
                                  'Macroseismic Stations']
         assert nstations == 185
-        assert nmmi == 977
+        assert nmmi == 547
         myzip.close()
 
     except Exception as e:
