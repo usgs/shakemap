@@ -153,17 +153,23 @@ class MappingModule(CoreModule):
         xmax = info['output']['map_information']['max']['longitude']
         ymin = info['output']['map_information']['min']['latitude']
         ymax = info['output']['map_information']['max']['latitude']
-        xmin = float(xmin) - 0.1
-        xmax = float(xmax) + 0.1
-        ymin = float(ymin) - 0.1
-        ymax = float(ymax) + 0.1
         dy = float(info['output']['map_information']
                    ['grid_spacing']['latitude'])
         dx = float(info['output']['map_information']
                    ['grid_spacing']['longitude'])
-        sampledict = GeoDict.createDictFromBox(xmin, xmax, ymin, ymax, dx, dy)
-        topogrid = GMTGrid.load(
-            topofile, samplegeodict=sampledict, resample=False)
+        padx = 5*dx
+        pady = 5*dy
+        sxmin = float(xmin) - padx
+        sxmax = float(xmax) + padx
+        symin = float(ymin) - pady
+        symax = float(ymax) + pady
+
+        sampledict = GeoDict.createDictFromBox(sxmin, sxmax,
+                                               symin, symax,
+                                               dx, dy)
+        topogrid = GMTGrid.load(topofile,
+                                samplegeodict=sampledict,
+                                resample=False)
 
         imtlist = container.getIMTs()
         for imtype in imtlist:
