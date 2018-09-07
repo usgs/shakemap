@@ -31,12 +31,9 @@ from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.utils.containers import ShakeMapInputContainer
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.utils.distance import geodetic_distance_fast
 from shakelib.rupture import constants
-
-from mapio.geodict import GeoDict
-from mapio.grid2d import Grid2D
 
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.utils import get_object_from_config
@@ -324,12 +321,12 @@ class ModelModule(CoreModule):
         # store it in the output container
         #
         info = self._getInfo(moutgrid)
-        oc.setDictionary('info.json', info)
+        oc.setMetadata(info)
 
         # ---------------------------------------------------------------------
         # Add the rupture JSON as a text string
         # ---------------------------------------------------------------------
-        oc.setRupture(self.rupture_obj)
+        oc.setRuptureDict(self.rupture_obj._geojson)
 
         # ---------------------------------------------------------------------
         # Fill the station dictionary for stationlist.json and add it to
@@ -1603,72 +1600,58 @@ class ModelModule(CoreModule):
         metadata['ny'] = self.smny
         metadata['dx'] = self.smdx
         metadata['dy'] = self.smdy
-        gdict = GeoDict(metadata)
         #
         # Put the Vs30 grid in the output container
         #
         _, units, digits = _get_layer_info('vs30')
-        vs30 = Grid2D(self.sx_out.vs30, gdict)
-        vs30_metadata = {}
-        vs30_metadata['units'] = units
-        vs30_metadata['digits'] = digits
-        oc.setGrid('vs30', vs30, metadata=vs30_metadata)
+        metadata['units'] = units
+        metadata['digits'] = digits
+        oc.setArray([], 'vs30', self.sx_out.vs30, metadata=metadata)
         #
         # Now do the distance grids
         #
-        dist_metadata = {}
-        dist_metadata['units'] = 'km'
-        dist_metadata['digits'] = 4
+        metadata['units'] = 'km'
+        metadata['digits'] = 4
         for dm in get_distance_measures():
             dm_arr = getattr(self.dx_out, dm, None)
             if dm_arr is None:
                 continue
-            dm_arr_2d = Grid2D(dm_arr.copy(), gdict)
-            oc.setGrid('distance_' + dm, dm_arr_2d, metadata=dist_metadata)
+            oc.setArray(['distances'], dm, dm_arr, metadata=metadata)
             if dm in ('rrup', 'rjb'):
                 dm_var = getattr(self.dx_out, dm + '_var', None)
                 if dm_var is None:
                     dm_var = np.zeros_like(dm_arr)
                 dm_std = np.sqrt(dm_var)
-                dm_std_2d = Grid2D(dm_std.copy(), gdict)
-                oc.setGrid('distance_' + dm + '_stddev', dm_std_2d,
-                           metadata=dist_metadata)
+                oc.setArray(['distances'], dm + '_std', dm_std,
+                            metadata=metadata)
 
         #
         # Output the data and uncertainty grids
         #
         component = self.config['interp']['component']
+        std_metadata = copy.copy(metadata)
         for key, value in self.outgrid.items():
             # set the data grid
-            mean_grid = Grid2D(value, gdict)
             _, units, digits = _get_layer_info(key)
-            mean_metadata = {
-                'units': units,
-                'digits': digits
-            }
+            metadata['units'] = units
+            metadata['digits'] = digits
 
             # set the uncertainty grid
             std_layername, units, digits = _get_layer_info(key + '_sd')
-            std_metadata = {
-                'units': units,
-                'digits': digits
-            }
-            std_grid = Grid2D(self.outsd[key], gdict.copy())
-            oc.setIMTGrids(
-                key,
-                mean_grid,
-                mean_metadata,
-                std_grid,
-                std_metadata,
-                component)
+            std_metadata['units'] = units
+            std_metadata['digits'] = digits
+            self.outsd[key]
+            oc.setIMTGrids(key, value, metadata, self.outsd[key],
+                           std_metadata, component)
         #
         # Directivity
         #
+        del metadata['units']
+        del metadata['digits']
         if self.do_directivity is True:
             for k, v in self.dir_output.items():
                 imtstr, _, _ = _get_layer_info(k)
-                dir_2d = Grid2D(v.copy(), gdict)
-                oc.setGrid(imtstr + '_directivity', dir_2d, metadata=None)
+                oc.setArray(['directivity'], imtstr, v, metadata=metadata)
 
     def _storePointData(self, oc):
         """
@@ -1681,7 +1664,7 @@ class ModelModule(CoreModule):
             'units': 'm/s',
             'digits': 4
         }
-        oc.setArray('vs30', self.sx_out.vs30.flatten(),
+        oc.setArray([], 'vs30', self.sx_out.vs30.flatten(),
                     metadata=vs30_metadata)
         #
         # Store the distances
@@ -1694,14 +1677,14 @@ class ModelModule(CoreModule):
             dm_arr = getattr(self.dx_out, dm, None)
             if dm_arr is None:
                 continue
-            oc.setArray('distance_' + dm, dm_arr.copy().flatten(),
+            oc.setArray(['distances'], dm, dm_arr.flatten(),
                         metadata=distance_metadata)
             if dm in ('rrup', 'rjb'):
                 dm_var = getattr(self.dx_out, dm + '_var', None)
                 if dm_var is None:
                     dm_var = np.zeros_like(dm_arr)
-                oc.setArray('distance_' + dm + '_stddev',
-                            np.sqrt(dm_var).copy().flatten(),
+                oc.setArray(['distances'], dm + '_std',
+                            np.sqrt(dm_var).flatten(),
                             metadata=distance_metadata)
         #
         # Store the IMTs
@@ -1722,10 +1705,13 @@ class ModelModule(CoreModule):
                 'units': units,
                 'digits': digits
             }
-            oc.setIMTArrays(key, self.sx_out.lons.flatten(),
+            oc.setIMTArrays(key,
+                            self.sx_out.lons.flatten(),
                             self.sx_out.lats.flatten(),
-                            ascii_ids, value.flatten(), mean_metadata,
-                            self.outsd[key].flatten(), std_metadata, component)
+                            ascii_ids,
+                            value.flatten(), mean_metadata,
+                            self.outsd[key].flatten(), std_metadata,
+                            component)
 
     def _storeRegressionData(self, oc):
         """
@@ -1761,19 +1747,19 @@ class ModelModule(CoreModule):
                 soilsd[imtstr][ix] = np.mean(self.soilsd[imtstr][ixx])
 
         mean_dists = np.delete(mean_dists, bad_ix)
-        oc.setArray('regression_distances', mean_dists)
+        oc.setArray(['regression'], 'distances', mean_dists)
         for imtstr in self.rockgrid.keys():
             rockmean[imtstr] = np.delete(rockmean[imtstr], bad_ix)
             soilmean[imtstr] = np.delete(soilmean[imtstr], bad_ix)
             rocksd[imtstr] = np.delete(rocksd[imtstr], bad_ix)
             soilsd[imtstr] = np.delete(soilsd[imtstr], bad_ix)
-            oc.setArray('regression_' + imtstr + '_rock_mean',
+            oc.setArray(['regression', 'rock', imtstr], 'mean',
                         rockmean[imtstr])
-            oc.setArray('regression_' + imtstr + '_soil_mean',
+            oc.setArray(['regression', 'soil', imtstr], 'mean',
                         soilmean[imtstr])
-            oc.setArray('regression_' + imtstr + '_rock_sd',
+            oc.setArray(['regression', 'rock', imtstr], 'std',
                         rocksd[imtstr])
-            oc.setArray('regression_' + imtstr + '_soil_sd',
+            oc.setArray(['regression', 'soil', imtstr], 'std',
                         soilsd[imtstr])
 
     #

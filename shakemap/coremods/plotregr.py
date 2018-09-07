@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # neic imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
 from shakemap.utils.config import get_config_paths
@@ -97,13 +97,15 @@ class PlotRegr(CoreModule):
         soilsd = {}
         imtlist = oc.getIMTs('GREATER_OF_TWO_HORIZONTAL')
         for myimt in imtlist:
-            rockgrid[myimt], _ = oc.getArray(
-                'regression_' + myimt + '_rock_mean')
-            soilgrid[myimt], _ = oc.getArray(
-                'regression_' + myimt + '_soil_mean')
-            rocksd[myimt], _ = oc.getArray('regression_' + myimt + '_rock_sd')
-            soilsd[myimt], _ = oc.getArray('regression_' + myimt + '_soil_sd')
-        distances, _ = oc.getArray('regression_distances')
+            rockgrid[myimt], _ = oc.getArray(['regression', 'rock', myimt],
+                                             'mean')
+            soilgrid[myimt], _ = oc.getArray(['regression', 'soil', myimt],
+                                             'mean')
+            rocksd[myimt], _ = oc.getArray(['regression', 'rock', myimt],
+                                           'std')
+            soilsd[myimt], _ = oc.getArray(['regression', 'soil', myimt],
+                                           'std')
+        distances, _ = oc.getArray(['regression'], 'distances')
 
         stations = oc.getStationDict()
         oc.close()
@@ -177,9 +179,10 @@ class PlotRegr(CoreModule):
                                              mfc='none')
                     else:
                         imtstr = myimt.lower()
-                        if imtstr in station['properties']['pgm_from_mmi']:
-                            amp = (station['properties']['pgm_from_mmi']
-                                   [imtstr]['value'])
+                        for thing in station['properties']['pgm_from_mmi']:
+                            if thing['name'] != imtstr:
+                                continue
+                            amp = thing['value']
                             if amp != 'null' and amp != 0:
                                 if myimt == 'PGV':
                                     amp = np.log(amp)
@@ -187,6 +190,7 @@ class PlotRegr(CoreModule):
                                     amp = np.log(amp / 100.)
                                 plt.semilogx(dist, amp, symbol + 'k',
                                              mfc='none')
+                            break
 
             plt.title(self._eventid + ': ' + myimt + ' mean')
             plt.xlabel('Rrup (km)')

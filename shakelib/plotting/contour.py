@@ -39,9 +39,8 @@ def contour(container, imtype, component, filter_size, gmice):
 
     intensity_colormap = ColorPalette.fromPreset('mmi')
     imtdict = container.getIMTGrids(imtype, component)
-    gridobj = imtdict['mean']
-    grid = gridobj.getData()
-    metadata = gridobj.getGeoDict().asDict()
+    grid = imtdict['mean']
+    metadata = imtdict['mean_metadata']
     if imtype == 'MMI':
         sgrid = grid
         units = 'mmi'

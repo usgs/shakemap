@@ -4,7 +4,7 @@ import json
 from collections import OrderedDict
 
 # third party imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
 from .base import CoreModule

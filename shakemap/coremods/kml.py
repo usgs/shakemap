@@ -9,11 +9,12 @@ import re
 # third party imports
 from shapely.geometry import shape
 import fiona
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from PIL import Image
 import configobj
 from lxml import etree
 import numpy as np
+from mapio.geodict import GeoDict
 
 # local imports
 from .base import CoreModule
@@ -270,7 +271,7 @@ def create_contours(container, document):
     """
     # TODO - label contours? gx:labelVisibility doesn't seem to be working...
     imts = container.getIMTs()
-    if 'MMI' not in imts:
+    if not any('MMI' in x for x in imts):
         return
     component = container.getComponents('MMI')[0]
     line_strings = contour(container, 'MMI', component, DEFAULT_FILTER_SIZE,
@@ -413,8 +414,8 @@ def create_overlay_image(container, oceanfile, filename):
     comp = container.getComponents('MMI')[0]
     imtdict = container.getIMTGrids('MMI', comp)
     mmigrid = imtdict['mean']
-    gd = mmigrid.getGeoDict()
-    imtdata = mmigrid.getData().copy()
+    gd = GeoDict(imtdict['mean_metadata'])
+    imtdata = mmigrid.copy()
     rows, cols = imtdata.shape
 
     # get the intensity colormap

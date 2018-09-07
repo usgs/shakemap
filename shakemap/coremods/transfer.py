@@ -7,7 +7,7 @@ import shutil
 import logging
 
 # third party imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from configobj import ConfigObj
 from validate import Validator
 from impactutils.transfer.factory import get_sender_class
@@ -90,7 +90,7 @@ class TransferModule(CoreModule):
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
         # extract the info.json object from the container
-        info = container.getDictionary('info.json')
+        info = container.getMetadata()
         container.close()
 
         # call the transfer method

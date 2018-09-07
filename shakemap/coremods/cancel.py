@@ -7,7 +7,7 @@ from configobj import ConfigObj
 
 
 # local imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from .base import CoreModule
 from .transfer import _transfer
 from shakemap.utils.config import get_config_paths, get_data_path
@@ -65,7 +65,7 @@ class CancelModule(CoreModule):
         # call the transfer method
         self.logger.info('Sending cancel message...')
         pdl_dir = os.path.join(datadir, 'pdl')
-        info = container.getDictionary('info.json')
+        info = container.getMetadata()
         _transfer(config, info, pdl_dir, products_dir, cancel=True)
         container.close()
 
