@@ -1,11 +1,27 @@
+import os
 from distutils.core import setup
 import os.path
 import versioneer
+from distutils.extension import Extension
+from Cython.Distutils import build_ext
+from Cython.Build import cythonize
+import numpy
 
+os.environ['CC'] = 'gcc'
+
+sourcefiles = ["shakemap/c/pcontour.pyx", "shakemap/c/contour.c"]
+
+ext_modules = [Extension("shakemap.c.pcontour",
+                         sourcefiles,
+                         libraries=["m"],
+                         include_dirs=[numpy.get_include()],
+                         extra_compile_args=["-O3"])]
+
+cmdclass = versioneer.get_cmdclass()
+cmdclass['build_ext'] = build_ext
 
 setup(name='shakemap',
       version=versioneer.get_version(),
-      cmdclass=versioneer.get_cmdclass(),
       description='USGS Near-Real-Time Ground Motion Mapping',
       author='Bruce Worden, Mike Hearne, Eric Thompson',
       author_email='cbworden@usgs.gov,mhearne@usgs.gov,emthompson@usgs.gov',
@@ -47,6 +63,7 @@ setup(name='shakemap',
           'bin/sm_profile',
           'bin/sm_compare',
           'bin/sm_queue',
-          'bin/sm_rupture'
-      ],
+          'bin/sm_rupture'],
+      cmdclass=cmdclass,
+      ext_modules=cythonize(ext_modules)
       )

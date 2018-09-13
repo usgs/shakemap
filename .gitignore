@@ -19,3 +19,5 @@ tests/data/install/data/amps.db-shm
 tests/data/install/data/amps.db-wal
 tests/data/install/data/dependencies.db
 *.pytest*
+shakemap/c/pcontour.c
+shakemap/c/*.so
