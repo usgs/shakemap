@@ -136,11 +136,13 @@ package_list='
       amptools
       basemap
       cartopy
+      cython
       defusedxml
       descartes
       docutils
       configobj
       fiona
+      gcc
       gdal
       h5py
       impactutils
@@ -163,6 +165,7 @@ package_list='
       scikit-image
       scipy
       shapely
+      simplekml
       strec
       versioneer 
       vcrpy
