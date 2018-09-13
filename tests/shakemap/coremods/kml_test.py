@@ -54,9 +54,15 @@ def test_create_kmz():
                 nstations = len(folder.getElementsByTagName('Placemark'))
             elif name == 'Macroseismic Stations':
                 nmmi = len(folder.getElementsByTagName('Placemark'))
-        assert sorted(names) == ['Contours',
-                                 'Instrumented Stations',
-                                 'Macroseismic Stations']
+        assert sorted(names) == ['Contours', 'Instrumented Stations',
+                                 'MMI 4 Polygons', 'MMI 5 Polygons',
+                                 'MMI 6 Polygons', 'MMI 7 Polygons',
+                                 'MMI 8 Polygons', 'MMI 8.5 Polygons',
+                                 'MMI Contours', 'MMI Labels',
+                                 'MMI Polygons', 'Macroseismic Stations',
+                                 'PGA Contours', 'PGV Contours',
+                                 'SA(0.3) Contours', 'SA(1.0) Contours',
+                                 'SA(3.0) Contours']
         assert nstations == 185
         assert nmmi == 547
         myzip.close()
