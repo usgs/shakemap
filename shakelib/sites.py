@@ -3,8 +3,9 @@
 # stdlib imports
 
 # third party imports
-from mapio.gmt import GMTGrid
-from mapio.gdal import GDALGrid
+# from mapio.gmt import GMTGrid
+# from mapio.gdal import GDALGrid
+from mapio.reader import read, get_file_geodict
 from mapio.grid2d import Grid2D
 from mapio.geodict import GeoDict
 from openquake.hazardlib.gsim.base import SitesContext
@@ -238,24 +239,16 @@ class Sites(object):
     def _load(vs30File, samplegeodict=None, resample=False, method='linear',
               doPadding=False, padValue=np.nan):
         try:
-            vs30grid = GMTGrid.load(vs30File,
-                                    samplegeodict=samplegeodict,
-                                    resample=resample,
-                                    method=method,
-                                    doPadding=doPadding,
-                                    padValue=padValue)
+            vs30grid = read(vs30File,
+                            samplegeodict=samplegeodict,
+                            resample=resample,
+                            method=method,
+                            doPadding=doPadding,
+                            padValue=padValue)
         except Exception as msg1:
-            try:
-                vs30grid = GDALGrid.load(vs30File,
-                                         samplegeodict=samplegeodict,
-                                         resample=resample,
-                                         method=method,
-                                         doPadding=doPadding,
-                                         padValue=padValue)
-            except Exception as msg2:
-                msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (
-                    vs30File, str(msg1), str(msg2))
-                raise ShakeLibException(msg)
+            msg = 'Load failure of %s - error message: "%s"' % (
+                vs30File, str(msg1))
+            raise ShakeLibException(msg)
 
         if vs30grid.getData().dtype != np.float64:
             vs30grid.setData(vs30grid.getData().astype(np.float64))
@@ -266,14 +259,11 @@ class Sites(object):
     def _getFileGeoDict(fname):
         geodict = None
         try:
-            geodict, t = GMTGrid.getFileGeoDict(fname)
+            geodict = get_file_geodict(fname)
         except Exception as msg1:
-            try:
-                geodict, t = GDALGrid.getFileGeoDict(fname)
-            except Exception as msg2:
-                msg = 'File geodict failure with %s - error messages: '\
-                      '"%s"\n "%s"' % (fname, str(msg1), str(msg2))
-                raise ShakeLibException(msg)
+            msg = 'File geodict failure with %s - error messages: '\
+                '"%s"' % (fname, str(msg1))
+            raise ShakeLibException(msg)
         return geodict
 
     @staticmethod

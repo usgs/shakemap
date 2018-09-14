@@ -34,7 +34,8 @@ from scipy.ndimage import gaussian_filter
 from openquake.hazardlib import imt
 
 # local imports
-from mapio.gmt import GMTGrid
+# from mapio.gmt import GMTGrid
+from mapio.reader import read, get_file_geodict
 from mapio.geodict import GeoDict
 from mapio.grid2d import Grid2D
 from impactutils.colors.cpalette import ColorPalette
@@ -948,7 +949,8 @@ class MapMaker(object):
         t0 = time.time()
         # resample shakemap to topogrid
         # get the geodict for the topo file
-        topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
+        topodict = get_file_geodict(self.topofile)
+        # topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
         comp = self.container.getComponents('MMI')[0]
         imtdict = self.container.getIMTGrids('MMI', comp)
@@ -965,8 +967,11 @@ class MapMaker(object):
         m = self._setMap(gd)
 
         # get topo layer and project it
-        topogrid = GMTGrid.load(
-            self.topofile, samplegeodict=sampledict, resample=False)
+        topogrid = read(self.topofile,
+                        samplegeodict=sampledict,
+                        resample=False)
+        # topogrid = GMTGrid.load(
+        #     self.topofile, samplegeodict=sampledict, resample=False)
         topodata = topogrid.getData().copy()
         ptopo = self._projectGrid(topodata, m, gd)
 
@@ -1149,7 +1154,8 @@ class MapMaker(object):
         t0 = time.time()
         # resample shakemap to topogrid
         # get the geodict for the topo file
-        topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
+        topodict = get_file_geodict(self.topofile)
+        # topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
         comp = self.container.getComponents(imtype)[0]
         imtdict = self.container.getIMTGrids(imtype, comp)
@@ -1166,8 +1172,11 @@ class MapMaker(object):
         m = self._setMap(gd)
 
         # get topo layer and project it
-        topogrid = GMTGrid.load(
-            self.topofile, samplegeodict=sampledict, resample=False)
+        topogrid = read(self.topofile,
+                        samplegeodict=sampledict,
+                        resample=False)
+        # topogrid = GMTGrid.load(
+        #     self.topofile, samplegeodict=sampledict, resample=False)
         topodata = topogrid.getData().copy()
         ptopo = self._projectGrid(topodata, m, gd)
 
