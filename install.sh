@@ -25,7 +25,7 @@ VENV=shakemap
 
 # Is the reset flag set? If not, use the frozen conda channel to install.
 # Otherwise, try to install from conda forge.
-reset=1
+reset=0
 while getopts r FLAG; do
   case $FLAG in
     r)

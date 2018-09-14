@@ -5,7 +5,7 @@ python:
 
 install:
     # Install shakemap and requirements
-    - bash install.sh
+    - bash install.sh -r
     - . $HOME/miniconda/etc/profile.d/conda.sh
     - conda activate shakemap
     - conda list

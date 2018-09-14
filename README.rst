@@ -65,6 +65,7 @@ Installation and Dependencies
 
 - Mac OSX or Linux operating systems
 - bash shell, git, curl
+- On OSX, Xcode and command line tools
 - The ``install.sh`` script installs this package and all other dependencies,
   including python 3.5 and the required python libraries. It is regularly tested
   on OSX, CentOS, and Ubuntu.
