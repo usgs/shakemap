@@ -1195,7 +1195,7 @@ def test_multigmpe_get_sites_depth_parameters():
              1165.96397227,  1172.97688837,  1176.12602836],
             [1575.22288791,  1329.69579201,  1162.02041292,  1155.01082322,
              1165.80081172,  1174.83307617,  1180.5495586]])
-    np.testing.assert_allclose(sx1.z2pt5, z2pt5d)
+    np.testing.assert_allclose(sx1.z2pt5, z2pt5d, atol=1e-2)
     sx2 = MultiGMPE.set_sites_depth_parameters(sctx, gmpes[1])
     z1pt0d = np.array(
         [[183.2043947,   217.27787758,  180.56690603,  180.68687904,
@@ -1212,7 +1212,7 @@ def test_multigmpe_get_sites_depth_parameters():
              179.96216197,  181.91290358,  182.78888133],
             [293.80330679,  225.506479,    178.86520526,  176.91538893,
              179.91677656,  182.42922842,  184.01934871]])
-    np.testing.assert_allclose(sx2.z1pt0, z1pt0d)
+    np.testing.assert_allclose(sx2.z1pt0, z1pt0d, atol=1e-2)
 
 
 def test_multigmpe_get_mean_stddevs():
@@ -1354,7 +1354,7 @@ def test_multigmpe_get_mean_stddevs():
             [0.82637075,  0.82637075,  0.82637075,  0.82637075,  0.82637075,
              0.82637075,  0.82637075]])
 
-    np.testing.assert_allclose(lnmu, lnmud)
+    np.testing.assert_allclose(lnmu, lnmud, atol=1e-2)
     np.testing.assert_allclose(lnsd[0], lnsdd)
 
     # --------------------------------------------------------------------------
