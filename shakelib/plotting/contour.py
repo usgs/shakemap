@@ -58,8 +58,13 @@ def contour(container, imtype, component, filter_size, gmice):
     interval_type = 'log'
     if imtype == 'MMI':
         interval_type = 'linear'
-    intervals = getContourLevels(
-        np.min(fgrid), np.max(fgrid), itype=interval_type)
+
+    grid_min = np.nanmin(fgrid)
+    grid_max = np.nanmax(fgrid)
+    if grid_max - grid_min:
+        intervals = getContourLevels(grid_min, grid_max, itype=interval_type)
+    else:
+        intervals = np.array([])
 
     lonstart = metadata['xmin']
     latstart = metadata['ymin']

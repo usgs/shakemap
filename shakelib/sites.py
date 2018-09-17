@@ -3,8 +3,6 @@
 # stdlib imports
 
 # third party imports
-# from mapio.gmt import GMTGrid
-# from mapio.gdal import GDALGrid
 from mapio.reader import read, get_file_geodict
 from mapio.grid2d import Grid2D
 from mapio.geodict import GeoDict
@@ -56,7 +54,7 @@ class Sites(object):
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
         if vs30File is not None:
-            fgeodict = cls._getFileGeoDict(vs30File)
+            fgeodict = get_file_geodict(vs30File)
             if not resample:
                 if not padding:
                     # we want something that is within and aligned
@@ -65,10 +63,9 @@ class Sites(object):
                     # we want something that is just aligned, since we're
                     # padding edges
                     geodict = fgeodict.getAligned(geodict)
-            vs30grid = cls._load(vs30File, samplegeodict=geodict,
-                                 resample=resample, method='linear',
-                                 doPadding=padding, padValue=defaultVs30)
-
+            vs30grid = read(vs30File, samplegeodict=geodict,
+                            resample=resample, method='linear',
+                            doPadding=padding, padValue=defaultVs30)
         return vs30grid
 
     @classmethod

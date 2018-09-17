@@ -29,10 +29,14 @@ from impactutils.mapping.mercatormap import MercatorMap
 from impactutils.mapping.city import Cities
 from impactutils.colors.cpalette import ColorPalette
 from impactutils.mapping.scalebar import draw_scale
+from mapio.grid2d import Grid2D
+from mapio.geodict import GeoDict
+
 
 # local imports
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture import constants
+from shakelib.rupture.factory import rupture_from_dict
 from shakelib.plotting.contour import contour
 from shakelib.utils.imt_string import oq_to_file
 from shakemap.utils.utils import get_object_from_config
@@ -263,8 +267,12 @@ def _draw_graticules(ax, xmin, xmax, ymin, ymax):
              7: 2.0}
 
     span_keys = np.array(sorted(list(spans.keys())))
-    nearest_span_idx = np.argmin(np.abs(int((xmax-xmin)) - span_keys))
-    interval = spans[span_keys[nearest_span_idx]]
+
+    nearest_xspan_idx = np.argmin(np.abs(int((xmax-xmin)) - span_keys))
+    x_interval = spans[span_keys[nearest_xspan_idx]]
+
+    nearest_yspan_idx = np.argmin(np.abs(int((ymax-ymin)) - span_keys))
+    y_interval = spans[span_keys[nearest_yspan_idx]]
 
     # let's floor/ceil the edges to nearest 1/interval
     # gxmin = np.floor(xmin * interval) / interval
@@ -285,8 +293,8 @@ def _draw_graticules(ax, xmin, xmax, ymin, ymax):
     # shakemap way
     # ylocs = np.arange(np.floor(gymin), np.ceil(gymax) + interval, interval)
     # xlocs = np.arange(np.floor(gxmin), np.ceil(gxmax) + interval, interval)
-    ylocs = np.arange(gymin, gymax+interval, interval)
-    xlocs = np.arange(gxmin, gxmax+interval, interval)
+    ylocs = np.arange(gymin, gymax+y_interval, y_interval)
+    xlocs = np.arange(gxmin, gxmax+x_interval, x_interval)
 
     if crosses:
         xlocs[xlocs > 180] -= 360
@@ -555,12 +563,14 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # get the geodict for the ShakeMap
     comp = container.getComponents('MMI')[0]
     imtdict = container.getIMTGrids('MMI', comp)
-    mmigrid = imtdict['mean']
-
-    gd = mmigrid.getGeoDict()
+    mmidata = imtdict['mean']
+    mmidict = imtdict['mean_metadata']
+    gd = GeoDict(mmidict)
+    mmigrid = Grid2D(mmidata, gd)
 
     # Retrieve the epicenter - this will get used on the map
-    origin = container.getRuptureObject().getOrigin()
+    rupture = rupture_from_dict(container.getRuptureDict())
+    origin = rupture.getOrigin()
     center_lat = origin.lat
     center_lon = origin.lon
 
@@ -674,7 +684,6 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
                                                    foreground='black')])
 
     # draw the rupture polygon(s) in black, if not point rupture
-    rupture = container.getRuptureObject()
     if not isinstance(rupture, PointRupture):
         lats = rupture.lats
         lons = rupture.lons
@@ -728,12 +737,15 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     """
     comp = container.getComponents(imtype)[0]
     imtdict = container.getIMTGrids(imtype, comp)
-    imtgrid = imtdict['mean']
+    imtdata = imtdict['mean']
+    gd = GeoDict(imtdict['mean_metadata'])
+    imtgrid = Grid2D(imtdata, gd)
 
     gd = imtgrid.getGeoDict()
 
     # Retrieve the epicenter - this will get used on the map
-    origin = container.getRuptureObject().getOrigin()
+    rupture = rupture_from_dict(container.getRuptureDict())
+    origin = rupture.getOrigin()
     center_lat = origin.lat
 
     # load the cities data, limit to cities within shakemap bounds
@@ -887,7 +899,6 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     is_scenario = etype == 'SCENARIO'
 
     # Retrieve the epicenter - this will get used on the map
-    origin = container.getRuptureObject().getOrigin()
     center_lat = origin.lat
     center_lon = origin.lon
 
@@ -915,7 +926,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
              zorder=EPICENTER_ZORDER, transform=geoproj)
 
     # draw the rupture polygon(s) in black, if not point rupture
-    rupture = container.getRuptureObject()
+    rupture = rupture_from_dict(container.getRuptureDict())
     if not isinstance(rupture, PointRupture):
         lats = rupture.lats
         lons = rupture.lons

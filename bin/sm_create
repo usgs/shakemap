@@ -227,9 +227,10 @@ def main(args):
                       'Downloading that data.'
                       % detail.id)
                 dataframe, msg = _get_dyfi_dataframe(detail)
-                data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
-                reference = 'USGS Did You Feel It? System'
-                dataframe_to_xml(dataframe, data_file, reference)
+                if dataframe is not None:
+                    data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
+                    reference = 'USGS Did You Feel It? System'
+                    dataframe_to_xml(dataframe, data_file, reference)
         else:
             if args.source:
                 source = args.source
