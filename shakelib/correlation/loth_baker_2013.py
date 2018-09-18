@@ -1,9 +1,10 @@
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
-import numexpr as ne
+# import numexpr as ne
 import itertools as it
 
 from shakelib.correlation.ccf_base import CrossCorrelationBase
+from shakemap.c.clib import eval_lb_correlation
 
 # Periods that apply to the axes in the cross-correlation tables
 Tlist = np.array([0.01, 0.1, 0.2, 0.5, 1, 2, 5, 7.5, 10.0001])
@@ -131,15 +132,17 @@ class LothBaker2013(CrossCorrelationBase):
         # periods of interest.
         #
         # These variables are used in ne.evaluate but unseen by linter
-        b1 = self.b1[ix1, ix2]  # noqa
-        b2 = self.b2[ix1, ix2]  # noqa
-        b3 = self.b3[ix1, ix2]  # noqa
-        afact = -3.0 / 20.0  # noqa
-        bfact = -3.0 / 70.0  # noqa
+        # b1 = self.b1[ix1, ix2]  # noqa
+        # b2 = self.b2[ix1, ix2]  # noqa
+        # b3 = self.b3[ix1, ix2]  # noqa
+        # afact = -3.0 / 20.0  # noqa
+        # bfact = -3.0 / 70.0  # noqa
         #
         # Compute the correlation coefficient (Equation 42)
         #
-        rho = ne.evaluate(
-            "b1 * exp(h * afact) + b2 * exp(h * bfact) + (h == 0) * b3")
+        # rho = ne.evaluate(
+        #     "b1 * exp(h * afact) + b2 * exp(h * bfact) + (h == 0) * b3")
+        rho = eval_lb_correlation(self.b1, self.b2, self.b3,
+                                  ix1, ix2, h)
 
         return rho
