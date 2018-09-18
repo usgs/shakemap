@@ -107,15 +107,15 @@ class LothBaker2013(CrossCorrelationBase):
         class constructor.
 
         Args:
-            ix1 (ndarray):
+            ix1 (2D, C-contiguous numpy array)):
                 The indices of the first period of interest.
-            ix2 (ndarrays):
+            ix2 (2D, C-contiguous numpy array)):
                 The indices of the second period of interest.
-            h (ndarray):
+            h (2D, C-contiguous numpy array)):
                 The separation distance between two sites (units of km).
 
         Returns:
-            ndarray:
+            numpy array::
                 The predicted correlation coefficient. The output array
                 will have the same shape as the inputs.
 
