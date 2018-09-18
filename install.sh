@@ -149,7 +149,7 @@ package_list='
       libcomcat
       lockfile
       mapio
-      matplotlib
+      matplotlib<=2.3
       numexpr
       numpy
       obspy
