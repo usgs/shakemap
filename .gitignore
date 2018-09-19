@@ -20,4 +20,5 @@ tests/data/install/data/amps.db-wal
 tests/data/install/data/dependencies.db
 *.pytest*
 shakemap/c/pcontour.c
+shakemap/c/clib.c
 shakemap/c/*.so

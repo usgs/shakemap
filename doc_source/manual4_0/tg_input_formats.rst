@@ -52,6 +52,8 @@ The attributes of the earthquake element are:
 +-----------------------+-------------------------------------------------------+
 | reference             | (optional) Source for hypocenter information          |
 +-----------------------+-------------------------------------------------------+
+| event_type            | (optional) Event type, one of 'ACTUAL' or 'SCENARIO'  |
++-----------------------+-------------------------------------------------------+
 | productcode           | (optional) Used to distinguish between different      |
 |                       | ShakeMaps created for the same event (e.g., one map   |
 |                       | showing the extent of shaking, and another zoomed     |

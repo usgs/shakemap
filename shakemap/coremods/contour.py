@@ -5,21 +5,23 @@ import json
 from collections import OrderedDict
 import shutil
 import logging
-import argparse
-import inspect
 
 # third party imports
 import fiona
 from openquake.hazardlib import imt
+from configobj import ConfigObj
 
 # local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths
 from shakemap.utils.logging import get_logging_config
 from shakelib.plotting.contour import contour
 from shakemap.utils.utils import get_object_from_config
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
 
 FORMATS = {
     'geojson': ('GeoJSON', 'json')
@@ -110,43 +112,26 @@ class ContourModule(CoreModule):
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
+        # get the path to the products.conf file, load the config
+        config_file = os.path.join(install_path, 'config', 'products.conf')
+        spec_file = get_configspec('products')
+        validator = get_custom_validator()
+        config = ConfigObj(config_file, configspec=spec_file)
+        results = config.validate(validator)
+        if not isinstance(results, bool) or not results:
+            config_error(config, results)
+
         if container.getDataType() != 'grid':
             raise NotImplementedError('contour module can only contour '
                                       'gridded data, not sets of points')
 
+        # get the filter size from the products.conf
+        filter_size = config['products']['contour']['filter_size']
+
         # create contour files
         self.logger.debug('Contouring to files...')
-        contour_to_files(container, datadir, self.logger, self.filter_size)
+        contour_to_files(container, datadir, self.logger, filter_size)
         container.close()
-
-    def parseArgs(self, arglist):
-        """
-        Set up the object to accept the --filter flag.
-        """
-        parser = argparse.ArgumentParser(
-            prog=self.__class__.command_name,
-            description=inspect.getdoc(self.__class__))
-        parser.add_argument('-f', '--filter', help='Specify the filter '
-                            'size (in grid points) for smoothing the '
-                            'grids before contouring. Must be a positive'
-                            'integer (default=10; use 0 to disable '
-                            'filtering).', type=float)
-        #
-        # This line should be in any modules that overrides this
-        # one. It will collect up everything after the current
-        # modules options in args.rem, which should be returned
-        # by this function. Note: doing parser.parse_known_args()
-        # will not work as it will suck up any later modules'
-        # options that are the same as this one's.
-        #
-        parser.add_argument('rem', nargs=argparse.REMAINDER,
-                            help=argparse.SUPPRESS)
-        args = parser.parse_args(arglist)
-        if args.filter is None:
-            self.filter_size = DEFAULT_FILTER_SIZE
-        else:
-            self.filter_size = args.filter
-        return args.rem
 
 
 def contour_to_files(container, output_dir, logger,

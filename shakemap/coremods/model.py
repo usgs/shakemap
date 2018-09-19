@@ -12,7 +12,6 @@ from collections import OrderedDict
 
 import numpy as np
 import numpy.ma as ma
-import numexpr as ne
 from mpl_toolkits.basemap import maskoceans
 from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
@@ -32,13 +31,15 @@ from shakelib.utils.utils import get_extent
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.utils.containers import ShakeMapInputContainer
 from impactutils.io.smcontainers import ShakeMapOutputContainer
-from shakelib.utils.distance import geodetic_distance_fast
 from shakelib.rupture import constants
 
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions
 from shakemap.utils.generic_amp import get_generic_amp_factors
+from shakemap.c.clib import (make_sigma_matrix,
+                             geodetic_distance_fast_c,
+                             make_sd_array)
 
 from shakelib.directivity.rowshandel2013 import Rowshandel2013
 
@@ -527,8 +528,8 @@ class ModelModule(CoreModule):
                                      self.sx_out.lats)
             self.sx_out.lons = np.flipud(lons.copy())
             self.sx_out.lats = np.flipud(lats.copy())
-            self.lons = np.flipud(lons).flatten()
-            self.lats = np.flipud(lats).flatten()
+            self.lons = np.flipud(lons).ravel()
+            self.lats = np.flipud(lats).ravel()
             self.depths = np.zeros_like(lats)
             dist_obj_out = Distance.fromSites(self.default_gmpe,
                                               self.sites_obj_out,
@@ -896,15 +897,17 @@ class ModelModule(CoreModule):
             #
             # Build the covariance matrix of the residuals
             #
-            dist22 = geodetic_distance_fast(sta_lons_rad_dl,
-                                            sta_lats_rad_dl,
-                                            sta_lons_rad_dl.T,
-                                            sta_lats_rad_dl.T)
+            dist22 = geodetic_distance_fast_c(sta_lons_rad_dl.ravel(),
+                                              sta_lats_rad_dl.ravel(),
+                                              sta_lons_rad_dl.ravel(),
+                                              sta_lats_rad_dl.ravel())
             d22_rows, d22_cols = np.shape(dist22)  # should be square
-            t1_22 = np.tile(sta_period_ix_dl, (1, d22_cols))
-            t2_22 = np.tile(sta_period_ix_dl.T, (d22_rows, 1))
+            t1_22 = sta_period_ix_dl * np.ones((1, d22_cols), dtype=np.long)
+            t2_22 = sta_period_ix_dl.T * np.ones((d22_rows, 1), dtype=np.long)
             corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
-            sigma22 = corr22 * corr_adj22 * (sta_phi_dl * sta_phi_dl.T)
+            sigma22 = make_sigma_matrix(corr22, corr_adj22,
+                                        sta_phi_dl.ravel(),
+                                        sta_phi_dl.ravel())
             sigma22inv = np.linalg.pinv(sigma22)
             #
             # Compute the bias numerator and denominator pieces
@@ -933,7 +936,7 @@ class ModelModule(CoreModule):
                 self.bias_num[imtstr] = 0.0
                 self.bias_den[imtstr] = 0.0
 
-            nom_tau = np.mean(sta_tau_dl.flatten())
+            nom_tau = np.mean(sta_tau_dl.ravel())
             nom_variance = 1.0 / ((1.0 / nom_tau**2) + self.bias_den[imtstr])
             self.nominal_bias[imtstr] = self.bias_num[imtstr] * nom_variance
             bias_time = time.time() - time1
@@ -1071,21 +1074,25 @@ class ModelModule(CoreModule):
         # Re-build the covariance matrix of the residuals with
         # the full set of data
         #
-        dist22 = geodetic_distance_fast(self.sta_lons_rad[imtstr],
-                                        self.sta_lats_rad[imtstr],
-                                        self.sta_lons_rad[imtstr].T,
-                                        self.sta_lats_rad[imtstr].T)
+        dist22 = geodetic_distance_fast_c(self.sta_lons_rad[imtstr].ravel(),
+                                          self.sta_lats_rad[imtstr].ravel(),
+                                          self.sta_lons_rad[imtstr].ravel(),
+                                          self.sta_lats_rad[imtstr].ravel())
         d22_rows, d22_cols = np.shape(dist22)  # should be square
-        t1_22 = np.tile(self.sta_period_ix[imtstr], (1, d22_cols))
-        t2_22 = np.tile(self.sta_period_ix[imtstr].T, (d22_rows, 1))
+        t1_22 = self.sta_period_ix[imtstr] * np.ones((1, d22_cols),
+                                                     dtype=np.long)
+        t2_22 = self.sta_period_ix[imtstr].T * np.ones((d22_rows, 1),
+                                                       dtype=np.long)
         corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
 
         #
         # Rebuild sigma22_inv now that we have updated phi and
         # the correlation adjustment factors
         #
-        sigma22 = corr22 * corr_adj22 * \
-            (self.sta_phi[imtstr] * self.sta_phi[imtstr].T)
+        sigma22 = make_sigma_matrix(corr22, corr_adj22,
+                                    self.sta_phi[imtstr].ravel(),
+                                    self.sta_phi[imtstr].ravel())
+
         sigma22inv = np.linalg.pinv(sigma22)
 
         #
@@ -1095,30 +1102,36 @@ class ModelModule(CoreModule):
 
         ampgrid = np.zeros_like(pout_mean)
         sdgrid = np.zeros_like(pout_mean)
-        corr_adj12 = corr_adj * np.ones((1, self.smnx))  # noqa
+        corr_adj12 = corr_adj * np.ones((1, self.smnx))
+        # Stuff that doesn't change within the loop:
+        sta_lons_rad_flat = self.sta_lons_rad[imtstr].ravel()
+        sta_lats_rad_flat = self.sta_lats_rad[imtstr].ravel()
+        lons_out_rad_flat = self.lons_out_rad.ravel()
+        lats_out_rad_flat = self.lats_out_rad.ravel()
+        ny = np.size(sta_lats_rad_flat)
+        d12_cols = self.smnx
+        t2_12 = np.full((ny, d12_cols), outperiod_ix, dtype=np.int)
+        t1_12 = self.sta_period_ix[imtstr] * np.ones((1, d12_cols),
+                                                     dtype=np.long)
+        # sdsta is the standard deviation of the stations
+        sdsta = self.sta_phi[imtstr].ravel()
         for iy in range(self.smny):
             ss = iy * self.smnx
             se = (iy + 1) * self.smnx
             time4 = time.time()
-            dist12 = geodetic_distance_fast(
-                self.lons_out_rad[ss:se].reshape(1, -1),
-                self.lats_out_rad[ss:se].reshape(1, -1),
-                self.sta_lons_rad[imtstr],
-                self.sta_lats_rad[imtstr])
-            t2_12 = np.full(dist12.shape, outperiod_ix, dtype=np.int)
-            _, d12_cols = np.shape(dist12)
-            t1_12 = np.tile(self.sta_period_ix[imtstr], (1, d12_cols))
+            dist12 = geodetic_distance_fast_c(
+                lons_out_rad_flat[ss:se],
+                lats_out_rad_flat[ss:se],
+                sta_lons_rad_flat,
+                sta_lats_rad_flat)
             ddtime += time.time() - time4
             time4 = time.time()
-            corr12 = self.ccf.getCorrelation(t1_12, t2_12, dist12)  # noqa
+            corr12 = self.ccf.getCorrelation(t1_12, t2_12, dist12)
             ctime += time.time() - time4
             time4 = time.time()
             # sdarr is the standard deviation of the output sites
-            sdarr = self.psd[imtstr][iy, :].reshape((1, -1))  # noqa
-            # sdsta is the standard deviation of the stations
-            sdsta = self.sta_phi[imtstr]  # noqa
-            sigma12 = ne.evaluate(
-                "corr12 * corr_adj12 * (sdsta * sdarr)").T
+            sdarr = self.psd[imtstr][iy, :].ravel()
+            sigma12 = make_sigma_matrix(corr12, corr_adj12, sdsta, sdarr)
             stime += time.time() - time4
             time4 = time.time()
             #
@@ -1143,13 +1156,11 @@ class ModelModule(CoreModule):
             # sdgrid[ss:se] = pout_sd2[ss:se] -
             #       np.diag(rcmatrix.dot(sigma21))
             #
-            sdgrid[iy, :] = \
-                pout_sd2[iy, :] - np.sum(rcmatrix * sigma12, axis=1)
+            make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, sigma12)
             mtime += time.time() - time4
 
         self.outgrid[imtstr] = ampgrid
-        sdgrid[sdgrid < 0] = 0
-        self.outsd[imtstr] = np.sqrt(sdgrid)
+        self.outsd[imtstr] = sdgrid
 
         self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
         self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
@@ -1254,7 +1265,16 @@ class ModelModule(CoreModule):
         # This AND locaction?
         info[ip][ei]['event_description'] = origin.locstring
         # This AND src_mech?
-        info[ip][ei]['event_type'] = origin.mech
+        # look at the origin information for indications that this
+        # event is a scenario
+        condition1 = hasattr(
+            origin, 'event_type') and origin.event_type.lower() == 'scenario'
+        condition2 = origin.id.endswith('_se')
+        if condition1 or condition2:
+            info[ip][ei]['event_type'] = 'SCENARIO'
+        else:
+            info[ip][ei]['event_type'] = 'ACTUAL'
+
         info[op] = {}
         info[op][gm] = {}
         for myimt in self.imt_out_set:
@@ -1381,7 +1401,7 @@ class ModelModule(CoreModule):
                 mybias = self.bias_num[myimt] / \
                     ((1.0 / sdf[myimt + '_pred_tau']**2) +
                      self.bias_den[myimt])
-                sdf[myimt + '_bias'] = mybias.flatten()
+                sdf[myimt + '_bias'] = mybias.ravel()
 
         # ---------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
@@ -1663,7 +1683,7 @@ class ModelModule(CoreModule):
             'units': 'm/s',
             'digits': 4
         }
-        oc.setArray([], 'vs30', self.sx_out.vs30.flatten(),
+        oc.setArray([], 'vs30', self.sx_out.vs30.ravel(),
                     metadata=vs30_metadata)
         #
         # Store the distances
@@ -1676,20 +1696,20 @@ class ModelModule(CoreModule):
             dm_arr = getattr(self.dx_out, dm, None)
             if dm_arr is None:
                 continue
-            oc.setArray(['distances'], dm, dm_arr.flatten(),
+            oc.setArray(['distances'], dm, dm_arr.ravel(),
                         metadata=distance_metadata)
             if dm in ('rrup', 'rjb'):
                 dm_var = getattr(self.dx_out, dm + '_var', None)
                 if dm_var is None:
                     dm_var = np.zeros_like(dm_arr)
                 oc.setArray(['distances'], dm + '_std',
-                            np.sqrt(dm_var).flatten(),
+                            np.sqrt(dm_var).ravel(),
                             metadata=distance_metadata)
         #
         # Store the IMTs
         #
         ascii_ids = np.array(
-            [x.encode('ascii') for x in self.idents]).flatten()
+            [x.encode('ascii') for x in self.idents]).ravel()
         component = self.config['interp']['component']
         for key, value in self.outgrid.items():
             # set the data grid
@@ -1705,11 +1725,11 @@ class ModelModule(CoreModule):
                 'digits': digits
             }
             oc.setIMTArrays(key,
-                            self.sx_out.lons.flatten(),
-                            self.sx_out.lats.flatten(),
+                            self.sx_out.lons.ravel(),
+                            self.sx_out.lats.ravel(),
                             ascii_ids,
-                            value.flatten(), mean_metadata,
-                            self.outsd[key].flatten(), std_metadata,
+                            value.ravel(), mean_metadata,
+                            self.outsd[key].ravel(), std_metadata,
                             component)
 
     def _storeRegressionData(self, oc):
