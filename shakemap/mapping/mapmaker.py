@@ -118,7 +118,6 @@ def _get_projected_grids(imtgrid, topobase, projstr):
     t1 = time.time()
     topogrid = topobase.interpolateToGrid(sampledict)
     t2 = time.time()
-    print('Topo grid took %.2f seconds to load.' % (t2-t1))
 
     # resampling 32bit floats gives odd results... upcasting to 64bit
     topogrid._data = topogrid._data.astype(np.float64)
