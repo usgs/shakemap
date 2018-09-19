@@ -41,7 +41,8 @@ class MappingModule(CoreModule):
     # can be created by this module.
     mapping_page = {'title': 'Ground Motion Maps', 'slug': 'maps'}
     contents = OrderedDict.fromkeys(
-        ['intensityMap', 'pgaMap', 'pgvMap', 'psa[PERIOD]Map'])
+        ['intensityMap', 'intensityThumbnail', 'pgaMap', 'pgvMap',
+         'psa[PERIOD]Map'])
     contents['intensityMap'] = {'title': 'Intensity Map',
                                 'caption': 'Map of macroseismic intensity.',
                                 'page': mapping_page,
@@ -51,6 +52,15 @@ class MappingModule(CoreModule):
                                              'type': 'application/pdf'}
                                             ]
                                 }
+
+    contents['intensityThumbnail'] = {'title': 'Intensity Thumbnail',
+                                      'caption': 'Thumbnail of intensity map.',
+                                      'page': mapping_page,
+                                      'formats': [{'filename':
+                                                   'pin-thumbnail.png',
+                                                   'type': 'image/png'}
+                                                  ]
+                                      }
 
     contents['pgaMap'] = {'title': 'PGA Map',
                           'caption': 'Map of peak ground acceleration (%g).',
