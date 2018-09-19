@@ -4,8 +4,12 @@ from collections import OrderedDict
 
 # third party
 from configobj import ConfigObj
-from mapio.gmt import GMTGrid
 from mapio.geodict import GeoDict
+import numpy as np
+from scipy.interpolate import griddata
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 # local imports
 # from mapio.gmt import GMTGrid
@@ -133,10 +137,10 @@ class MappingModule(CoreModule):
         oceanfile = layers['oceans']
         topofile = layers['topography']
 
-        # Reading HDF5 files currently takes a long time, due to poor programming
-        # in MapIO.  To save us some time until that issue is resolved, we'll
-        # coarsely subset the topo grid once here and pass it into both
-        # mapping functions
+        # Reading HDF5 files currently takes a long time, due to poor
+        # programming in MapIO.  To save us some time until that issue is
+        # resolved, we'll coarsely subset the topo grid once here and pass
+        # it into both mapping functions
         # get the bounds of the map
         info = container.getMetadata()
         xmin = info['output']['map_information']['min']['longitude']
@@ -172,6 +176,7 @@ class MappingModule(CoreModule):
                                                   datadir,
                                                   operator)
                 self.logger.debug('Created intensity map %s' % intensity_pdf)
+                self.make_pin_thumbnail(container, component, datadir)
             else:
                 self.logger.debug('Drawing %s contour map...' % imtype)
 
@@ -181,6 +186,31 @@ class MappingModule(CoreModule):
                                                         datadir,
                                                         operator, filter_size)
                 self.logger.debug('Created contour map %s' % contour_pdf)
-                print('Finished %s' % imtype)
 
         container.close()
+
+    def make_pin_thumbnail(self, container, component, datadir):
+        """Make the artsy-thumbnail for the pin on the USGS webpages.
+        """
+        imtdict = container.getIMTGrids("MMI", component)
+        grid = imtdict['mean']
+        metadata = imtdict['mean_metadata']
+        rx = (np.random.rand(500) * metadata['nx']).astype(np.int)
+        ry = (np.random.rand(500) * metadata['ny']).astype(np.int)
+
+        x_grid = np.linspace(0, metadata['nx'] - 1, 800)
+        y_grid = np.linspace(0, metadata['ny'] - 1, 800)
+
+        mx_grid, my_grid = np.meshgrid(x_grid, y_grid)
+
+        grid = griddata(np.hstack([rx.reshape((-1, 1)), ry.reshape((-1, 1))]),
+                        grid[ry, rx], (mx_grid, my_grid), method='nearest')
+
+        plt.figure(figsize=(2.75, 2.75), dpi=96, frameon=False)
+        plt.axis('off')
+        plt.tight_layout()
+        plt.imshow(grid, cmap=cm.jet)
+        plt.savefig(os.path.join(datadir, "pin-thumbnail.png"), dpi=96,
+                    bbox_inches=matplotlib.transforms.Bbox([[0.47, 0.39],
+                                                            [2.50, 2.50]]),
+                    pad_inches=0)
