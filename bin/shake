@@ -17,6 +17,7 @@ from validate import Validator
 import shlex
 
 # local imports
+import shakemap
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    config_error)
@@ -162,6 +163,9 @@ def get_parser():
                         help='Run the modules defined in shake.conf with the '
                              'autorun_modules parameter rather than any '
                              'found on the command line.')
+    parser.add_argument('-v', '--version', action='version',
+                        version='ShakeMap version %s' % shakemap.__version__,
+                        help='Print the version of ShakeMap and quit.')
     return parser
 
 
