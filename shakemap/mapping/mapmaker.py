@@ -158,16 +158,16 @@ def _get_map_info(gd, center_lat):
 
     # if the aspect is not 1, then trim bounds in x or y direction
     # as appropriate
-    if width > height:
-        dw = (width - height)/2.0  # this is width in km
-        xmin = xmin + dw/(np.cos(np.radians(center_lat))*DEG2KM)
-        xmax = xmax - dw/(np.cos(np.radians(center_lat))*DEG2KM)
-        width = (xmax-xmin)*np.cos(np.radians(center_lat))*DEG2KM
-    if height > width:
-        dh = (height - width)/2.0  # this is width in km
-        ymin = ymin + dh/DEG2KM
-        ymax = ymax - dh/DEG2KM
-        height = (ymax-ymin)*DEG2KM
+    # if width > height:
+    #     dw = (width - height)/2.0  # this is width in km
+    #     xmin = xmin + dw/(np.cos(np.radians(center_lat))*DEG2KM)
+    #     xmax = xmax - dw/(np.cos(np.radians(center_lat))*DEG2KM)
+    #     width = (xmax-xmin)*np.cos(np.radians(center_lat))*DEG2KM
+    # if height > width:
+    #     dh = (height - width)/2.0  # this is width in km
+    #     ymin = ymin + dh/DEG2KM
+    #     ymax = ymax - dh/DEG2KM
+    #     height = (ymax-ymin)*DEG2KM
 
     aspect = width/height
     figheight = FIGWIDTH/aspect
@@ -278,10 +278,10 @@ def _draw_graticules(ax, xmin, xmax, ymin, ymax):
     # gxmax = np.ceil(xmax * interval) / interval
     # gymin = np.floor(ymin * interval) / interval
     # gymax = np.ceil(ymax * interval) / interval
-    gxmin = np.floor(xmin)
-    gxmax = np.ceil(xmax)
-    gymin = np.floor(ymin)
-    gymax = np.ceil(ymax)
+    gxmin = x_interval*np.floor(xmin/x_interval)
+    gxmax = x_interval*np.ceil(xmax/x_interval)
+    gymin = y_interval*np.floor(ymin/y_interval)
+    gymax = y_interval*np.ceil(ymax/y_interval)
 
     # check for meridian crossing
     crosses = False
