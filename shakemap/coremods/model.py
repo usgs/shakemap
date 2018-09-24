@@ -1302,35 +1302,40 @@ class ModelModule(CoreModule):
                 units = 'ln(g)'
             info[op][gm][myimt]['units'] = units
             if myimt in self.nominal_bias:
-                info[op][gm][myimt]['bias'] = str(self.nominal_bias[myimt])
+                info[op][gm][myimt]['bias'] = \
+                    _string_round(self.nominal_bias[myimt], 3)
             else:
                 info[op][gm][myimt]['bias'] = '-'
-            info[op][gm][myimt]['max_grid'] = str(np.max(self.outgrid[myimt]))
-            info[op][gm][myimt]['max'] = str(np.max(moutgrid[myimt]))
+            info[op][gm][myimt]['max_grid'] = \
+                _string_round(np.max(self.outgrid[myimt]), 3)
+            info[op][gm][myimt]['max'] = \
+                _string_round(np.max(moutgrid[myimt]), 3)
         info[op][mi] = {}
         info[op][mi]['grid_points'] = {}
         info[op][mi]['grid_points']['longitude'] = str(self.smnx)
         info[op][mi]['grid_points']['latitude'] = str(self.smny)
         info[op][mi]['grid_points']['units'] = ''
         info[op][mi]['grid_spacing'] = {}
-        info[op][mi]['grid_spacing']['longitude'] = str(self.smdx)
-        info[op][mi]['grid_spacing']['latitude'] = str(self.smdy)
+        info[op][mi]['grid_spacing']['longitude'] = _string_round(self.smdx, 7)
+        info[op][mi]['grid_spacing']['latitude'] = _string_round(self.smdy, 7)
         info[op][mi]['grid_spacing']['units'] = 'degrees'
         info[op][mi]['grid_span'] = {}
-        info[op][mi]['grid_span']['longitude'] = str(self.E - self.W)
-        info[op][mi]['grid_span']['latitude'] = str(self.N - self.S)
+        info[op][mi]['grid_span']['longitude'] = \
+            _string_round(self.E - self.W, 3)
+        info[op][mi]['grid_span']['latitude'] = \
+            _string_round(self.N - self.S, 3)
         info[op][mi]['grid_span']['units'] = 'degrees'
         info[op][mi]['min'] = {}
-        info[op][mi]['min']['longitude'] = str(self.W)
-        info[op][mi]['min']['latitude'] = str(self.S)
+        info[op][mi]['min']['longitude'] = _string_round(self.W, 3)
+        info[op][mi]['min']['latitude'] = _string_round(self.S, 3)
         info[op][mi]['min']['units'] = 'degrees'
         info[op][mi]['max'] = {}
-        info[op][mi]['max']['longitude'] = str(self.E)
-        info[op][mi]['max']['latitude'] = str(self.N)
+        info[op][mi]['max']['longitude'] = _string_round(self.E, 3)
+        info[op][mi]['max']['latitude'] = _string_round(self.N, 3)
         info[op][mi]['max']['units'] = 'degrees'
         info[op][un] = {}
         info[op][un]['grade'] = mygrade
-        info[op][un]['mean_uncertainty_ratio'] = mean_rat
+        info[op][un]['mean_uncertainty_ratio'] = _string_round(mean_rat, 3)
         if 'df2' in self.dataframes:
             info[op][un]['total_flagged_mi'] = \
                 str(np.sum(self.df2.df['MMI_outliers'] |
@@ -1917,6 +1922,10 @@ def _round_float(val, digits):
     if val == 'null':
         return val
     return float(('%.' + str(digits) + 'f') % val)
+
+
+def _string_round(val, digits):
+    return str(_round_float(val, digits))
 
 
 def _get_period_arrays(*args):
