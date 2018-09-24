@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
-# import numexpr as ne
 import itertools as it
 
 from shakelib.correlation.ccf_base import CrossCorrelationBase

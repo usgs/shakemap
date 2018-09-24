@@ -38,7 +38,7 @@ from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions
 from shakemap.utils.generic_amp import get_generic_amp_factors
 from shakemap.c.clib import (make_sigma_matrix,
-                             geodetic_distance_fast_c,
+                             geodetic_distance_fast,
                              make_sd_array)
 
 from shakelib.directivity.rowshandel2013 import Rowshandel2013
@@ -906,10 +906,10 @@ class ModelModule(CoreModule):
             # time1 = time.time()
             matrix22 = np.empty((np.size(sta_lons_rad_dl),
                                 np.size(sta_lons_rad_dl)), dtype=np.double)
-            geodetic_distance_fast_c(sta_lons_rad_dl,
-                                     sta_lats_rad_dl,
-                                     sta_lons_rad_dl,
-                                     sta_lats_rad_dl, matrix22)
+            geodetic_distance_fast(sta_lons_rad_dl,
+                                   sta_lats_rad_dl,
+                                   sta_lons_rad_dl,
+                                   sta_lats_rad_dl, matrix22)
             # print("distance time %f" % (time.time() - time1))
             d22_rows, d22_cols = np.shape(matrix22)  # should be square
             t1_22 = sta_period_ix_dl * np.ones((1, d22_cols), dtype=np.long)
@@ -1086,10 +1086,10 @@ class ModelModule(CoreModule):
         matrix22 = np.empty((np.size(self.sta_lons_rad[imtstr]),
                             np.size(self.sta_lons_rad[imtstr])),
                             dtype=np.double)
-        geodetic_distance_fast_c(self.sta_lons_rad[imtstr].ravel(),
-                                 self.sta_lats_rad[imtstr].ravel(),
-                                 self.sta_lons_rad[imtstr].ravel(),
-                                 self.sta_lats_rad[imtstr].ravel(), matrix22)
+        geodetic_distance_fast(self.sta_lons_rad[imtstr].ravel(),
+                               self.sta_lats_rad[imtstr].ravel(),
+                               self.sta_lons_rad[imtstr].ravel(),
+                               self.sta_lats_rad[imtstr].ravel(), matrix22)
         d22_rows, d22_cols = np.shape(matrix22)  # should be square
         t1_22 = self.sta_period_ix[imtstr] * np.ones((1, d22_cols),
                                                      dtype=np.long)

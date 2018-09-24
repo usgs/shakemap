@@ -3,6 +3,8 @@ cimport cython
 from cython.parallel import prange
 from libc.math cimport (sqrt,
                         cos,
+                        sin,
+                        asin,
                         exp)
 
 cdef double EARTH_RADIUS = 6371.
@@ -26,9 +28,9 @@ def make_sigma_matrix(double[:, ::1]corr12, double[:, ::1]corr_adj12,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def geodetic_distance_fast_c(double[::1]lons1, double[::1]lats1,
-                             double[::1]lons2, double[::1]lats2,
-                             double[:, ::1]result):
+def geodetic_distance_fast(double[::1]lons1, double[::1]lats1,
+                           double[::1]lons2, double[::1]lats2,
+                           double[:, ::1]result):
     cdef Py_ssize_t nx = lons1.shape[0]
     cdef Py_ssize_t ny = lons2.shape[0]
 
@@ -50,6 +52,36 @@ def geodetic_distance_fast_c(double[::1]lons1, double[::1]lats1,
                     sqrt(((lons1[x] - lons2[y]) *
                         cos(0.5 * (lats1[x] + lats2[y])))**2 +
                         (lats1[x] - lats2[y])**2))
+    return
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def geodetic_distance_haversine(double[::1]lons1, double[::1]lats1,
+                                double[::1]lons2, double[::1]lats2,
+                                double[:, ::1]result):
+    cdef Py_ssize_t nx = lons1.shape[0]
+    cdef Py_ssize_t ny = lons2.shape[0]
+
+    cdef Py_ssize_t x, y
+    cdef double diameter = 2.0 * EARTH_RADIUS
+
+    if &lons1[0] == &lons2[0] and &lats1[0] == &lats2[0]:
+        for y in prange(ny, nogil=True, schedule='guided'):
+            for x in range(y+1):
+                result[y, x] = result[x, y] = (
+                    diameter * asin(sqrt(
+                        sin((lats1[x] - lats2[y]) / 2.0)**2 +
+                        cos(lats1[x]) * cos(lats2[y]) *
+                        sin((lons1[x] - lons2[y]) / 2.0)**2)))
+    else:
+        for y in prange(ny, nogil=True, schedule=dynamic):
+            for x in range(nx):
+                result[y, x] = (
+                    diameter * asin(sqrt(
+                        sin((lats1[x] - lats2[y]) / 2.0)**2 +
+                        cos(lats1[x]) * cos(lats2[y]) *
+                        sin((lons1[x] - lons2[y]) / 2.0)**2)))
     return
 
 
