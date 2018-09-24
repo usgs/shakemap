@@ -36,9 +36,11 @@ class CrossCorrelationBase(ABC):
                 The indices of the second period of interest.
             h (ndarray):
                 The separation distance between two sites (units of km).
+                The result is placed in h, so h must be copied if it is
+                to be preserved.
 
         Returns:
-            ndarray: The predicted correlation coefficient. The output
+            h (ndarray): The predicted correlation coefficient. The output
             array will have the same shape as the inputs.
 
         """

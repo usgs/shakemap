@@ -749,6 +749,11 @@ class ModelModule(CoreModule):
         df1 = self.df1.df
         gmice_imts = self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
         gmice_pers = self.gmice.DEFINED_FOR_SA_PERIODS
+        df1['MMI'] = self.gmice.getPreferredMI(df1, dists=df1['rrup'],
+                                               mag=self.rx.mag)
+        df1['MMI_sd'] = self.gmice.getPreferredSD()
+        if df1['MMI_sd'] is not None:
+            df1['MMI_sd'] = np.full_like(df1['lon'], df1['MMI_sd'])
         for imtstr in self.df1.imts:
             oqimt = imt.from_string(imtstr)
             if not isinstance(oqimt, tuple(gmice_imts)):
@@ -767,8 +772,9 @@ class ModelModule(CoreModule):
                 np.full_like(df1[imtstr], self.gmice.getGM2MIsd()[oqimt])
 
         preferred_imts = ['PGV', 'PGA', 'SA(1.0)', 'SA(0.3)', 'SA(3.0']
-        df1['MMI'] = np.full_like(df1['lon'], np.nan)
-        df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
+        if(df1['MMI'] is None):
+            df1['MMI'] = np.full_like(df1['lon'], np.nan)
+            df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
         for imtstr in preferred_imts:
             if 'derived_MMI_from_' + imtstr in df1:
                 ixx = np.isnan(df1['MMI'])
@@ -880,8 +886,8 @@ class ModelModule(CoreModule):
             sta_phi_dl = self.sta_phi[imtstr][dix].reshape((-1, 1))
             sta_tau_dl = self.sta_tau[imtstr][dix].reshape((-1, 1))
             sta_sig_total_dl = self.sta_sig_total[imtstr][dix].reshape((-1, 1))
-            sta_lons_rad_dl = self.sta_lons_rad[imtstr][dix].reshape((-1, 1))
-            sta_lats_rad_dl = self.sta_lats_rad[imtstr][dix].reshape((-1, 1))
+            sta_lons_rad_dl = self.sta_lons_rad[imtstr][dix].ravel()
+            sta_lats_rad_dl = self.sta_lats_rad[imtstr][dix].ravel()
             sta_period_ix_dl = self.sta_period_ix[imtstr][dix].reshape((-1, 1))
             sta_resids_dl = self.sta_resids[imtstr][dix].reshape((-1, 1))
             if np.size(sta_lons_rad_dl) == 0:
@@ -897,18 +903,22 @@ class ModelModule(CoreModule):
             #
             # Build the covariance matrix of the residuals
             #
-            dist22 = geodetic_distance_fast_c(sta_lons_rad_dl.ravel(),
-                                              sta_lats_rad_dl.ravel(),
-                                              sta_lons_rad_dl.ravel(),
-                                              sta_lats_rad_dl.ravel())
-            d22_rows, d22_cols = np.shape(dist22)  # should be square
+            # time1 = time.time()
+            matrix22 = np.empty((np.size(sta_lons_rad_dl),
+                                np.size(sta_lons_rad_dl)), dtype=np.double)
+            geodetic_distance_fast_c(sta_lons_rad_dl,
+                                     sta_lats_rad_dl,
+                                     sta_lons_rad_dl,
+                                     sta_lats_rad_dl, matrix22)
+            # print("distance time %f" % (time.time() - time1))
+            d22_rows, d22_cols = np.shape(matrix22)  # should be square
             t1_22 = sta_period_ix_dl * np.ones((1, d22_cols), dtype=np.long)
             t2_22 = sta_period_ix_dl.T * np.ones((d22_rows, 1), dtype=np.long)
-            corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
-            sigma22 = make_sigma_matrix(corr22, corr_adj22,
-                                        sta_phi_dl.ravel(),
-                                        sta_phi_dl.ravel())
-            sigma22inv = np.linalg.pinv(sigma22)
+            self.ccf.getCorrelation(t1_22, t2_22, matrix22)
+            make_sigma_matrix(matrix22, corr_adj22,
+                              sta_phi_dl.ravel(),
+                              sta_phi_dl.ravel())
+            sigma22inv = np.linalg.pinv(matrix22)
             #
             # Compute the bias numerator and denominator pieces
             #
@@ -918,9 +928,8 @@ class ModelModule(CoreModule):
                 # Get the correlation between the inputs and outputs
                 #
                 out_ix_arr = np.full_like(sta_period_ix_dl, outperiod_ix)
-                dist_arr = np.zeros_like(out_ix_arr, dtype=float)
-                Z = self.ccf.getCorrelation(sta_period_ix_dl, out_ix_arr,
-                                            dist_arr)
+                Z = np.zeros_like(out_ix_arr, dtype=float)
+                self.ccf.getCorrelation(sta_period_ix_dl, out_ix_arr, Z)
                 #
                 # Scale the correlation factor (Z) by the correlation
                 # adjustment due to observational uncertainty
@@ -1074,26 +1083,29 @@ class ModelModule(CoreModule):
         # Re-build the covariance matrix of the residuals with
         # the full set of data
         #
-        dist22 = geodetic_distance_fast_c(self.sta_lons_rad[imtstr].ravel(),
-                                          self.sta_lats_rad[imtstr].ravel(),
-                                          self.sta_lons_rad[imtstr].ravel(),
-                                          self.sta_lats_rad[imtstr].ravel())
-        d22_rows, d22_cols = np.shape(dist22)  # should be square
+        matrix22 = np.empty((np.size(self.sta_lons_rad[imtstr]),
+                            np.size(self.sta_lons_rad[imtstr])),
+                            dtype=np.double)
+        geodetic_distance_fast_c(self.sta_lons_rad[imtstr].ravel(),
+                                 self.sta_lats_rad[imtstr].ravel(),
+                                 self.sta_lons_rad[imtstr].ravel(),
+                                 self.sta_lats_rad[imtstr].ravel(), matrix22)
+        d22_rows, d22_cols = np.shape(matrix22)  # should be square
         t1_22 = self.sta_period_ix[imtstr] * np.ones((1, d22_cols),
                                                      dtype=np.long)
         t2_22 = self.sta_period_ix[imtstr].T * np.ones((d22_rows, 1),
                                                        dtype=np.long)
-        corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
+        self.ccf.getCorrelation(t1_22, t2_22, matrix22)
 
         #
         # Rebuild sigma22_inv now that we have updated phi and
         # the correlation adjustment factors
         #
-        sigma22 = make_sigma_matrix(corr22, corr_adj22,
-                                    self.sta_phi[imtstr].ravel(),
-                                    self.sta_phi[imtstr].ravel())
+        make_sigma_matrix(matrix22, corr_adj22,
+                          self.sta_phi[imtstr].ravel(),
+                          self.sta_phi[imtstr].ravel())
 
-        sigma22inv = np.linalg.pinv(sigma22)
+        sigma22inv = np.linalg.pinv(matrix22)
 
         #
         # Now do the MVN itself...
@@ -1115,32 +1127,35 @@ class ModelModule(CoreModule):
                                                      dtype=np.long)
         # sdsta is the standard deviation of the stations
         sdsta = self.sta_phi[imtstr].ravel()
+        matrix12 = np.empty(t2_12.shape, dtype=np.double)
+        rcmatrix = np.empty(t2_12.T.shape, dtype=np.double)
         for iy in range(self.smny):
             ss = iy * self.smnx
             se = (iy + 1) * self.smnx
             time4 = time.time()
-            dist12 = geodetic_distance_fast_c(
+            geodetic_distance_fast_c(
                 lons_out_rad_flat[ss:se],
                 lats_out_rad_flat[ss:se],
                 sta_lons_rad_flat,
-                sta_lats_rad_flat)
+                sta_lats_rad_flat, matrix12)
             ddtime += time.time() - time4
             time4 = time.time()
-            corr12 = self.ccf.getCorrelation(t1_12, t2_12, dist12)
+            self.ccf.getCorrelation(t1_12, t2_12, matrix12)
             ctime += time.time() - time4
             time4 = time.time()
             # sdarr is the standard deviation of the output sites
             sdarr = self.psd[imtstr][iy, :].ravel()
-            sigma12 = make_sigma_matrix(corr12, corr_adj12, sdsta, sdarr)
+            make_sigma_matrix(matrix12, corr_adj12, sdsta, sdarr)
             stime += time.time() - time4
             time4 = time.time()
             #
             # Sigma12 * Sigma22^-1 is known as the 'regression
             # coefficient' matrix (rcmatrix)
             #
-            rcmatrix = sigma12.dot(sigma22inv)
+            np.dot(matrix12.T, sigma22inv, out=rcmatrix)
             dtime += time.time() - time4
             time4 = time.time()
+
             #
             # This is the MVN solution for the conditional mean
             #
@@ -1156,7 +1171,7 @@ class ModelModule(CoreModule):
             # sdgrid[ss:se] = pout_sd2[ss:se] -
             #       np.diag(rcmatrix.dot(sigma21))
             #
-            make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, sigma12)
+            make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, matrix12.T)
             mtime += time.time() - time4
 
         self.outgrid[imtstr] = ampgrid
