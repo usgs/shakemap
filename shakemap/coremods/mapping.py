@@ -9,7 +9,7 @@ import numpy as np
 from scipy.interpolate import griddata
 import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+from impactutils.colors.cpalette import ColorPalette
 
 # local imports
 # from mapio.gmt import GMTGrid
@@ -216,10 +216,11 @@ class MappingModule(CoreModule):
         grid = griddata(np.hstack([rx.reshape((-1, 1)), ry.reshape((-1, 1))]),
                         grid[ry, rx], (mx_grid, my_grid), method='nearest')
 
+        mmimap = ColorPalette.fromPreset('mmi')
         plt.figure(figsize=(2.75, 2.75), dpi=96, frameon=False)
         plt.axis('off')
         plt.tight_layout()
-        plt.imshow(grid, cmap=cm.jet)
+        plt.imshow(grid, cmap=mmimap.cmap, vmin=1.5, vmax=9.5)
         plt.savefig(os.path.join(datadir, "pin-thumbnail.png"), dpi=96,
                     bbox_inches=matplotlib.transforms.Bbox([[0.47, 0.39],
                                                             [2.50, 2.50]]),
