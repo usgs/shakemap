@@ -1335,7 +1335,10 @@ class ModelModule(CoreModule):
         info[op][mi]['max']['units'] = 'degrees'
         info[op][un] = {}
         info[op][un]['grade'] = mygrade
-        info[op][un]['mean_uncertainty_ratio'] = _string_round(mean_rat, 3)
+        if mean_rat == '-':
+            info[op][un]['mean_uncertainty_ratio'] = mean_rat
+        else:
+            info[op][un]['mean_uncertainty_ratio'] = _string_round(mean_rat, 3)
         if 'df2' in self.dataframes:
             info[op][un]['total_flagged_mi'] = \
                 str(np.sum(self.df2.df['MMI_outliers'] |
