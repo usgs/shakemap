@@ -1133,7 +1133,7 @@ class ModelModule(CoreModule):
             ss = iy * self.smnx
             se = (iy + 1) * self.smnx
             time4 = time.time()
-            geodetic_distance_fast_c(
+            geodetic_distance_fast(
                 lons_out_rad_flat[ss:se],
                 lats_out_rad_flat[ss:se],
                 sta_lons_rad_flat,
