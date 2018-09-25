@@ -45,7 +45,7 @@ def test_probs():
     # so m_{int|abs(dz)} = 0.15
     np.testing.assert_allclose(
         gmmodel['weightlist'],
-        np.array([0.85,  0.15]),
+        np.array([0.400137,  0.599863]),
         rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'subduction_crustal'
     assert gmmodel['gmpelist'][1] == 'subduction_interface_nshmp2014'
@@ -61,7 +61,7 @@ def test_probs():
     # so m_{int|abs(dz)} = 0.15
     np.testing.assert_allclose(
         gmmodel['weightlist'],
-        np.array([0.15,  0.85]),
+        np.array([0.15, 0.85]),
         rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'subduction_interface_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'subduction_slab_nshmp2014'
@@ -122,16 +122,14 @@ def test_probs():
     eventxml = os.path.join(datadir, 'event.xml')
     org = Origin.fromFile(eventxml)
     gmmodel, strec_results = get_weights(org, config)
-    assert len(gmmodel['gmpelist']) == 5
-    assert len(gmmodel['weightlist']) == 5
+    assert len(gmmodel['gmpelist']) == 4
+    assert len(gmmodel['weightlist']) == 4
     np.testing.assert_allclose(np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'active_crustal_deep'
-    assert gmmodel['gmpelist'][2] == 'subduction_crustal'
-    assert gmmodel['gmpelist'][3] == 'subduction_interface_nshmp2014'
-    assert gmmodel['gmpelist'][4] == 'subduction_slab_nshmp2014'
-    weights = np.array(
-        [0.14107929,  0.32063474,  0.00484913,  0.13457149,  0.39886534])
+    assert gmmodel['gmpelist'][2] == 'subduction_interface_nshmp2014'
+    assert gmmodel['gmpelist'][3] == 'subduction_slab_nshmp2014'
+    weights = np.array([0.141079, 0.320635, 0.134571, 0.403714])
     np.testing.assert_allclose(weights, gmmodel['weightlist'], rtol=1e-05)
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'

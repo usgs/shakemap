@@ -2,6 +2,7 @@
 import numpy as np
 
 # stdlib imports
+from openquake.hazardlib import imt
 from openquake.hazardlib.imt import PGA, PGV
 from shakelib.gmice.gmice import GMICE
 
@@ -36,9 +37,9 @@ class Wald99(GMICE):
         self.scale = 'scale_wald99.ps'
         self.__constants = {
             self._pga: {'C1':  3.66, 'C2': -1.66, 'C3':  2.20, 'C4': 1.00,
-                    'T1':  1.82, 'T2': 5.00, 'SMMI': 1.08, 'SPGM': 0.295},
+                        'T1':  1.82, 'T2': 5.00, 'SMMI': 1.08, 'SPGM': 0.295},
             self._pgv: {'C1':  3.47, 'C2':  2.35, 'C3':  2.10, 'C4': 3.40,
-                    'T1':  0.76, 'T2': 5.00, 'SMMI': 0.98, 'SPGM': 0.282},
+                        'T1':  0.76, 'T2': 5.00, 'SMMI': 0.98, 'SPGM': 0.282},
         }
 
         self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
@@ -47,6 +48,28 @@ class Wald99(GMICE):
         ])
 
         self.DEFINED_FOR_SA_PERIODS = set([])
+
+    def getPreferredMI(self, df, dists=None, mag=None):
+        if 'PGA' not in df or 'PGV' not in df:
+            if 'PGV' in df:
+                oqimt = imt.from_string('PGV')
+                return self.getMIfromGM(df['PGV'], oqimt, dists, mag)
+            elif 'PGA' in df:
+                oqimt = imt.from_string('PGA')
+                return self.getMIfromGM(df['PGA'], oqimt, dists, mag)
+            else:
+                return None
+        oqimt = imt.from_string('PGA')
+        mmi_pga = self.getMIfromGM(df['PGA'], oqimt, dists, mag)
+        oqimt = imt.from_string('PGV')
+        mmi_pgv = self.getMIfromGM(df['PGV'], oqimt, dists, mag)
+        vscale = (mmi_pga - 5) / 2
+        vscale[vscale < 0] = 0
+        vscale[vscale > 1] = 1
+        ascale = 1 - vscale
+        mmi = np.clip(mmi_pga * ascale + mmi_pgv * vscale, 1, 10)
+        mmi[mmi > 9.5] = 10.0
+        return mmi
 
     def getMIfromGM(self, amps, imt, dists=None, mag=None):
         """

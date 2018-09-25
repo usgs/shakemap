@@ -150,7 +150,6 @@ package_list='
       lockfile
       mapio
       matplotlib<=2.3
-      numexpr
       numpy
       obspy
       openquake.engine

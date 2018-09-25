@@ -52,9 +52,10 @@ class DummyCorrelation(CrossCorrelationBase):
                 The indices of the second period of interest.
             h (ndarray):
                 The separation distance between two sites (units of km).
+                The result is placed in h.
 
         Returns:
-            ndarray: The predicted correlation coefficient. The output
+            h (ndarray): The predicted correlation coefficient. The output
             array will have the same shape as the inputs.
 
         """
@@ -73,4 +74,5 @@ class DummyCorrelation(CrossCorrelationBase):
         rho[invix] = 1.0 / rho[invix]
         ad = np.abs(h)
         rho = rho * np.exp(-ad / 10)
-        return rho
+        h[:] = rho[:]
+        return h
