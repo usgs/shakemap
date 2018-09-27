@@ -134,7 +134,6 @@ conda remove -y -n $VENV --all
 package_list='
       python=3.5
       amptools
-      basemap
       cartopy
       cython
       defusedxml

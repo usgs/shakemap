@@ -2,7 +2,6 @@
 Process a ShakeMap, based on the configuration and data found in
 shake_data.hdf, and produce output in shake_result.hdf.
 """
-import warnings
 import os.path
 import time as time
 import copy
@@ -13,9 +12,10 @@ from datetime import date
 
 import numpy as np
 import numpy.ma as ma
-from mpl_toolkits.basemap import maskoceans
 from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
+from mapio.geodict import GeoDict
+import mapio.reader
 
 import concurrent.futures as cf
 
@@ -34,7 +34,8 @@ from shakelib.utils.containers import ShakeMapInputContainer
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.rupture import constants
 
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_data_path)
 from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions
 from shakemap.utils.generic_amp import get_generic_amp_factors
@@ -571,7 +572,7 @@ class ModelModule(CoreModule):
                 self.dataframes.append(dfid)
 
         # Flag the stations in the bad stations list from the config
-        if not getattr(self, 'df1'):
+        if not hasattr(self, 'df1'):
             return
         evdt = date(self.rupture_obj._origin.time.year,
                     self.rupture_obj._origin.time.month,
@@ -579,6 +580,8 @@ class ModelModule(CoreModule):
         nostart = date(1970, 1, 1)
         self.df1.df['flagged'] = np.full_like(self.df1.df['lon'], 0,
                                               dtype=np.bool)
+        if 'bad_stations' not in self.config['data']:
+            return
         for sid, dates in self.config['data']['bad_stations'].items():
             ondate, offdate = dates.split(':')
             year, month, day = map(int, ondate.split('-'))
@@ -775,8 +778,10 @@ class ModelModule(CoreModule):
         df1 = self.df1.df
         gmice_imts = self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
         gmice_pers = self.gmice.DEFINED_FOR_SA_PERIODS
+        np.seterr(invalid='ignore')
         df1['MMI'] = self.gmice.getPreferredMI(df1, dists=df1['rrup'],
                                                mag=self.rx.mag)
+        np.seterr(invalid='warn')
         df1['MMI_sd'] = self.gmice.getPreferredSD()
         if df1['MMI_sd'] is not None:
             df1['MMI_sd'] = np.full_like(df1['lon'], df1['MMI_sd'])
@@ -1215,26 +1220,20 @@ class ModelModule(CoreModule):
         masked out.
         """
         moutgrid = {}
-        # We only need to make the mask for one IMT, then we can
-        # apply it to all of the other grids.
-        refimt = list(self.imt_out_set)[0]
-
-        #
-        # Don't know what to do about this warning; hopefully someone
-        # will fix maskoceans()
-        #
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore",
-                                    category=np.VisibleDeprecationWarning)
-            moutgrid[refimt] = \
-                maskoceans(self.sx_out.lons, self.sx_out.lats,
-                           self.outgrid[refimt], inlands=False, grid=1.25)
+        if not self.do_grid:
+            for imtout in self.imt_out_set:
+                moutgrid[imtout] = self.outgrid[imtout]
+            return moutgrid
+        gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
+                                       self.smdx, self.smdy)
+        maskfile = os.path.join(get_data_path(), 'landmask', 'landmask_nb.grd')
+        mask = mapio.reader.read(maskfile, samplegeodict=gd, resample=True,
+                                 method='nearest', doPadding=True,
+                                 padValue=0)
+        bmask = ~(mask._data.astype(np.bool))
         for imtout in self.imt_out_set:
-            if imtout == refimt:
-                continue
             moutgrid[imtout] = \
-                ma.masked_array(self.outgrid[imtout],
-                                mask=copy.copy(moutgrid[refimt].mask))
+                ma.masked_array(self.outgrid[imtout], mask=bmask)
         return moutgrid
 
     def _getInfo(self, moutgrid):
