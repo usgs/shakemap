@@ -9,6 +9,7 @@ import copy
 from time import gmtime, strftime
 import shutil
 from collections import OrderedDict
+from datetime import date
 
 import numpy as np
 import numpy.ma as ma
@@ -568,6 +569,31 @@ class ModelModule(CoreModule):
                 df.imts = imts
                 setattr(self, dfid, df)
                 self.dataframes.append(dfid)
+
+        # Flag the stations in the bad stations list from the config
+        if not getattr(self, 'df1'):
+            return
+        evdt = date(self.rupture_obj._origin.time.year,
+                    self.rupture_obj._origin.time.month,
+                    self.rupture_obj._origin.time.day)
+        nostart = date(1970, 1, 1)
+        self.df1.df['flagged'] = np.full_like(self.df1.df['lon'], 0,
+                                              dtype=np.bool)
+        for sid, dates in self.config['data']['bad_stations'].items():
+            ondate, offdate = dates.split(':')
+            year, month, day = map(int, ondate.split('-'))
+            ondt = date(year, month, day)
+            if offdate:
+                year, month, day = map(int, offdate.split('-'))
+                offdt = date(year, month, day)
+            else:
+                offdt = None
+            bad = False
+            if (ondt == nostart or ondt <= evdt) and \
+                    (offdt is None or offdt >= evdt):
+                bad = True
+            if bad:
+                self.df1.df['flagged'] |= (self.df1.df['id'] == sid)
 
     def _populateDataFrames(self):
         """
@@ -1174,14 +1200,14 @@ class ModelModule(CoreModule):
         self.outgrid[imtstr] = ampgrid
         self.outsd[imtstr] = sdgrid
 
-        self.logger.info('\ttime for %s distance=%f' % (imtstr, ddtime))
-        self.logger.info('\ttime for %s correlation=%f' % (imtstr, ctime))
-        self.logger.info('\ttime for %s sigma=%f' % (imtstr, stime))
-        self.logger.info('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
-        self.logger.info('\ttime for %s amp calc=%f' % (imtstr, atime))
-        self.logger.info('\ttime for %s sd calc=%f' % (imtstr, mtime))
-        self.logger.info('total time for %s=%f' %
-                         (imtstr, time.time() - time1))
+        self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
+        self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
+        self.logger.debug('\ttime for %s sigma=%f' % (imtstr, stime))
+        self.logger.debug('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
+        self.logger.debug('\ttime for %s amp calc=%f' % (imtstr, atime))
+        self.logger.debug('\ttime for %s sd calc=%f' % (imtstr, mtime))
+        self.logger.debug('total time for %s=%f' %
+                          (imtstr, time.time() - time1))
 
     def _getMaskedGrids(self):
         """
@@ -1351,6 +1377,7 @@ class ModelModule(CoreModule):
                 all_flagged |= \
                     self.df1.df[imtstr + '_outliers'] | \
                     np.isnan(self.df1.df[imtstr])
+            all_flagged |= self.df1.df['flagged']
             info[op][un]['total_flagged_pgm'] = str(np.sum(all_flagged))
         else:
             info[op][un]['total_flagged_pgm'] = '0'
@@ -1491,14 +1518,16 @@ class ModelModule(CoreModule):
                 station['properties']['intensity_stddev'] = 'null'
 
             if 'PGA' in sdf and not sdf['PGA_outliers'][six] \
-                    and not np.isnan(sdf['PGA'][six]):
+                    and not np.isnan(sdf['PGA'][six]) \
+                    and (ndf != 'df1' or not sdf['flagged'][six]):
                 station['properties']['pga'] = \
                     _round_float(np.exp(sdf['PGA'][six]) * 100, 4)
             else:
                 station['properties']['pga'] = 'null'
 
             if 'PGV' in sdf and not sdf['PGV_outliers'][six] \
-                    and not np.isnan(sdf['PGV'][six]):
+                    and not np.isnan(sdf['PGV'][six]) \
+                    and (ndf != 'df1' or not sdf['flagged'][six]):
                 station['properties']['pgv'] = \
                     _round_float(np.exp(sdf['PGV'][six]), 4)
             else:
@@ -1615,16 +1644,21 @@ class ModelModule(CoreModule):
             #
             # Set the outlier flags
             #
+            mflag = '0'
+            if ndf == 'df1' and sdf['flagged'][six]:
+                mflag = 'M'
             for channel in station['properties']['channels']:
                 for amp in channel['amplitudes']:
+                    if amp['flag'] != '0':
+                        amp['flag'] += mflag
+                    else:
+                        amp['flag'] = mflag
                     Name = amp['name'].upper()
                     if sdf[Name + '_outliers'][six]:
                         if amp['flag'] == '0':
                             amp['flag'] = 'T'
                         else:
-                            amp['flag'] += 'T'
-                    if not amp['flag']:
-                        amp['flag'] = '0'
+                            amp['flag'] += ',T'
         return sjdict
 
     def _storeGriddedData(self, oc):
@@ -2102,12 +2136,13 @@ def _get_imt_lists(df):
     for ix in range(nlist):
         valid_imts = []
         sa_imts = []
-        for this_imt in df.imts:
-            if not np.isnan(df.df[this_imt][ix]) and \
-               not df.df[this_imt + '_outliers'][ix]:
-                valid_imts.append(this_imt)
-                if this_imt.startswith('SA('):
-                    sa_imts.append(this_imt)
+        if 'flagged' not in df.df or not df.df['flagged'][ix]:
+            for this_imt in df.imts:
+                if not np.isnan(df.df[this_imt][ix]) and \
+                        not df.df[this_imt + '_outliers'][ix]:
+                    valid_imts.append(this_imt)
+                    if this_imt.startswith('SA('):
+                        sa_imts.append(this_imt)
         imtlist.append(valid_imts)
         salist.append(sa_imts)
     return imtlist, salist
