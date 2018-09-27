@@ -392,7 +392,11 @@ def create_polygons(container, document):
     gdict = container.getIMTGrids("MMI", component)
     fgrid = median_filter(gdict['mean'], size=10)
     cont_min = np.floor(np.min(fgrid)) - 0.5
+    if cont_min < 0:
+        cont_min = 0.5
     cont_max = np.ceil(np.max(fgrid)) + 0.5
+    if cont_max > 10.5:
+        cont_max = 10.5
     contour_levels = np.arange(cont_min, cont_max, 1, dtype=np.double)
     gjson = pcontour(fgrid,
                      gdict['mean_metadata']['dx'],
