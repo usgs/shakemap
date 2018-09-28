@@ -1,7 +1,6 @@
 # stdlib imports
 from datetime import datetime
 import os.path
-import time
 
 # third party imports
 import numpy as np
@@ -9,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LightSource
 import matplotlib.patheffects as path_effects
+from matplotlib.font_manager import FontProperties
 
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
@@ -37,13 +37,14 @@ from mapio.geodict import GeoDict
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture import constants
 from shakelib.rupture.factory import rupture_from_dict
-from shakelib.plotting.contour import contour
+from shakelib.plotting.contour import contour, getContourLevels
 from shakelib.utils.imt_string import oq_to_file
+from shakelib.gmice.wgrw12 import WGRW12
 from shakemap.utils.utils import get_object_from_config
 
 # define some constants
 WATERCOLOR = '#7AA1DA'
-FIGWIDTH = 7.0
+FIGWIDTH = 10.0
 FILTER_SMOOTH = 5.0
 XOFFSET = 4  # how many pixels between the city dot and the city text
 VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
@@ -93,6 +94,33 @@ MMI_LABELS = {'1': 'I',
 
 DEG2KM = 111.191
 
+# what is the colormap we want to use for non-MMI intensity values?
+IMT_CMAP = 'PuRd'
+
+
+def _create_palette(imtype, levels):
+    """Create a ColorPalette object from given levels and IMT type.
+
+    Args:
+        imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
+        levels (sequence): Sequence of contour levels.
+    Returns:
+        ColorPalette: ColorPalette using range of input data and IMT_CMAP.
+    """
+    # this method assumes that levels are in logspace
+    if len(levels) > 1:
+        if len(levels) % 2:
+            levels.append(levels[-1])
+        nsteps = 256
+        z0 = np.linspace(np.log(levels[0]), np.log(levels[-2]), nsteps)
+        z1 = np.linspace(np.log(levels[1]), np.log(levels[-1]), nsteps)
+    else:
+        z0 = np.array([levels[0], levels[0]*10])
+        z1 = np.array([levels[0], levels[0]*10])
+    cmap = plt.get_cmap(IMT_CMAP)
+    palette = ColorPalette.fromColorMap(imtype, z0, z1, cmap, is_log=True)
+    return palette
+
 
 def _get_projected_grids(imtgrid, topobase, projstr):
     """Resample IMT grid to topography, return projected versions of each.
@@ -115,9 +143,7 @@ def _get_projected_grids(imtgrid, topobase, projstr):
     simtgrid = imtgrid.interpolateToGrid(sampledict)
 
     # get topo layer and project it
-    t1 = time.time()
     topogrid = topobase.interpolateToGrid(sampledict)
-    t2 = time.time()
 
     # resampling 32bit floats gives odd results... upcasting to 64bit
     topogrid._data = topogrid._data.astype(np.float64)
@@ -170,10 +196,179 @@ def _get_map_info(gd, center_lat):
     #     height = (ymax-ymin)*DEG2KM
 
     aspect = width/height
-    figheight = FIGWIDTH/aspect
+    legend_pad = 1.5
+    figheight = FIGWIDTH/aspect + legend_pad
     bounds = (xmin, xmax, ymin, ymax)
     figsize = (FIGWIDTH, figheight)
     return (bounds, figsize)
+
+
+def _draw_imt_legend(fig, levels, palette, imtype):
+    """Create a legend axis for non MMI plots.
+
+    Args:
+        fig (Figure): Matplotlib Figure object.
+        levels (sequence): Sequence of contour levels.
+        palette (ColorPalette): ColorPalette using range of input data and IMT_CMAP.
+        imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
+    """
+    units = {'PGV': '(cm/s)',
+             'PGA': '(%g)',
+             'SA(0.3)': '(%g)',
+             'SA(1.0)': '(%g)',
+             'SA(3.0)': '(%g)'}
+    imtlabel = imtype + ' ' + units[imtype]
+    # imtlabel = imtype
+
+    cax = fig.add_axes([0.1, 0.1, 0.8, 0.02])
+    plt.axis('off')
+    cax_xmin, cax_xmax = cax.get_xlim()
+    bottom, top = cax.get_ylim()
+    plt.xlim(cax_xmin, cax_xmax)
+    plt.ylim(bottom, top)
+
+    firstcol_width = 0.15
+
+    font0 = FontProperties()
+    alignment = {'horizontalalignment': 'center',
+                 'verticalalignment': 'center'}
+    font0.set_weight('bold')
+
+    xloc = firstcol_width/2
+    plt.text(xloc, 0.5, imtlabel,
+             fontproperties=font0, **alignment)
+    # draw top/bottom edges of table
+    plt.plot([0, 1], [0, 0], 'k', clip_on=False)
+    plt.plot([0, 1], [1, 1], 'k', clip_on=False)
+    # draw left edge of table
+    plt.plot([0, 0], [0, 1], 'k', clip_on=False)
+    # draw right edge of first column
+    plt.plot([firstcol_width, firstcol_width], [0, 1], 'k', clip_on=False)
+    # draw right edge of table
+    plt.plot([1, 1], [0, 1], 'k', clip_on=False)
+
+    # we want to draw len(levels) cells and color them
+    # according to each level
+    nlevels = len(levels)
+    cell_width = (1 - firstcol_width)/nlevels
+    rights = np.linspace(firstcol_width+cell_width, 1, nlevels)
+    left = firstcol_width
+    for i in range(0, nlevels):
+        right = rights[i]
+        imtval = levels[i]
+        px = [left, right, right, left, left]
+        py = [1, 1, 0, 0, 1]
+        imtcolor = palette.getDataColor(imtval, color_format='hex')
+        plt.fill(px, py, imtcolor, ec=imtcolor)
+        plt.plot([right, right], [0, 1], 'k', clip_on=False)
+        imtstr = "{0:.3g}".format(imtval)
+        th = plt.text(np.mean([left, right]), 0.5, imtstr,
+                      fontproperties=font0, **alignment)
+        th.set_path_effects([path_effects.Stroke(linewidth=2.0,
+                                                 foreground='white'),
+                             path_effects.Normal()])
+        left = right
+
+
+def _draw_mmi_legend(fig, palette):
+    """Create a legend axis for MMI plots.
+
+    Args:
+        fig (Figure): Matplotlib Figure object.
+        levels (sequence): Sequence of contour levels.
+        palette (ColorPalette): ColorPalette using range of input data and IMT_CMAP.
+        imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
+    """
+    cax = fig.add_axes([0.1, 0.02, 0.8, 0.07])
+    plt.axis('off')
+    cax_xmin, cax_xmax = cax.get_xlim()
+    bottom, top = cax.get_ylim()
+    plt.xlim(cax_xmin, cax_xmax)
+    plt.ylim(bottom, top)
+
+    shaking = ['SHAKING',
+               'Not felt',
+               'Weak',
+               'Light',
+               'Moderate',
+               'Strong',
+               'Very strong',
+               'Severe',
+               'Violent',
+               'Extreme']
+    damage = ['DAMAGE',
+              'None',
+              'None',
+              'None',
+              'Very light',
+              'Light',
+              'Moderate',
+              'Moderate/heavy',
+              'Heavy',
+              'Very heavy']
+
+    imt_edges = np.array([0.5, 1.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5])
+    intensities = ['INTENSITY', 'I', 'II-III',
+                   'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X+']
+
+    widths = np.array([11.5, 7.75, 6.75, 7.0, 10.25,
+                       8.5, 12.0, 16.25, 8.25, 11.75])/100
+
+    yloc_first_row = 5/6
+    yloc_second_row = 3/6
+    yloc_third_row = 1/6
+
+    yloc_first_line = 4/6
+    yloc_second_line = 2/6
+
+    font0 = FontProperties()
+    alignment = {'horizontalalignment': 'center',
+                 'verticalalignment': 'center'}
+    font0.set_weight('bold')
+    # draw vertical cell separators
+    sumwidth = 0.0
+    gridleft = 0.0
+    plt.plot([gridleft, gridleft], [bottom, top],
+             'k', clip_on=False)  # left edge
+    plt.plot([0, 1], [top, top], 'k', clip_on=False)
+    plt.plot([0, 1], [bottom, bottom], 'k', clip_on=False)
+
+    plt.plot([0, 1], [yloc_first_line,
+                      yloc_first_line], 'k', clip_on=False)
+    plt.plot([0, 1], [yloc_second_line,
+                      yloc_second_line], 'k', clip_on=False)
+    nsteps = 10
+    for i in range(0, len(widths)):
+        width = widths[i]
+        textleft = sumwidth + width/2
+        sumwidth += width
+        plt.text(textleft, yloc_first_row, shaking[i],
+                 fontproperties=font0, **alignment)
+        plt.text(textleft, yloc_second_row, damage[i],
+                 fontproperties=font0, **alignment)
+        plt.text(textleft, yloc_third_row, intensities[i],
+                 fontproperties=font0, **alignment)
+
+        # draw right edge of cell
+        plt.plot([gridleft+widths[i], gridleft+widths[i]],
+                 [bottom, top], 'k', clip_on=False)  # right
+
+        # draw little colored rectangles inside the MMI cells
+        if i > 0:
+            left = gridleft
+            ptop = yloc_second_line
+            imt_min = imt_edges[i-1]
+            imt_max = imt_edges[i]
+            imts = np.linspace(imt_min, imt_max, nsteps)
+            rights = np.linspace(gridleft, gridleft+width, nsteps)
+            for mmi, right in zip(imts, rights):
+                px = [left, right, right, left, left]
+                py = [ptop, ptop, bottom, bottom, ptop]
+                mmicolor = palette.getDataColor(mmi, color_format='hex')
+                left = right
+                plt.fill(px, py, mmicolor, ec=mmicolor)
+
+        gridleft += widths[i]
 
 
 def _draw_colorbar(fig, mmimap):
@@ -583,7 +778,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # Create the MercatorMap object, which holds a separate but identical
     # axes object used to determine collisions between city labels.
     mmap = MercatorMap(bounds, figsize, cities, padding=0.5,
-                       dimensions=[0.1, 0.1, 0.8, 0.8])
+                       dimensions=[0.1, 0.115, 0.8, 0.7])
     fig = mmap.figure
     ax = mmap.axes
 
@@ -692,7 +887,8 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     _draw_graticules(ax, *bounds)
 
     # draw a separate intensity colorbar in a separate axes
-    _draw_colorbar(fig, mmimap)
+    # _draw_colorbar(fig, mmimap)
+    _draw_mmi_legend(fig, mmimap)
 
     # # make the map border thicker
     # the left/top edges don't line up here
@@ -818,6 +1014,10 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
                               component, filter_size,
                               my_gmice)
 
+    # get a color palette for the levels we have
+    levels = [c['properties']['value'] for c in contour_objects]
+    imt_cmap = _create_palette(imtype, levels)
+
     # cartopy shapely feature has some weird behaviors, so I had to go rogue
     # and draw contour lines/labels myself.
     # draw dashed contours first, the ones over land will be overridden by
@@ -831,7 +1031,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
             pmulti_line = mapping(multi_line)['coordinates']
             x, y = zip(*pmulti_line)
             npoints.append(len(x))
-            ax.plot(x, y, color=props['color'], linestyle='dashed',
+            color = imt_cmap.getDataColor(props['value'])
+            ax.plot(x, y, color=color, linestyle='dashed',
                     zorder=DASHED_CONTOUR_ZORDER)
 
     white_box = dict(boxstyle="round",
@@ -854,7 +1055,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
         for multi_line in pmulti_lines:
             pmulti_line = mapping(multi_line)['coordinates']
             x, y = zip(*pmulti_line)
-            ax.plot(x, y, color=props['color'], linestyle='solid',
+            color = imt_cmap.getDataColor(props['value'])
+            ax.plot(x, y, color=color, linestyle='solid',
                     zorder=CONTOUR_ZORDER)
             if len(x) > min_npoints:
                 # try to label each segment with black text in a white box
@@ -939,7 +1141,9 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     _draw_title(imtype, container, operator)
 
     # draw a separate intensity colorbar in a separate axes
-    _draw_colorbar(fig, mmimap)
+    # _draw_colorbar(fig, mmimap)
+
+    _draw_imt_legend(fig, levels, imt_cmap, imtype)
 
     # save plot to file
     fileimt = oq_to_file(imtype)
