@@ -139,7 +139,7 @@ def test_is_stable():
     assert is_stable(-87.0, 36.0)  # Nashville
     assert not is_stable(-112.0, 39.0)  # Wasatch
     assert is_stable(135.0, -30.0)  # South Australia
-    assert not is_stable(180.0, 0.0)  # South Pacific
+    assert is_stable(180.0, 0.0)  # South Pacific
     assert is_stable(-60.0, -15.0)  # Brazil, near border of Bolivia
 
 

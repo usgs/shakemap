@@ -2,19 +2,20 @@
 Process a ShakeMap, based on the configuration and data found in
 shake_data.hdf, and produce output in shake_result.hdf.
 """
-import warnings
 import os.path
 import time as time
 import copy
 from time import gmtime, strftime
 import shutil
 from collections import OrderedDict
+from datetime import date
 
 import numpy as np
 import numpy.ma as ma
-from mpl_toolkits.basemap import maskoceans
 from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
+from mapio.geodict import GeoDict
+import mapio.reader
 
 import concurrent.futures as cf
 
@@ -33,7 +34,8 @@ from shakelib.utils.containers import ShakeMapInputContainer
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.rupture import constants
 
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_data_path)
 from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions
 from shakemap.utils.generic_amp import get_generic_amp_factors
@@ -569,6 +571,33 @@ class ModelModule(CoreModule):
                 setattr(self, dfid, df)
                 self.dataframes.append(dfid)
 
+        # Flag the stations in the bad stations list from the config
+        if not hasattr(self, 'df1'):
+            return
+        evdt = date(self.rupture_obj._origin.time.year,
+                    self.rupture_obj._origin.time.month,
+                    self.rupture_obj._origin.time.day)
+        nostart = date(1970, 1, 1)
+        self.df1.df['flagged'] = np.full_like(self.df1.df['lon'], 0,
+                                              dtype=np.bool)
+        if 'bad_stations' not in self.config['data']:
+            return
+        for sid, dates in self.config['data']['bad_stations'].items():
+            ondate, offdate = dates.split(':')
+            year, month, day = map(int, ondate.split('-'))
+            ondt = date(year, month, day)
+            if offdate:
+                year, month, day = map(int, offdate.split('-'))
+                offdt = date(year, month, day)
+            else:
+                offdt = None
+            bad = False
+            if (ondt == nostart or ondt <= evdt) and \
+                    (offdt is None or offdt >= evdt):
+                bad = True
+            if bad:
+                self.df1.df['flagged'] |= (self.df1.df['id'] == sid)
+
     def _populateDataFrames(self):
         """
         Make the sites and distance contexts for each dataframe then
@@ -749,8 +778,10 @@ class ModelModule(CoreModule):
         df1 = self.df1.df
         gmice_imts = self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
         gmice_pers = self.gmice.DEFINED_FOR_SA_PERIODS
+        np.seterr(invalid='ignore')
         df1['MMI'] = self.gmice.getPreferredMI(df1, dists=df1['rrup'],
                                                mag=self.rx.mag)
+        np.seterr(invalid='warn')
         df1['MMI_sd'] = self.gmice.getPreferredSD()
         if df1['MMI_sd'] is not None:
             df1['MMI_sd'] = np.full_like(df1['lon'], df1['MMI_sd'])
@@ -904,20 +935,21 @@ class ModelModule(CoreModule):
             # Build the covariance matrix of the residuals
             #
             # time1 = time.time()
-            matrix22 = np.empty((np.size(sta_lons_rad_dl),
-                                np.size(sta_lons_rad_dl)), dtype=np.double)
+            nsta = np.size(sta_lons_rad_dl)
+            matrix22 = np.empty((nsta, nsta), dtype=np.double)
             geodetic_distance_fast(sta_lons_rad_dl,
                                    sta_lats_rad_dl,
                                    sta_lons_rad_dl,
                                    sta_lats_rad_dl, matrix22)
             # print("distance time %f" % (time.time() - time1))
-            d22_rows, d22_cols = np.shape(matrix22)  # should be square
-            t1_22 = sta_period_ix_dl * np.ones((1, d22_cols), dtype=np.long)
-            t2_22 = sta_period_ix_dl.T * np.ones((d22_rows, 1), dtype=np.long)
+            ones = np.ones((1, nsta), dtype=np.long)
+            t1_22 = sta_period_ix_dl * ones
+            t2_22 = sta_period_ix_dl.T * ones.T
             self.ccf.getCorrelation(t1_22, t2_22, matrix22)
+            sta_phi_dl_flat = sta_phi_dl.ravel()
             make_sigma_matrix(matrix22, corr_adj22,
-                              sta_phi_dl.ravel(),
-                              sta_phi_dl.ravel())
+                              sta_phi_dl_flat,
+                              sta_phi_dl_flat)
             sigma22inv = np.linalg.pinv(matrix22)
             #
             # Compute the bias numerator and denominator pieces
@@ -1079,32 +1111,30 @@ class ModelModule(CoreModule):
         corr_adj22 = corr_adj * corr_adj.T
         np.fill_diagonal(corr_adj22, 1.0)
 
+        sta_lons_rad_flat = self.sta_lons_rad[imtstr].ravel()
+        sta_lats_rad_flat = self.sta_lats_rad[imtstr].ravel()
         #
         # Re-build the covariance matrix of the residuals with
         # the full set of data
         #
-        matrix22 = np.empty((np.size(self.sta_lons_rad[imtstr]),
-                            np.size(self.sta_lons_rad[imtstr])),
-                            dtype=np.double)
-        geodetic_distance_fast(self.sta_lons_rad[imtstr].ravel(),
-                               self.sta_lats_rad[imtstr].ravel(),
-                               self.sta_lons_rad[imtstr].ravel(),
-                               self.sta_lats_rad[imtstr].ravel(), matrix22)
-        d22_rows, d22_cols = np.shape(matrix22)  # should be square
-        t1_22 = self.sta_period_ix[imtstr] * np.ones((1, d22_cols),
-                                                     dtype=np.long)
-        t2_22 = self.sta_period_ix[imtstr].T * np.ones((d22_rows, 1),
-                                                       dtype=np.long)
+        nsta = np.size(sta_lons_rad_flat)
+        matrix22 = np.empty((nsta, nsta), dtype=np.double)
+        geodetic_distance_fast(sta_lons_rad_flat,
+                               sta_lats_rad_flat,
+                               sta_lons_rad_flat,
+                               sta_lats_rad_flat,
+                               matrix22)
+        ones = np.ones((1, nsta), dtype=np.long)
+        t1_22 = self.sta_period_ix[imtstr] * ones
+        t2_22 = self.sta_period_ix[imtstr].T * ones.T
         self.ccf.getCorrelation(t1_22, t2_22, matrix22)
 
         #
         # Rebuild sigma22_inv now that we have updated phi and
         # the correlation adjustment factors
         #
-        make_sigma_matrix(matrix22, corr_adj22,
-                          self.sta_phi[imtstr].ravel(),
-                          self.sta_phi[imtstr].ravel())
-
+        sta_phi_flat = self.sta_phi[imtstr].ravel()
+        make_sigma_matrix(matrix22, corr_adj22, sta_phi_flat, sta_phi_flat)
         sigma22inv = np.linalg.pinv(matrix22)
 
         #
@@ -1114,30 +1144,28 @@ class ModelModule(CoreModule):
 
         ampgrid = np.zeros_like(pout_mean)
         sdgrid = np.zeros_like(pout_mean)
-        corr_adj12 = corr_adj * np.ones((1, self.smnx))
+        corr_adj12 = corr_adj.T * np.ones((self.smnx, 1))
         # Stuff that doesn't change within the loop:
-        sta_lons_rad_flat = self.sta_lons_rad[imtstr].ravel()
-        sta_lats_rad_flat = self.sta_lats_rad[imtstr].ravel()
         lons_out_rad_flat = self.lons_out_rad.ravel()
         lats_out_rad_flat = self.lats_out_rad.ravel()
-        ny = np.size(sta_lats_rad_flat)
         d12_cols = self.smnx
-        t2_12 = np.full((ny, d12_cols), outperiod_ix, dtype=np.int)
-        t1_12 = self.sta_period_ix[imtstr] * np.ones((1, d12_cols),
-                                                     dtype=np.long)
+        t2_12 = np.full((d12_cols, nsta), outperiod_ix, dtype=np.long)
+        t1_12 = self.sta_period_ix[imtstr].T * np.ones((d12_cols, 1),
+                                                       dtype=np.long)
         # sdsta is the standard deviation of the stations
         sdsta = self.sta_phi[imtstr].ravel()
         matrix12 = np.empty(t2_12.shape, dtype=np.double)
-        rcmatrix = np.empty(t2_12.T.shape, dtype=np.double)
+        rcmatrix = np.empty(t2_12.shape, dtype=np.double)
         for iy in range(self.smny):
             ss = iy * self.smnx
             se = (iy + 1) * self.smnx
             time4 = time.time()
             geodetic_distance_fast(
+                sta_lons_rad_flat,
+                sta_lats_rad_flat,
                 lons_out_rad_flat[ss:se],
                 lats_out_rad_flat[ss:se],
-                sta_lons_rad_flat,
-                sta_lats_rad_flat, matrix12)
+                matrix12)
             ddtime += time.time() - time4
             time4 = time.time()
             self.ccf.getCorrelation(t1_12, t2_12, matrix12)
@@ -1152,7 +1180,7 @@ class ModelModule(CoreModule):
             # Sigma12 * Sigma22^-1 is known as the 'regression
             # coefficient' matrix (rcmatrix)
             #
-            np.dot(matrix12.T, sigma22inv, out=rcmatrix)
+            np.dot(matrix12, sigma22inv, out=rcmatrix)
             dtime += time.time() - time4
             time4 = time.time()
 
@@ -1171,7 +1199,7 @@ class ModelModule(CoreModule):
             # sdgrid[ss:se] = pout_sd2[ss:se] -
             #       np.diag(rcmatrix.dot(sigma21))
             #
-            make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, matrix12.T)
+            make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, matrix12)
             mtime += time.time() - time4
 
         self.outgrid[imtstr] = ampgrid
@@ -1192,26 +1220,20 @@ class ModelModule(CoreModule):
         masked out.
         """
         moutgrid = {}
-        # We only need to make the mask for one IMT, then we can
-        # apply it to all of the other grids.
-        refimt = list(self.imt_out_set)[0]
-
-        #
-        # Don't know what to do about this warning; hopefully someone
-        # will fix maskoceans()
-        #
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore",
-                                    category=np.VisibleDeprecationWarning)
-            moutgrid[refimt] = \
-                maskoceans(self.sx_out.lons, self.sx_out.lats,
-                           self.outgrid[refimt], inlands=False, grid=1.25)
+        if not self.do_grid:
+            for imtout in self.imt_out_set:
+                moutgrid[imtout] = self.outgrid[imtout]
+            return moutgrid
+        gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
+                                       self.smdx, self.smdy)
+        maskfile = os.path.join(get_data_path(), 'landmask', 'landmask_nb.grd')
+        mask = mapio.reader.read(maskfile, samplegeodict=gd, resample=True,
+                                 method='nearest', doPadding=True,
+                                 padValue=0)
+        bmask = ~(mask._data.astype(np.bool))
         for imtout in self.imt_out_set:
-            if imtout == refimt:
-                continue
             moutgrid[imtout] = \
-                ma.masked_array(self.outgrid[imtout],
-                                mask=copy.copy(moutgrid[refimt].mask))
+                ma.masked_array(self.outgrid[imtout], mask=bmask)
         return moutgrid
 
     def _getInfo(self, moutgrid):
@@ -1354,6 +1376,7 @@ class ModelModule(CoreModule):
                 all_flagged |= \
                     self.df1.df[imtstr + '_outliers'] | \
                     np.isnan(self.df1.df[imtstr])
+            all_flagged |= self.df1.df['flagged']
             info[op][un]['total_flagged_pgm'] = str(np.sum(all_flagged))
         else:
             info[op][un]['total_flagged_pgm'] = '0'
@@ -1494,14 +1517,16 @@ class ModelModule(CoreModule):
                 station['properties']['intensity_stddev'] = 'null'
 
             if 'PGA' in sdf and not sdf['PGA_outliers'][six] \
-                    and not np.isnan(sdf['PGA'][six]):
+                    and not np.isnan(sdf['PGA'][six]) \
+                    and (ndf != 'df1' or not sdf['flagged'][six]):
                 station['properties']['pga'] = \
                     _round_float(np.exp(sdf['PGA'][six]) * 100, 4)
             else:
                 station['properties']['pga'] = 'null'
 
             if 'PGV' in sdf and not sdf['PGV_outliers'][six] \
-                    and not np.isnan(sdf['PGV'][six]):
+                    and not np.isnan(sdf['PGV'][six]) \
+                    and (ndf != 'df1' or not sdf['flagged'][six]):
                 station['properties']['pgv'] = \
                     _round_float(np.exp(sdf['PGV'][six]), 4)
             else:
@@ -1618,16 +1643,21 @@ class ModelModule(CoreModule):
             #
             # Set the outlier flags
             #
+            mflag = '0'
+            if ndf == 'df1' and sdf['flagged'][six]:
+                mflag = 'M'
             for channel in station['properties']['channels']:
                 for amp in channel['amplitudes']:
+                    if amp['flag'] != '0':
+                        amp['flag'] += mflag
+                    else:
+                        amp['flag'] = mflag
                     Name = amp['name'].upper()
                     if sdf[Name + '_outliers'][six]:
                         if amp['flag'] == '0':
                             amp['flag'] = 'T'
                         else:
-                            amp['flag'] += 'T'
-                    if not amp['flag']:
-                        amp['flag'] = '0'
+                            amp['flag'] += ',T'
         return sjdict
 
     def _storeGriddedData(self, oc):
@@ -2105,12 +2135,13 @@ def _get_imt_lists(df):
     for ix in range(nlist):
         valid_imts = []
         sa_imts = []
-        for this_imt in df.imts:
-            if not np.isnan(df.df[this_imt][ix]) and \
-               not df.df[this_imt + '_outliers'][ix]:
-                valid_imts.append(this_imt)
-                if this_imt.startswith('SA('):
-                    sa_imts.append(this_imt)
+        if 'flagged' not in df.df or not df.df['flagged'][ix]:
+            for this_imt in df.imts:
+                if not np.isnan(df.df[this_imt][ix]) and \
+                        not df.df[this_imt + '_outliers'][ix]:
+                    valid_imts.append(this_imt)
+                    if this_imt.startswith('SA('):
+                        sa_imts.append(this_imt)
         imtlist.append(valid_imts)
         salist.append(sa_imts)
     return imtlist, salist
