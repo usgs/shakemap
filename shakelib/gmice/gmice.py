@@ -35,10 +35,16 @@ class GMICE(ABC):
         Args:
             imt (str): Valid IMT string - 'MMI', 'PGV', 'PGA', 'SA(0.3)', etc.
         Returns:
-            bool: True if gmice is defined for input IMT, False if not.
+            bool: True if gmice is defined for input IMT (and period), False if not.
         """
         for imtcomp in self.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
-            if imtcomp == str(imtcomp):
+            thisimt = from_string(imt)
+            if isinstance(thisimt, imtcomp):
+                if isinstance(thisimt, SA):
+                    for period in self.DEFINED_FOR_SA_PERIODS:
+                        if period == thisimt.period:
+                            return True
+                    return False
                 return True
         return False
 

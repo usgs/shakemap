@@ -92,6 +92,13 @@ MMI_LABELS = {'1': 'I',
               '9': 'IX',
               '10': 'X'}
 
+IMT_RANGES = {'PGV': (1e-2, 500),
+              'PGA': (1e-4, 500),
+              'SA(0.3)': (1e-4, 500),
+              'SA(1.0)': (1e-4, 500),
+              'SA(3.0)': (1e-4, 400)}
+
+
 DEG2KM = 111.191
 
 # what is the colormap we want to use for non-MMI intensity values?
@@ -203,7 +210,7 @@ def _get_map_info(gd, center_lat):
     return (bounds, figsize)
 
 
-def _draw_imt_legend(fig, levels, palette, imtype):
+def _draw_imt_legend(fig, levels, palette, imtype, gmice):
     """Create a legend axis for non MMI plots.
 
     Args:
@@ -238,32 +245,47 @@ def _draw_imt_legend(fig, levels, palette, imtype):
     plt.text(xloc, 0.5, imtlabel,
              fontproperties=font0, **alignment)
     # draw top/bottom edges of table
-    plt.plot([0, 1], [0, 0], 'k', clip_on=False)
-    plt.plot([0, 1], [1, 1], 'k', clip_on=False)
+    plt.plot([bottom, top], [bottom, bottom], 'k', clip_on=False)
+    plt.plot([bottom, top], [top, top], 'k', clip_on=False)
     # draw left edge of table
-    plt.plot([0, 0], [0, 1], 'k', clip_on=False)
+    plt.plot([bottom, bottom], [bottom, top], 'k', clip_on=False)
     # draw right edge of first column
     plt.plot([firstcol_width, firstcol_width], [0, 1], 'k', clip_on=False)
     # draw right edge of table
     plt.plot([1, 1], [0, 1], 'k', clip_on=False)
 
-    # we want to draw len(levels) cells and color them
-    # according to each level
-    nlevels = len(levels)
-    cell_width = (1 - firstcol_width)/nlevels
-    rights = np.linspace(firstcol_width+cell_width, 1, nlevels)
+    # get the MMI/IMT values we need
+    itype = 'log'
+    divisor = 1
+    if imtype != 'PGV':
+        divisor = 100
+    dmin, dmax = IMT_RANGES[imtype]
+    imt_values = np.log(getContourLevels(dmin, dmax, itype=itype)/divisor)
+    if gmice.supports(imtype):
+        mmi_values, _ = gmice.getMIfromGM(imt_values, imt.from_string(imtype))
+    else:
+        gmice = WGRW12()
+        mmi_values, _ = gmice.getMIfromGM(imt_values, imt.from_string(imtype))
+    mmi_colors = [palette.getDataColor(
+        mmi, color_format='hex') for mmi in mmi_values]
+    new_imts = []
+    new_mmi_colors = []
+    for mmic, imtv in zip(mmi_colors, imt_values):
+        if mmic not in new_mmi_colors:
+            new_imts.append(imtv)
+            new_mmi_colors.append(mmic)
+
+    width = (1 - firstcol_width)/len(new_imts)
     left = firstcol_width
-    for i in range(0, nlevels):
-        right = rights[i]
-        imtval = levels[i]
+    for mmic, imtv in zip(new_mmi_colors, imt_values):
+        right = left + width
         px = [left, right, right, left, left]
-        py = [1, 1, 0, 0, 1]
-        imtcolor = palette.getDataColor(imtval, color_format='hex')
-        plt.fill(px, py, imtcolor, ec=imtcolor)
-        plt.plot([right, right], [0, 1], 'k', clip_on=False)
-        imtstr = "{0:.3g}".format(imtval)
-        th = plt.text(np.mean([left, right]), 0.5, imtstr,
-                      fontproperties=font0, **alignment)
+        py = [top, top, bottom, bottom, top]
+        plt.plot([right, right], [bottom, top], 'k')
+        plt.fill(px, py, mmic, ec=mmic)
+        xloc = left + width/2.0
+        imtstr = "{0:.3g}".format(np.exp(imtv)*divisor)
+        th = plt.text(xloc, 0.5, imtstr, fontproperties=font0, **alignment)
         th.set_path_effects([path_effects.Stroke(linewidth=2.0,
                                                  foreground='white'),
                              path_effects.Normal()])
@@ -1016,7 +1038,6 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     # get a color palette for the levels we have
     levels = [c['properties']['value'] for c in contour_objects]
-    imt_cmap = _create_palette(imtype, levels)
 
     # cartopy shapely feature has some weird behaviors, so I had to go rogue
     # and draw contour lines/labels myself.
@@ -1031,8 +1052,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
             pmulti_line = mapping(multi_line)['coordinates']
             x, y = zip(*pmulti_line)
             npoints.append(len(x))
-            color = imt_cmap.getDataColor(props['value'])
-            ax.plot(x, y, color=color, linestyle='dashed',
+            # color = imt_cmap.getDataColor(props['value'])
+            ax.plot(x, y, color=props['color'], linestyle='dashed',
                     zorder=DASHED_CONTOUR_ZORDER)
 
     white_box = dict(boxstyle="round",
@@ -1055,8 +1076,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
         for multi_line in pmulti_lines:
             pmulti_line = mapping(multi_line)['coordinates']
             x, y = zip(*pmulti_line)
-            color = imt_cmap.getDataColor(props['value'])
-            ax.plot(x, y, color=color, linestyle='solid',
+            # color = imt_cmap.getDataColor(props['value'])
+            ax.plot(x, y, color=props['color'], linestyle='solid',
                     zorder=CONTOUR_ZORDER)
             if len(x) > min_npoints:
                 # try to label each segment with black text in a white box
@@ -1140,10 +1161,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     _draw_title(imtype, container, operator)
 
-    # draw a separate intensity colorbar in a separate axes
-    # _draw_colorbar(fig, mmimap)
-
-    _draw_imt_legend(fig, levels, imt_cmap, imtype)
+    _draw_imt_legend(fig, levels, mmimap, imtype, gmice)
 
     # save plot to file
     fileimt = oq_to_file(imtype)
