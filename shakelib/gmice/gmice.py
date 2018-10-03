@@ -1,6 +1,9 @@
 # stdlib imports
 from abc import ABC, abstractmethod
 
+# third party imports
+from openquake.hazardlib.imt import PGA, PGV, SA, from_string
+
 # local imports
 from openquake.hazardlib import imt
 from openquake.hazardlib.imt import PGA, PGV, SA
@@ -13,16 +16,37 @@ class GMICE(ABC):
 
     Inherited by AK07, Wald99, WGRW12.
     """
+
     def __init__(self):
         self._pga = PGA()
         self._pgv = PGV()
         self._sa03 = SA(0.3)
         self._sa10 = SA(1.0)
         self._sa30 = SA(3.0)
+        self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set()
 
     @staticmethod
     def getDistanceType():
         return 'rrup'
+
+    def supports(self, imt):
+        """Determine whether input IMT is supported by GMICE instance.
+
+        Args:
+            imt (str): Valid IMT string - 'MMI', 'PGV', 'PGA', 'SA(0.3)', etc.
+        Returns:
+            bool: True if gmice is defined for input IMT (and period), False if not.
+        """
+        for imtcomp in self.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+            thisimt = from_string(imt)
+            if isinstance(thisimt, imtcomp):
+                if isinstance(thisimt, SA):
+                    for period in self.DEFINED_FOR_SA_PERIODS:
+                        if period == thisimt.period:
+                            return True
+                    return False
+                return True
+        return False
 
     def getMinMax(self):
         """

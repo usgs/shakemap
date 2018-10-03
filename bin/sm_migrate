@@ -8,6 +8,8 @@ import re
 import glob
 import tarfile
 import json
+from collections import OrderedDict
+import logging
 
 # third party imports
 from configobj import ConfigObj
@@ -29,6 +31,9 @@ from shakelib.rupture.factory import (
     get_rupture
 )
 from shakelib.utils.utils import get_extent
+from shakemap.utils.probs import get_weights
+from shakemap.utils.layers import (validate_config,
+                                   update_config_regions)
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.rupture import constants
 
@@ -85,10 +90,16 @@ does not prepend eventid'''
 in input data.'''
     hlptxt3 = '''Ignore previous ground motion conversion settings discovered
 in input data.'''
+    hlptxt4 = '''Ignore new improved GMPE sets and attempt to use old GMPE
+settings.  Note that this may result in errors when running ShakeMap. Not
+recommended.
+'''
     parser.add_argument('-b', '--skip-bounds', action='store_true',
                         default=False, help=hlptxt2)
     parser.add_argument('-s', '--skip-settings', action='store_true',
                         default=False, help=hlptxt3)
+    parser.add_argument('-u', '--use-old-gmpe', action='store_true',
+                        default=False, help=hlptxt4)
     parser.add_argument('-m', '--migrate-file',
                         help='Supply custom migrate.conf')
     return parser
@@ -107,6 +118,8 @@ def _extract_file(member, tarball, filename, event_dir):
 
 
 def main(args):
+    logger = logging.getLogger()
+    logger.setLevel(logging.CRITICAL)
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
         print('%s is not a valid directory.' % data_path)
@@ -148,9 +161,15 @@ def main(args):
         if 'save' in member:
             continue
 
+        if tarball.getmember(member).isdir():
+            continue
+
         parts = member.split('/')
+        if parts[0] == '.':
+            event_id = parts[1]
+        else:
+            event_id = parts[0]
         filename = parts[-1]
-        event_id = parts[1]
 
         if not event_id.startswith(netid):
             if args.ignore_naked_ids:
@@ -195,7 +214,8 @@ def main(args):
                 event_dir, tarball, member,
                 netid, networks, module_conf,
                 skip_bounds=args.skip_bounds,
-                skip_settings=args.skip_settings)
+                skip_settings=args.skip_settings,
+                use_old_gmpe=args.use_old_gmpe)
             errors += info_errors
             conversions.update(info_conversions)
             # handler.insertEvent(edict)
@@ -238,7 +258,7 @@ def parse_options(event_dir):
     eventfile = os.path.join(event_dir, 'event.xml')
     edict = read_event_file(eventfile)
     options = json.load(open(optfile, 'rt'))
-    model = ConfigObj()
+    model = ConfigObj(indent_type='    ')
     if 'nobias' in options:
         model['modeling'] = {'bias': {'do_bias': False}}
     if 'nooutlier' in options:
@@ -277,7 +297,7 @@ def parse_options(event_dir):
         if len(model):
             model_file = os.path.join(event_dir, 'model.conf')
             if os.path.isfile(model_file):
-                existing_model = ConfigObj(model_file)
+                existing_model = ConfigObj(model_file, indent_type='    ')
                 model.merge(existing_model)
         model.filename = model_file
         model.write()
@@ -378,7 +398,14 @@ def parse_config(event_dir, tarball, member, migrate_conf=None):
 
 def parse_info(event_dir, tarball, member, netid, networks,
                module_conf, skip_bounds=False, skip_settings=False,
-               migrate_conf=None):
+               migrate_conf=None, use_old_gmpe=False):
+
+    install_path, data_path = get_config_paths()
+    config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
+    global_data_path = os.path.join(os.path.expanduser('~'),
+                                    'shakemap_data')
+    validate_config(config, install_path, data_path, global_data_path)
+
     jsonfile = tarball.extractfile(member)
     jsonstring = jsonfile.read().decode('utf-8')
     jsondict = json.loads(jsonstring)
@@ -425,7 +452,7 @@ def parse_info(event_dir, tarball, member, netid, networks,
         'locstring': edict['locstring']
     }
 
-    model = ConfigObj()
+    model = ConfigObj(indent_type='    ')
     if not skip_settings:
         # get all of the bias information
         model['modeling'] = {'bias': {}}
@@ -463,17 +490,42 @@ def parse_info(event_dir, tarball, member, netid, networks,
         else:
             model['modeling']['gmice'] = gmice
 
-        # get the GMPE information
-        gmm_dict = jsondict['processing']['ground_motion_modules']
-        old_gmpe = gmm_dict['gmpe']['module']
-        try:
-            new_gmpe, reference = migrate_gmpe(old_gmpe, config=migrate_conf)
-            model = set_gmpe(new_gmpe, model, edict['id'])
-            if old_gmpe not in conversions:
-                conversions[old_gmpe] = (new_gmpe, reference)
-        except Exception as e:
-            msg = 'Unable to convert %s, error "%s"' % (old_gmpe, str(e))
-            errors.append(msg)
+        if use_old_gmpe:
+            # get the GMPE information
+            gmm_dict = jsondict['processing']['ground_motion_modules']
+            old_gmpe = gmm_dict['gmpe']['module']
+            try:
+                new_gmpe, reference = migrate_gmpe(
+                    old_gmpe, config=migrate_conf)
+                model = set_gmpe(new_gmpe, model, edict['id'])
+                if old_gmpe not in conversions:
+                    conversions[old_gmpe] = (new_gmpe, reference)
+            except Exception as e:
+                msg = 'Unable to convert %s, error "%s"' % (old_gmpe, str(e))
+                errors.append(msg)
+        else:
+            org = Origin(eqdict)
+            config = update_config_regions(org.lat, org.lon, config)
+            gmm_dict, strec_results = get_weights(org, config)
+            gmpe_set = 'gmpe_' + eqdict['id'] + '_custom'
+            model['gmpe_sets'] = OrderedDict([
+                (gmpe_set, OrderedDict([
+                    ('gmpes', list(gmm_dict['gmpelist'])),
+                    ('weights', list(gmm_dict['weightlist'])),
+                    ('weights_large_dist', 'None'),
+                    ('dist_cutoff', 'nan'),
+                    ('site_gmpes', 'None'),
+                    ('weights_site_gmpes', 'None')
+                ]))
+            ])
+            model['modeling']['gmpe'] = gmpe_set
+            model['modeling']['mechanism'] = strec_results['FocalMechanism']
+            if gmm_dict['ipe']:
+                model['modeling']['ipe'] = gmm_dict['ipe']
+            if gmm_dict['gmice']:
+                model['modeling']['gmice'] = gmm_dict['gmice']
+            if gmm_dict['ccf']:
+                model['modeling']['ccf'] = gmm_dict['ccf']
 
     # work on map extent/resolution data
     if not skip_bounds:
@@ -495,7 +547,7 @@ def parse_info(event_dir, tarball, member, netid, networks,
     if len(model):
         model_file = os.path.join(event_dir, 'model.conf')
         if os.path.isfile(model_file):
-            existing_model = ConfigObj(model_file)
+            existing_model = ConfigObj(model_file, indent_type='    ')
             model.merge(existing_model)
         model.filename = model_file
         model.write()

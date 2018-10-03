@@ -1,7 +1,6 @@
 # stdlib imports
 from datetime import datetime
 import os.path
-import time
 
 # third party imports
 import numpy as np
@@ -9,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LightSource
 import matplotlib.patheffects as path_effects
+from matplotlib.font_manager import FontProperties
 
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
@@ -29,6 +29,7 @@ from impactutils.mapping.mercatormap import MercatorMap
 from impactutils.mapping.city import Cities
 from impactutils.colors.cpalette import ColorPalette
 from impactutils.mapping.scalebar import draw_scale
+from impactutils.textformat.text import set_num_precision
 from mapio.grid2d import Grid2D
 from mapio.geodict import GeoDict
 
@@ -37,13 +38,15 @@ from mapio.geodict import GeoDict
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture import constants
 from shakelib.rupture.factory import rupture_from_dict
-from shakelib.plotting.contour import contour
+from shakelib.plotting.contour import contour, getContourLevels
 from shakelib.utils.imt_string import oq_to_file
+from shakelib.gmice.wgrw12 import WGRW12
 from shakemap.utils.utils import get_object_from_config
+from shakelib.rupture.constants import TIMEFMT
 
 # define some constants
 WATERCOLOR = '#7AA1DA'
-FIGWIDTH = 7.0
+FIGWIDTH = 10.0
 FILTER_SMOOTH = 5.0
 XOFFSET = 4  # how many pixels between the city dot and the city text
 VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
@@ -91,7 +94,108 @@ MMI_LABELS = {'1': 'I',
               '9': 'IX',
               '10': 'X'}
 
+IMT_RANGES = {'PGV': (1e-2, 500),
+              'PGA': (1e-4, 500),
+              'SA(0.3)': (1e-4, 500),
+              'SA(1.0)': (1e-4, 500),
+              'SA(3.0)': (1e-4, 400)}
+
+IMTYPES = {'MMI': 'Macroseismic Intensity Map',
+           'PGV': 'Peak Ground Velocity Map',
+           'PGA': 'Peak Ground Acceleration Map',
+           'SA(0.3)': '0.3 Second Peak Spectral Acceleration Map',
+           'SA(1.0)': '1.0 Second Peak Spectral Acceleration Map',
+           'SA(3.0)': '3.0 Second Peak Spectral Acceleration Map'}
+
 DEG2KM = 111.191
+
+# what is the colormap we want to use for non-MMI intensity values?
+IMT_CMAP = 'PuRd'
+
+
+def to_precision(x, p):
+    """
+    returns a string representation of x formatted with a precision of p
+
+    Based on the webkit javascript implementation taken from here:
+    https://code.google.com/p/webkit-mirror/source/browse/JavaScriptCore/kjs/number_object.cpp
+    """
+
+    x = float(x)
+
+    if x == 0.:
+        return "0." + "0"*(p-1)
+
+    out = []
+
+    if x < 0:
+        out.append("-")
+        x = -x
+
+    e = int(np.log10(x))
+    tens = np.power(10, e - p + 1)
+    n = np.floor(x/tens)
+
+    if n < np.power(10, p - 1):
+        e = e - 1
+        tens = np.power(10, e - p+1)
+        n = np.floor(x / tens)
+
+    if abs((n + 1.) * tens - x) <= abs(n * tens - x):
+        n = n + 1
+
+    if n >= np.power(10, p):
+        n = n / 10.
+        e = e + 1
+
+    m = "%.*g" % (p, n)
+
+    if e < -2 or e >= p:
+        out.append(m[0])
+        if p > 1:
+            out.append(".")
+            out.extend(m[1:p])
+        out.append('e')
+        if e > 0:
+            out.append("+")
+        out.append(str(e))
+    elif e == (p - 1):
+        out.append(m)
+    elif e >= 0:
+        out.append(m[:e+1])
+        if e+1 < len(m):
+            out.append(".")
+            out.extend(m[e+1:])
+    else:
+        out.append("0.")
+        out.extend(["0"]*-(e+1))
+        out.append(m)
+
+    return "".join(out)
+
+
+def _create_palette(imtype, levels):
+    """Create a ColorPalette object from given levels and IMT type.
+
+    Args:
+        imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
+        levels (sequence): Sequence of contour levels.
+    Returns:
+        ColorPalette: ColorPalette using range of input data and IMT_CMAP.
+    """
+    # this method assumes that levels are in logspace
+    if len(levels) > 1:
+        if len(levels) % 2:
+            levels.append(levels[-1])
+        nsteps = 256
+        z0 = np.linspace(np.log(levels[0]), np.log(levels[-2]), nsteps)
+        z1 = np.linspace(np.log(levels[1]), np.log(levels[-1]), nsteps)
+    else:
+        z0 = np.array([levels[0], levels[0]*10])
+        z1 = np.array([levels[0], levels[0]*10])
+    cmap = plt.get_cmap(IMT_CMAP)
+    palette = ColorPalette.fromColorMap(imtype, z0, z1, cmap, is_log=True)
+    return palette
 
 
 def _get_projected_grids(imtgrid, topobase, projstr):
@@ -115,9 +219,7 @@ def _get_projected_grids(imtgrid, topobase, projstr):
     simtgrid = imtgrid.interpolateToGrid(sampledict)
 
     # get topo layer and project it
-    t1 = time.time()
     topogrid = topobase.interpolateToGrid(sampledict)
-    t2 = time.time()
 
     # resampling 32bit floats gives odd results... upcasting to 64bit
     topogrid._data = topogrid._data.astype(np.float64)
@@ -170,10 +272,271 @@ def _get_map_info(gd, center_lat):
     #     height = (ymax-ymin)*DEG2KM
 
     aspect = width/height
-    figheight = FIGWIDTH/aspect
+    legend_pad = 2.7
+    figheight = FIGWIDTH/aspect + legend_pad
     bounds = (xmin, xmax, ymin, ymax)
     figsize = (FIGWIDTH, figheight)
     return (bounds, figsize)
+
+
+def _draw_imt_legend(fig, levels, palette, imtype, gmice):
+    """Create a legend axis for non MMI plots.
+
+    Args:
+        fig (Figure): Matplotlib Figure object.
+        levels (sequence): Sequence of contour levels.
+        palette (ColorPalette): ColorPalette using range of input data and IMT_CMAP.
+        imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
+    """
+    units = {'PGV': '(cm/s)',
+             'PGA': '(%g)',
+             'SA(0.3)': '(%g)',
+             'SA(1.0)': '(%g)',
+             'SA(3.0)': '(%g)'}
+    imtlabel = imtype + ' ' + units[imtype]
+    # imtlabel = imtype
+
+    cax = fig.add_axes([0.1, 0.1, 0.8, 0.02])
+    plt.axis('off')
+    cax_xmin, cax_xmax = cax.get_xlim()
+    bottom, top = cax.get_ylim()
+    plt.xlim(cax_xmin, cax_xmax)
+    plt.ylim(bottom, top)
+
+    firstcol_width = 0.15
+
+    font0 = FontProperties()
+    alignment = {'horizontalalignment': 'center',
+                 'verticalalignment': 'center'}
+    font0.set_weight('bold')
+
+    xloc = firstcol_width/2
+    plt.text(xloc, 0.5, imtlabel,
+             fontproperties=font0, **alignment)
+    # draw top/bottom edges of table
+    plt.plot([bottom, top], [bottom, bottom], 'k', clip_on=False)
+    plt.plot([bottom, top], [top, top], 'k', clip_on=False)
+    # draw left edge of table
+    plt.plot([bottom, bottom], [bottom, top], 'k', clip_on=False)
+    # draw right edge of first column
+    plt.plot([firstcol_width, firstcol_width], [0, 1], 'k', clip_on=False)
+    # draw right edge of table
+    plt.plot([1, 1], [0, 1], 'k', clip_on=False)
+
+    # get the MMI/IMT values we need
+    itype = 'log'
+    divisor = 1
+    if imtype != 'PGV':
+        divisor = 100
+    dmin, dmax = IMT_RANGES[imtype]
+    imt_values = np.log(getContourLevels(dmin, dmax, itype=itype)/divisor)
+    if gmice.supports(imtype):
+        mmi_values, _ = gmice.getMIfromGM(imt_values, imt.from_string(imtype))
+    else:
+        gmice = WGRW12()
+        mmi_values, _ = gmice.getMIfromGM(imt_values, imt.from_string(imtype))
+    mmi_colors = [palette.getDataColor(
+        mmi, color_format='hex') for mmi in mmi_values]
+    new_imts = []
+    new_mmi_colors = []
+    for mmic, imtv in zip(mmi_colors, imt_values):
+        if mmic not in new_mmi_colors:
+            new_imts.append(imtv)
+            new_mmi_colors.append(mmic)
+
+    width = (1 - firstcol_width)/len(new_imts)
+    left = firstcol_width
+    for mmic, imtv in zip(new_mmi_colors, imt_values):
+        right = left + width
+        px = [left, right, right, left, left]
+        py = [top, top, bottom, bottom, top]
+        plt.plot([right, right], [bottom, top], 'k')
+        plt.fill(px, py, mmic, ec=mmic)
+        xloc = left + width/2.0
+        imtstr = "{0:.3g}".format(np.exp(imtv)*divisor)
+        th = plt.text(xloc, 0.5, imtstr, fontproperties=font0, **alignment)
+        th.set_path_effects([path_effects.Stroke(linewidth=2.0,
+                                                 foreground='white'),
+                             path_effects.Normal()])
+        left = right
+
+
+def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
+    """Create a legend axis for MMI plots.
+
+    Args:
+        fig (Figure): Matplotlib Figure object.
+        levels (sequence): Sequence of contour levels.
+        palette (ColorPalette): ColorPalette using range of input data and IMT_CMAP.
+        imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
+    """
+    cax = fig.add_axes([0.1, 0.001, 0.8, 0.15])
+    plt.axis('off')
+    cax_xmin, cax_xmax = cax.get_xlim()
+    bottom, top = cax.get_ylim()
+    plt.xlim(cax_xmin, cax_xmax)
+    plt.ylim(bottom, top)
+
+    shaking = ['SHAKING',
+               'Not felt',
+               'Weak',
+               'Light',
+               'Moderate',
+               'Strong',
+               'Very strong',
+               'Severe',
+               'Violent',
+               'Extreme']
+    damage = ['DAMAGE',
+              'None',
+              'None',
+              'None',
+              'Very light',
+              'Light',
+              'Moderate',
+              'Moderate/heavy',
+              'Heavy',
+              'Very heavy']
+
+    acceleration = ['PGA(%g)']
+    velocity = ['PGV(cm/s)']
+
+    imt_edges = np.array([0.5, 1.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5])
+    intensities = ['INTENSITY', 'I', 'II-III',
+                   'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X+']
+
+    widths = np.array([11.5, 7.75, 6.75, 7.0, 10.25,
+                       8.5, 12.0, 16.25, 8.25, 11.75])/100
+
+    mmi_centers = np.array([1.0, 2.5, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+    pga_values, _ = gmice.getGMfromMI(mmi_centers, imt.from_string('PGA'))
+    pgv_values, _ = gmice.getGMfromMI(mmi_centers, imt.from_string('PGV'))
+    pga_values = np.exp(pga_values)*100
+    pgv_values = np.exp(pgv_values)
+    pga_labels = ["{0:.3g}".format(set_num_precision(
+        pga, 3, mode='float')) for pga in pga_values]
+    pgv_labels = ["{0:.3g}".format(set_num_precision(
+        pgv, 3, mode='float')) for pgv in pgv_values]
+
+    pga_labels[0] = '<'+pga_labels[0]
+    pga_labels[-1] = '>'+pga_labels[-1]
+    pgv_labels[0] = '<'+pgv_labels[0]
+    pgv_labels[-1] = '>'+pgv_labels[-1]
+
+    acceleration += pga_labels
+    velocity += pgv_labels
+
+    yloc_first_row = 13/14
+    yloc_second_row = 11/14
+    yloc_third_row = 9/14
+    yloc_fourth_row = 7/14
+    yloc_fifth_row = 5/14
+    yloc_sixth_row = 3/14
+    yloc_seventh_row = 1.5/14
+
+    yloc_first_line = 12/14
+    yloc_second_line = 10/14
+    yloc_third_line = 8/14
+    yloc_fourth_line = 6/14
+    yloc_fifth_line = 4/14
+
+    bottom = 4/14
+
+    font0 = FontProperties()
+    alignment = {'horizontalalignment': 'center',
+                 'verticalalignment': 'center'}
+    font0.set_weight('bold')
+
+    font1 = FontProperties()
+    font1.set_weight('normal')
+
+    # draw vertical cell separators
+    sumwidth = 0.0
+    gridleft = 0.0
+    plt.plot([gridleft, gridleft], [bottom, top],
+             'k', clip_on=False)  # left edge
+    plt.plot([0, 1], [top, top], 'k', clip_on=False)
+    plt.plot([0, 1], [bottom, bottom], 'k', clip_on=False)
+
+    plt.plot([0, 1], [yloc_first_line,
+                      yloc_first_line], 'k', clip_on=False)
+    plt.plot([0, 1], [yloc_second_line,
+                      yloc_second_line], 'k', clip_on=False)
+    plt.plot([0, 1], [yloc_third_line,
+                      yloc_third_line], 'k', clip_on=False)
+    plt.plot([0, 1], [yloc_fourth_line,
+                      yloc_fourth_line], 'k', clip_on=False)
+
+    # draw the bottom line of text that describes stations/mmi,
+    # and shakemap version/process time
+    triangle_marker_x = widths[0]/10
+    triangle_text_x = widths[0]/5
+    plt.plot(triangle_marker_x, yloc_sixth_row, '^', markerfacecolor='w',
+             markeredgecolor='k', markersize=6, mew=0.5)
+    plt.text(triangle_text_x, yloc_sixth_row,
+             'Seismic Instrument', va='center')
+
+    circle_marker_x = triangle_text_x + 0.2
+    circle_text_x = circle_marker_x + widths[1]/10
+    plt.plot(circle_marker_x, yloc_sixth_row, 'o', markerfacecolor='w',
+             markeredgecolor='k', markersize=4, mew=0.5)
+    plt.text(circle_text_x, yloc_sixth_row,
+             'Macroseismic Observation', va='center')
+
+    version_x = 1.0
+    tpl = (map_version, process_time)
+    plt.text(version_x, yloc_sixth_row,
+             'Map Version %i: Processed %s' % tpl, ha='right', va='center')
+
+    ref = gmice.name
+    refx = widths[0]/12
+    plt.text(refx, yloc_seventh_row,
+             'Scale based upon %s' % ref, va='center')
+
+    nsteps = 10
+    for i in range(0, len(widths)):
+        width = widths[i]
+        textleft = sumwidth + width/2
+        sumwidth += width
+        plt.text(textleft, yloc_first_row, shaking[i],
+                 fontproperties=font1, **alignment)
+        plt.text(textleft, yloc_second_row, damage[i],
+                 fontproperties=font1, **alignment)
+        plt.text(textleft, yloc_third_row, acceleration[i],
+                 fontproperties=font1, **alignment)
+        plt.text(textleft, yloc_fourth_row, velocity[i],
+                 fontproperties=font1, **alignment)
+
+        if i == 0:
+            font = font1
+        else:
+            font = font0
+        th = plt.text(textleft, yloc_fifth_row, intensities[i],
+                      fontproperties=font, **alignment)
+        th.set_path_effects([path_effects.Stroke(linewidth=2.0,
+                                                 foreground='white'),
+                             path_effects.Normal()])
+
+        # draw right edge of cell
+        plt.plot([gridleft+widths[i], gridleft+widths[i]],
+                 [bottom, top], 'k', clip_on=False)  # right
+
+        # draw little colored rectangles inside the MMI cells
+        if i > 0:
+            left = gridleft
+            ptop = yloc_fourth_line
+            imt_min = imt_edges[i-1]
+            imt_max = imt_edges[i]
+            imts = np.linspace(imt_min, imt_max, nsteps)
+            rights = np.linspace(gridleft, gridleft+width, nsteps)
+            for mmi, right in zip(imts, rights):
+                px = [left, right, right, left, left]
+                py = [ptop, ptop, bottom, bottom, ptop]
+                mmicolor = palette.getDataColor(mmi, color_format='hex')
+                left = right
+                plt.fill(px, py, mmicolor, ec=mmicolor)
+
+        gridleft += widths[i]
 
 
 def _draw_colorbar(fig, mmimap):
@@ -363,13 +726,14 @@ def _draw_title(imt, container, operator):
         latstr = 'N%.2f' % hlat
     dep = float(edict['depth'])
     eid = edict['event_id']
+    imtstr = IMTYPES[imt]
     if len(eid) <= 10:
-        fmt = ('%s ShakeMap (%s): %s\n %s UTC M%.1f %s %s '
+        fmt = ('%s\n%s ShakeMap: %s\n %s UTC M%.1f %s %s '
                'Depth: %.1fkm ID:%s')
     else:
-        fmt = ('%s ShakeMap (%s): %s\n %s UTC M%.1f %s %s '
+        fmt = ('%s\n%s ShakeMap: %s\n %s UTC M%.1f %s %s '
                'Depth: %.1fkm\nID:%s')
-    tstr = fmt % (operator, imt, eloc, timestr, mag, latstr,
+    tstr = fmt % (imtstr, operator, eloc, timestr, mag, latstr,
                   lonstr, dep, eid)
     plt.title(tstr, fontsize=10, verticalalignment='bottom')
 
@@ -583,7 +947,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # Create the MercatorMap object, which holds a separate but identical
     # axes object used to determine collisions between city labels.
     mmap = MercatorMap(bounds, figsize, cities, padding=0.5,
-                       dimensions=[0.1, 0.1, 0.8, 0.8])
+                       dimensions=[0.1, 0.17, 0.8, 0.61])
     fig = mmap.figure
     ax = mmap.axes
 
@@ -692,7 +1056,12 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     _draw_graticules(ax, *bounds)
 
     # draw a separate intensity colorbar in a separate axes
-    _draw_colorbar(fig, mmimap)
+    # _draw_colorbar(fig, mmimap)
+    config = container.getConfig()
+    gmice = get_object_from_config('gmice', 'modeling', config)
+    process_time = info['processing']['shakemap_versions']['process_time']
+    map_version = int(info['processing']['shakemap_versions']['map_version'])
+    _draw_mmi_legend(fig, mmimap, gmice, process_time, map_version)
 
     # # make the map border thicker
     # the left/top edges don't line up here
@@ -818,6 +1187,9 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
                               component, filter_size,
                               my_gmice)
 
+    # get a color palette for the levels we have
+    levels = [c['properties']['value'] for c in contour_objects]
+
     # cartopy shapely feature has some weird behaviors, so I had to go rogue
     # and draw contour lines/labels myself.
     # draw dashed contours first, the ones over land will be overridden by
@@ -831,6 +1203,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
             pmulti_line = mapping(multi_line)['coordinates']
             x, y = zip(*pmulti_line)
             npoints.append(len(x))
+            # color = imt_cmap.getDataColor(props['value'])
             ax.plot(x, y, color=props['color'], linestyle='dashed',
                     zorder=DASHED_CONTOUR_ZORDER)
 
@@ -854,6 +1227,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
         for multi_line in pmulti_lines:
             pmulti_line = mapping(multi_line)['coordinates']
             x, y = zip(*pmulti_line)
+            # color = imt_cmap.getDataColor(props['value'])
             ax.plot(x, y, color=props['color'], linestyle='solid',
                     zorder=CONTOUR_ZORDER)
             if len(x) > min_npoints:
@@ -938,8 +1312,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     _draw_title(imtype, container, operator)
 
-    # draw a separate intensity colorbar in a separate axes
-    _draw_colorbar(fig, mmimap)
+    _draw_imt_legend(fig, levels, mmimap, imtype, gmice)
 
     # save plot to file
     fileimt = oq_to_file(imtype)
