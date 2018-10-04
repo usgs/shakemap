@@ -5,6 +5,7 @@ import glob
 import re
 import shutil
 import logging
+import sys
 
 # third party imports
 from impactutils.io.smcontainers import ShakeMapOutputContainer
@@ -282,5 +283,11 @@ def _get_properties(info):
         info['processing']['shakemap_versions']['map_version']
     product_properties['map-status'] = \
         info['processing']['shakemap_versions']['map_status']
+
+    # if this process is being run manually, set the review-status property
+    # to "reviewed". If automatic, then set to "automatic".
+    product_properties['review-status'] = 'automatic'
+    if sys.stdin.isatty():
+        product_properties['review-status'] = 'reviewed'
 
     return (properties, product_properties)
