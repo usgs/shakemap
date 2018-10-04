@@ -205,22 +205,28 @@ class MappingModule(CoreModule):
         imtdict = container.getIMTGrids("MMI", component)
         grid = imtdict['mean']
         metadata = imtdict['mean_metadata']
-        rx = (np.random.rand(500) * metadata['nx']).astype(np.int)
-        ry = (np.random.rand(500) * metadata['ny']).astype(np.int)
+        rx = (np.random.rand(300) * metadata['nx']).astype(np.int)
+        ry = (np.random.rand(300) * metadata['ny']).astype(np.int)
+        rvals = np.arange(0, 30, 0.1)
 
-        x_grid = np.linspace(0, metadata['nx'] - 1, 800)
-        y_grid = np.linspace(0, metadata['ny'] - 1, 800)
+        x_grid = np.linspace(0, metadata['nx'] - 1, 400)
+        y_grid = np.linspace(0, metadata['ny'] - 1, 400)
 
         mx_grid, my_grid = np.meshgrid(x_grid, y_grid)
 
         grid = griddata(np.hstack([rx.reshape((-1, 1)), ry.reshape((-1, 1))]),
                         grid[ry, rx], (mx_grid, my_grid), method='nearest')
+        grid = (grid * 10 + 0.5).astype(np.int).astype(np.float) / 10.0
+
+        rgrid = griddata(np.hstack([rx.reshape((-1, 1)), ry.reshape((-1, 1))]),
+                         rvals, (mx_grid, my_grid), method='nearest')
 
         mmimap = ColorPalette.fromPreset('mmi')
         plt.figure(figsize=(2.75, 2.75), dpi=96, frameon=False)
         plt.axis('off')
         plt.tight_layout()
         plt.imshow(grid, cmap=mmimap.cmap, vmin=1.5, vmax=9.5)
+        plt.contour(rgrid, levels=rvals, colors='#cccccc', linewidths=0.02)
         plt.savefig(os.path.join(datadir, "pin-thumbnail.png"), dpi=96,
                     bbox_inches=matplotlib.transforms.Bbox([[0.47, 0.39],
                                                             [2.50, 2.50]]),

@@ -1327,7 +1327,7 @@ class ModelModule(CoreModule):
                 info[op][gm][myimt]['bias'] = \
                     _string_round(self.nominal_bias[myimt], 3)
             else:
-                info[op][gm][myimt]['bias'] = '-'
+                info[op][gm][myimt]['bias'] = '--'
             info[op][gm][myimt]['max_grid'] = \
                 _string_round(np.max(self.outgrid[myimt]), 3)
             info[op][gm][myimt]['max'] = \
@@ -1357,7 +1357,7 @@ class ModelModule(CoreModule):
         info[op][mi]['max']['units'] = 'degrees'
         info[op][un] = {}
         info[op][un]['grade'] = mygrade
-        if mean_rat == '-':
+        if mean_rat == '--':
             info[op][un]['mean_uncertainty_ratio'] = mean_rat
         else:
             info[op][un]['mean_uncertainty_ratio'] = _string_round(mean_rat, 3)
@@ -1952,7 +1952,7 @@ class ModelModule(CoreModule):
 
 
 def _round_float(val, digits):
-    if val == 'null':
+    if val == 'null' or np.isnan(val) or val == '--':
         return val
     return float(('%.' + str(digits) + 'f') % val)
 
@@ -2152,7 +2152,7 @@ def _get_map_grade(do_grid, outsd, psd, moutgrid):
     Computes a 'grade' for the map. Essentially looks at the ratio of
     the computed PGA uncertainty to the predicted PGA uncertainty for
     the area inside the MMI 6 contour. If the maximum MMI is less than
-    6, or the map is not a grid, the grade and mean ratio are set to '-'.
+    6, or the map is not a grid, the grade and mean ratio are set to '--'.
 
     Args:
         do_grid (bool): Is the map a grid (True) or a list of points
@@ -2168,8 +2168,8 @@ def _get_map_grade(do_grid, outsd, psd, moutgrid):
     Returns:
         tuple: The mean uncertainty ratio and the letter grade.
     """
-    mean_rat = '-'
-    mygrade = '-'
+    mean_rat = '--'
+    mygrade = '--'
     if not do_grid or 'PGA' not in outsd or 'PGA' not in psd \
             or 'MMI' not in moutgrid:
         return mean_rat, mygrade
@@ -2184,7 +2184,7 @@ def _get_map_grade(do_grid, outsd, psd, moutgrid):
             if mean_rat <= val:
                 mygrade = grades[ix]
                 break
-        if mygrade == '-':
+        if mygrade == '--':
             mygrade = 'F'
     return mean_rat, mygrade
 
