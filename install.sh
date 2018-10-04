@@ -25,10 +25,11 @@ VENV=shakemap
 
 # Is the reset flag set? If not, use the frozen conda channel to install.
 # Otherwise, try to install from conda forge.
-reset=0
+reset=1
 while getopts r FLAG; do
   case $FLAG in
     r)
+        echo "The -r flag is deprecated; installation is now from conda-forge by default."
         reset=1
         
       ;;
