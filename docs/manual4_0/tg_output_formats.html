@@ -6,19 +6,20 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>2.6. Output Data Formats &#8212; ShakeMap Documentation  documentation</title>
+    <title>2.7. Output Data Formats &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="2.7. Verification" href="tg_verification.html" />
-    <link rel="prev" title="2.5. Input Data Formats" href="tg_input_formats.html" />
+    <link rel="next" title="2.8. Verification" href="tg_verification.html" />
+    <link rel="prev" title="2.6. Input Data Formats" href="tg_input_formats.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,9 +35,9 @@
           <div class="body" role="main">
             
   <div class="section" id="output-data-formats">
-<span id="sec-output-formats-4"></span><h1>2.6. Output Data Formats<a class="headerlink" href="#output-data-formats" title="Permalink to this headline">¶</a></h1>
+<span id="sec-output-formats-4"></span><h1>2.7. Output Data Formats<a class="headerlink" href="#output-data-formats" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="about-the-hdf5-file-format">
-<h2>2.6.1. About the HDF5 File Format<a class="headerlink" href="#about-the-hdf5-file-format" title="Permalink to this headline">¶</a></h2>
+<h2>2.7.1. About the HDF5 File Format<a class="headerlink" href="#about-the-hdf5-file-format" title="Permalink to this headline">¶</a></h2>
 <p>HDF5 files are an efficient and flexible way to store large sets of
 structured data.  HDF stands for Hierarchical Data Format and is an
 open-source project . The data model consists of two types of objects:
@@ -60,7 +61,7 @@ shakelib classes <strong>ShakeMapInputContainer</strong> and <strong>ShakeMapOut
 For documentation see the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib container module</a>.</p>
 </div>
 <div class="section" id="shake-data-hdf">
-<h2>2.6.2. shake_data.hdf<a class="headerlink" href="#shake-data-hdf" title="Permalink to this headline">¶</a></h2>
+<h2>2.7.2. shake_data.hdf<a class="headerlink" href="#shake-data-hdf" title="Permalink to this headline">¶</a></h2>
 <p><em>shake_data.hdf</em> is the input to the <strong>model</strong> module. It is built by
 bringing
 together the various ShakeMap configuration files (found in both the
@@ -76,7 +77,7 @@ is accessed through the shakelib ShakeMapInputContainer interface:
 <a class="reference external" href="https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html">https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html</a></p>
 </div>
 <div class="section" id="shake-result-hdf">
-<h2>2.6.3. shake_result.hdf<a class="headerlink" href="#shake-result-hdf" title="Permalink to this headline">¶</a></h2>
+<h2>2.7.3. shake_result.hdf<a class="headerlink" href="#shake-result-hdf" title="Permalink to this headline">¶</a></h2>
 <p>The primary output product of the <strong>model</strong> module is the HDF5 file
 <em>shake_result.hdf</em>. There are some differences depending on whether
 <strong>model</strong> produces output grids or lists of points.  HDF5 files
@@ -328,7 +329,7 @@ for some basic access patterns.</p>
 the repository for ShakeMap here: <a class="reference external" href="https://github.com/usgs/shakemap/blob/master/contrib/read_shakemap_data.m">https://github.com/usgs/shakemap/blob/master/contrib/read_shakemap_data.m</a></p>
 </div>
 <div class="section" id="stationlist-geojson">
-<span id="subsec-stationlist-geojson"></span><h2>2.6.4. Stationlist GeoJSON<a class="headerlink" href="#stationlist-geojson" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-stationlist-geojson"></span><h2>2.7.4. Stationlist GeoJSON<a class="headerlink" href="#stationlist-geojson" title="Permalink to this headline">¶</a></h2>
 <p>The <em>stationlist.json</em> file is a GeoJSON file describing the seismic station and
 macroseismic data that comprised the input to the ShakeMap. It is contained within
 <em>shake_result.hdf</em> and may be extracted into the <em>products</em> directory with the
@@ -789,19 +790,20 @@ PGM (i.e., they will have the value ‘null’).</li>
 <li class="toctree-l4"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="tg_installation.html">2.1. Installation and Configuration</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html">2.2. Software Architecture</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.3. Queueing Events</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.4. Data Processing</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_input_formats.html">2.5. Input Data Formats</a></li>
-<li class="toctree-l5 current"><a class="current reference internal" href="#">2.6. Output Data Formats</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#about-the-hdf5-file-format">2.6.1. About the HDF5 File Format</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#shake-data-hdf">2.6.2. shake_data.hdf</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#shake-result-hdf">2.6.3. shake_result.hdf</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#stationlist-geojson">2.6.4. Stationlist GeoJSON</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_select.html">2.2. Ground Motion Model Selection</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html">2.3. Software Architecture</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.4. Queueing Events</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.5. Data Processing</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_input_formats.html">2.6. Input Data Formats</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">2.7. Output Data Formats</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#about-the-hdf5-file-format">2.7.1. About the HDF5 File Format</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shake-data-hdf">2.7.2. shake_data.hdf</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shake-result-hdf">2.7.3. shake_result.hdf</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#stationlist-geojson">2.7.4. Stationlist GeoJSON</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.7. Verification</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.8. Guidelines for Contributors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.8. Verification</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.9. Guidelines for Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>

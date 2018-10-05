@@ -9,11 +9,12 @@
     <title>shakelib.station &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -50,10 +51,10 @@
 <span class="n">TABLES</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">((</span>
     <span class="p">(</span><span class="s1">&#39;station&#39;</span><span class="p">,</span>
      <span class="n">OrderedDict</span><span class="p">((</span>
-         <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;str primary key&#39;</span><span class="p">),</span>  <span class="c1"># id is net.sta</span>
-         <span class="p">(</span><span class="s1">&#39;network&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">),</span>
-         <span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">),</span>
-         <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;text primary key&#39;</span><span class="p">),</span>  <span class="c1"># id is net.sta</span>
+         <span class="p">(</span><span class="s1">&#39;network&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;elev&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
@@ -65,19 +66,19 @@
     <span class="p">(</span><span class="s1">&#39;imt&#39;</span><span class="p">,</span>
      <span class="n">OrderedDict</span><span class="p">((</span>
          <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;integer primary key&#39;</span><span class="p">),</span>
-         <span class="p">(</span><span class="s1">&#39;imt_type&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span>
+         <span class="p">(</span><span class="s1">&#39;imt_type&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span>
      <span class="p">))</span>
      <span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;amp&#39;</span><span class="p">,</span>
      <span class="n">OrderedDict</span><span class="p">((</span>
          <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;integer primary key&#39;</span><span class="p">),</span>
-         <span class="p">(</span><span class="s1">&#39;station_id&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;station_id&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;imt_id&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">),</span>
-         <span class="p">(</span><span class="s1">&#39;original_channel&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">),</span>
-         <span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;original_channel&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;amp&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;stddev&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
-         <span class="p">(</span><span class="s1">&#39;flag&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span>
+         <span class="p">(</span><span class="s1">&#39;flag&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span>
      <span class="p">))</span>
      <span class="p">)</span>
 <span class="p">))</span>
@@ -395,13 +396,9 @@
         <span class="n">sta_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">sta_rows</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">):</span>
-                <span class="n">myid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">myid</span> <span class="o">=</span> <span class="n">sta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
             <span class="n">feature</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;Feature&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">myid</span><span class="p">,</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                 <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s1">&#39;code&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
                     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
