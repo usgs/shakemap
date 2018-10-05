@@ -287,7 +287,7 @@ def _get_properties(info):
     # if this process is being run manually, set the review-status property
     # to "reviewed". If automatic, then set to "automatic".
     product_properties['review-status'] = 'automatic'
-    if sys.stdin.isatty():
+    if sys.stdout is not None and sys.stdout.isatty():
         product_properties['review-status'] = 'reviewed'
 
     return (properties, product_properties)

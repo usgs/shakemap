@@ -82,7 +82,7 @@ class AssembleModule(CoreModule):
 
         # Prompt for a comment string if none is provided on the command line
         if self.comment is None:
-            if sys.stdout.isatty():
+            if sys.stdout is not None and sys.stdout.isatty():
                 self.comment = input(
                     'Please enter a comment for this version.\n'
                     'comment: ')
