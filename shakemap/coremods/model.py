@@ -1342,8 +1342,12 @@ class ModelModule(CoreModule):
         info[op][mi]['grid_spacing']['latitude'] = _string_round(self.smdy, 7)
         info[op][mi]['grid_spacing']['units'] = 'degrees'
         info[op][mi]['grid_span'] = {}
-        info[op][mi]['grid_span']['longitude'] = \
-            _string_round(self.E - self.W, 3)
+        if self.E <= 0 and self.W >= 0:
+            info[op][mi]['grid_span']['longitude'] = \
+                _string_round(self.E + 360.0 - self.W, 3)
+        else:
+            info[op][mi]['grid_span']['longitude'] = \
+                _string_round(self.E - self.W, 3)
         info[op][mi]['grid_span']['latitude'] = \
             _string_round(self.N - self.S, 3)
         info[op][mi]['grid_span']['units'] = 'degrees'
@@ -1949,6 +1953,8 @@ class ModelModule(CoreModule):
 
 
 def _round_float(val, digits):
+    if ma.is_masked(val) or val == '--' or val == 'null' or np.isnan(val):
+        return None
     return float(('%.' + str(digits) + 'f') % val)
 
 
