@@ -9,11 +9,12 @@
     <title>shakemap.coremods.model &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -46,7 +47,6 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
-<span class="kn">import</span> <span class="nn">numexpr</span> <span class="k">as</span> <span class="nn">ne</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="k">import</span> <span class="n">maskoceans</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
 <span class="kn">import</span> <span class="nn">openquake.hazardlib.const</span> <span class="k">as</span> <span class="nn">oqconst</span>
@@ -65,17 +65,16 @@
 <span class="kn">from</span> <span class="nn">shakelib.utils.utils</span> <span class="k">import</span> <span class="n">get_extent</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapInputContainer</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.distance</span> <span class="k">import</span> <span class="n">geodetic_distance_fast</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
-
-<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
-<span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
 
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
 <span class="kn">from</span> <span class="nn">shakemap._version</span> <span class="k">import</span> <span class="n">get_versions</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.generic_amp</span> <span class="k">import</span> <span class="n">get_generic_amp_factors</span>
+<span class="kn">from</span> <span class="nn">shakemap.c.clib</span> <span class="k">import</span> <span class="p">(</span><span class="n">make_sigma_matrix</span><span class="p">,</span>
+                             <span class="n">geodetic_distance_fast_c</span><span class="p">,</span>
+                             <span class="n">make_sd_array</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">shakelib.directivity.rowshandel2013</span> <span class="k">import</span> <span class="n">Rowshandel2013</span>
 
@@ -358,12 +357,12 @@
         <span class="c1"># store it in the output container</span>
         <span class="c1">#</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getInfo</span><span class="p">(</span><span class="n">moutgrid</span><span class="p">)</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setMetadata</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Add the rupture JSON as a text string</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="p">)</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setRuptureDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_geojson</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Fill the station dictionary for stationlist.json and add it to</span>
@@ -564,8 +563,8 @@
                                      <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lats</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lons</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lats</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span>
             <span class="n">dist_obj_out</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">fromSites</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_gmpe</span><span class="p">,</span>
                                               <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="p">,</span>
@@ -933,15 +932,17 @@
             <span class="c1">#</span>
             <span class="c1"># Build the covariance matrix of the residuals</span>
             <span class="c1">#</span>
-            <span class="n">dist22</span> <span class="o">=</span> <span class="n">geodetic_distance_fast</span><span class="p">(</span><span class="n">sta_lons_rad_dl</span><span class="p">,</span>
-                                            <span class="n">sta_lats_rad_dl</span><span class="p">,</span>
-                                            <span class="n">sta_lons_rad_dl</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
-                                            <span class="n">sta_lats_rad_dl</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">dist22</span> <span class="o">=</span> <span class="n">geodetic_distance_fast_c</span><span class="p">(</span><span class="n">sta_lons_rad_dl</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                              <span class="n">sta_lats_rad_dl</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                              <span class="n">sta_lons_rad_dl</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                              <span class="n">sta_lats_rad_dl</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
             <span class="n">d22_rows</span><span class="p">,</span> <span class="n">d22_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">dist22</span><span class="p">)</span>  <span class="c1"># should be square</span>
-            <span class="n">t1_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">sta_period_ix_dl</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">d22_cols</span><span class="p">))</span>
-            <span class="n">t2_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">sta_period_ix_dl</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">d22_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">t1_22</span> <span class="o">=</span> <span class="n">sta_period_ix_dl</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">d22_cols</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+            <span class="n">t2_22</span> <span class="o">=</span> <span class="n">sta_period_ix_dl</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">d22_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
             <span class="n">corr22</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_22</span><span class="p">,</span> <span class="n">t2_22</span><span class="p">,</span> <span class="n">dist22</span><span class="p">)</span>
-            <span class="n">sigma22</span> <span class="o">=</span> <span class="n">corr22</span> <span class="o">*</span> <span class="n">corr_adj22</span> <span class="o">*</span> <span class="p">(</span><span class="n">sta_phi_dl</span> <span class="o">*</span> <span class="n">sta_phi_dl</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">sigma22</span> <span class="o">=</span> <span class="n">make_sigma_matrix</span><span class="p">(</span><span class="n">corr22</span><span class="p">,</span> <span class="n">corr_adj22</span><span class="p">,</span>
+                                        <span class="n">sta_phi_dl</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                        <span class="n">sta_phi_dl</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
             <span class="n">sigma22inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">sigma22</span><span class="p">)</span>
             <span class="c1">#</span>
             <span class="c1"># Compute the bias numerator and denominator pieces</span>
@@ -970,7 +971,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-            <span class="n">nom_tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sta_tau_dl</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+            <span class="n">nom_tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sta_tau_dl</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
             <span class="n">nom_variance</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">nom_tau</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nominal_bias</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">nom_variance</span>
             <span class="n">bias_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time1</span>
@@ -1108,21 +1109,25 @@
         <span class="c1"># Re-build the covariance matrix of the residuals with</span>
         <span class="c1"># the full set of data</span>
         <span class="c1">#</span>
-        <span class="n">dist22</span> <span class="o">=</span> <span class="n">geodetic_distance_fast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">sta_lats_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">sta_lats_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">dist22</span> <span class="o">=</span> <span class="n">geodetic_distance_fast_c</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">sta_lats_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">sta_lats_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
         <span class="n">d22_rows</span><span class="p">,</span> <span class="n">d22_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">dist22</span><span class="p">)</span>  <span class="c1"># should be square</span>
-        <span class="n">t1_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">d22_cols</span><span class="p">))</span>
-        <span class="n">t2_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">d22_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">t1_22</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">d22_cols</span><span class="p">),</span>
+                                                     <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        <span class="n">t2_22</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">d22_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                                       <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
         <span class="n">corr22</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_22</span><span class="p">,</span> <span class="n">t2_22</span><span class="p">,</span> <span class="n">dist22</span><span class="p">)</span>
 
         <span class="c1">#</span>
         <span class="c1"># Rebuild sigma22_inv now that we have updated phi and</span>
         <span class="c1"># the correlation adjustment factors</span>
         <span class="c1">#</span>
-        <span class="n">sigma22</span> <span class="o">=</span> <span class="n">corr22</span> <span class="o">*</span> <span class="n">corr_adj22</span> <span class="o">*</span> \
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">sigma22</span> <span class="o">=</span> <span class="n">make_sigma_matrix</span><span class="p">(</span><span class="n">corr22</span><span class="p">,</span> <span class="n">corr_adj22</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
         <span class="n">sigma22inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">sigma22</span><span class="p">)</span>
 
         <span class="c1">#</span>
@@ -1132,30 +1137,36 @@
 
         <span class="n">ampgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">pout_mean</span><span class="p">)</span>
         <span class="n">sdgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">pout_mean</span><span class="p">)</span>
-        <span class="n">corr_adj12</span> <span class="o">=</span> <span class="n">corr_adj</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span><span class="p">))</span>  <span class="c1"># noqa</span>
+        <span class="n">corr_adj12</span> <span class="o">=</span> <span class="n">corr_adj</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span><span class="p">))</span>
+        <span class="c1"># Stuff that doesn&#39;t change within the loop:</span>
+        <span class="n">sta_lons_rad_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">sta_lats_rad_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_lats_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">lons_out_rad_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lons_out_rad</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">lats_out_rad_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lats_out_rad</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">ny</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sta_lats_rad_flat</span><span class="p">)</span>
+        <span class="n">d12_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span>
+        <span class="n">t2_12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">d12_cols</span><span class="p">),</span> <span class="n">outperiod_ix</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="n">t1_12</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">d12_cols</span><span class="p">),</span>
+                                                     <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        <span class="c1"># sdsta is the standard deviation of the stations</span>
+        <span class="n">sdsta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">iy</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smny</span><span class="p">):</span>
             <span class="n">ss</span> <span class="o">=</span> <span class="n">iy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span>
             <span class="n">se</span> <span class="o">=</span> <span class="p">(</span><span class="n">iy</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span>
             <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="n">dist12</span> <span class="o">=</span> <span class="n">geodetic_distance_fast</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lons_out_rad</span><span class="p">[</span><span class="n">ss</span><span class="p">:</span><span class="n">se</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lats_out_rad</span><span class="p">[</span><span class="n">ss</span><span class="p">:</span><span class="n">se</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sta_lats_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
-            <span class="n">t2_12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">dist12</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">outperiod_ix</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">d12_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">dist12</span><span class="p">)</span>
-            <span class="n">t1_12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">d12_cols</span><span class="p">))</span>
+            <span class="n">dist12</span> <span class="o">=</span> <span class="n">geodetic_distance_fast_c</span><span class="p">(</span>
+                <span class="n">lons_out_rad_flat</span><span class="p">[</span><span class="n">ss</span><span class="p">:</span><span class="n">se</span><span class="p">],</span>
+                <span class="n">lats_out_rad_flat</span><span class="p">[</span><span class="n">ss</span><span class="p">:</span><span class="n">se</span><span class="p">],</span>
+                <span class="n">sta_lons_rad_flat</span><span class="p">,</span>
+                <span class="n">sta_lats_rad_flat</span><span class="p">)</span>
             <span class="n">ddtime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
             <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="n">corr12</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_12</span><span class="p">,</span> <span class="n">t2_12</span><span class="p">,</span> <span class="n">dist12</span><span class="p">)</span>  <span class="c1"># noqa</span>
+            <span class="n">corr12</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_12</span><span class="p">,</span> <span class="n">t2_12</span><span class="p">,</span> <span class="n">dist12</span><span class="p">)</span>
             <span class="n">ctime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
             <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="c1"># sdarr is the standard deviation of the output sites</span>
-            <span class="n">sdarr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># noqa</span>
-            <span class="c1"># sdsta is the standard deviation of the stations</span>
-            <span class="n">sdsta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>  <span class="c1"># noqa</span>
-            <span class="n">sigma12</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-                <span class="s2">&quot;corr12 * corr_adj12 * (sdsta * sdarr)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">sdarr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">sigma12</span> <span class="o">=</span> <span class="n">make_sigma_matrix</span><span class="p">(</span><span class="n">corr12</span><span class="p">,</span> <span class="n">corr_adj12</span><span class="p">,</span> <span class="n">sdsta</span><span class="p">,</span> <span class="n">sdarr</span><span class="p">)</span>
             <span class="n">stime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
             <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="c1">#</span>
@@ -1180,13 +1191,11 @@
             <span class="c1"># sdgrid[ss:se] = pout_sd2[ss:se] -</span>
             <span class="c1">#       np.diag(rcmatrix.dot(sigma21))</span>
             <span class="c1">#</span>
-            <span class="n">sdgrid</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
-                <span class="n">pout_sd2</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rcmatrix</span> <span class="o">*</span> <span class="n">sigma12</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">make_sd_array</span><span class="p">(</span><span class="n">sdgrid</span><span class="p">,</span> <span class="n">pout_sd2</span><span class="p">,</span> <span class="n">iy</span><span class="p">,</span> <span class="n">rcmatrix</span><span class="p">,</span> <span class="n">sigma12</span><span class="p">)</span>
             <span class="n">mtime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampgrid</span>
-        <span class="n">sdgrid</span><span class="p">[</span><span class="n">sdgrid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sdgrid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">sdgrid</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> distance=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">ddtime</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> correlation=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">ctime</span><span class="p">))</span>
@@ -1270,6 +1279,7 @@
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;productsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_network&#39;</span><span class="p">]</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;producttype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;product_type&#39;</span><span class="p">]</span>
 
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;reference&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;fault_ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">getReference</span><span class="p">()</span>
         <span class="k">if</span> <span class="s1">&#39;df2&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span><span class="p">:</span>
             <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;intensity_observations&#39;</span><span class="p">]</span> <span class="o">=</span> \
@@ -1290,7 +1300,16 @@
         <span class="c1"># This AND locaction?</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">locstring</span>
         <span class="c1"># This AND src_mech?</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mech</span>
+        <span class="c1"># look at the origin information for indications that this</span>
+        <span class="c1"># event is a scenario</span>
+        <span class="n">condition1</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span>
+            <span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;event_type&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">origin</span><span class="o">.</span><span class="n">event_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;scenario&#39;</span>
+        <span class="n">condition2</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_se&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">condition1</span> <span class="ow">or</span> <span class="n">condition2</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SCENARIO&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ACTUAL&#39;</span>
+
         <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">imt_out_set</span><span class="p">:</span>
@@ -1417,7 +1436,7 @@
                 <span class="n">mybias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">/</span> \
                     <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
                      <span class="bp">self</span><span class="o">.</span><span class="n">bias_den</span><span class="p">[</span><span class="n">myimt</span><span class="p">])</span>
-                <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_bias&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mybias</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_bias&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mybias</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Add the station data. The stationlist object has the original</span>
@@ -1636,72 +1655,57 @@
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smny</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span>
-        <span class="n">gdict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Put the Vs30 grid in the output container</span>
         <span class="c1">#</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="n">_get_layer_info</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">)</span>
-        <span class="n">vs30</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="n">gdict</span><span class="p">)</span>
-        <span class="n">vs30_metadata</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">vs30_metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
-        <span class="n">vs30_metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">digits</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setGrid</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">vs30_metadata</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">digits</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([],</span> <span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Now do the distance grids</span>
         <span class="c1">#</span>
-        <span class="n">dist_metadata</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">dist_metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;km&#39;</span>
-        <span class="n">dist_metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;km&#39;</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="n">get_distance_measures</span><span class="p">():</span>
             <span class="n">dm_arr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">dm_arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">dm_arr_2d</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">dm_arr</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">gdict</span><span class="p">)</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setGrid</span><span class="p">(</span><span class="s1">&#39;distance_&#39;</span> <span class="o">+</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_arr_2d</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">dist_metadata</span><span class="p">)</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;distances&#39;</span><span class="p">],</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_arr</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">dm</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">):</span>
                 <span class="n">dm_var</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">dm</span> <span class="o">+</span> <span class="s1">&#39;_var&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">dm_var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">dm_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dm_arr</span><span class="p">)</span>
                 <span class="n">dm_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dm_var</span><span class="p">)</span>
-                <span class="n">dm_std_2d</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">dm_std</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">gdict</span><span class="p">)</span>
-                <span class="n">oc</span><span class="o">.</span><span class="n">setGrid</span><span class="p">(</span><span class="s1">&#39;distance_&#39;</span> <span class="o">+</span> <span class="n">dm</span> <span class="o">+</span> <span class="s1">&#39;_stddev&#39;</span><span class="p">,</span> <span class="n">dm_std_2d</span><span class="p">,</span>
-                           <span class="n">metadata</span><span class="o">=</span><span class="n">dist_metadata</span><span class="p">)</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;distances&#39;</span><span class="p">],</span> <span class="n">dm</span> <span class="o">+</span> <span class="s1">&#39;_std&#39;</span><span class="p">,</span> <span class="n">dm_std</span><span class="p">,</span>
+                            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
 
         <span class="c1">#</span>
         <span class="c1"># Output the data and uncertainty grids</span>
         <span class="c1">#</span>
         <span class="n">component</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]</span>
+        <span class="n">std_metadata</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># set the data grid</span>
-            <span class="n">mean_grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">gdict</span><span class="p">)</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="n">_get_layer_info</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="n">mean_metadata</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
-                <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="n">digits</span>
-            <span class="p">}</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">digits</span>
 
             <span class="c1"># set the uncertainty grid</span>
             <span class="n">std_layername</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="n">_get_layer_info</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">)</span>
-            <span class="n">std_metadata</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
-                <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="n">digits</span>
-            <span class="p">}</span>
-            <span class="n">std_grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">gdict</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setIMTGrids</span><span class="p">(</span>
-                <span class="n">key</span><span class="p">,</span>
-                <span class="n">mean_grid</span><span class="p">,</span>
-                <span class="n">mean_metadata</span><span class="p">,</span>
-                <span class="n">std_grid</span><span class="p">,</span>
-                <span class="n">std_metadata</span><span class="p">,</span>
-                <span class="n">component</span><span class="p">)</span>
+            <span class="n">std_metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
+            <span class="n">std_metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">digits</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setIMTGrids</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">],</span>
+                           <span class="n">std_metadata</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Directivity</span>
         <span class="c1">#</span>
+        <span class="k">del</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_directivity</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_output</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">imtstr</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_layer_info</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="n">dir_2d</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">gdict</span><span class="p">)</span>
-                <span class="n">oc</span><span class="o">.</span><span class="n">setGrid</span><span class="p">(</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_directivity&#39;</span><span class="p">,</span> <span class="n">dir_2d</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;directivity&#39;</span><span class="p">],</span> <span class="n">imtstr</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_storePointData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oc</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1714,7 +1718,7 @@
             <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;m/s&#39;</span><span class="p">,</span>
             <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="mi">4</span>
         <span class="p">}</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">vs30</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([],</span> <span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">vs30</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
                     <span class="n">metadata</span><span class="o">=</span><span class="n">vs30_metadata</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Store the distances</span>
@@ -1727,20 +1731,20 @@
             <span class="n">dm_arr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">dm_arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;distance_&#39;</span> <span class="o">+</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_arr</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;distances&#39;</span><span class="p">],</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_arr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
                         <span class="n">metadata</span><span class="o">=</span><span class="n">distance_metadata</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">dm</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">):</span>
                 <span class="n">dm_var</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">dm</span> <span class="o">+</span> <span class="s1">&#39;_var&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">dm_var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">dm_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dm_arr</span><span class="p">)</span>
-                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;distance_&#39;</span> <span class="o">+</span> <span class="n">dm</span> <span class="o">+</span> <span class="s1">&#39;_stddev&#39;</span><span class="p">,</span>
-                            <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dm_var</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;distances&#39;</span><span class="p">],</span> <span class="n">dm</span> <span class="o">+</span> <span class="s1">&#39;_std&#39;</span><span class="p">,</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dm_var</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
                             <span class="n">metadata</span><span class="o">=</span><span class="n">distance_metadata</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Store the IMTs</span>
         <span class="c1">#</span>
         <span class="n">ascii_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">idents</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">idents</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">component</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># set the data grid</span>
@@ -1755,10 +1759,13 @@
                 <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
                 <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="n">digits</span>
             <span class="p">}</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setIMTArrays</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lons</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lats</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
-                            <span class="n">ascii_ids</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">mean_metadata</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">std_metadata</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setIMTArrays</span><span class="p">(</span><span class="n">key</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lons</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lats</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                            <span class="n">ascii_ids</span><span class="p">,</span>
+                            <span class="n">value</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">mean_metadata</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">std_metadata</span><span class="p">,</span>
+                            <span class="n">component</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_storeRegressionData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oc</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1794,19 +1801,19 @@
                 <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ixx</span><span class="p">])</span>
 
         <span class="n">mean_dists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">mean_dists</span><span class="p">,</span> <span class="n">bad_ix</span><span class="p">)</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_distances&#39;</span><span class="p">,</span> <span class="n">mean_dists</span><span class="p">)</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">],</span> <span class="s1">&#39;distances&#39;</span><span class="p">,</span> <span class="n">mean_dists</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rockgrid</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">rockmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">rockmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">bad_ix</span><span class="p">)</span>
             <span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">bad_ix</span><span class="p">)</span>
             <span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">bad_ix</span><span class="p">)</span>
             <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">bad_ix</span><span class="p">)</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_rock_mean&#39;</span><span class="p">,</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span>
                         <span class="n">rockmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_soil_mean&#39;</span><span class="p">,</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span>
                         <span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_rock_sd&#39;</span><span class="p">,</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span>
                         <span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_soil_sd&#39;</span><span class="p">,</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span>
                         <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
 
     <span class="c1">#</span>

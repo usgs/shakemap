@@ -6,19 +6,20 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>2.5. Input Data Formats &#8212; ShakeMap Documentation  documentation</title>
+    <title>2.6. Input Data Formats &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="2.6. Output Data Formats" href="tg_output_formats.html" />
-    <link rel="prev" title="2.4. Data Processing" href="tg_processing.html" />
+    <link rel="next" title="2.7. Output Data Formats" href="tg_output_formats.html" />
+    <link rel="prev" title="2.5. Data Processing" href="tg_processing.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,9 +35,9 @@
           <div class="body" role="main">
             
   <div class="section" id="input-data-formats">
-<span id="sec-input-formats-4"></span><h1>2.5. Input Data Formats<a class="headerlink" href="#input-data-formats" title="Permalink to this headline">¶</a></h1>
+<span id="sec-input-formats-4"></span><h1>2.6. Input Data Formats<a class="headerlink" href="#input-data-formats" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="event-xml-file">
-<span id="subsec-event-xml-file"></span><h2>2.5.1. Event XML File<a class="headerlink" href="#event-xml-file" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-event-xml-file"></span><h2>2.6.1. Event XML File<a class="headerlink" href="#event-xml-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>required</em>.</p>
 <p>The earthquake origin information is contained in a simple XML file
 called <em>event.xml</em> that is contained in the event’s <em>current</em>
@@ -97,7 +98,10 @@ YYYY-MM-DDTHH:MM:SS.fZ format.</td>
 <tr class="row-even"><td>reference</td>
 <td>(optional) Source for hypocenter information</td>
 </tr>
-<tr class="row-odd"><td>productcode</td>
+<tr class="row-odd"><td>event_type</td>
+<td>(optional) Event type, one of ‘ACTUAL’ or ‘SCENARIO’</td>
+</tr>
+<tr class="row-even"><td>productcode</td>
 <td>(optional) Used to distinguish between different
 ShakeMaps created for the same event (e.g., one map
 showing the extent of shaking, and another zoomed
@@ -110,7 +114,7 @@ supplied to the <strong>shake</strong> program).</td>
 </table>
 </div>
 <div class="section" id="moment-xml-file">
-<h2>2.5.2. Moment XML File<a class="headerlink" href="#moment-xml-file" title="Permalink to this headline">¶</a></h2>
+<h2>2.6.2. Moment XML File<a class="headerlink" href="#moment-xml-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>optional</em>.</p>
 <p>Users may provide moment tensor information in a QuakeML file called
 <em>moment.xml</em> that is in the event’s <em>current</em> directory. The QuakeML
@@ -120,7 +124,7 @@ complete <em>nodalPlanes</em> and <em>principalAxes</em> elements. See the Quake
 documentation for details.</p>
 </div>
 <div class="section" id="shakemap-xml-data-file">
-<h2>2.5.3. ShakeMap XML Data File<a class="headerlink" href="#shakemap-xml-data-file" title="Permalink to this headline">¶</a></h2>
+<h2>2.6.3. ShakeMap XML Data File<a class="headerlink" href="#shakemap-xml-data-file" title="Permalink to this headline">¶</a></h2>
 <p>These files are <em>optional</em>.</p>
 <p>To inform your ShakeMap with real data, either macroseismic intensity
 or instrumented accelerations and velocities, you may include any
@@ -366,7 +370,7 @@ intensity_flag=&quot;0&quot;&gt;
 output file provided to the public.</p>
 </div>
 <div class="section" id="shakemap-json-data-file">
-<h2>2.5.4. ShakeMap JSON Data File<a class="headerlink" href="#shakemap-json-data-file" title="Permalink to this headline">¶</a></h2>
+<h2>2.6.4. ShakeMap JSON Data File<a class="headerlink" href="#shakemap-json-data-file" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap will also accept a ShakeMap-produced GeoJSON <em>stationlist.json</em>
 file as input (see <a class="reference internal" href="tg_output_formats.html#subsec-stationlist-geojson"><span class="std std-ref">Stationlist GeoJSON</span></a>). Additional
 JSON files of the form <em>*_dat.json</em> file may also be included in the input.</p>
@@ -538,7 +542,7 @@ and should have a <strong>channels</strong> element that is an empty list
 (i.e., “channels: []”).</p>
 </div>
 <div class="section" id="source-text-file">
-<h2>2.5.5. Source Text File<a class="headerlink" href="#source-text-file" title="Permalink to this headline">¶</a></h2>
+<h2>2.6.5. Source Text File<a class="headerlink" href="#source-text-file" title="Permalink to this headline">¶</a></h2>
 <p>Because most ShakeMap installations automatically generate XML input
 files and write them to the input directory, manual changes made by
 the operator to the event.xml file will generally be overwritten by
@@ -556,7 +560,7 @@ etc.. Blank lines and lines beginning with ‘#’ (i.e., comments) are
 ignored.</p>
 </div>
 <div class="section" id="rupture-geojson-file">
-<h2>2.5.6. Rupture GeoJson File<a class="headerlink" href="#rupture-geojson-file" title="Permalink to this headline">¶</a></h2>
+<h2>2.6.6. Rupture GeoJson File<a class="headerlink" href="#rupture-geojson-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>optional</em>.</p>
 <p>Rupture (also known as finite fault) files are defined in ShakeMap 4
 as GeoJSON files, a standard format for representing geospatial
@@ -690,7 +694,7 @@ sub-polygon are horizontal, the distance calculations are much faster.</p>
 </div>
 </div>
 <div class="section" id="generic-amplification-factors">
-<h2>2.5.7. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
+<h2>2.6.7. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
 <p>The ShakeMap generic amplification factor facility supports the inclusion
 of linear amplifications that are not otherwise supported (by, for example,
 Vs30-based
@@ -806,22 +810,23 @@ provided. Etc.</p>
 <li class="toctree-l4"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="tg_installation.html">2.1. Installation and Configuration</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html">2.2. Software Architecture</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.3. Queueing Events</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.4. Data Processing</a></li>
-<li class="toctree-l5 current"><a class="current reference internal" href="#">2.5. Input Data Formats</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#event-xml-file">2.5.1. Event XML File</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#moment-xml-file">2.5.2. Moment XML File</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#shakemap-xml-data-file">2.5.3. ShakeMap XML Data File</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#shakemap-json-data-file">2.5.4. ShakeMap JSON Data File</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#source-text-file">2.5.5. Source Text File</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#rupture-geojson-file">2.5.6. Rupture GeoJson File</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#generic-amplification-factors">2.5.7. Generic Amplification Factors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_select.html">2.2. Ground Motion Model Selection</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html">2.3. Software Architecture</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.4. Queueing Events</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.5. Data Processing</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">2.6. Input Data Formats</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#event-xml-file">2.6.1. Event XML File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#moment-xml-file">2.6.2. Moment XML File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shakemap-xml-data-file">2.6.3. ShakeMap XML Data File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shakemap-json-data-file">2.6.4. ShakeMap JSON Data File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#source-text-file">2.6.5. Source Text File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#rupture-geojson-file">2.6.6. Rupture GeoJson File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#generic-amplification-factors">2.6.7. Generic Amplification Factors</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tg_output_formats.html">2.6. Output Data Formats</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.7. Verification</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.8. Guidelines for Contributors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_output_formats.html">2.7. Output Data Formats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.8. Verification</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.9. Guidelines for Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>

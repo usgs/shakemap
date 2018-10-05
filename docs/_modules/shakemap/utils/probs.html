@@ -9,11 +9,12 @@
     <title>shakemap.utils.probs &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -387,6 +388,29 @@
 
         <span class="c1"># Calculate combined probability of interface</span>
         <span class="n">p_int</span> <span class="o">=</span> <span class="n">p_int_hypo</span> <span class="o">*</span> <span class="n">p_int_kagan</span> <span class="o">*</span> <span class="n">p_int_sz</span>
+
+        <span class="c1"># Calculate probability that the earthquake lies above the slab</span>
+        <span class="c1"># and is thus crustal.</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_slab&#39;</span><span class="p">][</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_slab&#39;</span><span class="p">][</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_slab&#39;</span><span class="p">][</span><span class="s1">&#39;p1&#39;</span><span class="p">]</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_slab&#39;</span><span class="p">][</span><span class="s1">&#39;p2&#39;</span><span class="p">]</span>
+
+        <span class="n">p_crust_slab</span> <span class="o">=</span> <span class="n">get_probability</span><span class="p">((</span><span class="n">depth</span> <span class="o">-</span> <span class="n">slab_depth</span><span class="p">),</span> <span class="n">x1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+
+        <span class="c1"># Calculate probability that the earthquake lies within the crust</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_hypo&#39;</span><span class="p">][</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_hypo&#39;</span><span class="p">][</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_hypo&#39;</span><span class="p">][</span><span class="s1">&#39;p1&#39;</span><span class="p">]</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_hypo&#39;</span><span class="p">][</span><span class="s1">&#39;p2&#39;</span><span class="p">]</span>
+        <span class="n">p_crust_hypo</span> <span class="o">=</span> <span class="n">get_probability</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+
+        <span class="c1"># Calculate probability of crustal</span>
+        <span class="n">p_crustal</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p_int</span><span class="p">)</span> <span class="o">*</span> <span class="n">p_crust_slab</span> <span class="o">*</span> <span class="n">p_crust_hypo</span>
+
+        <span class="c1"># Calculate probability of intraslab</span>
+        <span class="n">p_slab</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">p_int</span> <span class="o">+</span> <span class="n">p_crustal</span><span class="p">)</span>
+
     <span class="k">else</span><span class="p">:</span>
         <span class="n">slab_depth</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;default_slab_depth&#39;</span><span class="p">]</span>
         <span class="c1"># Calculate the probability that an earthquake is interface</span>
@@ -421,27 +445,12 @@
         <span class="c1"># and 1 at large magnitudes.</span>
         <span class="n">p_int</span> <span class="o">=</span> <span class="n">p_int_depth</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p_int_depth</span><span class="p">)</span><span class="o">*</span><span class="n">p_int_mag</span>
 
-    <span class="c1"># Calculate probability that the earthquake lies above the slab</span>
-    <span class="c1"># and is thus crustal.</span>
-    <span class="n">x1</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_slab&#39;</span><span class="p">][</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span>
-    <span class="n">x2</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_slab&#39;</span><span class="p">][</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span>
-    <span class="n">p1</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_slab&#39;</span><span class="p">][</span><span class="s1">&#39;p1&#39;</span><span class="p">]</span>
-    <span class="n">p2</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_slab&#39;</span><span class="p">][</span><span class="s1">&#39;p2&#39;</span><span class="p">]</span>
-
-    <span class="n">p_crust_slab</span> <span class="o">=</span> <span class="n">get_probability</span><span class="p">((</span><span class="n">depth</span> <span class="o">-</span> <span class="n">slab_depth</span><span class="p">),</span> <span class="n">x1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
-
-    <span class="c1"># Calculate probability that the earthquake lies within the crust</span>
-    <span class="n">x1</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_hypo&#39;</span><span class="p">][</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span>
-    <span class="n">x2</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_hypo&#39;</span><span class="p">][</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span>
-    <span class="n">p1</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_hypo&#39;</span><span class="p">][</span><span class="s1">&#39;p1&#39;</span><span class="p">]</span>
-    <span class="n">p2</span> <span class="o">=</span> <span class="n">subcfg</span><span class="p">[</span><span class="s1">&#39;p_crust_hypo&#39;</span><span class="p">][</span><span class="s1">&#39;p2&#39;</span><span class="p">]</span>
-    <span class="n">p_crust_hypo</span> <span class="o">=</span> <span class="n">get_probability</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
-
-    <span class="c1"># Calculate probability of crustal</span>
-    <span class="n">p_crustal</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p_int</span><span class="p">)</span> <span class="o">*</span> <span class="n">p_crust_slab</span> <span class="o">*</span> <span class="n">p_crust_hypo</span>
-
-    <span class="c1"># Calculate probability of intraslab</span>
-    <span class="n">p_slab</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">p_int</span> <span class="o">+</span> <span class="n">p_crustal</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="n">slab_depth</span><span class="p">:</span>
+            <span class="n">p_crustal</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">p_slab</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">p_int</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p_crustal</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">p_int</span>
+            <span class="n">p_slab</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="n">probs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="n">p_crustal</span><span class="p">,</span>

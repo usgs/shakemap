@@ -10,11 +10,12 @@
     <title>Index &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
@@ -65,8 +66,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.add_icon_style">add_icon_style() (in module shakemap.coremods.kml)</a>
 </li>
-      <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.add_style_map">add_style_map() (in module shakemap.coremods.kml)</a>
-</li>
       <li><a href="shakelib/shakelib.station.html#shakelib.station.StationList.addData">addData() (shakelib.station.StationList method)</a>
 </li>
       <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.addStationData">addStationData() (shakelib.utils.containers.ShakeMapInputContainer method)</a>
@@ -75,10 +74,10 @@
 </li>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler">AmplitudeHandler (class in shakemap.utils.amps)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/shakemap.utils.config.html#shakemap.utils.config.annotatedfloat_type">annotatedfloat_type() (in module shakemap.utils.config)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule">AssembleModule (class in shakemap.coremods.assemble)</a>
 </li>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.associate">associate() (shakemap.utils.amps.AmplitudeHandler method)</a>
@@ -319,6 +318,8 @@
 </li>
       <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay_image">create_overlay_image() (in module shakemap.coremods.kml)</a>
 </li>
+      <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_polygons">create_polygons() (in module shakemap.coremods.kml)</a>
+</li>
       <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_stations">create_stations() (in module shakemap.coremods.kml)</a>
 </li>
       <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_styles">create_styles() (in module shakemap.coremods.kml)</a>
@@ -424,12 +425,6 @@
       <li><a href="apidoc/shakemap.utils.layers.html#shakemap.utils.layers.dist_to_layer">dist_to_layer() (in module shakemap.utils.layers)</a>
 </li>
       <li><a href="shakelib/shakelib.distance.html#shakelib.distance.Distance">Distance (class in shakelib.distance)</a>
-</li>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.drawContourMap">drawContourMap() (shakemap.coremods.mapping.MapMaker method)</a>
-</li>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.drawIntensityMap">drawIntensityMap() (shakemap.coremods.mapping.MapMaker method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.dropIMT">dropIMT() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
 </li>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.dt_to_timestamp">dt_to_timestamp() (in module shakemap.utils.amps)</a>
 </li>
@@ -669,10 +664,6 @@
         <li><a href="shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getArea">(shakelib.rupture.quad_rupture.QuadRupture method)</a>
 </li>
       </ul></li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getComponents">getComponents() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getConfig">getConfig() (shakelib.utils.containers.ShakeMapContainer method)</a>
-</li>
       <li><a href="shakelib/shakelib.plotting.contour.html#shakelib.plotting.contour.getContourLevels">getContourLevels() (in module shakelib.plotting.contour)</a>
 </li>
       <li><a href="shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.IMTConverter.getConversionFactor">getConversionFactor() (shakelib.conversions.convert_imt.IMTConverter method)</a>
@@ -685,8 +676,6 @@
         <li><a href="shakelib/shakelib.correlation.loth_baker_2013.html#shakelib.correlation.loth_baker_2013.LothBaker2013.getCorrelation">(shakelib.correlation.loth_baker_2013.LothBaker2013 method)</a>
 </li>
       </ul></li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getDataType">getDataType() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
-</li>
       <li><a href="apidoc/shakemap.utils.dependencies.html#shakemap.utils.dependencies.CommandDatabase.getDependencyStatus">getDependencyStatus() (shakemap.utils.dependencies.CommandDatabase method)</a>
 </li>
       <li><a href="shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getDeps">getDeps() (shakelib.rupture.quad_rupture.QuadRupture method)</a>
@@ -715,14 +704,14 @@
       </ul></li>
       <li><a href="shakelib/shakelib.distance.html#shakelib.distance.Distance.getDistanceContext">getDistanceContext() (shakelib.distance.Distance method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getDistanceType">getDistanceType() (shakelib.gmice.gmice.GMICE static method)</a>
 </li>
       <li><a href="shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getDT">getDT() (shakelib.directivity.rowshandel2013.Rowshandel2013 method)</a>
 </li>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.getEvent">getEvent() (shakemap.utils.amps.AmplitudeHandler method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="shakelib/shakelib.directivity.bayless2013.html#shakelib.directivity.bayless2013.Bayless2013.getFd">getFd() (shakelib.directivity.bayless2013.Bayless2013 method)</a>
 
       <ul>
@@ -753,12 +742,6 @@
       </ul></li>
       <li><a href="shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.getHypo">getHypo() (shakelib.rupture.origin.Origin method)</a>
 </li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTArrays">getIMTArrays() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTGrids">getIMTGrids() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTs">getIMTs() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
-</li>
       <li><a href="shakelib/shakelib.station.html#shakelib.station.StationList.getIMTtypes">getIMTtypes() (shakelib.station.StationList method)</a>
 </li>
       <li><a href="shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getIndividualTopLengths">getIndividualTopLengths() (shakelib.rupture.quad_rupture.QuadRupture method)</a>
@@ -782,8 +765,6 @@
 </li>
       </ul></li>
       <li><a href="shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getLnSigma">getLnSigma() (shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982 method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getMetadata">getMetadata() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
 </li>
       <li><a href="shakelib/shakelib.gmice.ak07.html#shakelib.gmice.ak07.AK07.getMI2GMsd">getMI2GMsd() (shakelib.gmice.ak07.AK07 method)</a>
 
@@ -819,10 +800,6 @@
 </li>
       <li><a href="shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods">getPeriods() (shakelib.directivity.rowshandel2013.Rowshandel2013 class method)</a>
 </li>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.getProjectedPatches">getProjectedPatches() (in module shakemap.coremods.mapping)</a>
-</li>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.getProjectedPolygon">getProjectedPolygon() (in module shakemap.coremods.mapping)</a>
-</li>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getQuadrilaterals">getQuadrilaterals() (shakelib.rupture.base.Rupture method)</a>
 
       <ul>
@@ -843,9 +820,7 @@
 </li>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getRuptureContext">getRuptureContext() (shakelib.rupture.base.Rupture method)</a>
 </li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getRuptureDict">getRuptureDict() (shakelib.utils.containers.ShakeMapContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getRuptureObject">getRuptureObject() (shakelib.utils.containers.ShakeMapContainer method)</a>
+      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.getRuptureObject">getRuptureObject() (shakelib.utils.containers.ShakeMapInputContainer method)</a>
 </li>
       <li><a href="shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getScale">getScale() (shakelib.gmice.gmice.GMICE method)</a>
 </li>
@@ -853,11 +828,9 @@
 </li>
       <li><a href="shakelib/shakelib.sites.html#shakelib.sites.Sites.getSitesContext">getSitesContext() (shakelib.sites.Sites method)</a>
 </li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getStationDict">getStationDict() (shakelib.utils.containers.ShakeMapContainer method)</a>
-</li>
       <li><a href="shakelib/shakelib.station.html#shakelib.station.StationList.getStationDictionary">getStationDictionary() (shakelib.station.StationList method)</a>
 </li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getStationList">getStationList() (shakelib.utils.containers.ShakeMapContainer method)</a>
+      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.getStationList">getStationList() (shakelib.utils.containers.ShakeMapInputContainer method)</a>
 </li>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.getStats">getStats() (shakemap.utils.amps.AmplitudeHandler method)</a>
 </li>
@@ -871,8 +844,6 @@
         <li><a href="shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getStrike">(shakelib.rupture.quad_rupture.QuadRupture method)</a>
 </li>
       </ul></li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getVersionHistory">getVersionHistory() (shakelib.utils.containers.ShakeMapContainer method)</a>
-</li>
       <li><a href="shakelib/shakelib.sites.html#shakelib.sites.Sites.getVs30Grid">getVs30Grid() (shakelib.sites.Sites method)</a>
 </li>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getWidth">getWidth() (shakelib.rupture.base.Rupture method)</a>
@@ -977,17 +948,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/shakemap.utils.queue.html#shakemap.utils.queue.magnitude_too_small">magnitude_too_small() (in module shakemap.utils.queue)</a>
 </li>
+      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule.make_pin_thumbnail">make_pin_thumbnail() (shakemap.coremods.mapping.MappingModule method)</a>
+</li>
       <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.make_placemark">make_placemark() (in module shakemap.coremods.kml)</a>
 </li>
       <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.make_row">make_row() (in module shakemap.coremods.kml)</a>
 </li>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.map">map() (shakelib.rupture.base.Rupture method)</a>
 </li>
-      <li><a href="shakelib/shakelib.plotting.plotrupture.html#shakelib.plotting.plotrupture.map_rupture">map_rupture() (in module shakelib.plotting.plotrupture)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker">MapMaker (class in shakemap.coremods.mapping)</a>
+      <li><a href="shakelib/shakelib.plotting.plotrupture.html#shakelib.plotting.plotrupture.map_rupture">map_rupture() (in module shakelib.plotting.plotrupture)</a>
 </li>
       <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule.mapping_page">mapping_page (shakemap.coremods.mapping.MappingModule attribute)</a>
 </li>
@@ -1041,8 +1012,6 @@
         <li><a href="apidoc/shakemap.coremods.augment.html#shakemap.coremods.augment.AugmentModule.parseArgs">(shakemap.coremods.augment.AugmentModule method)</a>
 </li>
         <li><a href="apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule.parseArgs">(shakemap.coremods.base.CoreModule method)</a>
-</li>
-        <li><a href="apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule.parseArgs">(shakemap.coremods.contour.ContourModule method)</a>
 </li>
         <li><a href="apidoc/shakemap.coremods.sleep.html#shakemap.coremods.sleep.SleepModule.parseArgs">(shakemap.coremods.sleep.SleepModule method)</a>
 </li>
@@ -1133,8 +1102,6 @@
       </ul></li>
       <li><a href="shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.reverse_quad">reverse_quad() (in module shakelib.rupture.utils)</a>
 </li>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.round_to">round_to() (shakemap.coremods.mapping.MapMaker method)</a>
-</li>
       <li><a href="shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013">Rowshandel2013 (class in shakelib.directivity.rowshandel2013)</a>
 </li>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture">Rupture (class in shakelib.rupture.base)</a>
@@ -1161,31 +1128,13 @@
 </li>
       <li><a href="shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE.set_sites_depth_parameters">set_sites_depth_parameters() (shakelib.multigmpe.MultiGMPE static method)</a>
 </li>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.setCityGrid">setCityGrid() (shakemap.coremods.mapping.MapMaker method)</a>
-</li>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.setCityList">setCityList() (shakemap.coremods.mapping.MapMaker method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setConfig">setConfig() (shakelib.utils.containers.ShakeMapContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setDataType">setDataType() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
-</li>
-      <li><a href="apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.setFigureSize">setFigureSize() (shakemap.coremods.mapping.MapMaker method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setIMTArrays">setIMTArrays() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setIMTGrids">setIMTGrids() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
-</li>
       <li><a href="shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.setMechanism">setMechanism() (shakelib.rupture.origin.Origin method)</a>
 </li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setRupture">setRupture() (shakelib.utils.containers.ShakeMapContainer method)</a>
+      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.setRupture">setRupture() (shakelib.utils.containers.ShakeMapInputContainer method)</a>
 </li>
       <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.setStationData">setStationData() (shakelib.utils.containers.ShakeMapInputContainer method)</a>
 </li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationDict">setStationDict() (shakelib.utils.containers.ShakeMapContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationList">setStationList() (shakelib.utils.containers.ShakeMapContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setVersionHistory">setVersionHistory() (shakelib.utils.containers.ShakeMapContainer method)</a>
+      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.setStationList">setStationList() (shakelib.utils.containers.ShakeMapInputContainer method)</a>
 </li>
       <li><a href="apidoc/shakemap.utils.dependencies.html#shakemap.utils.dependencies.sha_sum">sha_sum() (in module shakemap.utils.dependencies)</a>
 </li>
@@ -1263,8 +1212,6 @@
 </li>
       <li><a href="shakelib/shakelib.rupture.quad_rupture.html#module-shakelib.rupture.quad_rupture">shakelib.rupture.quad_rupture (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="shakelib/shakelib.rupture.utils.html#module-shakelib.rupture.utils">shakelib.rupture.utils (module)</a>
 </li>
       <li><a href="shakelib/shakelib.sites.html#module-shakelib.sites">shakelib.sites (module)</a>
@@ -1273,6 +1220,8 @@
 </li>
       <li><a href="shakelib/shakelib.utils.html#module-shakelib.utils">shakelib.utils (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="shakelib/shakelib.utils.containers.html#module-shakelib.utils.containers">shakelib.utils.containers (module)</a>
 </li>
       <li><a href="shakelib/shakelib.utils.distance.html#module-shakelib.utils.distance">shakelib.utils.distance (module)</a>
@@ -1361,11 +1310,7 @@
 </li>
       <li><a href="apidoc/shakemap.utils.utils.html#module-shakemap.utils.utils">shakemap.utils.utils (module)</a>
 </li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer">ShakeMapContainer (class in shakelib.utils.containers)</a>
-</li>
       <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer">ShakeMapInputContainer (class in shakelib.utils.containers)</a>
-</li>
-      <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer">ShakeMapOutputContainer (class in shakelib.utils.containers)</a>
 </li>
       <li><a href="shakelib/shakelib.sites.html#shakelib.sites.Sites">Sites (class in shakelib.sites)</a>
 </li>

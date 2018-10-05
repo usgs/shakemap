@@ -9,11 +9,12 @@
     <title>shakelib.multigmpe &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -198,6 +199,16 @@
 
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">MultiGMPE</span><span class="p">):</span>
                 <span class="c1"># -------------------------------------------------------------</span>
+                <span class="c1"># We may need to inflate the standard deviations to account for</span>
+                <span class="c1"># the point-source to finite rupture conversion.</span>
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="n">lsd_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflatePSSigma</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span>
+                                              <span class="n">dists</span><span class="p">,</span> <span class="n">timt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">sd</span> <span class="ow">in</span> <span class="n">lsd</span><span class="p">:</span>
+                    <span class="n">lsd_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sd</span><span class="p">)</span>
+                <span class="n">lsd</span> <span class="o">=</span> <span class="n">lsd_new</span>
+
+                <span class="c1"># -------------------------------------------------------------</span>
                 <span class="c1"># If IMT is PGV and PGV is not given by the GMPE, then</span>
                 <span class="c1"># convert from PSA10.</span>
                 <span class="c1"># -------------------------------------------------------------</span>
@@ -235,16 +246,6 @@
                         <span class="k">if</span> <span class="n">stddev_type</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
                             <span class="k">continue</span>
                         <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">bk17</span><span class="o">.</span><span class="n">convertSigmas</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
-
-                <span class="c1"># -------------------------------------------------------------</span>
-                <span class="c1"># We may need to inflate the standard deviations to account for</span>
-                <span class="c1"># the point-source to finite rupture conversion.</span>
-                <span class="c1"># -------------------------------------------------------------</span>
-                <span class="n">lsd_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflatePSSigma</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span>
-                                              <span class="n">dists</span><span class="p">,</span> <span class="n">timt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">sd</span> <span class="ow">in</span> <span class="n">lsd</span><span class="p">:</span>
-                    <span class="n">lsd_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sd</span><span class="p">)</span>
-                <span class="n">lsd</span> <span class="o">=</span> <span class="n">lsd_new</span>
 
             <span class="c1"># End: if GMPE is not MultiGMPE</span>
             <span class="k">else</span><span class="p">:</span>
