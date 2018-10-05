@@ -1327,7 +1327,7 @@ class ModelModule(CoreModule):
                 info[op][gm][myimt]['bias'] = \
                     _string_round(self.nominal_bias[myimt], 3)
             else:
-                info[op][gm][myimt]['bias'] = '--'
+                info[op][gm][myimt]['bias'] = None
             info[op][gm][myimt]['max_grid'] = \
                 _string_round(np.max(self.outgrid[myimt]), 3)
             info[op][gm][myimt]['max'] = \
@@ -1357,10 +1357,7 @@ class ModelModule(CoreModule):
         info[op][mi]['max']['units'] = 'degrees'
         info[op][un] = {}
         info[op][un]['grade'] = mygrade
-        if mean_rat == '--':
-            info[op][un]['mean_uncertainty_ratio'] = mean_rat
-        else:
-            info[op][un]['mean_uncertainty_ratio'] = _string_round(mean_rat, 3)
+        info[op][un]['mean_uncertainty_ratio'] = _string_round(mean_rat, 3)
         if 'df2' in self.dataframes:
             info[op][un]['total_flagged_mi'] = \
                 str(np.sum(self.df2.df['MMI_outliers'] |
@@ -1952,12 +1949,12 @@ class ModelModule(CoreModule):
 
 
 def _round_float(val, digits):
-    if val == 'null' or np.isnan(val) or val == '--':
-        return val
     return float(('%.' + str(digits) + 'f') % val)
 
 
 def _string_round(val, digits):
+    if ma.is_masked(val) or val == '--' or val == 'null' or np.isnan(val):
+        return None
     return str(_round_float(val, digits))
 
 
