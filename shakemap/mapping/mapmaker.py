@@ -296,7 +296,7 @@ def _draw_imt_legend(fig, levels, palette, imtype, gmice):
     imtlabel = imtype + ' ' + units[imtype]
     # imtlabel = imtype
 
-    cax = fig.add_axes([0.1, 0.1, 0.8, 0.02])
+    cax = fig.add_axes([0.1, 0.13, 0.8, 0.02])
     plt.axis('off')
     cax_xmin, cax_xmax = cax.get_xlim()
     bottom, top = cax.get_ylim()

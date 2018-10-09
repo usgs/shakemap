@@ -68,7 +68,12 @@ def contour(container, imtype, component, filter_size, gmice):
 
     lonstart = metadata['xmin']
     latstart = metadata['ymin']
-    lonspan = np.abs(metadata['xmax'] - lonstart)
+
+    lonend = metadata['xmax']
+    if lonend < lonstart:
+        lonstart -= 360
+
+    lonspan = np.abs(lonend - lonstart)
     latspan = np.abs(metadata['ymax'] - latstart)
     nlon = metadata['nx']
     nlat = metadata['ny']
