@@ -534,6 +534,34 @@
     <span class="k">return</span> <span class="n">fval</span></div>
 
 
+<div class="viewcode-block" id="cfg_bool"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.cfg_bool">[docs]</a><span class="k">def</span> <span class="nf">cfg_bool</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts (if possible) the input string to a bool. Raises</span>
+<span class="sd">    ValidateError if the input can&#39;t be converted to a bool.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (str): A string to be converted to a bool.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: The input converted to a bool.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValidateError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a bool&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">]:</span>
+            <span class="n">bval</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bval</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a bool&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">bval</span></div>
+
+
 <div class="viewcode-block" id="check_profile_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_profile_config">[docs]</a><span class="k">def</span> <span class="nf">check_profile_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validation checks on the profile config. At least one profile must exist</span>

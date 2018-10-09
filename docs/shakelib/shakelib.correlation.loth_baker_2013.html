@@ -71,7 +71,7 @@ of h.</p>
 <p>The indices (ix1 and ix2) and h must have the same dimensions. The
 indices may be equal, and there is no restriction on which one is
 larger. The indices refer to periods in the ‘period’ argument to the
-class constructor.</p>
+class constructor. The result is stored in h.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -79,17 +79,17 @@ class constructor.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>ix1</strong> (<em>2D</em><em>, </em><em>C-contiguous numpy array</em><em>)</em>) – The indices of the first period of interest.</li>
 <li><strong>ix2</strong> (<em>2D</em><em>, </em><em>C-contiguous numpy array</em><em>)</em>) – The indices of the second period of interest.</li>
-<li><strong>h</strong> (<em>2D</em><em>, </em><em>C-contiguous numpy array</em><em>)</em>) – The separation distance between two sites (units of km).</li>
+<li><strong>h</strong> (<em>2D</em><em>, </em><em>C-contiguous numpy array</em><em>)</em>) – The separation distance between two sites (units of km).
+h will be returned with the result, so it must be
+copied if the values in h are to be preserved.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><dl class="docutils">
-<dt>numpy array::</dt>
-<dd><p class="first last">The predicted correlation coefficient. The output array
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The predicted correlation coefficient. The output array
 will have the same shape as the inputs.</p>
-</dd>
-</dl>
-</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">h (numpy array)</p>
 </td>
 </tr>
 </tbody>

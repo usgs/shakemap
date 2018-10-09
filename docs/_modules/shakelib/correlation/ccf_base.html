@@ -71,9 +71,11 @@
 <span class="sd">                The indices of the second period of interest.</span>
 <span class="sd">            h (ndarray):</span>
 <span class="sd">                The separation distance between two sites (units of km).</span>
+<span class="sd">                The result is placed in h, so h must be copied if it is</span>
+<span class="sd">                to be preserved.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            ndarray: The predicted correlation coefficient. The output</span>
+<span class="sd">            h (ndarray): The predicted correlation coefficient. The output</span>
 <span class="sd">            array will have the same shape as the inputs.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>

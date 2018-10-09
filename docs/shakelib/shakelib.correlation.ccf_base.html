@@ -64,7 +64,9 @@ class constructor.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>ix1</strong> (<em>ndarray</em>) – The indices of the first period of interest.</li>
 <li><strong>ix2</strong> (<em>ndarrays</em>) – The indices of the second period of interest.</li>
-<li><strong>h</strong> (<em>ndarray</em>) – The separation distance between two sites (units of km).</li>
+<li><strong>h</strong> (<em>ndarray</em>) – The separation distance between two sites (units of km).
+The result is placed in h, so h must be copied if it is
+to be preserved.</li>
 </ul>
 </td>
 </tr>
@@ -72,7 +74,7 @@ class constructor.</p>
 array will have the same shape as the inputs.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">h (ndarray)</p>
 </td>
 </tr>
 </tbody>

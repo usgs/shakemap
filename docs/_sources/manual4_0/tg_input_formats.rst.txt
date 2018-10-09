@@ -147,7 +147,7 @@ psa10, and psa30 elements are empty but have the following attributes:
 +-------------+-----------------------------------------------------------------+
 | flag        | Flag indicating problematic data (optional).                    |
 +-------------+-----------------------------------------------------------------+
-| units       | (optional) See below.
+| units       | (optional) See below.                                           |
 +-------------+-----------------------------------------------------------------+
 
 If the units are unspecifies, the value attributes are expected to have units of:

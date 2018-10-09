@@ -39,6 +39,8 @@ def validate_config(mydict, install_path, data_path, global_data_path):
             continue
         if key == 'horizontal_buffer' or key == 'vertical_buffer':
             mydict[key] = config.cfg_float(mydict[key])
+        elif key == 'use_slab':
+            mydict[key] = config.cfg_bool(mydict[key])
         elif key == 'gmpe':
             mydict[key] = config.gmpe_list(mydict[key], 1)
         elif key == 'min_depth' or key == 'max_depth':
