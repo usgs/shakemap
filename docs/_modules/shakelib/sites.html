@@ -9,11 +9,12 @@
     <title>shakelib.sites &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -37,8 +38,7 @@
 <span class="c1"># stdlib imports</span>
 
 <span class="c1"># third party imports</span>
-<span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
-<span class="kn">from</span> <span class="nn">mapio.gdal</span> <span class="k">import</span> <span class="n">GDALGrid</span>
+<span class="kn">from</span> <span class="nn">mapio.reader</span> <span class="k">import</span> <span class="n">read</span><span class="p">,</span> <span class="n">get_file_geodict</span>
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
 <span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">SitesContext</span>
@@ -89,7 +89,7 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">geodict</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="p">,</span> <span class="n">vs30File</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">resample</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">vs30File</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fgeodict</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_getFileGeoDict</span><span class="p">(</span><span class="n">vs30File</span><span class="p">)</span>
+            <span class="n">fgeodict</span> <span class="o">=</span> <span class="n">get_file_geodict</span><span class="p">(</span><span class="n">vs30File</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">resample</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">padding</span><span class="p">:</span>
                     <span class="c1"># we want something that is within and aligned</span>
@@ -98,10 +98,9 @@
                     <span class="c1"># we want something that is just aligned, since we&#39;re</span>
                     <span class="c1"># padding edges</span>
                     <span class="n">geodict</span> <span class="o">=</span> <span class="n">fgeodict</span><span class="o">.</span><span class="n">getAligned</span><span class="p">(</span><span class="n">geodict</span><span class="p">)</span>
-            <span class="n">vs30grid</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">geodict</span><span class="p">,</span>
-                                 <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
-                                 <span class="n">doPadding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span> <span class="n">padValue</span><span class="o">=</span><span class="n">defaultVs30</span><span class="p">)</span>
-
+            <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">geodict</span><span class="p">,</span>
+                            <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                            <span class="n">doPadding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span> <span class="n">padValue</span><span class="o">=</span><span class="n">defaultVs30</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">vs30grid</span>
 
 <div class="viewcode-block" id="Sites.fromBounds"><a class="viewcode-back" href="../../shakelib/shakelib.sites.html#shakelib.sites.Sites.fromBounds">[docs]</a>    <span class="nd">@classmethod</span>
@@ -272,24 +271,16 @@
     <span class="k">def</span> <span class="nf">_load</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
               <span class="n">doPadding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">padValue</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span>
-                                    <span class="n">samplegeodict</span><span class="o">=</span><span class="n">samplegeodict</span><span class="p">,</span>
-                                    <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">,</span>
-                                    <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
-                                    <span class="n">doPadding</span><span class="o">=</span><span class="n">doPadding</span><span class="p">,</span>
-                                    <span class="n">padValue</span><span class="o">=</span><span class="n">padValue</span><span class="p">)</span>
+            <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span>
+                            <span class="n">samplegeodict</span><span class="o">=</span><span class="n">samplegeodict</span><span class="p">,</span>
+                            <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">,</span>
+                            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                            <span class="n">doPadding</span><span class="o">=</span><span class="n">doPadding</span><span class="p">,</span>
+                            <span class="n">padValue</span><span class="o">=</span><span class="n">padValue</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg1</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">GDALGrid</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span>
-                                         <span class="n">samplegeodict</span><span class="o">=</span><span class="n">samplegeodict</span><span class="p">,</span>
-                                         <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">,</span>
-                                         <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
-                                         <span class="n">doPadding</span><span class="o">=</span><span class="n">doPadding</span><span class="p">,</span>
-                                         <span class="n">padValue</span><span class="o">=</span><span class="n">padValue</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg2</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Load failure of </span><span class="si">%s</span><span class="s1"> - error messages: &quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1"> &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                    <span class="n">vs30File</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg2</span><span class="p">))</span>
-                <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Load failure of </span><span class="si">%s</span><span class="s1"> - error message: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">vs30File</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg1</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">vs30grid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
             <span class="n">vs30grid</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">vs30grid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
@@ -300,14 +291,11 @@
     <span class="k">def</span> <span class="nf">_getFileGeoDict</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
         <span class="n">geodict</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">geodict</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">getFileGeoDict</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="n">geodict</span> <span class="o">=</span> <span class="n">get_file_geodict</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg1</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">geodict</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">GDALGrid</span><span class="o">.</span><span class="n">getFileGeoDict</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg2</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;File geodict failure with </span><span class="si">%s</span><span class="s1"> - error messages: &#39;</span>\
-                      <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1"> &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg2</span><span class="p">))</span>
-                <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;File geodict failure with </span><span class="si">%s</span><span class="s1"> - error messages: &#39;</span>\
+                <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg1</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">geodict</span>
 
     <span class="nd">@staticmethod</span>

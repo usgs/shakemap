@@ -70,6 +70,10 @@ which overrides the GMPE set in the `model.conf` file located in the
 global config directory, but the config settings in an event-specific
 `model.conf` take precedence over the settings in `model_select.conf`.
 
+Please see the
+:ref:`Ground Motion Selection section <sec-select-4>` for
+additional details on how this configuration works.
+
 
 products.conf
 -------------

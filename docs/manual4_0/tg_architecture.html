@@ -6,19 +6,20 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>2.2. Software Architecture &#8212; ShakeMap Documentation  documentation</title>
+    <title>2.3. Software Architecture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="2.3. Queueing Events" href="tg_queue.html" />
-    <link rel="prev" title="2.1. Installation and Configuration" href="tg_installation.html" />
+    <link rel="next" title="2.4. Queueing Events" href="tg_queue.html" />
+    <link rel="prev" title="2.2. Ground Motion Model Selection" href="tg_select.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,9 +35,9 @@
           <div class="body" role="main">
             
   <div class="section" id="software-architecture">
-<span id="sec-architecture-4"></span><h1>2.2. Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this headline">¶</a></h1>
+<span id="sec-architecture-4"></span><h1>2.3. Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
-<h2>2.2.1. Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<h2>2.3.1. Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap 4.0 is designed to allow flexibility in the organization of
 computing resources. <a class="pageref" href="#architecture-overview">Figure  1</a> illustrates an
 idealized implementation where data preparation, processing, and rendering
@@ -101,14 +102,14 @@ constituent modules are needed, whether the products are delivered directly by
 the authoritative ShakeMap system or through a web service.</p>
 </div>
 <div class="section" id="programs">
-<h2>2.2.2. Programs<a class="headerlink" href="#programs" title="Permalink to this headline">¶</a></h2>
+<h2>2.3.2. Programs<a class="headerlink" href="#programs" title="Permalink to this headline">¶</a></h2>
 <p>The core components of ShakeMap are a set of command line programs.
 These
 programs allow the operator to set up a ShakeMap environment, collect
 data and configurations into inputs (i.e., <em>shake_data.hdf</em>), and
 generate ShakeMap grids and their associated products.</p>
 <div class="section" id="sm-profile">
-<h3>2.2.2.1. sm_profile<a class="headerlink" href="#sm-profile" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.2.1. sm_profile<a class="headerlink" href="#sm-profile" title="Permalink to this headline">¶</a></h3>
 <p>The user will need to run <strong>sm_profile</strong> at least once to create a
 ShakeMap
 environment, referred to as a ‘profile.’ This environment consists of two
@@ -183,7 +184,7 @@ scenarios, and historic events). See the
 <a class="reference internal" href="../programs/sm_profile.html#sm-profile"><span class="std std-ref">sm_profile man page</span></a> for usage and a list of options.</p>
 </div>
 <div class="section" id="shake">
-<h3>2.2.2.2. shake<a class="headerlink" href="#shake" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.2.2. shake<a class="headerlink" href="#shake" title="Permalink to this headline">¶</a></h3>
 <p>The primary ShakeMap program is called <strong>shake</strong>. It takes an event
 ID and a list of modules as arguments. The modules do the work of
 assembling the input data, producing interpolated grids, and deriving
@@ -212,7 +213,7 @@ quit without running <strong>model</strong>. The user can override this behavior
 calling <strong>shake</strong> with the <strong>–force</strong> option.</p>
 </div>
 <div class="section" id="shake-modules">
-<h3>2.2.2.3. shake Modules<a class="headerlink" href="#shake-modules" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.2.3. shake Modules<a class="headerlink" href="#shake-modules" title="Permalink to this headline">¶</a></h3>
 <p>Below is a description of many of the modules available to <strong>shake</strong>.
 They are ordered in more or less the order they would be called. The
 module <strong>select</strong> would be run first if the operator wanted to have
@@ -228,7 +229,7 @@ usually not as important as they typically depend upon the output of
 <strong>model</strong> (i.e., <em>shake_result.hdf</em>) and not upon the results of
 other modules. <strong>transfer</strong>, however, will typically be run last.</p>
 <div class="section" id="select">
-<h4>2.2.2.3.1. select<a class="headerlink" href="#select" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.1. select<a class="headerlink" href="#select" title="Permalink to this headline">¶</a></h4>
 <p><strong>select</strong> reads an event’s <em>event.xml</em> file for origin information
 and then constructs a GMPE set for the event based on the event’s residence
 within,
@@ -324,7 +325,7 @@ encountered in <em>select.conf</em> is used and any other(s) will be ignored.</p
 documentation.</p>
 </div>
 <div class="section" id="dyfi">
-<h4>2.2.2.3.2. dyfi<a class="headerlink" href="#dyfi" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.2. dyfi<a class="headerlink" href="#dyfi" title="Permalink to this headline">¶</a></h4>
 <p>The <strong>dyfi</strong> module queries ComCat for any “Did You Feel It?” data
 associated with an event and writes that data to a file in the event’s
 <em>current</em> directory. The event ID must be an ID that the ComCat system
@@ -334,7 +335,7 @@ NEIC or the US regional networks is unlikely to produce results.</p>
 documentation.</p>
 </div>
 <div class="section" id="assemble">
-<h4>2.2.2.3.3. assemble<a class="headerlink" href="#assemble" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.3. assemble<a class="headerlink" href="#assemble" title="Permalink to this headline">¶</a></h4>
 <p>The <strong>assemble</strong> module collects event and configuration data and creates the
 file <em>shake_data.hdf</em>. It first reads <em>event.xml</em> and stores it in a
 data structure. <strong>sm_assemble</strong> then reads the configuration files</p>
@@ -385,7 +386,7 @@ documentation.</p>
 </div>
 </div>
 <div class="section" id="augment">
-<h4>2.2.2.3.4. augment<a class="headerlink" href="#augment" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.4. augment<a class="headerlink" href="#augment" title="Permalink to this headline">¶</a></h4>
 <p>The <strong>augment</strong> module behaves in a manner similar to <strong>assemble</strong> except
 that it
 will first read <em>shake_data.hdf</em> from the event’s <em>current</em> directory.
@@ -415,7 +416,7 @@ Run “shake help augment” for more.</p>
 documentation.</p>
 </div>
 <div class="section" id="model">
-<h4>2.2.2.3.5. model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.5. model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h4>
 <p>The <strong>model</strong> module reads the data in <em>shake_data.hdf</em> and produces an
 interpolated ShakeMap. Depending upon the settings found in <em>model.conf</em>,
 the interpolation product may be a grid or a set of points. See
@@ -442,7 +443,7 @@ content of <em>shake_result.hdf</em>.</p>
 documentation.</p>
 </div>
 <div class="section" id="contour">
-<h4>2.2.2.3.6. contour<a class="headerlink" href="#contour" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.6. contour<a class="headerlink" href="#contour" title="Permalink to this headline">¶</a></h4>
 <p><strong>contour</strong> reads an event’s <em>shake_result.hdf</em> and produces iso-seismal
 contours for each of the intensity measure types found therein. The contours
 are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in the event’s
@@ -450,7 +451,7 @@ are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in th
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.contour()</span></code></a> for the module’s API documentation..</p>
 </div>
 <div class="section" id="gridxml">
-<h4>2.2.2.3.7. gridxml<a class="headerlink" href="#gridxml" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.7. gridxml<a class="headerlink" href="#gridxml" title="Permalink to this headline">¶</a></h4>
 <p><strong>gridxml</strong> reads an event’s <em>shake_result.hdf</em> and produces the ShakeMap 3.5
 files <em>grid.xml</em> and <em>uncertainty.xml</em>. Note that these files will eventually
 become deprecated in favor of the new <em>shake_result.hdf</em> file.
@@ -464,21 +465,21 @@ using <em>shake_result.hdf</em>.</p>
 documentation.</p>
 </div>
 <div class="section" id="info">
-<h4>2.2.2.3.8. info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.8. info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h4>
 <p><strong>info</strong> reads an event’s <em>shake_result.hdf</em> and produces <em>info.json</em>,
 which contains metadata about the ShakeMap.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.info.html#module-shakemap.coremods.info" title="shakemap.coremods.info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.info()</span></code></a> for the module’s API
 documentation.</p>
 </div>
 <div class="section" id="kml">
-<h4>2.2.2.3.9. kml<a class="headerlink" href="#kml" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.9. kml<a class="headerlink" href="#kml" title="Permalink to this headline">¶</a></h4>
 <p><strong>kml</strong> reads <em>shake_result.hdf</em> and produces a file, <em>shakemap.kmz</em>
 which is a self-contained file of geographic layers suitable for
 reading into Google Earth. The layers include an MMI overlay, MMI
 contours, station locations and data, and the event’s epicenter.</p>
 </div>
 <div class="section" id="mapping">
-<h4>2.2.2.3.10. mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.10. mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h4>
 <p><strong>mapping</strong> reads an event’s <em>shake_result.hdf</em> and produces a set of
 maps of the IMTs for use in quality control and evaluation of the
 performance of the system. Currently, this module is a placeholder
@@ -493,7 +494,7 @@ configuration file <em>products.conf</em> for information on configuring
 the <strong>mapping</strong> module.</p>
 </div>
 <div class="section" id="plotregr">
-<h4>2.2.2.3.11. plotregr<a class="headerlink" href="#plotregr" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.11. plotregr<a class="headerlink" href="#plotregr" title="Permalink to this headline">¶</a></h4>
 <p><strong>plotregr</strong> makes plots of an approximation of the GMPE’s predicted
 ground motion as a function of distance for each
 output IMT, along with the data for that IMT. The plotted value at each
@@ -510,7 +511,7 @@ Our hope it that it will be rendered obsolete by
 more sophisticated interactive plots.</p>
 </div>
 <div class="section" id="raster">
-<h4>2.2.2.3.12. raster<a class="headerlink" href="#raster" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.12. raster<a class="headerlink" href="#raster" title="Permalink to this headline">¶</a></h4>
 <p><strong>raster</strong> reads an event’s <em>shake_result.hdf</em> and produces GIS
 raster files of the mean and standard deviation for each of the
 IMTs in <em>shake_result.hdf</em>.</p>
@@ -518,7 +519,7 @@ IMTs in <em>shake_result.hdf</em>.</p>
 documentation.</p>
 </div>
 <div class="section" id="rupture">
-<h4>2.2.2.3.13. rupture<a class="headerlink" href="#rupture" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.13. rupture<a class="headerlink" href="#rupture" title="Permalink to this headline">¶</a></h4>
 <p><strong>rupture</strong> reads an event’s <em>shake_result.hdf</em> and produces a
 file, <em>rupture.json</em> containing the coordinates of the rupture
 plane(s) supplied via the input file <em>&lt;&gt;_fault.txt</em> or <em>&lt;&gt;_fault.json</em>.</p>
@@ -526,14 +527,14 @@ plane(s) supplied via the input file <em>&lt;&gt;_fault.txt</em> or <em>&lt;&gt;
 documentation.</p>
 </div>
 <div class="section" id="stations">
-<h4>2.2.2.3.14. stations<a class="headerlink" href="#stations" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.14. stations<a class="headerlink" href="#stations" title="Permalink to this headline">¶</a></h4>
 <p><strong>stations</strong> reads an event’s <em>shake_result.hdf</em> and produces a
 JSON file, <em>stationlist.json</em>, of the input station data.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.stations.html#module-shakemap.coremods.stations" title="shakemap.coremods.stations"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.stations()</span></code></a> for the module’s API
 documentation.</p>
 </div>
 <div class="section" id="transfer">
-<h4>2.2.2.3.15. transfer<a class="headerlink" href="#transfer" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.15. transfer<a class="headerlink" href="#transfer" title="Permalink to this headline">¶</a></h4>
 <p><strong>transfer</strong> allows the operator to transfer ShakeMap products to
 other system via PDL or ssh. See the documentation in <em>transfer.conf</em>
 for details on configuring <strong>transfer</strong>.</p>
@@ -543,24 +544,24 @@ documentation.</p>
 </div>
 </div>
 <div class="section" id="additional-programs">
-<h2>2.2.3. Additional Programs<a class="headerlink" href="#additional-programs" title="Permalink to this headline">¶</a></h2>
+<h2>2.3.3. Additional Programs<a class="headerlink" href="#additional-programs" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap provides a few auxiliary programs that may occasionally be
 useful.</p>
 <div class="section" id="getdyfi">
-<h3>2.2.3.1. getdyfi<a class="headerlink" href="#getdyfi" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.3.1. getdyfi<a class="headerlink" href="#getdyfi" title="Permalink to this headline">¶</a></h3>
 <p><strong>getdyfi</strong> is a standalone program implementing the <strong>dyfi</strong> module’s
 functionality.  See the <a class="reference internal" href="../programs/getdyfi.html#getdyfi"><span class="std std-ref">getdyfi man page</span></a> for usage and a
 list of options.</p>
 </div>
 <div class="section" id="sm-compare">
-<h3>2.2.3.2. sm_compare<a class="headerlink" href="#sm-compare" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.3.2. sm_compare<a class="headerlink" href="#sm-compare" title="Permalink to this headline">¶</a></h3>
 <p>Allows the user to compare two ShakeMaps by making images of their
 difference and ratio.</p>
 <p>See the <a class="reference internal" href="../programs/sm_compare.html#sm-compare"><span class="std std-ref">sm_compare man page</span></a> for usage and a
 list of options.</p>
 </div>
 <div class="section" id="sm-create">
-<h3>2.2.3.3. sm_create<a class="headerlink" href="#sm-create" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.3.3. sm_create<a class="headerlink" href="#sm-create" title="Permalink to this headline">¶</a></h3>
 <p><strong>sm_create</strong> queries the NEIC ComCat database for ShakeMap data
 associated with an event and writes that data into the event’s
 local <em>current</em> directory. The event will then be available for
@@ -569,7 +570,7 @@ local processing.</p>
 list of options.</p>
 </div>
 <div class="section" id="sm-migrate">
-<h3>2.2.3.4. sm_migrate<a class="headerlink" href="#sm-migrate" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.3.4. sm_migrate<a class="headerlink" href="#sm-migrate" title="Permalink to this headline">¶</a></h3>
 <p>Migrates a directory of ShakeMap 3.5 data files into ShakeMap 4.0 inputs.
 The migration of GMPEs is configurable via the <em>migrate.conf</em> configuration
 file.</p>
@@ -577,7 +578,7 @@ file.</p>
 list of options.</p>
 </div>
 <div class="section" id="sm-queue">
-<h3>2.2.3.5. sm_queue<a class="headerlink" href="#sm-queue" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.3.5. sm_queue<a class="headerlink" href="#sm-queue" title="Permalink to this headline">¶</a></h3>
 <p>A daemon process to receive messages from external systems for the
 triggering and cancellation of ShakeMap runs. See the section
 <a class="reference internal" href="tg_queue.html#sec-queue-4"><span class="std std-ref">Queueing Events</span></a> for more detail. The behavior
@@ -589,7 +590,7 @@ may be retrieved from the source directory
 list of options.</p>
 </div>
 <div class="section" id="receive-amps-receive-origins-and-associate-amps">
-<h3>2.2.3.6. receive_amps, receive_origins, and associate_amps<a class="headerlink" href="#receive-amps-receive-origins-and-associate-amps" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.3.6. receive_amps, receive_origins, and associate_amps<a class="headerlink" href="#receive-amps-receive-origins-and-associate-amps" title="Permalink to this headline">¶</a></h3>
 <p><strong>receive_amps</strong> and <strong>receive_origins</strong> are intended to be run
 by a configured instance of the USGS’s Product
 Distribution system to inform <strong>sm_queue</strong> of new origins and
@@ -602,7 +603,7 @@ input files with those that associate. Again, this will be of
 limited utility to users not running PDL.</p>
 </div>
 <div class="section" id="run-verification">
-<h3>2.2.3.7. run_verification<a class="headerlink" href="#run-verification" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.3.7. run_verification<a class="headerlink" href="#run-verification" title="Permalink to this headline">¶</a></h3>
 <p>Runs a set of simple verification tests and displays the results.
 The resulting plots may be compared to those found in the
 documentation section <a class="reference internal" href="tg_verification.html#sec-verification-4"><span class="std std-ref">Verification</span></a>.
@@ -653,49 +654,50 @@ zones.</td></tr>
 <li class="toctree-l4"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="tg_installation.html">2.1. Installation and Configuration</a></li>
-<li class="toctree-l5 current"><a class="current reference internal" href="#">2.2. Software Architecture</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#overview">2.2.1. Overview</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#programs">2.2.2. Programs</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="#sm-profile">2.2.2.1. sm_profile</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#shake">2.2.2.2. shake</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#shake-modules">2.2.2.3. shake Modules</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="#select">2.2.2.3.1. select</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#dyfi">2.2.2.3.2. dyfi</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#assemble">2.2.2.3.3. assemble</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#augment">2.2.2.3.4. augment</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#model">2.2.2.3.5. model</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#contour">2.2.2.3.6. contour</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#gridxml">2.2.2.3.7. gridxml</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#info">2.2.2.3.8. info</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#kml">2.2.2.3.9. kml</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#mapping">2.2.2.3.10. mapping</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#plotregr">2.2.2.3.11. plotregr</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#raster">2.2.2.3.12. raster</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#rupture">2.2.2.3.13. rupture</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#stations">2.2.2.3.14. stations</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#transfer">2.2.2.3.15. transfer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_select.html">2.2. Ground Motion Model Selection</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">2.3. Software Architecture</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#overview">2.3.1. Overview</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#programs">2.3.2. Programs</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#sm-profile">2.3.2.1. sm_profile</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#shake">2.3.2.2. shake</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#shake-modules">2.3.2.3. shake Modules</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#select">2.3.2.3.1. select</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#dyfi">2.3.2.3.2. dyfi</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#assemble">2.3.2.3.3. assemble</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#augment">2.3.2.3.4. augment</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#model">2.3.2.3.5. model</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#contour">2.3.2.3.6. contour</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#gridxml">2.3.2.3.7. gridxml</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#info">2.3.2.3.8. info</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#kml">2.3.2.3.9. kml</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#mapping">2.3.2.3.10. mapping</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#plotregr">2.3.2.3.11. plotregr</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#raster">2.3.2.3.12. raster</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#rupture">2.3.2.3.13. rupture</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#stations">2.3.2.3.14. stations</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#transfer">2.3.2.3.15. transfer</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l6"><a class="reference internal" href="#additional-programs">2.2.3. Additional Programs</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="#getdyfi">2.2.3.1. getdyfi</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#sm-compare">2.2.3.2. sm_compare</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#sm-create">2.2.3.3. sm_create</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#sm-migrate">2.2.3.4. sm_migrate</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#sm-queue">2.2.3.5. sm_queue</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#receive-amps-receive-origins-and-associate-amps">2.2.3.6. receive_amps, receive_origins, and associate_amps</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#run-verification">2.2.3.7. run_verification</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#additional-programs">2.3.3. Additional Programs</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#getdyfi">2.3.3.1. getdyfi</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#sm-compare">2.3.3.2. sm_compare</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#sm-create">2.3.3.3. sm_create</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#sm-migrate">2.3.3.4. sm_migrate</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#sm-queue">2.3.3.5. sm_queue</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#receive-amps-receive-origins-and-associate-amps">2.3.3.6. receive_amps, receive_origins, and associate_amps</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#run-verification">2.3.3.7. run_verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.3. Queueing Events</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.4. Data Processing</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_input_formats.html">2.5. Input Data Formats</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_output_formats.html">2.6. Output Data Formats</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.7. Verification</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.8. Guidelines for Contributors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.4. Queueing Events</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.5. Data Processing</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_input_formats.html">2.6. Input Data Formats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_output_formats.html">2.7. Output Data Formats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.8. Verification</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.9. Guidelines for Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>

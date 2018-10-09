@@ -9,15 +9,16 @@
     <title>2.1. Installation and Configuration &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="2.2. Software Architecture" href="tg_architecture.html" />
+    <link rel="next" title="2.2. Ground Motion Model Selection" href="tg_select.html" />
     <link rel="prev" title="2. Technical Guide" href="technical_guide.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -94,6 +95,9 @@ creates the file <cite>model_select.conf</cite> in the event’s _current_ direc
 which overrides the GMPE set in the <cite>model.conf</cite> file located in the
 global config directory, but the config settings in an event-specific
 <cite>model.conf</cite> take precedence over the settings in <cite>model_select.conf</cite>.</p>
+<p>Please see the
+<a class="reference internal" href="tg_select.html#sec-select-4"><span class="std std-ref">Ground Motion Selection section</span></a> for
+additional details on how this configuration works.</p>
 </div>
 <div class="section" id="products-conf">
 <h3>2.1.2.3. products.conf<a class="headerlink" href="#products-conf" title="Permalink to this headline">¶</a></h3>
@@ -250,13 +254,14 @@ the paths to any absolute path on your system.</p>
 <li class="toctree-l6"><a class="reference internal" href="#downloading-and-configuring-vs30-and-topography">2.1.3. Downloading and Configuring Vs30 and Topography</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html">2.2. Software Architecture</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.3. Queueing Events</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.4. Data Processing</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_input_formats.html">2.5. Input Data Formats</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_output_formats.html">2.6. Output Data Formats</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.7. Verification</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.8. Guidelines for Contributors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_select.html">2.2. Ground Motion Model Selection</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html">2.3. Software Architecture</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.4. Queueing Events</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.5. Data Processing</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_input_formats.html">2.6. Input Data Formats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_output_formats.html">2.7. Output Data Formats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.8. Verification</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.9. Guidelines for Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>

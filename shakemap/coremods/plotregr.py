@@ -147,7 +147,8 @@ class PlotRegr(CoreModule):
                                     continue
                                 if amp['flag'] != '' and amp['flag'] != '0':
                                     break
-                                if amp['value'] == 'null':
+                                if amp['value'] is None or \
+                                        amp['value'] == 'null':
                                     break
                                 if isinstance(amp['value'], str):
                                     thisamp = float(amp['value'])
@@ -170,7 +171,7 @@ class PlotRegr(CoreModule):
                         amp = station['properties']['intensity']
                         flag = station['properties']['intensity_flag']
                         if flag == '' or flag == '0':
-                            if amp != 'null':
+                            if amp is not None and amp != 'null':
                                 if isinstance(amp, str):
                                     value = float(amp)
                                 else:
@@ -183,7 +184,7 @@ class PlotRegr(CoreModule):
                             if thing['name'] != imtstr:
                                 continue
                             amp = thing['value']
-                            if amp != 'null' and amp != 0:
+                            if amp is not None and amp != 'null' and amp != 0:
                                 if myimt == 'PGV':
                                     amp = np.log(amp)
                                 else:

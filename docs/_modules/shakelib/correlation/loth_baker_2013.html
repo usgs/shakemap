@@ -9,11 +9,12 @@
     <title>shakelib.correlation.loth_baker_2013 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -34,10 +35,11 @@
   <h1>Source code for shakelib.correlation.loth_baker_2013</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="k">import</span> <span class="n">RectBivariateSpline</span>
-<span class="kn">import</span> <span class="nn">numexpr</span> <span class="k">as</span> <span class="nn">ne</span>
+<span class="c1"># import numexpr as ne</span>
 <span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
 
 <span class="kn">from</span> <span class="nn">shakelib.correlation.ccf_base</span> <span class="k">import</span> <span class="n">CrossCorrelationBase</span>
+<span class="kn">from</span> <span class="nn">shakemap.c.clib</span> <span class="k">import</span> <span class="n">eval_lb_correlation</span>
 
 <span class="c1"># Periods that apply to the axes in the cross-correlation tables</span>
 <span class="n">Tlist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="mf">10.0001</span><span class="p">])</span>
@@ -140,15 +142,15 @@
 <span class="sd">        class constructor.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            ix1 (ndarray):</span>
+<span class="sd">            ix1 (2D, C-contiguous numpy array)):</span>
 <span class="sd">                The indices of the first period of interest.</span>
-<span class="sd">            ix2 (ndarrays):</span>
+<span class="sd">            ix2 (2D, C-contiguous numpy array)):</span>
 <span class="sd">                The indices of the second period of interest.</span>
-<span class="sd">            h (ndarray):</span>
+<span class="sd">            h (2D, C-contiguous numpy array)):</span>
 <span class="sd">                The separation distance between two sites (units of km).</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            ndarray:</span>
+<span class="sd">            numpy array::</span>
 <span class="sd">                The predicted correlation coefficient. The output array</span>
 <span class="sd">                will have the same shape as the inputs.</span>
 
@@ -165,16 +167,18 @@
         <span class="c1"># periods of interest.</span>
         <span class="c1">#</span>
         <span class="c1"># These variables are used in ne.evaluate but unseen by linter</span>
-        <span class="n">b1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">[</span><span class="n">ix1</span><span class="p">,</span> <span class="n">ix2</span><span class="p">]</span>  <span class="c1"># noqa</span>
-        <span class="n">b2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2</span><span class="p">[</span><span class="n">ix1</span><span class="p">,</span> <span class="n">ix2</span><span class="p">]</span>  <span class="c1"># noqa</span>
-        <span class="n">b3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b3</span><span class="p">[</span><span class="n">ix1</span><span class="p">,</span> <span class="n">ix2</span><span class="p">]</span>  <span class="c1"># noqa</span>
-        <span class="n">afact</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">20.0</span>  <span class="c1"># noqa</span>
-        <span class="n">bfact</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">70.0</span>  <span class="c1"># noqa</span>
+        <span class="c1"># b1 = self.b1[ix1, ix2]  # noqa</span>
+        <span class="c1"># b2 = self.b2[ix1, ix2]  # noqa</span>
+        <span class="c1"># b3 = self.b3[ix1, ix2]  # noqa</span>
+        <span class="c1"># afact = -3.0 / 20.0  # noqa</span>
+        <span class="c1"># bfact = -3.0 / 70.0  # noqa</span>
         <span class="c1">#</span>
         <span class="c1"># Compute the correlation coefficient (Equation 42)</span>
         <span class="c1">#</span>
-        <span class="n">rho</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-            <span class="s2">&quot;b1 * exp(h * afact) + b2 * exp(h * bfact) + (h == 0) * b3&quot;</span><span class="p">)</span>
+        <span class="c1"># rho = ne.evaluate(</span>
+        <span class="c1">#     &quot;b1 * exp(h * afact) + b2 * exp(h * bfact) + (h == 0) * b3&quot;)</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">eval_lb_correlation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b3</span><span class="p">,</span>
+                                  <span class="n">ix1</span><span class="p">,</span> <span class="n">ix2</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">rho</span></div></div>
 </pre></div>

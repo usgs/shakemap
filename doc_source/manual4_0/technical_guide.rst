@@ -13,6 +13,7 @@ outdated and are superseded by this current report.
    :maxdepth: 1
 
    tg_installation.rst
+   tg_select.rst
    tg_architecture.rst
    tg_queue.rst
    tg_processing.rst
