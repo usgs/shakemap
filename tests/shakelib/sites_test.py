@@ -99,8 +99,13 @@ def test_sites(vs30file=None):
     np.testing.assert_allclose(grd, grdt)
 
     grd = sc.lats
-    grdt = np.array([34.075,  34.08333333,  34.09166667,  34.1,
-                     34.10833333,  34.11666667,  34.125])
+    grdt = np.array([34.125,
+                     34.11666667,
+                     34.10833333,
+                     34.1,
+                     34.09166667,
+                     34.08333333,
+                     34.075])
     np.testing.assert_allclose(grd, grdt)
 
     grd = sc.lons

@@ -53,8 +53,8 @@ class Sites(object):
         self._lons = np.linspace(xmin,
                                  xmax,
                                  self._GeoDict.nx)
-        self._lats = np.linspace(self._GeoDict.ymin,
-                                 self._GeoDict.ymax,
+        self._lats = np.linspace(self._GeoDict.ymax,
+                                 self._GeoDict.ymin,
                                  self._GeoDict.ny)
 
     @classmethod
