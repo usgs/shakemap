@@ -499,6 +499,34 @@ def cfg_float(value):
     return fval
 
 
+def cfg_bool(value):
+    """
+    Converts (if possible) the input string to a bool. Raises
+    ValidateError if the input can't be converted to a bool.
+
+    Args:
+        value (str): A string to be converted to a bool.
+
+    Returns:
+        bool: The input converted to a bool.
+
+    Raises:
+        ValidateError
+    """
+    if not isinstance(value, (str, bool)) or not value or value == 'None':
+        logging.error("'%s' is not a bool" % (value))
+        raise ValidateError()
+    try:
+        if value.lower() in ['true', 't', 'yes', 'y', '1']:
+            bval = True
+        else:
+            bval = False
+    except ValueError:
+        logging.error("'%s' is not a bool" % (value))
+        raise ValidateError()
+    return bval
+
+
 def check_profile_config(config):
     """
     Validation checks on the profile config. At least one profile must exist
