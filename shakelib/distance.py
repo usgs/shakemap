@@ -66,16 +66,7 @@ class Distance(object):
         Returns:
             Distance object.
         """  # noqa
-        sm_dict = sites._GeoDict
-        west = sm_dict.xmin
-        east = sm_dict.xmax
-        south = sm_dict.ymin
-        north = sm_dict.ymax
-        nx = sm_dict.nx
-        ny = sm_dict.ny
-        lats = np.linspace(north, south, ny)
-        lons = np.linspace(west, east, nx)
-        lon, lat = np.meshgrid(lons, lats)
+        lon, lat = np.meshgrid(sites._lons, sites._lats[::-1])
         dep = np.zeros_like(lon)
         return cls(gmpe, lon, lat, dep, rup)
 
