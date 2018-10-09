@@ -489,10 +489,10 @@ class ModelModule(CoreModule):
                 padding=True, resample=True
             )
 
-            self.sx_out = self.sites_obj_out.getSitesContext({
-                'lats': self.lats,
-                'lons': self.lons
-            })
+            self.sx_out = self.sites_obj_out.getSitesContext(
+                {'lats': self.lats,
+                 'lons': self.lons}
+            )
             # Replace the Vs30 from the grid (or default) with the Vs30
             # provided with the site list.
             if np.any(self.vs30 > 0):
@@ -528,10 +528,10 @@ class ModelModule(CoreModule):
             self.sx_soil = self.sites_obj_out.getSitesContext(rock_vs30=180)
             lons, lats = np.meshgrid(self.sx_out.lons,
                                      self.sx_out.lats)
-            self.sx_out.lons = np.flipud(lons.copy())
-            self.sx_out.lats = np.flipud(lats.copy())
-            self.lons = np.flipud(lons).ravel()
-            self.lats = np.flipud(lats).ravel()
+            self.sx_out.lons = lons.copy()
+            self.sx_out.lats = lats.copy()
+            self.lons = lons.ravel()
+            self.lats = lats.ravel()
             self.depths = np.zeros_like(lats)
             dist_obj_out = Distance.fromSites(self.default_gmpe,
                                               self.sites_obj_out,
@@ -546,6 +546,10 @@ class ModelModule(CoreModule):
 
         self.lons_out_rad = np.radians(self.lons)
         self.lats_out_rad = np.radians(self.lats)
+        self.flip_lons = False
+        if self.W > 0 and self.E < 0:
+            self.flip_lons = True
+            self.lons_out_rad[self.lons_out_rad < 0] += 2 * np.pi
 
     def _setDataFrames(self):
         """
@@ -703,6 +707,8 @@ class ModelModule(CoreModule):
             #
             df['lon_rad'] = np.radians(df['lon'])
             df['lat_rad'] = np.radians(df['lat'])
+            if self.flip_lons:
+                df['lon_rad'][df['lon_rad'] < 0] += 2 * np.pi
             #
             # It will be handy later on to have the rupture distance
             # in the dataframes
@@ -887,6 +893,9 @@ class ModelModule(CoreModule):
             self.sta_period_ix[imtstr] = np.array(period_ix).reshape((-1, 1))
             self.sta_lons_rad[imtstr] = np.array(lons_rad).reshape((-1, 1))
             self.sta_lats_rad[imtstr] = np.array(lats_rad).reshape((-1, 1))
+            if self.flip_lons:
+                self.sta_lons_rad[imtstr][self.sta_lons_rad[imtstr] < 0] += \
+                    2 * np.pi
             self.sta_resids[imtstr] = np.array(resids).reshape((-1, 1))
             self.sta_tau[imtstr] = np.array(tau).reshape((-1, 1))
             self.sta_phi[imtstr] = np.array(phi).reshape((-1, 1))

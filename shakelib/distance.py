@@ -66,7 +66,7 @@ class Distance(object):
         Returns:
             Distance object.
         """  # noqa
-        lon, lat = np.meshgrid(sites._lons, sites._lats[::-1])
+        lon, lat = np.meshgrid(sites._lons, sites._lats)
         dep = np.zeros_like(lon)
         return cls(gmpe, lon, lat, dep, rup)
 
