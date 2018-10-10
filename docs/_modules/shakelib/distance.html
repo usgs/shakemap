@@ -101,16 +101,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Distance object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
-        <span class="n">sm_dict</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">_GeoDict</span>
-        <span class="n">west</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">xmin</span>
-        <span class="n">east</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">xmax</span>
-        <span class="n">south</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">ymin</span>
-        <span class="n">north</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">ymax</span>
-        <span class="n">nx</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">nx</span>
-        <span class="n">ny</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">ny</span>
-        <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
-        <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
-        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
+        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">_lons</span><span class="p">,</span> <span class="n">sites</span><span class="o">.</span><span class="n">_lats</span><span class="p">)</span>
         <span class="n">dep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rup</span><span class="p">)</span></div>
 
