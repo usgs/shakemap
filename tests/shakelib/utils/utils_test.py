@@ -28,10 +28,10 @@ def test_get_extent_small_point():
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 93.66666666666667)
-    np.testing.assert_allclose(E, 115.08333333333333)
-    np.testing.assert_allclose(S, 21.55)
-    np.testing.assert_allclose(N, 39.55)
+    np.testing.assert_allclose(W, 102.53333333333333)
+    np.testing.assert_allclose(E, 104.2)
+    np.testing.assert_allclose(S, 30.266666666666666)
+    np.testing.assert_allclose(N, 31.7)
 
 
 def test_get_extent_small_complex():
@@ -43,10 +43,10 @@ def test_get_extent_small_complex():
     faultfile = os.path.join(datadir, 'Hartzell11_fault.txt')
     rupture = get_rupture(origin, faultfile)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 100.05)
-    np.testing.assert_allclose(E, 108.91666666666667)
-    np.testing.assert_allclose(S, 27.916666666666668)
-    np.testing.assert_allclose(N, 35.53333333333333)
+    np.testing.assert_allclose(W, 102.25)
+    np.testing.assert_allclose(E, 106.43333333333334)
+    np.testing.assert_allclose(S, 29.95)
+    np.testing.assert_allclose(N, 33.61666666666667)
 
 
 def test_get_extent_bad_usage():
@@ -79,10 +79,10 @@ def test_get_extent_aspect():
     )
     rupture = get_rupture(origin, rrep)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 97.3)
-    np.testing.assert_allclose(E, 113.66666666666667)
-    np.testing.assert_allclose(S, 24.0)
-    np.testing.assert_allclose(N, 35.68333333333333)
+    np.testing.assert_allclose(W, 99.4)
+    np.testing.assert_allclose(E, 111.1)
+    np.testing.assert_allclose(S, 25.766666666666666)
+    np.testing.assert_allclose(N, 34.15)
     #
     # Long vertical rupture
     #
@@ -97,10 +97,10 @@ def test_get_extent_aspect():
     )
     rupture = get_rupture(origin, rrep)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 92.23333333333333)
-    np.testing.assert_allclose(E, 109.26666666666667)
-    np.testing.assert_allclose(S, 21.016666666666666)
-    np.testing.assert_allclose(N, 38.43333333333333)
+    np.testing.assert_allclose(W, 93.91666666666667)
+    np.testing.assert_allclose(E, 106.96666666666667)
+    np.testing.assert_allclose(S, 23.116666666666667)
+    np.testing.assert_allclose(N, 36.56666666666666)
 
 
 def test_get_extent_stable_small():
@@ -112,10 +112,10 @@ def test_get_extent_stable_small():
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, -107.45)
-    np.testing.assert_allclose(E, -84.8)
-    np.testing.assert_allclose(S, 26.166666666666668)
-    np.testing.assert_allclose(N, 44.15)
+    np.testing.assert_allclose(W, -98.28333333333333)
+    np.testing.assert_allclose(E, -96.5)
+    np.testing.assert_allclose(S, 34.95)
+    np.testing.assert_allclose(N, 36.4)
 
 
 def test_get_extent_stable_large():
@@ -127,10 +127,10 @@ def test_get_extent_stable_large():
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, -100.61666666666666)
-    np.testing.assert_allclose(E, -93.96666666666667)
-    np.testing.assert_allclose(S, 32.93333333333333)
-    np.testing.assert_allclose(N, 38.333333333333336)
+    np.testing.assert_allclose(W, -98.28333333333333)
+    np.testing.assert_allclose(E, -96.5)
+    np.testing.assert_allclose(S, 34.95)
+    np.testing.assert_allclose(N, 36.4)
 
 
 def test_is_stable():
