@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 from openquake.hazardlib import imt
 from openquake.hazardlib import const
@@ -65,15 +66,10 @@ def get_extent(rupture=None, config=None):
     # -------------------------------------------------------------------------
     # Check to see what parameters are specified in the extent config
     # -------------------------------------------------------------------------
-    coeffs = []
     spans = {}
     bounds = []
     if config is not None:
         if 'extent' in config:
-            if 'coefficients' in config['extent']:
-                if 'coeffs' in config['extent']['coefficients']:
-                    if config['extent']['coefficients']['coeffs'][0] != 0.0:
-                        coeffs = config['extent']['coefficients']['coeffs']
             if 'magnitude_spans' in config['extent']:
                 if len(config['extent']['magnitude_spans']):
                     if isinstance(config['extent']['magnitude_spans'], dict):
@@ -253,6 +249,8 @@ def get_extent(rupture=None, config=None):
     # output grid register with common grid resolutions (60c, 30c,
     # 15c, 7.5c)
     #
+    logging.info("Extent: %f, %f, %f, %f" %
+                 (lonmin, lonmax, latmin, latmax))
     return _round_coord(lonmin[0]), _round_coord(lonmax[0]), \
         _round_coord(latmin[0]), _round_coord(latmax[0])
 
