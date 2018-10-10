@@ -233,18 +233,19 @@ def main(args):
             if len(status) == 1 and status[0] == cmd:
                 pass
             elif len(status) > 0:
-                logger.warn("Out of date dependencies. The following commands "
-                            "should be rerun before '%s' (use --force to "
-                            "ignore this warning and attempt to run the "
-                            "module anyway):" % cmd)
+                logger.warning(
+                    "Out of date dependencies. The following commands "
+                    "should be rerun before '%s' (use --force to "
+                    "ignore this warning and attempt to run the "
+                    "module anyway):" % cmd)
                 if cmd in status:
                     status.remove(cmd)
-                logger.warn(", ".join(status))
+                logger.warning(", ".join(status))
                 if not args.force:
                     sys.exit(0)
                 else:
-                    logger.warn('Running "%s" because of --force option.'
-                                % cmd)
+                    logger.warning('Running "%s" because of --force option.'
+                                   % cmd)
             else:
                 # Command is not out of date, but if the user wants to
                 # run it, we won't stop him/her

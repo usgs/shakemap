@@ -103,7 +103,12 @@
 
     <span class="n">lonstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span>
     <span class="n">latstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymin&#39;</span><span class="p">]</span>
-    <span class="n">lonspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">lonstart</span><span class="p">)</span>
+
+    <span class="n">lonend</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmax&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">lonend</span> <span class="o">&lt;</span> <span class="n">lonstart</span><span class="p">:</span>
+        <span class="n">lonstart</span> <span class="o">-=</span> <span class="mi">360</span>
+
+    <span class="n">lonspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lonend</span> <span class="o">-</span> <span class="n">lonstart</span><span class="p">)</span>
     <span class="n">latspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">latstart</span><span class="p">)</span>
     <span class="n">nlon</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx&#39;</span><span class="p">]</span>
     <span class="n">nlat</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">]</span>
