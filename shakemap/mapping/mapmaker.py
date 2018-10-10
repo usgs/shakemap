@@ -42,12 +42,10 @@ from shakelib.plotting.contour import contour, getContourLevels
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.gmice.wgrw12 import WGRW12
 from shakemap.utils.utils import get_object_from_config
-from shakelib.rupture.constants import TIMEFMT
 
 # define some constants
 WATERCOLOR = '#7AA1DA'
 FIGWIDTH = 10.0
-FILTER_SMOOTH = 5.0
 XOFFSET = 4  # how many pixels between the city dot and the city text
 VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
 
@@ -1075,8 +1073,8 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     jpg_file = os.path.join(outpath, 'intensity.jpg')
 
     # save to pdf/jpeg
-    plt.savefig(pdf_file)
-    plt.savefig(jpg_file)
+    plt.savefig(pdf_file, bbox_inches='tight')
+    plt.savefig(jpg_file, bbox_inches='tight')
 
     return (pdf_file, jpg_file)
 
