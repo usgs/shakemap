@@ -170,9 +170,9 @@ def get_extent(rupture=None, config=None):
     # Distance context
     dx = DistancesContext()
     # This imposes minimum/ maximum distances of:
-    #   300 and 1000 km; could make this configurable
-    d_min = 300
-    d_max = 1000
+    #   80 and 800 km; could make this configurable
+    d_min = 80
+    d_max = 800
     dx.rjb = np.logspace(np.log10(d_min), np.log10(d_max), 2000)
     # Details don't matter for this; assuming vertical surface rupturing fault
     # with epicenter at the surface.
