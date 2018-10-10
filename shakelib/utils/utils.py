@@ -210,7 +210,7 @@ def get_extent(rupture=None, config=None):
     if len(dists_exceed_mmi):
         mindist_km = np.min(dists_exceed_mmi)
     else:
-        mindist_km = d_max
+        mindist_km = d_min
 
     # Get a projection
     proj = OrthographicProjection(clon - 4, clon + 4, clat + 4, clat - 4)
