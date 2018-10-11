@@ -1315,8 +1315,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     # save plot to file
     fileimt = oq_to_file(imtype)
     plt.draw()
-    pdf_file = os.path.join(outpath, '%s_contour.pdf' % (fileimt))
-    jpg_file = os.path.join(outpath, '%s_contour.jpg' % (fileimt))
+    pdf_file = os.path.join(outpath, '%s.pdf' % (fileimt))
+    jpg_file = os.path.join(outpath, '%s.jpg' % (fileimt))
     plt.savefig(pdf_file)
     plt.savefig(jpg_file)
 
