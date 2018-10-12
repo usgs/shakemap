@@ -13,6 +13,7 @@ from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.base import Rupture
 from shakelib.multigmpe import MultiGMPE
+from shakelib.sites import Sites
 
 from strec.gmreg import Regionalizer
 
@@ -187,7 +188,9 @@ def get_extent(rupture=None, config=None):
     # Set to soft soil conditions
     sx.vs30 = np.full_like(dx.rjb, 180)
     sx = MultiGMPE.set_sites_depth_parameters(sx, gmpe)
-    sx.vs30measured = np.zeros_like(sx.vs30, dtype=bool)
+    sx.vs30measured = np.full_like(sx.vs30, False, dtype=bool)
+    sx = Sites._addDepthParameters(sx)
+    sx.backarc = np.full_like(sx.vs30, False, dtype=bool)
 
     # Rupture context
     rx = RuptureContext()
