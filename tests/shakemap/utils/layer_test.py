@@ -31,28 +31,41 @@ def test_layers():
     elon = -117.0
     elat = 33.0
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'japan': 7462.090628325871,
-                 'california': 0.0,
-                 'induced': 1578.3879076203307,
-                 'taiwan': 9698.206101592557}
+    reference = {'australia': 11215.730686119145, 'california': 0.0,
+                 'chile': 4803.758846004145, 'china': 8749.15702828136,
+                 'europe_share': 6337.760076297577,
+                 'greece': 9513.190936814879, 'hawaii': 4005.6856572857287,
+                 'induced': 1578.3879076203307, 'italy': 9590.16820545142,
+                 'japan': 7462.090628325871, 'new_zealand': 9796.252889722464,
+                 'taiwan': 9698.206101592557, 'turkey': 9595.056080385448}
     layers_equal(layer_distances, reference)
 
     elon = -97.5
     elat = 36.5
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'california': 1508.2155746648657,
+    reference = {'australia': 13035.904906164218,
+                 'california': 1508.2155746648657,
+                 'chile': 3593.1726960068413, 'china': 9045.63060410134,
+                 'europe_share': 5178.578550706942,
+                 'greece': 8551.021519240006, 'hawaii': 5820.014613372237,
+                 'induced': 0.0, 'italy': 8143.870794318513,
                  'japan': 8221.294305532281,
-                 'induced': 0.0,
-                 'taiwan': 10301.898766277141}
+                 'new_zealand': 11418.34439118372,
+                 'taiwan': 10301.898766277141, 'turkey': 8706.788113517472}
     layers_equal(layer_distances, reference)
 
     elon = 121.0
     elat = 22.5
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'taiwan': 0.0,
-                 'induced': 12041.424518656486,
+    reference = {'australia': 3875.4867797064226,
                  'california': 9610.549505042432,
-                 'japan': 1231.8954391427453}
+                 'chile': 12071.522116104166, 'china': 284.8972981364,
+                 'europe_share': 7207.060301217243,
+                 'greece': 8700.076583248745, 'hawaii': 7467.418933530909,
+                 'induced': 12041.424518656486, 'italy': 8555.0797075834,
+                 'japan': 1231.8954391427453,
+                 'new_zealand': 7707.863992372902, 'taiwan': 0.0,
+                 'turkey': 7282.9392265845645}
     layers_equal(layer_distances, reference)
 
     #
