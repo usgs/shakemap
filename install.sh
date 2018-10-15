@@ -176,7 +176,8 @@ if [ $reset == 0 ]; then
     conda create -y --override-channels -n $VENV \
           -c file://$PWD/$channel $package_list
 else
-    conda create -y -n $VENV -c conda-forge $package_list
+    conda create -y -n $VENV -c conda-forge \
+          --channel-priority $package_list
 fi
 
 
