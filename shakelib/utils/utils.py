@@ -19,7 +19,8 @@ from strec.gmreg import Regionalizer
 
 # ACR GMPE/GMICE
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
-from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
+from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
+    CampbellBozorgnia2014)
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from shakelib.gmice.wgrw12 import WGRW12
 
@@ -28,11 +29,14 @@ from openquake.hazardlib.gsim.frankel_1996 import FrankelEtAl1996MwNSHMP2008
 from openquake.hazardlib.gsim.toro_1997 import ToroEtAl1997MwNSHMP2008
 from openquake.hazardlib.gsim.silva_2002 import SilvaEtAl2002MwNSHMP2008
 from openquake.hazardlib.gsim.campbell_2003 import Campbell2003MwNSHMP2008
-from openquake.hazardlib.gsim.tavakoli_pezeshk_2005 import TavakoliPezeshk2005MwNSHMP2008
-from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006Modified2011
+from openquake.hazardlib.gsim.tavakoli_pezeshk_2005 import (
+    TavakoliPezeshk2005MwNSHMP2008)
+from openquake.hazardlib.gsim.atkinson_boore_2006 import (
+    AtkinsonBoore2006Modified2011)
 from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
 from openquake.hazardlib.gsim.boore_atkinson_2011 import Atkinson2008prime
-from openquake.hazardlib.gsim.somerville_2001 import SomervilleEtAl2001NSHMP2008
+from openquake.hazardlib.gsim.somerville_2001 import (
+    SomervilleEtAl2001NSHMP2008)
 from shakelib.gmice.ak07 import AK07
 
 
@@ -182,6 +186,7 @@ def get_extent(rupture=None, config=None):
     dx.repi = dx.rjb
     dx.rx = np.zeros_like(dx.rjb)
     dx.ry0 = np.zeros_like(dx.rjb)
+    dx.rvolc = np.zeros_like(dx.rjb)
 
     # Sites context
     sx = SitesContext()
@@ -252,8 +257,8 @@ def get_extent(rupture=None, config=None):
     # output grid register with common grid resolutions (60c, 30c,
     # 15c, 7.5c)
     #
-    logging.info("Extent: %f, %f, %f, %f" %
-                 (lonmin, lonmax, latmin, latmax))
+    logging.debug("Extent: %f, %f, %f, %f" %
+                  (lonmin, lonmax, latmin, latmax))
     return _round_coord(lonmin[0]), _round_coord(lonmax[0]), \
         _round_coord(latmin[0]), _round_coord(latmax[0])
 

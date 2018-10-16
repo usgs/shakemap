@@ -135,7 +135,8 @@ def get_distance_measures():
         A list of strings.
     """
 
-    return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
+    return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T',
+            'rvolc']
 
 
 def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
@@ -169,6 +170,9 @@ def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
     | U      | GC2 coordinate U.                                        |
     +--------+----------------------------------------------------------+
     | T      | GC2 coordinate T.                                        |
+    +--------+----------------------------------------------------------+
+    | rvolc  | Part of the rupture distance spent in volcanic region.   |
+    |        | Currently set to 0 for all points.                       |
     +--------+----------------------------------------------------------+
 
     Args:
@@ -228,5 +232,8 @@ def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
     # If any of the GC2-related distances are requested, may as well do all
     if len(set(methods).intersection(gc2_distances)) > 0:
         distdict.update(rupture.computeGC2(lon, lat, dep))
+
+    if 'rvolc' in methods:
+        distdict['rvolc'] = np.zeros_like(lon)
 
     return distdict
