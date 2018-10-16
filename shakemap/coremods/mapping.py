@@ -30,68 +30,89 @@ class MappingModule(CoreModule):
     """
 
     command_name = 'mapping'
-    targets = [r'products/intensity\.jpg', r'products/intensity\.pdf',
-               r'products/pga\.jpg', r'products/pga\.pdf',
-               r'products/pgv\.jpg', r'products/pgv\.pdf',
-               r'products/psa.*p.*\.jpg', r'products/psa.*p.*\.pdf']
+    targets = [
+        r'products/intensity\.jpg', r'products/intensity\.pdf',
+        r'products/pga\.jpg', r'products/pga\.pdf',
+        r'products/pgv\.jpg', r'products/pgv\.pdf',
+        r'products/psa.*p.*\.jpg', r'products/psa.*p.*\.pdf']
     dependencies = [('products/shake_result.hdf', True)]
     configs = ['products.conf']
 
     # supply here a data structure with information about files that
     # can be created by this module.
-    mapping_page = {'title': 'Ground Motion Maps', 'slug': 'maps'}
+    mapping_page = {
+        'title': 'Ground Motion Maps',
+        'slug': 'maps'
+    }
     contents = OrderedDict.fromkeys(
-        ['intensityMap', 'intensityThumbnail', 'pgaMap', 'pgvMap',
+        ['intensityMap',
+         'intensityThumbnail',
+         'pgaMap',
+         'pgvMap',
          'psa[PERIOD]Map'])
-    contents['intensityMap'] = {'title': 'Intensity Map',
-                                'caption': 'Map of macroseismic intensity.',
-                                'page': mapping_page,
-                                'formats': [{'filename': 'intensity.jpg',
-                                             'type': 'image/jpeg'},
-                                            {'filename': 'intensity.pdf',
-                                             'type': 'application/pdf'}
-                                            ]
-                                }
+    contents['intensityMap'] = {
+        'title': 'Intensity Map',
+        'caption': 'Map of macroseismic intensity.',
+        'page': mapping_page,
+        'formats': [{
+            'filename': 'intensity.jpg',
+            'type': 'image/jpeg'
+        }, {
+            'filename': 'intensity.pdf',
+            'type': 'application/pdf'}
+        ]
+    }
 
-    contents['intensityThumbnail'] = {'title': 'Intensity Thumbnail',
-                                      'caption': 'Thumbnail of intensity map.',
-                                      'page': mapping_page,
-                                      'formats': [{'filename':
-                                                   'pin-thumbnail.png',
-                                                   'type': 'image/png'}
-                                                  ]
-                                      }
+    contents['intensityThumbnail'] = {
+        'title': 'Intensity Thumbnail',
+        'caption': 'Thumbnail of intensity map.',
+        'page': mapping_page,
+        'formats': [{
+            'filename':
+            'pin-thumbnail.png',
+            'type': 'image/png'
+        }]
+    }
 
-    contents['pgaMap'] = {'title': 'PGA Map',
-                          'caption': 'Map of peak ground acceleration (%g).',
-                          'page': mapping_page,
-                          'formats': [{'filename': 'pga.jpg',
-                                       'type': 'image/jpeg'},
-                                      {'filename': 'pga.pdf',
-                                       'type': 'image/jpeg'}
-                                      ]
-                          }
-    contents['pgvMap'] = {'title': 'PGV Map',
-                          'caption': 'Map of peak ground velocity (cm/s).',
-                          'page': mapping_page,
-                          'formats': [{'filename': 'pgv.jpg',
-                                       'type': 'image/jpeg'},
-                                      {'filename': 'pgv.pdf',
-                                       'type': 'application/pdf'},
-                                      ]
-                          }
+    contents['pgaMap'] = {
+        'title': 'PGA Map',
+        'caption': 'Map of peak ground acceleration (%g).',
+        'page': mapping_page,
+        'formats': [{
+            'filename': 'pga.jpg',
+            'type': 'image/jpeg'
+        }, {
+            'filename': 'pga.pdf',
+            'type': 'image/jpeg'
+        }]
+    }
+    contents['pgvMap'] = {
+        'title': 'PGV Map',
+        'caption': 'Map of peak ground velocity (cm/s).',
+        'page': mapping_page,
+        'formats': [{
+            'filename': 'pgv.jpg',
+            'type': 'image/jpeg'
+        }, {
+            'filename': 'pgv.pdf',
+            'type': 'application/pdf'
+        }]
+    }
     psacap = 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'
-    contents['psa[PERIOD]Map'] = {'title': 'PSA[PERIOD] Map',
-                                  'page': mapping_page,
-                                  'caption': psacap,
-                                  'formats': [{'filename':
-                                               'psa[0-9]p[0-9].jpg',
-                                               'type': 'image/jpeg'},
-                                              {'filename':
-                                               'psa[0-9]p[0-9].pdf',
-                                               'type': 'application/pdf'},
-                                              ]
-                                  }
+    contents['psa[PERIOD]Map'] = {
+        'title': 'PSA[PERIOD] Map',
+        'page': mapping_page,
+        'caption': psacap,
+        'formats': [{
+            'filename':
+            'psa[0-9]p[0-9].jpg',
+            'type': 'image/jpeg'
+        }, {
+            'filename':
+            'psa[0-9]p[0-9].pdf',
+            'type': 'application/pdf'
+        }]
+    }
 
     def execute(self):
         """
@@ -180,21 +201,25 @@ class MappingModule(CoreModule):
             component, imtype = imtype.split('/')
             if imtype == 'MMI':
                 self.logger.debug('Drawing intensity map...')
-                intensity_pdf, _ = draw_intensity(container,
-                                                  topogrid,
-                                                  oceanfile,
-                                                  datadir,
-                                                  operator)
+                intensity_pdf, _ = draw_intensity(
+                    container,
+                    topogrid,
+                    oceanfile,
+                    datadir,
+                    operator
+                )
                 self.logger.debug('Created intensity map %s' % intensity_pdf)
                 self.make_pin_thumbnail(container, component, datadir)
             else:
                 self.logger.debug('Drawing %s contour map...' % imtype)
 
-                contour_pdf, contour_png = draw_contour(container,
-                                                        imtype, topogrid,
-                                                        oceanfile,
-                                                        datadir,
-                                                        operator, filter_size)
+                contour_pdf, contour_png = draw_contour(
+                    container,
+                    imtype, topogrid,
+                    oceanfile,
+                    datadir,
+                    operator, filter_size
+                )
                 self.logger.debug('Created contour map %s' % contour_pdf)
 
         container.close()
@@ -227,7 +252,9 @@ class MappingModule(CoreModule):
         plt.tight_layout()
         plt.imshow(grid, cmap=mmimap.cmap, vmin=1.5, vmax=9.5)
         plt.contour(rgrid, levels=rvals, colors='#cccccc', linewidths=0.02)
-        plt.savefig(os.path.join(datadir, "pin-thumbnail.png"), dpi=96,
-                    bbox_inches=matplotlib.transforms.Bbox([[0.47, 0.39],
-                                                            [2.50, 2.50]]),
-                    pad_inches=0)
+        plt.savefig(
+            os.path.join(datadir, "pin-thumbnail.png"),
+            dpi=96,
+            bbox_inches=matplotlib.transforms.Bbox(
+                [[0.47, 0.39], [2.50, 2.50]]),
+            pad_inches=0)

@@ -67,6 +67,7 @@ GRATICULE_ZORDER = 1200
 SCALE_ZORDER = 1500
 SCENARIO_ZORDER = 2000
 AXES_ZORDER = 3000
+BORDER_ZORDER = 1110
 
 # default font for cities
 # DEFAULT_FONT = 'DejaVu Sans'
@@ -81,29 +82,35 @@ WATERMARK_ALPHA = 0.4
 MAP_FRAC = 10
 
 # define dictionary of MMI integer values to Roman numeral equivalents
-MMI_LABELS = {'1': 'I',
-              '2': 'II',
-              '3': 'III',
-              '4': 'IV',
-              '5': 'V',
-              '6': 'VI',
-              '7': 'VII',
-              '8': 'VIII',
-              '9': 'IX',
-              '10': 'X'}
+MMI_LABELS = {
+    '1': 'I',
+    '2': 'II',
+    '3': 'III',
+    '4': 'IV',
+    '5': 'V',
+    '6': 'VI',
+    '7': 'VII',
+    '8': 'VIII',
+    '9': 'IX',
+    '10': 'X'
+}
 
-IMT_RANGES = {'PGV': (1e-2, 500),
-              'PGA': (1e-4, 500),
-              'SA(0.3)': (1e-4, 500),
-              'SA(1.0)': (1e-4, 500),
-              'SA(3.0)': (1e-4, 400)}
+IMT_RANGES = {
+    'PGV': (1e-2, 500),
+    'PGA': (1e-4, 500),
+    'SA(0.3)': (1e-4, 500),
+    'SA(1.0)': (1e-4, 500),
+    'SA(3.0)': (1e-4, 400)
+}
 
-IMTYPES = {'MMI': 'Macroseismic Intensity Map',
-           'PGV': 'Peak Ground Velocity Map',
-           'PGA': 'Peak Ground Acceleration Map',
-           'SA(0.3)': '0.3 Second Peak Spectral Acceleration Map',
-           'SA(1.0)': '1.0 Second Peak Spectral Acceleration Map',
-           'SA(3.0)': '3.0 Second Peak Spectral Acceleration Map'}
+IMTYPES = {
+    'MMI': 'Macroseismic Intensity Map',
+    'PGV': 'Peak Ground Velocity Map',
+    'PGA': 'Peak Ground Acceleration Map',
+    'SA(0.3)': '0.3 Second Peak Spectral Acceleration Map',
+    'SA(1.0)': '1.0 Second Peak Spectral Acceleration Map',
+    'SA(3.0)': '3.0 Second Peak Spectral Acceleration Map'
+}
 
 DEG2KM = 111.191
 
@@ -269,12 +276,11 @@ def _get_map_info(gd, center_lat):
     #     ymax = ymax - dh/DEG2KM
     #     height = (ymax-ymin)*DEG2KM
 
-    aspect = width/height
-    legend_pad = 2.7
+    legend_pad = 0.0
     figheight = FIGWIDTH/aspect + legend_pad
     bounds = (xmin, xmax, ymin, ymax)
     figsize = (FIGWIDTH, figheight)
-    return (bounds, figsize)
+    return (bounds, figsize, aspect)
 
 
 def _draw_imt_legend(fig, levels, palette, imtype, gmice):
@@ -283,14 +289,17 @@ def _draw_imt_legend(fig, levels, palette, imtype, gmice):
     Args:
         fig (Figure): Matplotlib Figure object.
         levels (sequence): Sequence of contour levels.
-        palette (ColorPalette): ColorPalette using range of input data and IMT_CMAP.
+        palette (ColorPalette): ColorPalette using range of input data and
+            IMT_CMAP.
         imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
     """
-    units = {'PGV': '(cm/s)',
-             'PGA': '(%g)',
-             'SA(0.3)': '(%g)',
-             'SA(1.0)': '(%g)',
-             'SA(3.0)': '(%g)'}
+    units = {
+        'PGV': '(cm/s)',
+        'PGA': '(%g)',
+        'SA(0.3)': '(%g)',
+        'SA(1.0)': '(%g)',
+        'SA(3.0)': '(%g)'
+    }
     imtlabel = imtype + ' ' + units[imtype]
     # imtlabel = imtype
 
@@ -304,8 +313,10 @@ def _draw_imt_legend(fig, levels, palette, imtype, gmice):
     firstcol_width = 0.15
 
     font0 = FontProperties()
-    alignment = {'horizontalalignment': 'center',
-                 'verticalalignment': 'center'}
+    alignment = {
+        'horizontalalignment': 'center',
+        'verticalalignment': 'center'
+    }
     font0.set_weight('bold')
 
     xloc = firstcol_width/2
@@ -365,7 +376,8 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
     Args:
         fig (Figure): Matplotlib Figure object.
         levels (sequence): Sequence of contour levels.
-        palette (ColorPalette): ColorPalette using range of input data and IMT_CMAP.
+        palette (ColorPalette): ColorPalette using range of input data and
+            IMT_CMAP.
         imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
     """
     cax = fig.add_axes([0.1, 0.001, 0.8, 0.15])
@@ -375,26 +387,28 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
     plt.xlim(cax_xmin, cax_xmax)
     plt.ylim(bottom, top)
 
-    shaking = ['SHAKING',
-               'Not felt',
-               'Weak',
-               'Light',
-               'Moderate',
-               'Strong',
-               'Very strong',
-               'Severe',
-               'Violent',
-               'Extreme']
-    damage = ['DAMAGE',
-              'None',
-              'None',
-              'None',
-              'Very light',
-              'Light',
-              'Moderate',
-              'Moderate/heavy',
-              'Heavy',
-              'Very heavy']
+    shaking = [
+        'SHAKING',
+        'Not felt',
+        'Weak',
+        'Light',
+        'Moderate',
+        'Strong',
+        'Very strong',
+        'Severe',
+        'Violent',
+        'Extreme']
+    damage = [
+        'DAMAGE',
+        'None',
+        'None',
+        'None',
+        'Very light',
+        'Light',
+        'Moderate',
+        'Moderate/heavy',
+        'Heavy',
+        'Very heavy']
 
     acceleration = ['PGA(%g)']
     velocity = ['PGV(cm/s)']
@@ -456,14 +470,14 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
     plt.plot([0, 1], [top, top], 'k', clip_on=False)
     plt.plot([0, 1], [bottom, bottom], 'k', clip_on=False)
 
-    plt.plot([0, 1], [yloc_first_line,
-                      yloc_first_line], 'k', clip_on=False)
-    plt.plot([0, 1], [yloc_second_line,
-                      yloc_second_line], 'k', clip_on=False)
-    plt.plot([0, 1], [yloc_third_line,
-                      yloc_third_line], 'k', clip_on=False)
-    plt.plot([0, 1], [yloc_fourth_line,
-                      yloc_fourth_line], 'k', clip_on=False)
+    plt.plot([0, 1], [yloc_first_line, yloc_first_line],
+             'k', clip_on=False)
+    plt.plot([0, 1], [yloc_second_line, yloc_second_line],
+             'k', clip_on=False)
+    plt.plot([0, 1], [yloc_third_line, yloc_third_line],
+             'k', clip_on=False)
+    plt.plot([0, 1], [yloc_fourth_line, yloc_fourth_line],
+             'k', clip_on=False)
 
     # draw the bottom line of text that describes stations/mmi,
     # and shakemap version/process time
@@ -940,12 +954,19 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     cities = allcities.limitByBounds((gd.xmin, gd.xmax, gd.ymin, gd.ymax))
 
     # get the map boundaries and figure size
-    bounds, figsize = _get_map_info(gd, center_lat)
+    bounds, figsize, aspect = _get_map_info(gd, center_lat)
+
+    # Note: dimensions are: [left, bottom, width, height]
+    dim_left = 0.1
+    dim_bottom = 0.17
+    dim_width = 0.8
+    dim_height = dim_width/aspect
 
     # Create the MercatorMap object, which holds a separate but identical
     # axes object used to determine collisions between city labels.
-    mmap = MercatorMap(bounds, figsize, cities, padding=0.5,
-                       dimensions=[0.1, 0.17, 0.8, 0.61])
+    mmap = MercatorMap(
+        bounds, figsize, cities, padding=0.5,
+        dimensions=[dim_left, dim_bottom, dim_width, dim_height])
     fig = mmap.figure
     ax = mmap.axes
 
@@ -1035,14 +1056,17 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     is_scenario = etype == 'SCENARIO'
 
     if is_scenario and not override_scenario:
-        plt.text(center_lon, center_lat, 'SCENARIO', fontsize=72,
-                 zorder=SCENARIO_ZORDER, transform=geoproj,
-                 alpha=WATERMARK_ALPHA, color=WATERMARK_COLOR,
-                 horizontalalignment='center',
-                 verticalalignment='center',
-                 rotation=45,
-                 path_effects=[path_effects.Stroke(linewidth=1,
-                                                   foreground='black')])
+        plt.text(
+            center_lon, center_lat, 'SCENARIO', fontsize=72,
+            zorder=SCENARIO_ZORDER, transform=geoproj,
+            alpha=WATERMARK_ALPHA, color=WATERMARK_COLOR,
+            horizontalalignment='center',
+            verticalalignment='center',
+            rotation=45,
+            path_effects=[path_effects.Stroke(
+                linewidth=1,
+                foreground='black')]
+        )
 
     # draw the rupture polygon(s) in black, if not point rupture
     if not isinstance(rupture, PointRupture):
@@ -1061,12 +1085,13 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     map_version = int(info['processing']['shakemap_versions']['map_version'])
     _draw_mmi_legend(fig, mmimap, gmice, process_time, map_version)
 
-    # # make the map border thicker
-    # the left/top edges don't line up here
-    # plt.sca(ax)
-    # lw = 5.0
-    # ax.outline_patch.set_zorder(AXES_ZORDER)
-    # ax.outline_patch.set_linewidth(lw)
+    # make the map border thicker
+    plt.sca(ax)
+    lw = 2.0
+    ax.outline_patch.set_zorder(BORDER_ZORDER)
+    ax.outline_patch.set_linewidth(lw)
+    ax.outline_patch.set_joinstyle('round')
+    ax.outline_patch.set_capstyle('round')
 
     # create pdf and png output file names
     pdf_file = os.path.join(outpath, 'intensity.pdf')
@@ -1119,12 +1144,19 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     cities = allcities.limitByBounds((gd.xmin, gd.xmax, gd.ymin, gd.ymax))
 
     # get the map boundaries and figure size
-    bounds, figsize = _get_map_info(gd, center_lat)
+    bounds, figsize, aspect = _get_map_info(gd, center_lat)
+
+    # Note: dimensions are: [left, bottom, width, height]
+    dim_left = 0.1
+    dim_bottom = 0.17
+    dim_width = 0.8
+    dim_height = dim_width/aspect
 
     # Create the MercatorMap object, which holds a separate but identical
     # axes object used to determine collisions between city labels.
-    mmap = MercatorMap(bounds, figsize, cities, padding=0.5,
-                       dimensions=[0.1, 0.1, 0.8, 0.8])
+    mmap = MercatorMap(
+        bounds, figsize, cities, padding=0.5,
+        dimensions=[dim_left, dim_bottom, dim_width, dim_height])
     fig = mmap.figure
     ax = mmap.axes
     # this needs to be done here so that city label collision
@@ -1205,11 +1237,12 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
             ax.plot(x, y, color=props['color'], linestyle='dashed',
                     zorder=DASHED_CONTOUR_ZORDER)
 
-    white_box = dict(boxstyle="round",
-                     ec=(0, 0, 0),
-                     fc=(1., 1, 1),
-                     color='k'
-                     )
+    white_box = dict(
+        boxstyle="round",
+        ec=(0, 0, 0),
+        fc=(1., 1, 1),
+        color='k'
+    )
 
     # only label lines with lots of points
     npoints = np.array(npoints)
@@ -1232,8 +1265,9 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
                 # try to label each segment with black text in a white box
                 xc = x[int(len(x)/3)]
                 yc = y[int(len(y)/3)]
-                if _label_close_to_edge(xc, yc, proj_gd.xmin, proj_gd.xmax,
-                                        proj_gd.ymin, proj_gd.ymax):
+                if _label_close_to_edge(
+                        xc, yc, proj_gd.xmin, proj_gd.xmax,
+                        proj_gd.ymin, proj_gd.ymax):
                     continue
                 # TODO: figure out if box is going to go outside the map, if so
                 # choose a different point on the line.
@@ -1241,14 +1275,22 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
                         ha="center", va="center",
                         bbox=white_box, zorder=AXES_ZORDER-1)
 
-    ax.outline_patch.set_zorder(AXES_ZORDER)
+    # make the border thicker
+    lw = 2.0
+    ax.outline_patch.set_zorder(BORDER_ZORDER)
+    ax.outline_patch.set_linewidth(lw)
+    ax.outline_patch.set_joinstyle('round')
+    ax.outline_patch.set_capstyle('round')
 
     # clip the ocean data to the shakemap
     bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
     oceanshapes = _clip_bounds(bbox, oceanfile)
 
-    ax.add_feature(ShapelyFeature(oceanshapes, crs=geoproj),
-                   facecolor=WATERCOLOR, zorder=OCEAN_ZORDER)
+    ax.add_feature(
+        ShapelyFeature(oceanshapes, crs=geoproj),
+        facecolor=WATERCOLOR,
+        zorder=OCEAN_ZORDER
+    )
 
     # draw 10m res coastlines
     ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
@@ -1274,22 +1316,24 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     center_lon = origin.lon
 
     if is_scenario and not override_scenario:
-        plt.text(center_lon, center_lat, 'SCENARIO', fontsize=72,
-                 zorder=SCENARIO_ZORDER, transform=geoproj,
-                 alpha=WATERMARK_ALPHA, color=WATERMARK_COLOR,
-                 horizontalalignment='center',
-                 verticalalignment='center',
-                 rotation=45,
-                 path_effects=[path_effects.Stroke(linewidth=1,
-                                                   foreground='black')])
+        plt.text(
+            center_lon, center_lat, 'SCENARIO', fontsize=72,
+            zorder=SCENARIO_ZORDER, transform=geoproj,
+            alpha=WATERMARK_ALPHA, color=WATERMARK_COLOR,
+            horizontalalignment='center',
+            verticalalignment='center',
+            rotation=45,
+            path_effects=[
+                path_effects.Stroke(linewidth=1, foreground='black')]
+        )
 
     # Draw the map scale in the unoccupied lower corner.
     corner = 'll'
     draw_scale(ax, corner, pady=0.05, padx=0.05, zorder=SCALE_ZORDER)
 
     # draw cities
-    mmap.drawCities(shadow=True, zorder=CITIES_ZORDER,
-                    draw_dots=True)
+    mmap.drawCities(
+        shadow=True, zorder=CITIES_ZORDER, draw_dots=True)
 
     # Draw the epicenter as a black star
     plt.sca(ax)
@@ -1317,7 +1361,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     plt.draw()
     pdf_file = os.path.join(outpath, '%s.pdf' % (fileimt))
     jpg_file = os.path.join(outpath, '%s.jpg' % (fileimt))
-    plt.savefig(pdf_file)
-    plt.savefig(jpg_file)
+    plt.savefig(pdf_file, bbox_inches='tight')
+    plt.savefig(jpg_file, bbox_inches='tight')
 
     return (pdf_file, jpg_file)
