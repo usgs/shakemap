@@ -99,8 +99,7 @@ def test_layers():
 
     config = update_config_regions(elat, elon, config)
     assert config['tectonic_regions']['scr']['gmpe'] == \
-        ['stable_continental_induced', 'stable_continental_nshmp2014_rlme',
-         'stable_continental_deep']
+        ['stable_continental_nshmp2014_rlme', 'stable_continental_deep']
 
     config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
     validate_config(config, install_path, data_path, global_data_path)
