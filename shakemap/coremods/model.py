@@ -738,7 +738,10 @@ class ModelModule(CoreModule):
             else:
                 iterlist = [None]
             for period in iterlist:
-                oqimt = gmice_imt(period)
+                if period:
+                    oqimt = gmice_imt(period)
+                else:
+                    oqimt = gmice_imt()
                 imtstr = str(oqimt)
 
                 np.seterr(invalid='ignore')
