@@ -14,6 +14,7 @@ from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.base import Rupture
 from shakelib.multigmpe import MultiGMPE
 from shakelib.sites import Sites
+from shakelib.station import StationList
 
 from strec.gmreg import Regionalizer
 
@@ -44,6 +45,40 @@ DEFAULT_ACTIVE_COEFFS = [27.24, 250.4, 579.1]
 DEFAULT_STABLE_COEFFS = [63.4, 465.4, 581.3]
 
 
+def replace_dyfi(stationfile, dyfi_xml):
+    """Remove any non-instrumented data from station file, add DYFI.
+
+    Args:
+        stationfile (str): Existing station data file, presumed to
+                           contain old DYFI data.
+        dyfi_xml (str): DYFI XML data file, which will be added to
+                        instrumented station data.
+    Returns:
+        StationList: Object containing merged data.
+
+    """
+    stations = StationList.loadFromFiles([stationfile])
+    # reach into the internal database and find the instrumented stations
+    conn = stations.db
+    cursor = stations.cursor
+    query1 = ('SELECT id from station WHERE instrumented = '
+              '0 and (network = "DYFI" or network="CIIM")')
+    cursor.execute(query1)
+    rows = cursor.fetchall()
+    for row in rows:
+        sid = row[0]
+        query2 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        cursor.execute(query2)
+        conn.commit()
+        query3 = 'DELETE FROM station where id="%s"' % sid
+        cursor.execute(query3)
+        conn.commit()
+
+    # now insert the dyfi data
+    stations.addData([dyfi_xml])
+    return stations
+
+
 def get_extent(rupture=None, config=None):
     """
     Method to compute map extent from rupture. There are numerous methods for
@@ -53,7 +88,7 @@ def get_extent(rupture=None, config=None):
           file, or
         - it can be based on the MultiGMPE for the event.
 
-    All methods excetp for the first requires a rupture object.
+    All methods except for the first requires a rupture object.
 
     If no config is provided then a rupture is required and the extent is based
     on a generic set of active/stable.

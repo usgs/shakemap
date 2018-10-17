@@ -10,13 +10,51 @@ import pytest
 
 # local imports
 from shakelib.utils.exception import ShakeLibException
-from shakelib.utils.utils import get_extent, is_stable
+from shakelib.utils.utils import get_extent, is_stable, replace_dyfi
 from shakelib.rupture.factory import get_rupture
 from shakelib.rupture.origin import Origin
+from shakelib.station import StationList
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 datadir = os.path.join(homedir, 'utils_data')
+
+
+def test_replace_dyfi():
+    stationfile = os.path.join(datadir, 'nepal_dat.xml')
+    dyfifile = os.path.join(datadir, 'nepal_dyfi_dat.xml')
+
+    original_stations = StationList.loadFromFiles([stationfile])
+    dyfi_stations = StationList.loadFromFiles([dyfifile])
+    dcursor = dyfi_stations.cursor
+    dcursor.execute('SELECT count(*) from station')
+    ndyfi1 = dcursor.fetchone()[0]
+
+    original_cursor = original_stations.cursor
+    original_cursor.execute('SELECT count(*) from station')
+
+    original_cursor.execute(
+        'SELECT count(*) from station WHERE instrumented=0')
+    noriginal_mmi = original_cursor.fetchone()[0]
+
+    original_cursor.execute(
+        'SELECT count(*) from station WHERE instrumented=0 and network="DYFI"')
+    noriginal_dyfi = original_cursor.fetchone()[0]
+
+    noriginal_observed = noriginal_mmi - noriginal_dyfi
+
+    stations = replace_dyfi(stationfile, dyfifile)
+
+    scursor = stations.cursor
+    scursor.execute('SELECT count(*) from station where '
+                    'instrumented=0 and network != "DYFI"')
+    nobserved = scursor.fetchone()[0]
+
+    assert nobserved == noriginal_observed
+    scursor.execute(
+        'SELECT count(*) from station where instrumented=0 and network="DYFI"')
+    ndyfi = scursor.fetchone()[0]
+    assert ndyfi == ndyfi1
 
 
 def test_get_extent_small_point():
@@ -177,6 +215,7 @@ def test_exception():
 
 
 if __name__ == '__main__':
+    test_replace_dyfi()
     test_get_extent_small_point()
     test_get_extent_small_complex()
     test_get_extent_bad_usage()

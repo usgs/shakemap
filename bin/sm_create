@@ -26,6 +26,7 @@ from shakemap.utils.layers import (validate_config,
                                    update_config_regions)
 from shakemap.coremods.dyfi import _get_dyfi_dataframe
 from shakelib.rupture import constants
+from shakelib.utils.utils import replace_dyfi
 
 TIMEFMT2 = '%Y-%m-%dT%H:%M:%S'
 KM2SEC = 3600.0/111  # seconds per kilometer
@@ -249,6 +250,26 @@ def main(args):
 
             data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
             shakemap.getContent('stationlist.xml', filename=data_file)
+
+            # let's grab any dyfi product we find, and replace the
+            # non-instrumented data in the stationlist with the (presumably
+            # updated) dyfi data
+            dataframe, msg = _get_dyfi_dataframe(detail)
+            if dataframe is not None:
+                dyfi_file = os.path.join(
+                    event_dir, '%s_dyfi_dat.xml' % eventid)
+                reference = 'USGS Did You Feel It? System'
+                dataframe_to_xml(dataframe, dyfi_file, reference)
+                if os.path.isfile(data_file):
+                    stations = replace_dyfi(data_file, dyfi_file)
+                    json_data = stations.getGeoJson()
+                    new_data_file = os.path.join(
+                        event_dir, '%s_dat.geojson' % eventid)
+                    with open(new_data_file, 'wt') as f:
+                        json.dump(json_data, f)
+                    os.remove(data_file)
+                    os.remove(dyfi_file)
+
             fault_files = shakemap.getContentsMatching('fault.txt')
             if len(fault_files):
                 fault_file = os.path.join(event_dir, fault_files[0])
