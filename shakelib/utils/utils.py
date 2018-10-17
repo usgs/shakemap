@@ -203,7 +203,7 @@ def get_extent(rupture=None, config=None):
         gmpe = MultiGMPE.from_list(
             gmpes, weights, default_gmpes_for_site=site_gmpes)
 
-    min_mmi = 4.0
+    min_mmi = 5.0
     default_imt = imt.SA(1.0)
     sd_types = [const.StdDev.TOTAL]
 
@@ -251,7 +251,7 @@ def get_extent(rupture=None, config=None):
     # Minimum distance that exceeds threshold MMI?
     dists_exceed_mmi = dx.rjb[gmpe_to_mmi > min_mmi]
     if len(dists_exceed_mmi):
-        mindist_km = np.min(dists_exceed_mmi)
+        mindist_km = np.max(dists_exceed_mmi)
     else:
         mindist_km = d_min
 
