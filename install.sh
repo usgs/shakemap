@@ -26,16 +26,20 @@ VENV=shakemap
 # Is the reset flag set? If not, use the frozen conda channel to install.
 # Otherwise, try to install from conda forge.
 reset=1
-while getopts r FLAG; do
+developer=0
+while getopts rd FLAG; do
   case $FLAG in
     r)
         echo "The -r flag is deprecated; installation is now from conda-forge by default."
         reset=1
         
+        ;;
+    d)
+        echo "Installing developer packages."
+        developer=1
       ;;
   esac
 done
-
 
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d "$matplotlibdir" ]; then
@@ -130,54 +134,68 @@ conda activate base
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
 
+dev_list=(
+    "ipython"
+    "autopep8"
+    "flake8"
+    "pyflakes"
+    "rope"
+    "yapf"
+    "sphinx"
+)
 
 # Package list:
-package_list='
-      python=3.5
-      amptools
-      cartopy
-      cython
-      defusedxml
-      descartes
-      docutils
-      configobj
-      fiona
-      gcc
-      gdal
-      h5py
-      impactutils
-      libcomcat
-      lockfile
-      mapio
-      matplotlib<=2.3
-      numpy
-      obspy
-      openquake.engine
-      pandas
-      ps2ff
-      psutil
-      pyproj
-      pytest
-      pytest-cov
-      python-daemon
-      pytest-faulthandler
-      scikit-image
-      scipy
-      shapely
-      simplekml
-      strec
-      versioneer 
-      vcrpy
-'
+package_list=(
+      "python=3.5"
+      "amptools"
+      "cartopy"
+      "cython"
+      "defusedxml"
+      "descartes"
+      "docutils"
+      "configobj"
+      "fiona"
+      "gcc"
+      "gdal"
+      "h5py"
+      "impactutils"
+      "libcomcat"
+      "lockfile"
+      "mapio"
+      "matplotlib<=2.3"
+      "numpy"
+      "obspy"
+      "openquake.engine"
+      "pandas"
+      "ps2ff"
+      "psutil"
+      "pyproj"
+      "pytest"
+      "pytest-cov"
+      "python-daemon"
+      "pytest-faulthandler"
+      "scikit-image"
+      "scipy"
+      "shapely"
+      "simplekml"
+      "strec"
+      "versioneer"
+      "vcrpy"
+)
+
+if [ $developer == 1 ]; then
+    package_list=( "${package_list[@]}" "${dev_list[@]}" )
+    echo ${package_list[*]}
+fi
 
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
 if [ $reset == 0 ]; then
     conda create -y --override-channels -n $VENV \
-          -c file://$PWD/$channel $package_list
+          -c file://$PWD/$channel ${package_list[*]}
 else
     conda create -y -n $VENV -c conda-forge \
-          --channel-priority $package_list
+          --channel-priority ${package_list[*]}
 fi
 
 
@@ -206,6 +224,10 @@ pip install --upgrade pip
 if [ $? -ne 0 ];then
     echo "Failed to upgrade pip, trying to continue..."
     exit 1
+fi
+
+if [ $developer == 1 ]; then
+    pip install sphinx-argparse
 fi
 
 # This package
