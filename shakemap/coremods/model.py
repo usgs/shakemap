@@ -405,10 +405,12 @@ class ModelModule(CoreModule):
         # Processing parameters
         # ---------------------------------------------------------------------
         self.max_workers = self.config['system']['max_workers']
+
         # ---------------------------------------------------------------------
         # Do we apply the generic amplification factors?
         # ---------------------------------------------------------------------
         self.apply_gafs = self.config['modeling']['apply_generic_amp_factors']
+
         # ---------------------------------------------------------------------
         # Bias parameters
         # ---------------------------------------------------------------------
@@ -417,6 +419,7 @@ class ModelModule(CoreModule):
         self.bias_max_mag = self.config['modeling']['bias']['max_mag']
         self.bias_max_dsigma = \
             self.config['modeling']['bias']['max_delta_sigma']
+
         # ---------------------------------------------------------------------
         # Outlier parameters
         # ---------------------------------------------------------------------
@@ -424,15 +427,19 @@ class ModelModule(CoreModule):
         self.outlier_deviation_level = \
             self.config['data']['outlier']['max_deviation']
         self.outlier_max_mag = self.config['data']['outlier']['max_mag']
+
         # ---------------------------------------------------------------------
         # These are the IMTs we want to make
         # ---------------------------------------------------------------------
         self.imt_out_set = set(self.config['interp']['imt_list'])
+
         # ---------------------------------------------------------------------
         # The x and y resolution of the output grid
         # ---------------------------------------------------------------------
         self.smdx = self.config['interp']['prediction_location']['xres']
         self.smdy = self.config['interp']['prediction_location']['yres']
+        self.nmax = self.config['interp']['prediction_location']['nmax']
+
         # ---------------------------------------------------------------------
         # Get the Vs30 file name
         # ---------------------------------------------------------------------
@@ -511,6 +518,12 @@ class ModelModule(CoreModule):
                     self.rupture_obj,
                     config=self.config
                 )
+
+            # Adjust resolution to be under nmax
+            self._adjustResolution()
+            print('#########################')
+            print('dx: %s ' % self.smdx)
+            print('')
 
             self.sites_obj_out = Sites.fromBounds(
                 self.W, self.E, self.S,
@@ -1962,6 +1975,45 @@ class ModelModule(CoreModule):
                 mean += fd
 
         return mean, stddevs
+
+    def _adjustResolution(self):
+        """
+        This is a helper function to adjust the resolution to be under
+        the maximum value specified in the config.
+        """
+        # We want to only use resolutions that are multiples of 1 minute or
+        # an integer division of 1 minute.
+        one_minute = 1/60
+        multiples = np.arange(1, 11)
+        divisions = 1/multiples
+        factors = np.sort(np.unique(np.concatenate((divisions, multiples))))
+        ok_res = one_minute * factors
+        latspan = self.N - self.S
+        # 180 ??
+        if self.E > self.W:
+            lonspan = self.E - self.W
+        else:
+            xmax = self.E + 360
+            lonspan = xmax - self.W
+        nx = np.floor(lonspan / self.smdx) + 1
+        ny = np.floor(latspan / self.smdy) + 1
+        ngrid = nx * ny
+        nmax = self.nmax
+        print('ngrid: %s' % ngrid)
+        print('nmax: %s' % nmax)
+        if ngrid > nmax:
+            target_res = \
+                (-(latspan + lonspan) -
+                 np.sqrt(latspan**2 + lonspan**2 +
+                         2 * latspan * lonspan *
+                         (2 * nmax - 1))) / (2 * (1 - nmax))
+
+            if np.any(ok_res > target_res):
+                sel_res = np.min(ok_res[ok_res > target_res])
+            else:
+                sel_res = np.max(ok_res)
+            self.smdx = sel_res
+            self.smdy = sel_res
 
 
 def _round_float(val, digits):
