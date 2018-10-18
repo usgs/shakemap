@@ -81,7 +81,7 @@ def nearest_edge(elon, elat, poly):
                                      np.array(y[ix - 1:ix + 1]),
                                      elon_arr, elat_arr)
         if np.abs(dd[0]) < nearest:
-            nearest = dd[0]
+            nearest = np.abs(dd[0])
     return nearest
 
 
@@ -119,8 +119,10 @@ def dist_to_layer(elon, elat, geom):
     min_dist = 99999.
     for poly in plist:
         nearest = nearest_edge(elon, elat, poly)
+        print(nearest)
         if nearest < 5000:
             nearest = ep.distance(transform(project, poly))
+            print(nearest)
         if nearest < min_dist:
             min_dist = nearest
         if min_dist == 0:
@@ -157,10 +159,12 @@ def get_layer_distances(elon, elat, layer_dir):
     dist_dict = {}
     for file in layer_files:
         layer_name = os.path.splitext(os.path.basename(file))[0]
+        print(layer_name)
         with open(file, 'r') as fd:
             data = fd.read()
         geom = shapely.wkt.loads(data)
         dist_dict[layer_name] = dist_to_layer(elon, elat, geom)
+    print(repr(dist_dict))
     return dist_dict
 
 
