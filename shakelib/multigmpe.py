@@ -9,7 +9,7 @@ import numpy as np
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
-                                                CampbellBozorgnia2014)
+    CampbellBozorgnia2014)
 from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
 
