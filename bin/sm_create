@@ -264,7 +264,7 @@ def main(args):
                     stations = replace_dyfi(data_file, dyfi_file)
                     json_data = stations.getGeoJson()
                     new_data_file = os.path.join(
-                        event_dir, '%s_dat.geojson' % eventid)
+                        event_dir, '%s_dat.json' % eventid)
                     with open(new_data_file, 'wt') as f:
                         json.dump(json_data, f)
                     os.remove(data_file)
