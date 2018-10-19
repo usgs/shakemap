@@ -81,7 +81,7 @@ def nearest_edge(elon, elat, poly):
                                      np.array(y[ix - 1:ix + 1]),
                                      elon_arr, elat_arr)
         if np.abs(dd[0]) < nearest:
-            nearest = dd[0]
+            nearest = np.abs(dd[0])
     return nearest
 
 
