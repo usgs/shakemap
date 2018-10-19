@@ -239,12 +239,11 @@ def _get_projected_grids(imtgrid, topobase, projstr):
     return (pimtgrid, ptopogrid)
 
 
-def _get_map_info(gd, center_lat):
+def _get_map_info(gd):
     """Get the desired bounds of the map and the figure size (in).
 
     Args:
         gd (GeoDict): GeoDict to use as basis for map boundaries.
-        center_lat (float): Epicentral latitude.
 
     Returns:
         tuple: xmin,xmax,ymin,ymax Extent of map.
@@ -253,15 +252,9 @@ def _get_map_info(gd, center_lat):
     # define the map
     # first cope with stupid 180 meridian
     xmin, xmax, ymin, ymax = (gd.xmin, gd.xmax, gd.ymin, gd.ymax)
-    if xmin < xmax:
-        width_ll = xmax-xmin
-    else:
+    if xmin > xmax:
         xmax = xmax + 360
-        width_ll = (xmax + 360) - xmin
 
-    height = (ymax - ymin)*DEG2KM
-
-    center_lat = (ymin + ymax)/2.0
     center_lon = (xmin + xmax)/2.0
 
     proj = ccrs.Mercator(central_longitude=center_lon,
@@ -274,12 +267,10 @@ def _get_map_info(gd, center_lat):
     pwidth = pxmax - pxmin
     pheight = pymax - pymin
 
-    width = width_ll * np.cos(np.radians(center_lat))*DEG2KM
-
     # Map aspect
     aspect = pwidth/pheight
 
-    fig_aspect = 1.0/(0.17 + 0.8/aspect)
+    fig_aspect = 1.0/(0.19 + 0.8/aspect)
     figheight = FIGWIDTH/fig_aspect
     bounds = (xmin, xmax, ymin, ymax)
     figsize = (FIGWIDTH, figheight)
@@ -494,7 +485,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version, point_sourc
     # Explanation of symbols: triangle is instrument, circle is mmi,
     # epicenter is black star
     # thick black line is rupture (if available)
-    item_sep = [0.2, 0.28, 0.2]
+    item_sep = [0.2, 0.28, 0.15]
     left_offset = 0.005
     label_pad = 0.02
 
@@ -544,7 +535,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version, point_sourc
         rheight = 0.05
         rup = patches.Rectangle(
             xy=(rup_marker_x - rwidth,
-                yloc_seventh_row-0.3*rheight),
+                yloc_seventh_row-0.5*rheight),
             width=rwidth,
             height=rheight,
             linewidth=2,
@@ -1020,11 +1011,11 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     cities = allcities.limitByBounds((gd.xmin, gd.xmax, gd.ymin, gd.ymax))
 
     # get the map boundaries and figure size
-    bounds, figsize, aspect = _get_map_info(gd, center_lat)
+    bounds, figsize, aspect = _get_map_info(gd)
 
     # Note: dimensions are: [left, bottom, width, height]
     dim_left = 0.1
-    dim_bottom = 0.17
+    dim_bottom = 0.19
     dim_width = 0.8
     dim_height = dim_width/aspect
 
@@ -1216,11 +1207,11 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     cities = allcities.limitByBounds((gd.xmin, gd.xmax, gd.ymin, gd.ymax))
 
     # get the map boundaries and figure size
-    bounds, figsize, aspect = _get_map_info(gd, center_lat)
+    bounds, figsize, aspect = _get_map_info(gd)
 
     # Note: dimensions are: [left, bottom, width, height]
     dim_left = 0.1
-    dim_bottom = 0.17
+    dim_bottom = 0.19
     dim_width = 0.8
     dim_height = dim_width/aspect
 
