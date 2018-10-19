@@ -2028,8 +2028,10 @@ class ModelModule(CoreModule):
             self.smdy = sel_res
             self.logger.info('Updated dx: %f' % self.smdx)
             self.logger.info('Updatd dy: %f' % self.smdy)
+            nx = np.floor(lonspan / self.smdx) + 1
+            ny = np.floor(latspan / self.smdy) + 1
             self.logger.info('Updated number of grid points: %i'
-                             % self.smdx * self.smdy)
+                             % (nx * ny))
 
 
 def _round_float(val, digits):
