@@ -9,6 +9,7 @@ from time import gmtime, strftime
 import shutil
 from collections import OrderedDict
 from datetime import date
+import json
 
 import numpy as np
 import numpy.ma as ma
@@ -1292,8 +1293,9 @@ class ModelModule(CoreModule):
         _, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current')
         strecfile = os.path.join(datadir, 'strec_results.json')
-        strec_results = json.load(open(strecfile, 'rt'))
-        info[st] = strec_results
+        if os.path.isfile(strecfile):
+            strec_results = json.load(open(strecfile, 'rt'))
+            info[st] = strec_results
 
         # the following items are primarily useful for PDL
         origin = self.rupture_obj._origin
