@@ -23,6 +23,7 @@ from shakemap.utils.config import (get_config_paths,
                                    config_error)
 from shakemap.utils.logging import get_logger
 from shakemap.utils.dependencies import CommandDatabase
+from shakemap.utils.exception import TerminateShakeMap
 from shakelib.rupture.origin import read_event_file
 
 
@@ -251,7 +252,12 @@ def main(args):
                 # run it, we won't stop him/her
                 pass
             t1 = time.time()
-            obj.execute()
+            try:
+                obj.execute()
+            except TerminateShakeMap as e:
+                logger.warn("ShakeMap terminated in module %s: %s" %
+                            (cmd, str(e)))
+                break
             t2 = time.time()
             elapsed = t2 - t1
             logger.info('Finished running command %s: Elapsed %.2f secs'
@@ -264,6 +270,8 @@ def main(args):
         error_msg = _format_error_info(e, args.eventid)
         logger.critical(error_msg)  # should get sent by email and logged
         sys.exit(1)
+
+    logger.info("shake finished with event %s" % args.eventid)
 
 
 if __name__ == '__main__':
