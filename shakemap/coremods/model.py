@@ -9,6 +9,7 @@ from time import gmtime, strftime
 import shutil
 from collections import OrderedDict
 from datetime import date
+import json
 
 import numpy as np
 import numpy.ma as ma
@@ -1270,6 +1271,7 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         # This is the metadata for creating info.json
         # ---------------------------------------------------------------------
+        st = 'strec'
         ip = 'input'
         ei = 'event_information'
         op = 'output'
@@ -1286,6 +1288,14 @@ class ModelModule(CoreModule):
         info[ip][ei] = {}
         info[ip][ei]['depth'] = str(self.rx.hypo_depth)
         info[ip][ei]['event_id'] = self._eventid
+
+        # look for the presence of a strec_results file and read it in
+        _, data_path = get_config_paths()
+        datadir = os.path.join(data_path, self._eventid, 'current')
+        strecfile = os.path.join(datadir, 'strec_results.json')
+        if os.path.isfile(strecfile):
+            strec_results = json.load(open(strecfile, 'rt'))
+            info[st] = strec_results
 
         # the following items are primarily useful for PDL
         origin = self.rupture_obj._origin

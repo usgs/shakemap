@@ -24,3 +24,4 @@ tests/data/install/data/dependencies.db-wal
 shakemap/c/pcontour.c
 shakemap/c/clib.c
 shakemap/c/*.so
+strec_results.json
