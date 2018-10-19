@@ -521,9 +521,6 @@ class ModelModule(CoreModule):
 
             # Adjust resolution to be under nmax
             self._adjustResolution()
-            print('#########################')
-            print('dx: %s ' % self.smdx)
-            print('')
 
             self.sites_obj_out = Sites.fromBounds(
                 self.W, self.E, self.S,
@@ -1989,7 +1986,8 @@ class ModelModule(CoreModule):
         factors = np.sort(np.unique(np.concatenate((divisions, multiples))))
         ok_res = one_minute * factors
         latspan = self.N - self.S
-        # 180 ??
+
+        # Deal with possible 180 longitude disontinuity
         if self.E > self.W:
             lonspan = self.E - self.W
         else:
@@ -1999,9 +1997,15 @@ class ModelModule(CoreModule):
         ny = np.floor(latspan / self.smdy) + 1
         ngrid = nx * ny
         nmax = self.nmax
-        print('ngrid: %s' % ngrid)
-        print('nmax: %s' % nmax)
         if ngrid > nmax:
+            self.logger.info('Extent and resolution of shakemap results in '
+                             'too many grid points. Adjusting resolution...')
+            self.logger.info('Longitude span: %f' % lonspan)
+            self.logger.info('Latitude span: %f' % latspan)
+            self.logger.info('Current dx: %f' % self.smdx)
+            self.logger.info('Current dy: %f' % self.smdy)
+            self.logger.info('Current number of grid points: %i' % ngrid)
+            self.logger.info('Max grid points allowed: %i' % nmax)
             target_res = \
                 (-(latspan + lonspan) -
                  np.sqrt(latspan**2 + lonspan**2 +
@@ -2014,6 +2018,10 @@ class ModelModule(CoreModule):
                 sel_res = np.max(ok_res)
             self.smdx = sel_res
             self.smdy = sel_res
+            self.logger.info('Updated dx: %f' % self.smdx)
+            self.logger.info('Updatd dy: %f' % self.smdy)
+            self.logger.info('Updated number of grid points: %i'
+                             % self.smdx * self.smdy)
 
 
 def _round_float(val, digits):
