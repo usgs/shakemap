@@ -43,6 +43,7 @@ from shakemap.utils.generic_amp import get_generic_amp_factors
 from shakemap.c.clib import (make_sigma_matrix,
                              geodetic_distance_fast,
                              make_sd_array)
+from shakemap.utils.exception import TerminateShakeMap
 
 from shakelib.directivity.rowshandel2013 import Rowshandel2013
 
@@ -157,6 +158,10 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         self.logger.debug('Setting output params...')
         self._setOutputParams()
+
+        landmask = self._getLandMask()
+        if landmask is not None and np.all(landmask):
+            raise TerminateShakeMap("Mapped area is entirely water")
 
         # ---------------------------------------------------------------------
         # If the gmpe doesn't break down its stardard deviation into
@@ -318,7 +323,7 @@ class ModelModule(CoreModule):
         # We're going to need masked arrays of the output grids later, so
         # make them now.
         #
-        moutgrid = self._getMaskedGrids()
+        moutgrid = self._getMaskedGrids(landmask)
 
         #
         # Get the info dictionary that will become info.json, and
@@ -1237,7 +1242,23 @@ class ModelModule(CoreModule):
         self.logger.debug('total time for %s=%f' %
                           (imtstr, time.time() - time1))
 
-    def _getMaskedGrids(self):
+    def _getLandMask(self):
+        """
+        Get the landmask for this map. Land will be False, water will
+        be True (because of the way masked arrays work).
+        """
+        if not self.do_grid:
+            return None
+        gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
+                                       self.smdx, self.smdy)
+        maskfile = os.path.join(get_data_path(), 'landmask', 'landmask_nb.grd')
+        mask = mapio.reader.read(maskfile, samplegeodict=gd, resample=True,
+                                 method='nearest', doPadding=True,
+                                 padValue=0)
+        bmask = ~(mask._data.astype(np.bool))
+        return bmask
+
+    def _getMaskedGrids(self, bmask):
         """
         For each grid in the output, generate a grid with the water areas
         masked out.
@@ -1247,13 +1268,6 @@ class ModelModule(CoreModule):
             for imtout in self.imt_out_set:
                 moutgrid[imtout] = self.outgrid[imtout]
             return moutgrid
-        gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
-                                       self.smdx, self.smdy)
-        maskfile = os.path.join(get_data_path(), 'landmask', 'landmask_nb.grd')
-        mask = mapio.reader.read(maskfile, samplegeodict=gd, resample=True,
-                                 method='nearest', doPadding=True,
-                                 padValue=0)
-        bmask = ~(mask._data.astype(np.bool))
         for imtout in self.imt_out_set:
             moutgrid[imtout] = \
                 ma.masked_array(self.outgrid[imtout], mask=bmask)
