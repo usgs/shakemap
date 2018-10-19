@@ -276,7 +276,7 @@ def _get_map_info(gd, center_lat):
     #     ymax = ymax - dh/DEG2KM
     #     height = (ymax-ymin)*DEG2KM
 
-    legend_pad = 0.0
+    legend_pad = 0.2
     figheight = FIGWIDTH/aspect + legend_pad
     bounds = (xmin, xmax, ymin, ymax)
     figsize = (FIGWIDTH, figheight)
@@ -481,27 +481,37 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
 
     # draw the bottom line of text that describes stations/mmi,
     # and shakemap version/process time
-    triangle_marker_x = widths[0]/10
-    triangle_text_x = widths[0]/5
+    triangle_marker_x = 0  # widths[0]/10
+    triangle_text_x = triangle_marker_x + 0.1  # widths[0]/5
     plt.plot(triangle_marker_x, yloc_sixth_row, '^', markerfacecolor='w',
              markeredgecolor='k', markersize=6, mew=0.5)
-    plt.text(triangle_text_x, yloc_sixth_row,
-             'Seismic Instrument', va='center')
+    plt.text(triangle_text_x,
+             yloc_sixth_row,
+             'Seismic Instrument',
+             va='center',
+             ha='left')
 
     circle_marker_x = triangle_text_x + 0.2
-    circle_text_x = circle_marker_x + widths[1]/10
-    plt.plot(circle_marker_x, yloc_sixth_row, 'o', markerfacecolor='w',
-             markeredgecolor='k', markersize=4, mew=0.5)
-    plt.text(circle_text_x, yloc_sixth_row,
-             'Macroseismic Observation', va='center')
+    circle_text_x = circle_marker_x + 0.1  # circle_marker_x + widths[1]/10
+    plt.plot(circle_marker_x,
+             yloc_sixth_row, 'o',
+             markerfacecolor='w',
+             markeredgecolor='k',
+             markersize=4,
+             mew=0.5)
+    plt.text(circle_text_x,
+             yloc_sixth_row,
+             'Macroseismic Observation',
+             va='center',
+             ha='left')
 
     version_x = 1.0
     tpl = (map_version, process_time)
-    plt.text(version_x, yloc_sixth_row,
-             'Map Version %i: Processed %s' % tpl, ha='right', va='center')
+    plt.text(version_x, yloc_seventh_row,
+             'Version %i: Processed %s' % tpl, ha='right', va='center')
 
     ref = gmice.name
-    refx = widths[0]/12
+    refx = 0  # widths[0]/12
     plt.text(refx, yloc_seventh_row,
              'Scale based upon %s' % ref, va='center')
 
