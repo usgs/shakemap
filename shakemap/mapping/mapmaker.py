@@ -1,6 +1,7 @@
 # stdlib imports
 from datetime import datetime
 import os.path
+import json
 
 # third party imports
 import numpy as np
@@ -1069,9 +1070,13 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
 
     # draw the rupture polygon(s) in black, if not point rupture
     if not isinstance(rupture, PointRupture):
-        lats = rupture.lats
-        lons = rupture.lons
-        ax.plot(lons, lats, 'k', lw=2, zorder=FAULT_ZORDER, transform=geoproj)
+        json_dict = rupture._geojson
+        shapes = []
+        for feature in json_dict['features']:
+            rup_shape = sShape(feature['geometry'])
+            sfeature = cfeature.ShapelyFeature(rup_shape, geoproj)
+            ax.add_feature(sfeature, zorder=FAULT_ZORDER,
+                           lw=2, edgecolor='k', facecolor=(0, 0, 0, 0))
 
     # draw graticules, ticks, tick labels
     _draw_graticules(ax, *bounds)
@@ -1342,9 +1347,13 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     # draw the rupture polygon(s) in black, if not point rupture
     rupture = rupture_from_dict(container.getRuptureDict())
     if not isinstance(rupture, PointRupture):
-        lats = rupture.lats
-        lons = rupture.lons
-        ax.plot(lons, lats, 'k', lw=2, zorder=FAULT_ZORDER, transform=geoproj)
+        json_dict = rupture._geojson
+        shapes = []
+        for feature in json_dict['features']:
+            rup_shape = sShape(feature['geometry'])
+            sfeature = cfeature.ShapelyFeature(rup_shape, geoproj)
+            ax.add_feature(sfeature, zorder=FAULT_ZORDER,
+                           lw=2, edgecolor='k', facecolor=(0, 0, 0, 0))
 
     # draw the station data on the map
     stations = container.getStationDict()
