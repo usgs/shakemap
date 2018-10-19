@@ -1,7 +1,6 @@
 # stdlib imports
 from datetime import datetime
 import os.path
-import json
 
 # third party imports
 import numpy as np
@@ -10,12 +9,14 @@ import matplotlib.ticker as mticker
 from matplotlib.colors import LightSource
 import matplotlib.patheffects as path_effects
 from matplotlib.font_manager import FontProperties
+from matplotlib import patches
 
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 from cartopy.feature import ShapelyFeature
 import cartopy.feature as cfeature
 from cartopy.io.shapereader import Reader
+import pyproj
 
 from shapely.geometry import shape as sShape
 from shapely.geometry import Polygon as sPolygon
@@ -251,33 +252,35 @@ def _get_map_info(gd, center_lat):
     """
     # define the map
     # first cope with stupid 180 meridian
-    height = (gd.ymax-gd.ymin)*DEG2KM
-    if gd.xmin < gd.xmax:
-        width = (gd.xmax-gd.xmin)*np.cos(np.radians(center_lat))*DEG2KM
-        xmin, xmax, ymin, ymax = (gd.xmin, gd.xmax, gd.ymin, gd.ymax)
+    xmin, xmax, ymin, ymax = (gd.xmin, gd.xmax, gd.ymin, gd.ymax)
+    if xmin < xmax:
+        width_ll = xmax-xmin
     else:
-        xmin, xmax, ymin, ymax = (gd.xmin, gd.xmax, gd.ymin, gd.ymax)
-        xmax += 360
-        width = ((gd.xmax+360) - gd.xmin) * \
-            np.cos(np.radians(center_lat))*DEG2KM
+        xmax = xmax + 360
+        width_ll = (xmax + 360) - xmin
 
-    aspect = width/height
+    height = (ymax - ymin)*DEG2KM
 
-    # if the aspect is not 1, then trim bounds in x or y direction
-    # as appropriate
-    # if width > height:
-    #     dw = (width - height)/2.0  # this is width in km
-    #     xmin = xmin + dw/(np.cos(np.radians(center_lat))*DEG2KM)
-    #     xmax = xmax - dw/(np.cos(np.radians(center_lat))*DEG2KM)
-    #     width = (xmax-xmin)*np.cos(np.radians(center_lat))*DEG2KM
-    # if height > width:
-    #     dh = (height - width)/2.0  # this is width in km
-    #     ymin = ymin + dh/DEG2KM
-    #     ymax = ymax - dh/DEG2KM
-    #     height = (ymax-ymin)*DEG2KM
+    center_lat = (ymin + ymax)/2.0
+    center_lon = (xmin + xmax)/2.0
 
-    legend_pad = 0.2
-    figheight = FIGWIDTH/aspect + legend_pad
+    proj = ccrs.Mercator(central_longitude=center_lon,
+                         min_latitude=ymin,
+                         max_latitude=ymax,
+                         globe=None)
+    pproj = pyproj.Proj(proj.proj4_init)
+    pxmin, pymin = pproj(xmin, ymin)
+    pxmax, pymax = pproj(xmax, ymax)
+    pwidth = pxmax - pxmin
+    pheight = pymax - pymin
+
+    width = width_ll * np.cos(np.radians(center_lat))*DEG2KM
+
+    # Map aspect
+    aspect = pwidth/pheight
+
+    fig_aspect = 1.0/(0.17 + 0.8/aspect)
+    figheight = FIGWIDTH/fig_aspect
     bounds = (xmin, xmax, ymin, ymax)
     figsize = (FIGWIDTH, figheight)
     return (bounds, figsize, aspect)
@@ -364,23 +367,28 @@ def _draw_imt_legend(fig, levels, palette, imtype, gmice):
         xloc = left + width/2.0
         imtstr = "{0:.3g}".format(np.exp(imtv)*divisor)
         th = plt.text(xloc, 0.5, imtstr, fontproperties=font0, **alignment)
-        th.set_path_effects([path_effects.Stroke(linewidth=2.0,
-                                                 foreground='white'),
-                             path_effects.Normal()])
+        th.set_path_effects(
+            [path_effects.Stroke(linewidth=2.0,
+                                 foreground='white'),
+             path_effects.Normal()]
+        )
         left = right
 
 
-def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
+def _draw_mmi_legend(fig, palette, gmice, process_time, map_version, point_source):
     """Create a legend axis for MMI plots.
 
     Args:
         fig (Figure): Matplotlib Figure object.
-        levels (sequence): Sequence of contour levels.
         palette (ColorPalette): ColorPalette using range of input data and
             IMT_CMAP.
-        imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
+        gmice: A gmice object.
+        process_time (str): Process time.
+        map_version (int): ShakeMap version.
+        point_source (bool): Is the rupture a PointRupture?
+
     """
-    cax = fig.add_axes([0.1, 0.001, 0.8, 0.15])
+    cax = fig.add_axes([0.1, 0.00, 0.8, 0.15])
     plt.axis('off')
     cax_xmin, cax_xmax = cax.get_xlim()
     bottom, top = cax.get_ylim()
@@ -414,8 +422,10 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
     velocity = ['PGV(cm/s)']
 
     imt_edges = np.array([0.5, 1.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5])
-    intensities = ['INTENSITY', 'I', 'II-III',
-                   'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X+']
+    intensities = [
+        'INTENSITY', 'I', 'II-III',
+        'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X+'
+    ]
 
     widths = np.array([11.5, 7.75, 6.75, 7.0, 10.25,
                        8.5, 12.0, 16.25, 8.25, 11.75])/100
@@ -455,8 +465,10 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
     bottom = 4/14
 
     font0 = FontProperties()
-    alignment = {'horizontalalignment': 'center',
-                 'verticalalignment': 'center'}
+    alignment = {
+        'horizontalalignment': 'center',
+        'verticalalignment': 'center'
+    }
     font0.set_weight('bold')
 
     font1 = FontProperties()
@@ -479,41 +491,85 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version):
     plt.plot([0, 1], [yloc_fourth_line, yloc_fourth_line],
              'k', clip_on=False)
 
-    # draw the bottom line of text that describes stations/mmi,
-    # and shakemap version/process time
-    triangle_marker_x = 0  # widths[0]/10
-    triangle_text_x = triangle_marker_x + 0.1  # widths[0]/5
-    plt.plot(triangle_marker_x, yloc_sixth_row, '^', markerfacecolor='w',
-             markeredgecolor='k', markersize=6, mew=0.5)
+    # Explanation of symbols: triangle is instrument, circle is mmi,
+    # epicenter is black star
+    # thick black line is rupture (if available)
+    item_sep = [0.2, 0.28, 0.2]
+    left_offset = 0.005
+    label_pad = 0.02
+
+    # Instrument
+    triangle_marker_x = left_offset
+    triangle_text_x = triangle_marker_x + label_pad
+    plt.plot(triangle_marker_x, yloc_seventh_row, '^', markerfacecolor='w',
+             markeredgecolor='k', markersize=6, mew=0.5, clip_on=False)
     plt.text(triangle_text_x,
-             yloc_sixth_row,
+             yloc_seventh_row,
              'Seismic Instrument',
              va='center',
              ha='left')
 
-    circle_marker_x = triangle_text_x + 0.2
-    circle_text_x = circle_marker_x + 0.1  # circle_marker_x + widths[1]/10
+    # Macroseismic
+    circle_marker_x = triangle_text_x + item_sep[0]
+    circle_text_x = circle_marker_x + label_pad
     plt.plot(circle_marker_x,
-             yloc_sixth_row, 'o',
+             yloc_seventh_row, 'o',
              markerfacecolor='w',
              markeredgecolor='k',
              markersize=4,
              mew=0.5)
     plt.text(circle_text_x,
-             yloc_sixth_row,
+             yloc_seventh_row,
              'Macroseismic Observation',
              va='center',
              ha='left')
 
+    # Epicenter
+    star_marker_x = circle_marker_x + item_sep[1]
+    star_text_x = star_marker_x + label_pad
+    plt.plot(star_marker_x,
+             yloc_seventh_row, 'k*',
+             markersize=12,
+             mew=0.5)
+    plt.text(star_text_x,
+             yloc_seventh_row,
+             'Epicenter',
+             va='center',
+             ha='left')
+
+    if not point_source:
+        rup_marker_x = star_marker_x + item_sep[2]
+        rup_text_x = rup_marker_x + label_pad
+        rwidth = 0.02
+        rheight = 0.05
+        rup = patches.Rectangle(
+            xy=(rup_marker_x - rwidth,
+                yloc_seventh_row-0.3*rheight),
+            width=rwidth,
+            height=rheight,
+            linewidth=2,
+            edgecolor='k',
+            facecolor='w'
+        )
+        cax.add_patch(rup)
+        plt.text(rup_text_x,
+                 yloc_seventh_row,
+                 'Rupture',
+                 va='center',
+                 ha='left')
+
+    # Add conversion reference and shakemap version/process time
     version_x = 1.0
     tpl = (map_version, process_time)
-    plt.text(version_x, yloc_seventh_row,
-             'Version %i: Processed %s' % tpl, ha='right', va='center')
+    plt.text(version_x, yloc_sixth_row,
+             'Version %i: Processed %s' % tpl,
+             ha='right', va='center')
 
     ref = gmice.name
-    refx = 0  # widths[0]/12
-    plt.text(refx, yloc_seventh_row,
-             'Scale based upon %s' % ref, va='center')
+    refx = 0
+    plt.text(refx, yloc_sixth_row,
+             'Scale based on %s' % ref,
+             va='center')
 
     nsteps = 10
     for i in range(0, len(widths)):
@@ -887,11 +943,11 @@ def _get_draped(data, topodata, colormap):
 
     ls1 = LightSource(azdeg=300, altdeg=45)
     ls2 = LightSource(azdeg=45, altdeg=45)
-    intensity1 = ls1.hillshade(topodata, fraction=0.25,
-                               vert_exag=VERT_EXAG)
+    intensity1 = ls1.hillshade(
+        topodata, fraction=0.25, vert_exag=VERT_EXAG)
 
-    intensity2 = ls2.hillshade(topodata, fraction=0.25,
-                               vert_exag=VERT_EXAG)
+    intensity2 = ls2.hillshade(
+        topodata, fraction=0.25, vert_exag=VERT_EXAG)
 
     intensity = intensity1 * 0.5 + intensity2 * 0.5
 
@@ -1079,9 +1135,10 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
         )
 
     # draw the rupture polygon(s) in black, if not point rupture
+    point_source = True
     if not isinstance(rupture, PointRupture):
+        point_source = False
         json_dict = rupture._geojson
-        shapes = []
         for feature in json_dict['features']:
             rup_shape = sShape(feature['geometry'])
             sfeature = cfeature.ShapelyFeature(rup_shape, geoproj)
@@ -1097,7 +1154,8 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     gmice = get_object_from_config('gmice', 'modeling', config)
     process_time = info['processing']['shakemap_versions']['process_time']
     map_version = int(info['processing']['shakemap_versions']['map_version'])
-    _draw_mmi_legend(fig, mmimap, gmice, process_time, map_version)
+    _draw_mmi_legend(fig, mmimap, gmice, process_time,
+                     map_version, point_source)
 
     # make the map border thicker
     plt.sca(ax)
