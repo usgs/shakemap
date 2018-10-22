@@ -277,7 +277,7 @@ def _get_map_info(gd):
     return (bounds, figsize, aspect)
 
 
-def _draw_imt_legend(fig, levels, palette, imtype, gmice):
+def _draw_imt_legend(fig, palette, imtype, gmice):
     """Create a legend axis for non MMI plots.
 
     Args:
@@ -836,7 +836,6 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
     for feature in stations['features']:
         lon, lat = feature['geometry']['coordinates']
         net = feature['properties']['network'].lower()
-
         # If the network matches one of these then it is an MMI
         # observation
         if net in ['dyfi', 'mmi', 'intensity', 'ciim']:
@@ -1164,7 +1163,14 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     plt.savefig(pdf_file, bbox_inches='tight')
     plt.savefig(jpg_file, bbox_inches='tight')
 
-    return (pdf_file, jpg_file)
+    # make a separate MMI legend
+    fig2 = plt.figure(figsize=figsize)
+    _draw_mmi_legend(fig2, mmimap, gmice, process_time,
+                     map_version, point_source)
+    legend_file = os.path.join(outpath, 'mmi_legend.pdf')
+    plt.savefig(legend_file, bbox_inches='tight')
+
+    return (pdf_file, jpg_file, legend_file)
 
 
 def draw_contour(container, imtype, topobase, oceanfile, outpath,
@@ -1421,7 +1427,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     _draw_title(imtype, container, operator)
 
-    _draw_imt_legend(fig, levels, mmimap, imtype, gmice)
+    _draw_imt_legend(fig, mmimap, imtype, gmice)
 
     # save plot to file
     fileimt = oq_to_file(imtype)

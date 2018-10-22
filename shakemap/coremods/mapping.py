@@ -32,6 +32,7 @@ class MappingModule(CoreModule):
     command_name = 'mapping'
     targets = [
         r'products/intensity\.jpg', r'products/intensity\.pdf',
+        r'products/mmi_legend\.pdf',
         r'products/pga\.jpg', r'products/pga\.pdf',
         r'products/pgv\.jpg', r'products/pgv\.pdf',
         r'products/psa.*p.*\.jpg', r'products/psa.*p.*\.pdf']
@@ -201,7 +202,7 @@ class MappingModule(CoreModule):
             component, imtype = imtype.split('/')
             if imtype == 'MMI':
                 self.logger.debug('Drawing intensity map...')
-                intensity_pdf, _ = draw_intensity(
+                intensity_pdf, intensity_png, legend_file = draw_intensity(
                     container,
                     topogrid,
                     oceanfile,
