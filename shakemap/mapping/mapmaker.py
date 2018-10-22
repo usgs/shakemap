@@ -277,7 +277,7 @@ def _get_map_info(gd):
     return (bounds, figsize, aspect)
 
 
-def _draw_imt_legend(fig, levels, palette, imtype, gmice):
+def _draw_imt_legend(fig, palette, imtype, gmice):
     """Create a legend axis for non MMI plots.
 
     Args:
@@ -1421,7 +1421,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     _draw_title(imtype, container, operator)
 
-    _draw_imt_legend(fig, levels, mmimap, imtype, gmice)
+    _draw_imt_legend(fig, mmimap, imtype, gmice)
 
     # save plot to file
     fileimt = oq_to_file(imtype)
