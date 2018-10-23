@@ -45,8 +45,8 @@ def test_mapmaker_intensity():
     outpath = mkdtemp()
 
     try:
-        pdf, png = draw_intensity(container, topogrid, oceanfile,
-                                  outpath, 'NEIC')
+        pdf, png, legend = draw_intensity(container, topogrid, oceanfile,
+                                          outpath, 'NEIC')
         print(pdf)
     except Exception:
         assert 1 == 2

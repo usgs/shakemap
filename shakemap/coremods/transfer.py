@@ -290,4 +290,8 @@ def _get_properties(info):
     if sys.stdout is not None and sys.stdout.isatty():
         product_properties['review-status'] = 'reviewed'
 
+    # what gmice was used for the model calculations
+    gmice = info['processing']['ground_motion_modules']['gmice']['module']
+    product_properties['gmice'] = gmice
+
     return (properties, product_properties)
