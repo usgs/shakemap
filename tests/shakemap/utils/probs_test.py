@@ -64,11 +64,10 @@ def test_probs():
     # so m_{int|abs(dz)} = 0.15
     np.testing.assert_allclose(
         gmmodel['weightlist'],
-        np.array([0.18534348, 0.12219848, 0.69245804]),
+        np.array(np.array([0.18534348, 0.81465652])),
         rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_deep'
-    assert gmmodel['gmpelist'][1] == 'subduction_interface_nshmp2014'
-    assert gmmodel['gmpelist'][2] == 'subduction_slab_nshmp2014'
+    assert gmmodel['gmpelist'][1] == 'subduction_slab_nshmp2014'
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'
     assert gmmodel['ccf'] == 'LB13'
