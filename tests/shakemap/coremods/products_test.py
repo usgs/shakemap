@@ -356,7 +356,7 @@ def test_products():
         #
         do_rupture(evid, datapath, oc)
 
-        do_info(evid, datapath, oc)
+        # do_info(evid, datapath, oc)
 
         do_raster(evid, datapath, oc)
 
