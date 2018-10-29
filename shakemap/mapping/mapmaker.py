@@ -1041,6 +1041,11 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # get the proj4 string - used by Grid2D project() method
     projstr = proj.proj4_init
 
+    # this is a workaround to an occasional problem where some vector layers are
+    # not rendered. See
+    # https://github.com/SciTools/cartopy/issues/1155#issuecomment-432941088
+    proj._threshold /= 6
+
     # get the projected MMI and topo grids
     pmmigrid, ptopogrid = _get_projected_grids(mmigrid, topobase, projstr)
 
@@ -1067,10 +1072,12 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # draw 10m res coastlines
     ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
 
+    proj._threshold /= 6
+
     states_provinces = cfeature.NaturalEarthFeature(
         category='cultural',
         name='admin_1_states_provinces_lines',
-        scale='50m',
+        scale='10m',
         facecolor='none')
 
     ax.add_feature(states_provinces, edgecolor='black', zorder=BORDER_ZORDER)
@@ -1239,6 +1246,11 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     # get the proj4 string - used by Grid2D project() method
     projstr = proj.proj4_init
 
+    # this is a workaround to an occasional problem where some vector layers are
+    # not rendered. See
+    # https://github.com/SciTools/cartopy/issues/1155#issuecomment-432941088
+    proj._threshold /= 6
+
     # get the projected MMI and topo grids
     pimtgrid, ptopogrid = _get_projected_grids(imtgrid, topobase, projstr)
 
@@ -1367,7 +1379,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     states_provinces = cfeature.NaturalEarthFeature(
         category='cultural',
         name='admin_1_states_provinces_lines',
-        scale='50m',
+        scale='10m',
         facecolor='none')
 
     ax.add_feature(states_provinces, edgecolor='black', zorder=COAST_ZORDER)
