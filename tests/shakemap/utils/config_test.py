@@ -4,12 +4,27 @@ import os
 import os.path
 import pytest
 import copy
+import math
 
 from configobj import ConfigObj
 from validate import ValidateError
 
 import shakemap.utils.config as config
 from shakemap.utils.logging import get_logger
+
+
+def cmp_nanlists(list1, list2):
+    # inputs are two lists potentially containing inf or nanfloat_list.
+    if len(list1) != len(list2):
+        raise AssertionError('Lists not the same length.')
+    for f1, f2 in zip(list1, list2):
+        nanmatch = math.isnan(f1) and math.isnan(f2)
+        infmatch = math.isinf(f1) and math.isinf(f2)
+        floatmatch = f1 == f2
+        if nanmatch or infmatch or floatmatch:
+            continue
+        else:
+            raise AssertionError('Lists do not contain identical values.')
 
 
 def test_config():
@@ -198,6 +213,44 @@ def test_config():
     res = config.extent_list(['-20.0', '-10.0', '20.0', '10.0'])
     assert isinstance(res, list)
     assert res == [-20.0, -10.0, 20.0, 10.0]
+
+    #
+    # nanfloat_list()
+    #
+    res = config.nanfloat_list('[]', 0)
+    assert isinstance(res, list)
+    assert res == []
+    res = config.nanfloat_list([], 0)
+    assert isinstance(res, list)
+    assert res == []
+
+    res = config.nanfloat_list(['-20.0',
+                                '-Inf',
+                                'NaN',
+                                'nan',
+                                'Inf',
+                                'Nan'], 0)
+    assert isinstance(res, list)
+    nan = float('nan')
+    inf = float('inf')
+    minf = float('-inf')
+    cmp_nanlists(res, [-20.0, minf, nan, nan, inf, nan])
+
+    with pytest.raises(ValidateError):
+        res = config.nanfloat_list(7, 0)
+
+    with pytest.raises(ValidateError):
+        res = config.nanfloat_list([7], 2)
+
+    with pytest.raises(ValidateError):
+        res = config.nanfloat_list(['-20.0',
+                                    '-Inf',
+                                    'NaN',
+                                    'nan',
+                                    'Inf',
+                                    'Nan',
+                                    'thing'], 0)
+
     #
     # file_type()
     #
@@ -261,6 +314,13 @@ def test_config():
         res = config.cfg_float('thing')
 
 
+def test_config_check():
+    install_dir, data_dir = config.get_config_paths()
+    configdir = os.path.join(install_dir, 'config')
+    config.check_all_configs(configdir)
+
+
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
+    test_config_check()
     test_config()

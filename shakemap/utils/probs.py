@@ -33,7 +33,12 @@ def get_weights(origin, config):
         if value > 0.0:
             probs[key] = value
     all_keylist = list(probs.keys())
-    use_slab = config['tectonic_regions']['subduction']['use_slab']
+
+    # let's have the code default to use the slab data
+    if config['tectonic_regions']['subduction']:
+        use_slab = config['tectonic_regions']['subduction']['use_slab']
+    else:
+        use_slab = True
 
     for region, rdict in config['tectonic_regions'].items():
         if (region == 'subduction') and use_slab:
