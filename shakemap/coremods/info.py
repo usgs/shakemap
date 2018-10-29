@@ -4,6 +4,7 @@ from collections import OrderedDict
 import json
 
 # third party imports
+import numpy as np
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
@@ -51,10 +52,17 @@ class InfoModule(CoreModule):
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
-        # create ShakeMap metadata file
+        # Create ShakeMap metadata file
         self.logger.debug('Writing info.json file...')
         info = container.getMetadata()
-        infostring = json.dumps(info)
+
+        # Clean up strec results to be valid json
+        for k, v in info['strec'].items():
+            if isinstance(v, float):
+                if not np.isfinite(v):
+                    info['strec'][k] = None
+
+        infostring = json.dumps(info, allow_nan=False)
         info_file = os.path.join(datadir, 'info.json')
         f = open(info_file, 'wt')
         f.write(infostring)
