@@ -176,6 +176,19 @@ def get_extent(rupture=None, config=None):
         gmpe = MultiGMPE.from_config(config)
         gmice = get_object_from_config('gmice', 'modeling', config)
     else:
+        # Put in some default values for conf
+        config = {
+            'extent': {
+                'mmi': {
+                    'threshold': 4.5,
+                    'mindist': 100,
+                    'maxdist': 1000
+                }
+            }
+        }
+
+        # Generic GMPEs choices based only on active vs stable
+        # as defaults...
         stable = is_stable(origin.lon, origin.lat)
         if not stable:
             ASK14 = AbrahamsonEtAl2014()
@@ -200,10 +213,11 @@ def get_extent(rupture=None, config=None):
             site_gmpes = [AB06p]
             weights = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
             gmice = AK07()
+
         gmpe = MultiGMPE.from_list(
             gmpes, weights, default_gmpes_for_site=site_gmpes)
 
-    min_mmi = 5.0
+    min_mmi = config['extent']['mmi']['threshold']
     default_imt = imt.SA(1.0)
     sd_types = [const.StdDev.TOTAL]
 
@@ -211,8 +225,8 @@ def get_extent(rupture=None, config=None):
     dx = DistancesContext()
     # This imposes minimum/ maximum distances of:
     #   80 and 800 km; could make this configurable
-    d_min = 80
-    d_max = 800
+    d_min = config['extent']['mmi']['mindist']
+    d_max = config['extent']['mmi']['maxdist']
     dx.rjb = np.logspace(np.log10(d_min), np.log10(d_max), 2000)
     # Details don't matter for this; assuming vertical surface rupturing fault
     # with epicenter at the surface.
