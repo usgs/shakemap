@@ -10,6 +10,7 @@ from scipy.interpolate import griddata
 import matplotlib
 import matplotlib.pyplot as plt
 from impactutils.colors.cpalette import ColorPalette
+import rasterio.features
 
 # local imports
 # from mapio.gmt import GMTGrid
@@ -231,28 +232,38 @@ class MappingModule(CoreModule):
         imtdict = container.getIMTGrids("MMI", component)
         grid = imtdict['mean']
         metadata = imtdict['mean_metadata']
-        rx = (np.random.rand(300) * metadata['nx']).astype(np.int)
-        ry = (np.random.rand(300) * metadata['ny']).astype(np.int)
-        rvals = np.arange(0, 30, 0.1)
+        num_pixels = 300
+        randx = np.random.rand(num_pixels)
+        randy = np.random.rand(num_pixels)
+        rx = (randx * metadata['nx']).astype(np.int)
+        ry = (randy * metadata['ny']).astype(np.int)
+        rvals = np.arange(num_pixels)
 
-        x_grid = np.linspace(0, metadata['nx'] - 1, 400)
-        y_grid = np.linspace(0, metadata['ny'] - 1, 400)
+        x_grid = np.arange(400)
+        y_grid = np.arange(400)
 
         mx_grid, my_grid = np.meshgrid(x_grid, y_grid)
 
-        grid = griddata(np.hstack([rx.reshape((-1, 1)), ry.reshape((-1, 1))]),
+        grid = griddata(np.hstack([randx.reshape((-1, 1)) * 400,
+                                   randy.reshape((-1, 1)) * 400]),
                         grid[ry, rx], (mx_grid, my_grid), method='nearest')
         grid = (grid * 10 + 0.5).astype(np.int).astype(np.float) / 10.0
 
-        rgrid = griddata(np.hstack([rx.reshape((-1, 1)), ry.reshape((-1, 1))]),
+        rgrid = griddata(np.hstack([randx.reshape((-1, 1)) * 400,
+                                    randy.reshape((-1, 1)) * 400]),
                          rvals, (mx_grid, my_grid), method='nearest')
+        irgrid = rgrid.astype(np.int32)
+        mypols = [p[0]['coordinates']
+                  for p in rasterio.features.shapes(irgrid)]
 
         mmimap = ColorPalette.fromPreset('mmi')
         plt.figure(figsize=(2.75, 2.75), dpi=96, frameon=False)
         plt.axis('off')
         plt.tight_layout()
         plt.imshow(grid, cmap=mmimap.cmap, vmin=1.5, vmax=9.5)
-        plt.contour(rgrid, levels=rvals, colors='#cccccc', linewidths=0.02)
+        for pol in mypols:
+            mycoords = list(zip(*pol[0]))
+            plt.plot(mycoords[0], mycoords[1], color='#cccccc', linewidth=0.2)
         plt.savefig(
             os.path.join(datadir, "pin-thumbnail.png"),
             dpi=96,
