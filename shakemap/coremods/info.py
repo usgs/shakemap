@@ -57,10 +57,11 @@ class InfoModule(CoreModule):
         info = container.getMetadata()
 
         # Clean up strec results to be valid json
-        for k, v in info['strec'].items():
-            if isinstance(v, float):
-                if not np.isfinite(v):
-                    info['strec'][k] = None
+        if 'strec' in info:
+            for k, v in info['strec'].items():
+                if isinstance(v, float):
+                    if not np.isfinite(v):
+                        info['strec'][k] = None
 
         infostring = json.dumps(info, allow_nan=False)
         info_file = os.path.join(datadir, 'info.json')
