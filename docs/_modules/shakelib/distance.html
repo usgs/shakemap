@@ -170,7 +170,8 @@
 <span class="sd">        A list of strings.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rx&#39;</span><span class="p">,</span> <span class="s1">&#39;ry&#39;</span><span class="p">,</span> <span class="s1">&#39;ry0&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rx&#39;</span><span class="p">,</span> <span class="s1">&#39;ry&#39;</span><span class="p">,</span> <span class="s1">&#39;ry0&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;rvolc&#39;</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="get_distance"><a class="viewcode-back" href="../../shakelib/shakelib.distance.html#shakelib.distance.get_distance">[docs]</a><span class="k">def</span> <span class="nf">get_distance</span><span class="p">(</span><span class="n">methods</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
@@ -204,6 +205,9 @@
 <span class="sd">    | U      | GC2 coordinate U.                                        |</span>
 <span class="sd">    +--------+----------------------------------------------------------+</span>
 <span class="sd">    | T      | GC2 coordinate T.                                        |</span>
+<span class="sd">    +--------+----------------------------------------------------------+</span>
+<span class="sd">    | rvolc  | Part of the rupture distance spent in volcanic region.   |</span>
+<span class="sd">    |        | Currently set to 0 for all points.                       |</span>
 <span class="sd">    +--------+----------------------------------------------------------+</span>
 
 <span class="sd">    Args:</span>
@@ -263,6 +267,9 @@
     <span class="c1"># If any of the GC2-related distances are requested, may as well do all</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">methods</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">gc2_distances</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">distdict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">computeGC2</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="s1">&#39;rvolc&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;rvolc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">distdict</span></div>
 </pre></div>

@@ -581,15 +581,67 @@ parameters may also be set: eid, location, time, lat, lon, depth, mag,
 etc.. Blank lines and lines beginning with ‘#’ (i.e., comments) are
 ignored.</p>
 </div>
+<div class="section" id="rupture-specification">
+<h2>2.6.6. Rupture Specification<a class="headerlink" href="#rupture-specification" title="Permalink to this headline">¶</a></h2>
+<p>There are three classes of rupture objects:</p>
+<ul class="simple">
+<li><cite>PointRupture</cite></li>
+<li><cite>QuadRupture</cite></li>
+<li><cite>EdgeRupture</cite></li>
+</ul>
+<p>A <cite>PointRupture</cite> is just a point representation of the earthquake and
+is generated from the origin and so no additional specification is
+required. In this case, distance calculations use approximate adjustments
+to convert from epicentral distance to finite distances based on the
+earthquake magnitude.</p>
+<p>There are two extended-source rupture objects: a <cite>QuadRupture</cite> and an
+<cite>EdgeRupture</cite>. There are some general rules for the specification of the
+rupture vertices that apply to both of the extended-source rupture
+objects:</p>
+<ul class="simple">
+<li>Vertices must start on the top edge of the rupture.</li>
+<li>The top and bottom edges must contain the same number of vertices.</li>
+<li>The first and last points must be identical to close the polygon, and this
+means that there must always be an odd number of vertices.</li>
+<li>The top edge of the rupture must always be above the bottom edge.</li>
+</ul>
+<p>In cross section, a single-segment multiple-quadrilateral rupture might look
+schematically like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="n">_</span><span class="o">.-</span><span class="n">P1</span><span class="o">-.</span><span class="n">_</span>
+<span class="n">P0</span><span class="s1">&#39;        &#39;</span><span class="n">P2</span><span class="o">---</span><span class="n">P3</span>
+<span class="o">|</span>                  \
+<span class="n">P7</span><span class="o">---</span><span class="n">P6</span><span class="o">----</span><span class="n">P5</span><span class="o">-------</span><span class="n">P4</span>
+</pre></div>
+</div>
+<p>An <cite>EdgeRupture</cite> does not have any additional constraints beyond those already
+described. This rupture would be initialized as an <cite>EdgeRupture</cite> because P1 causes
+the top edges of two of the constituent quadrilaterals to not be horizontal, which
+is a requirement for the <cite>QuadRupture</cite> class.</p>
+<p>A <cite>QuadRupture</cite> consists of one or more quadrilaterals that can be grouped
+into segments. The distance calculations are faster for a <cite>QuadRupture</cite> than
+and <cite>EdgeRupture</cite>. The additional requirements for the vertices of a <cite>QuadRupture</cite>
+are:</p>
+<ul class="simple">
+<li>The top and bottom edges of each quadrilateral are horizontal. In the example
+there are three quadrilateriasl: P0-P1-P6-P7, P1-P2-P5-P6, P2-P3-P4-P5. Of those,
+only the last one fulfills this criteria.</li>
+<li>The four points that define each quadrilateral must be approximately co-planar.</li>
+</ul>
+<p>In ShakeMap version 3, ruptures were specified in a <cite>*_fault.txt</cite> file format. We
+still support this format for backwards compatibility but we prefer to use the
+GeoJSON format described below. Eventually we will stop support for the older
+<cite>*_fault.txt</cite> file format.</p>
+</div>
 <div class="section" id="rupture-geojson-file">
-<h2>2.6.6. Rupture GeoJson File<a class="headerlink" href="#rupture-geojson-file" title="Permalink to this headline">¶</a></h2>
+<h2>2.6.7. Rupture GeoJson File<a class="headerlink" href="#rupture-geojson-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>optional</em>.</p>
-<p>Rupture (also known as finite fault) files are defined in ShakeMap 4
+<p>Rupture (also referred to as “finite fault”) files are defined in ShakeMap 4
 as GeoJSON files, a standard format for representing geospatial
-data. This format is described in great detail here: <a class="reference external" href="https://tools.ietf.org/html/rfc7946">https://tools.ietf.org/html/rfc7946</a></p>
+data. This format is described in great detail here:
+<a class="reference external" href="https://tools.ietf.org/html/rfc7946">https://tools.ietf.org/html/rfc7946</a></p>
 <p>The rupture format consists of a <em>FeatureCollection</em>, containing one
 to many Features. The FeatureCollection should contain a dictionary
-called <em>metadata</em>, which consists of the following fields:</p>
+called <em>metadata</em>, which contains of the following fields:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="29%" />
@@ -635,42 +687,26 @@ YYYY-MM-DDTHH:MM:SSZ format.</td>
 <td>Source for rupture information.</td>
 </tr>
 <tr class="row-even"><td>mech</td>
-<td>(optional) Focal mechanism, one of “RS”, “SS”,
+<td>Focal mechanism, one of “RS”, “SS”,
 “NM”, or “ALL”.</td>
 </tr>
 </tbody>
 </table>
-<p>Each Feature should contain either a <em>Point</em> or <em>MultiPolygon</em>
-geometry. When the geometry is a MultiPolygon, each sub-polygon in the
-MultiPolygon must adhere to the following rules:</p>
-<ol class="arabic simple">
-<li>Each vertex should contain longitude, latitude <em>and</em> depth coordinates.</li>
-<li>The vertices of the top edge are always defined first.</li>
-<li>There must be the same number of vertices on top and bottom edges.</li>
-<li>Last vertex must be the same as the first (polygon must be closed.)</li>
-</ol>
-<p>While this is not required, if the top and bottom edges of each
-sub-polygon are horizontal, the distance calculations are much faster.</p>
+<p>Note that the only <em>required</em> field for specifying a rupture is <em>reference</em> and
+that the other fields are merged with origin information and are included when
+this file is output after running ShakeMap.</p>
+<p>Each Feature must contain either a <em>Point</em> or <em>MultiPolygon</em>
+geometry. Note that there is usually no reason to use the <em>Point</em> Feature type
+when specifying a rupture, but the output rupture file is a <em>Point</em> type for
+<cite>PointRupture</cite> object.</p>
 <p>The file should be named <em>rupture.json</em> and placed in the event’s
-<em>current</em> directory. A sample file is below:</p>
+<em>current</em> directory. Here is a single-segment single-quadrilaterial example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
   <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;netid&quot;</span><span class="p">:</span> <span class="s2">&quot;ci&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;lon&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">118.537</span><span class="p">,</span>
-    <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">34.213</span><span class="p">,</span>
-    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot; Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="mf">18.202</span><span class="p">,</span>
-    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;1994-01-17T12:30:55.390000Z&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;locstring&quot;</span><span class="p">:</span> <span class="s2">&quot;1km NNW of Reseda, CA&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mag&quot;</span><span class="p">:</span> <span class="mf">6.7</span><span class="p">,</span>
-    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;ci3144585&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mech&quot;</span><span class="p">:</span> <span class="s2">&quot;ALL&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;rake&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-    <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="s2">&quot;California Integrated Seismic Network: Southern California Seismic Network (Caltech, USGS Pasadena, and Partners)&quot;</span>
+    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.&quot;</span>
   <span class="p">},</span>
-  <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span>
+  <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[{</span>
       <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
       <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;rupture type&quot;</span><span class="p">:</span> <span class="s2">&quot;rupture extent&quot;</span>
@@ -678,45 +714,112 @@ sub-polygon are horizontal, the distance calculations are much faster.</p>
       <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;MultiPolygon&quot;</span><span class="p">,</span>
         <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">[</span>
+          <span class="p">[</span>
             <span class="p">[</span>
-              <span class="p">[</span>
-                <span class="o">-</span><span class="mf">118.421</span><span class="p">,</span>
-                <span class="mf">34.315</span><span class="p">,</span>
-                <span class="mf">5.0</span>
-              <span class="p">],</span>
-              <span class="p">[</span>
-                <span class="o">-</span><span class="mf">118.587</span><span class="p">,</span>
-                <span class="mf">34.401</span><span class="p">,</span>
-                <span class="mf">5.0</span>
-              <span class="p">],</span>
-              <span class="p">[</span>
-                <span class="o">-</span><span class="mf">118.693</span><span class="p">,</span>
-                <span class="mf">34.261</span><span class="p">,</span>
-                <span class="mf">20.427</span>
-              <span class="p">],</span>
-              <span class="p">[</span>
-                <span class="o">-</span><span class="mf">118.527</span><span class="p">,</span>
-                <span class="mf">34.175</span><span class="p">,</span>
-                <span class="mf">20.427</span>
-              <span class="p">],</span>
-              <span class="p">[</span>
-                <span class="o">-</span><span class="mf">118.421</span><span class="p">,</span>
-                <span class="mf">34.315</span><span class="p">,</span>
-                <span class="mf">5.0</span>
-              <span class="p">]</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">118.421</span><span class="p">,</span> <span class="mf">34.315</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">118.587</span><span class="p">,</span> <span class="mf">34.401</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">118.693</span><span class="p">,</span> <span class="mf">34.261</span><span class="p">,</span> <span class="mf">20.427</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">118.527</span><span class="p">,</span> <span class="mf">34.175</span><span class="p">,</span> <span class="mf">20.427</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">118.421</span><span class="p">,</span> <span class="mf">34.315</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">]</span>
             <span class="p">]</span>
           <span class="p">]</span>
         <span class="p">]</span>
       <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here is a single-segment multi-quadrilaterial example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;Konca, A. O, Hjorleifsdottir, V., Song, T. A., Avouac, J., Helmberger, D., Ji, C., Sieh, K., Briggs, R., and A. Meltzner. Rupture Kinematics of the 2005 Mw 8.6 Nias-Simeulue Earthquake from the Joint Inversion of Seismic and Geodetic Data (2007). BSSA Vol. 97, No. 1A, pp. S307-S322, January 2007, doi: 10.1785/0120050632.&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;rupture type&quot;</span><span class="p">:</span> <span class="s2">&quot;rupture extent&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;MultiPolygon&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="p">[</span>
+            <span class="p">[</span>
+              <span class="p">[</span><span class="mf">97.8322</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0442476</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">96.5212</span><span class="p">,</span> <span class="mf">0.897694</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">95.9014</span><span class="p">,</span> <span class="mf">2.57177</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">96.9539</span><span class="p">,</span> <span class="mf">3.18268</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">98.1601</span><span class="p">,</span> <span class="mf">1.89031</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">98.7634</span><span class="p">,</span> <span class="mf">1.09946</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">97.8322</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0442476</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+            <span class="p">]</span>
+          <span class="p">]</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here is a multi-segment example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;Oglesby, D. D., D. S. Dreger, R. A. Harris, N. Ratchkovski, and R. Hansen (2004). Inverse kinematic and forward dynamic models of the 2002 Denali fault earthquake, Alaska, Bull. Seism. Soc. Am. 94, S214-S233.&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;rupture type&quot;</span><span class="p">:</span> <span class="s2">&quot;rupture extent&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;MultiPolygon&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;coordinates&quot;</span><span class="p">:[</span>
+          <span class="p">[</span>
+            <span class="p">[</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">147.807</span><span class="p">,</span> <span class="mf">63.434</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">147.21</span><span class="p">,</span> <span class="mf">63.472</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">147.267</span><span class="p">,</span> <span class="mf">63.65</span><span class="p">,</span> <span class="mf">22.294</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">147.864</span><span class="p">,</span> <span class="mf">63.613</span><span class="p">,</span> <span class="mf">22.294</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">147.807</span><span class="p">,</span> <span class="mf">63.434</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">146.951</span><span class="p">,</span> <span class="mf">63.551</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">147.551</span><span class="p">,</span> <span class="mf">63.518</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">147.551</span><span class="p">,</span> <span class="mf">63.518</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">146.951</span><span class="p">,</span> <span class="mf">63.551</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">146.951</span><span class="p">,</span> <span class="mf">63.551</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">145.968</span><span class="p">,</span> <span class="mf">63.453</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">146.952</span><span class="p">,</span> <span class="mf">63.547</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">146.952</span><span class="p">,</span> <span class="mf">63.547</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">145.968</span><span class="p">,</span> <span class="mf">63.453</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">145.968</span><span class="p">,</span> <span class="mf">63.453</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">143.586</span><span class="p">,</span> <span class="mf">62.872</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">145.996</span><span class="p">,</span> <span class="mf">63.427</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">145.996</span><span class="p">,</span> <span class="mf">63.427</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">143.586</span><span class="p">,</span> <span class="mf">62.872</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">143.586</span><span class="p">,</span> <span class="mf">62.872</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">142.5</span><span class="p">,</span> <span class="mf">62.114</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">143.669</span><span class="p">,</span> <span class="mf">62.831</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">143.669</span><span class="p">,</span> <span class="mf">62.831</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">142.5</span><span class="p">,</span> <span class="mf">62.114</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mf">142.5</span><span class="p">,</span> <span class="mf">62.114</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+            <span class="p">]</span>
+          <span class="p">]</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+  <span class="p">}]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="generic-amplification-factors">
-<h2>2.6.7. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
+<h2>2.6.8. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
 <p>The ShakeMap generic amplification factor facility supports the inclusion
 of linear amplifications that are not otherwise supported (by, for example,
 Vs30-based
@@ -842,8 +945,9 @@ provided. Etc.</p>
 <li class="toctree-l6"><a class="reference internal" href="#shakemap-xml-data-file">2.6.3. ShakeMap XML Data File</a></li>
 <li class="toctree-l6"><a class="reference internal" href="#shakemap-json-data-file">2.6.4. ShakeMap JSON Data File</a></li>
 <li class="toctree-l6"><a class="reference internal" href="#source-text-file">2.6.5. Source Text File</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#rupture-geojson-file">2.6.6. Rupture GeoJson File</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#generic-amplification-factors">2.6.7. Generic Amplification Factors</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#rupture-specification">2.6.6. Rupture Specification</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#rupture-geojson-file">2.6.7. Rupture GeoJson File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#generic-amplification-factors">2.6.8. Generic Amplification Factors</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="tg_output_formats.html">2.7. Output Data Formats</a></li>

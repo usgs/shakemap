@@ -481,18 +481,74 @@ parameters may also be set: eid, location, time, lat, lon, depth, mag,
 etc.. Blank lines and lines beginning with ‘#’ (i.e., comments) are
 ignored.
 
+
+Rupture Specification
+=====================
+There are three classes of rupture objects:
+
+- `PointRupture`
+- `QuadRupture`
+- `EdgeRupture`
+  
+A `PointRupture` is just a point representation of the earthquake and
+is generated from the origin and so no additional specification is
+required. In this case, distance calculations use approximate adjustments
+to convert from epicentral distance to finite distances based on the
+earthquake magnitude.
+
+There are two extended-source rupture objects: a `QuadRupture` and an
+`EdgeRupture`. There are some general rules for the specification of the
+rupture vertices that apply to both of the extended-source rupture
+objects:
+
+- Vertices must start on the top edge of the rupture.
+- The top and bottom edges must contain the same number of vertices.
+- The first and last points must be identical to close the polygon, and this
+  means that there must always be an odd number of vertices.
+- The top edge of the rupture must always be above the bottom edge.
+
+
+In cross section, a single-segment multiple-quadrilateral rupture might look
+schematically like this::
+
+       _.-P1-._
+    P0'        'P2---P3
+    |                  \
+    P7---P6----P5-------P4
+
+An `EdgeRupture` does not have any additional constraints beyond those already
+described. This rupture would be initialized as an `EdgeRupture` because P1 causes
+the top edges of two of the constituent quadrilaterals to not be horizontal, which
+is a requirement for the `QuadRupture` class.
+
+A `QuadRupture` consists of one or more quadrilaterals that can be grouped
+into segments. The distance calculations are faster for a `QuadRupture` than
+and `EdgeRupture`. The additional requirements for the vertices of a `QuadRupture`
+are:
+
+- The top and bottom edges of each quadrilateral are horizontal. In the example
+  there are three quadrilateriasl: P0-P1-P6-P7, P1-P2-P5-P6, P2-P3-P4-P5. Of those,
+  only the last one fulfills this criteria.
+- The four points that define each quadrilateral must be approximately co-planar.
+
+In ShakeMap version 3, ruptures were specified in a `*_fault.txt` file format. We
+still support this format for backwards compatibility but we prefer to use the
+GeoJSON format described below. Eventually we will stop support for the older
+`*_fault.txt` file format.
+
 Rupture GeoJson File
 ====================
 
 This file is *optional*.
 
-Rupture (also known as finite fault) files are defined in ShakeMap 4
+Rupture (also referred to as "finite fault") files are defined in ShakeMap 4
 as GeoJSON files, a standard format for representing geospatial
-data. This format is described in great detail here: https://tools.ietf.org/html/rfc7946
+data. This format is described in great detail here:
+https://tools.ietf.org/html/rfc7946
 
 The rupture format consists of a *FeatureCollection*, containing one
 to many Features. The FeatureCollection should contain a dictionary
-called *metadata*, which consists of the following fields:
+called *metadata*, which contains of the following fields:
 
 +-----------------------+-------------------------------------------------------+
 | Field                 | Description                                           |
@@ -520,43 +576,29 @@ called *metadata*, which consists of the following fields:
 +-----------------------+-------------------------------------------------------+
 | reference             | Source for rupture information.                       |
 +-----------------------+-------------------------------------------------------+
-| mech                  | (optional) Focal mechanism, one of "RS", "SS",        |
+| mech                  | Focal mechanism, one of "RS", "SS",                   |
 |                       | "NM", or "ALL".                                       |
 +-----------------------+-------------------------------------------------------+
 
-Each Feature should contain either a *Point* or *MultiPolygon*
-geometry. When the geometry is a MultiPolygon, each sub-polygon in the
-MultiPolygon must adhere to the following rules:
+Note that the only *required* field for specifying a rupture is *reference* and
+that the other fields are merged with origin information and are included when
+this file is output after running ShakeMap.
 
-1. Each vertex should contain longitude, latitude *and* depth coordinates.
-2. The vertices of the top edge are always defined first.
-3. There must be the same number of vertices on top and bottom edges.
-4. Last vertex must be the same as the first (polygon must be closed.)
+Each Feature must contain either a *Point* or *MultiPolygon*
+geometry. Note that there is usually no reason to use the *Point* Feature type
+when specifying a rupture, but the output rupture file is a *Point* type for
+`PointRupture` object. 
 
-While this is not required, if the top and bottom edges of each
-sub-polygon are horizontal, the distance calculations are much faster.
-   
+
 The file should be named *rupture.json* and placed in the event's
-*current* directory. A sample file is below::
+*current* directory. Here is a single-segment single-quadrilaterial example::
 
   {
     "type": "FeatureCollection",
     "metadata": {
-      "netid": "ci",
-      "lon": -118.537,
-      "lat": 34.213,
-      "reference": " Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.",
-      "depth": 18.202,
-      "time": "1994-01-17T12:30:55.390000Z",
-      "locstring": "1km NNW of Reseda, CA",
-      "mag": 6.7,
-      "id": "ci3144585",
-      "mech": "ALL",
-      "rake": 0.0,
-      "network": "California Integrated Seismic Network: Southern California Seismic Network (Caltech, USGS Pasadena, and Partners)"
+      "reference": "Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70."
     },
-    "features": [
-      {
+    "features": [{
         "type": "Feature",
         "properties": {
           "rupture type": "rupture extent"
@@ -564,43 +606,109 @@ The file should be named *rupture.json* and placed in the event's
         "geometry": {
           "type": "MultiPolygon",
           "coordinates": [
-          [
+            [
               [
-                [
-                  -118.421,
-                  34.315,
-                  5.0
-                ],
-                [
-                  -118.587,
-                  34.401,
-                  5.0
-                ],
-                [
-                  -118.693,
-                  34.261,
-                  20.427
-                ],
-                [
-                  -118.527,
-                  34.175,
-                  20.427
-                ],
-                [
-                  -118.421,
-                  34.315,
-                  5.0
-                ]
+                [-118.421, 34.315, 5.0],
+                [-118.587, 34.401, 5.0],
+                [-118.693, 34.261, 20.427],
+                [-118.527, 34.175, 20.427],
+                [-118.421, 34.315, 5.0]
               ]
             ]
           ]
         }
-      }
-    ]
+    }]
   }
 
+Here is a single-segment multi-quadrilaterial example::
 
+    {
+      "type": "FeatureCollection",
+      "metadata": {
+        "reference": "Konca, A. O, Hjorleifsdottir, V., Song, T. A., Avouac, J., Helmberger, D., Ji, C., Sieh, K., Briggs, R., and A. Meltzner. Rupture Kinematics of the 2005 Mw 8.6 Nias-Simeulue Earthquake from the Joint Inversion of Seismic and Geodetic Data (2007). BSSA Vol. 97, No. 1A, pp. S307-S322, January 2007, doi: 10.1785/0120050632."
+      },
+      "features": [{
+          "type": "Feature",
+          "properties": {
+            "rupture type": "rupture extent"
+          },
+          "geometry": {
+            "type": "MultiPolygon",
+            "coordinates": [
+              [
+                [
+                  [97.8322, -0.0442476, 10],
+                  [96.5212, 0.897694, 10],
+                  [95.9014, 2.57177, 10],
+                  [96.9539, 3.18268, 40],
+                  [98.1601, 1.89031, 40],
+                  [98.7634, 1.09946, 40],
+                  [97.8322, -0.0442476, 10]
+		]
+              ]
+            ]
+          }
+      }]
+    }
 
+Here is a multi-segment example::
+
+    {
+      "type": "FeatureCollection",
+      "metadata": {
+        "reference": "Oglesby, D. D., D. S. Dreger, R. A. Harris, N. Ratchkovski, and R. Hansen (2004). Inverse kinematic and forward dynamic models of the 2002 Denali fault earthquake, Alaska, Bull. Seism. Soc. Am. 94, S214-S233."
+      },
+      "features": [{
+          "type": "Feature",
+          "properties": {
+            "rupture type": "rupture extent"
+          },
+          "geometry": {
+            "type": "MultiPolygon",
+            "coordinates":[
+              [
+                [
+                  [-147.807, 63.434, 0.0],
+                  [-147.21, 63.472, 0.0],
+                  [-147.267, 63.65, 22.294],
+                  [-147.864, 63.613, 22.294],
+                  [-147.807, 63.434, 0.0]
+                ],
+                [
+                  [-146.951, 63.551, 0.0],
+                  [-147.551, 63.518, 0.0],
+                  [-147.551, 63.518, 30.0],
+                  [-146.951, 63.551, 30.0],
+                  [-146.951, 63.551, 0.0]
+                ],
+                [
+                  [-145.968, 63.453, 0.0],
+                  [-146.952, 63.547, 0.0],
+                  [-146.952, 63.547, 30.0],
+                  [-145.968, 63.453, 30.0],
+                  [-145.968, 63.453, 0.0]
+                ],
+                [
+                  [-143.586, 62.872, 0.0],
+                  [-145.996, 63.427, 0.0],
+                  [-145.996, 63.427, 30.0],
+                  [-143.586, 62.872, 30.0],
+                  [-143.586, 62.872, 0.0]
+                ],
+                [
+                  [-142.5, 62.114, 0.0],
+                  [-143.669, 62.831, 0.0],
+                  [-143.669, 62.831, 30.0],
+                  [-142.5, 62.114, 30.0],
+                  [-142.5, 62.114, 0.0]
+                ]
+              ]
+            ]
+          }
+      }]
+    }
+
+    
 Generic Amplification Factors
 =============================
 

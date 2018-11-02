@@ -39,6 +39,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 
 <span class="c1"># third party imports</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 
 <span class="c1"># local imports</span>
@@ -86,10 +87,18 @@
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
-        <span class="c1"># create ShakeMap metadata file</span>
+        <span class="c1"># Create ShakeMap metadata file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Writing info.json file...&#39;</span><span class="p">)</span>
         <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
-        <span class="n">infostring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+        <span class="c1"># Clean up strec results to be valid json</span>
+        <span class="k">if</span> <span class="s1">&#39;strec&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;strec&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;strec&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">infostring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">info_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">info_file</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">infostring</span><span class="p">)</span>

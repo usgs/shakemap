@@ -148,10 +148,10 @@ S214-S233.'''
 def test_rupture_from_dict():
 
     # Grab an EdgeRupture
-    origin = Origin({'id': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
-                     'network': '', 'locstring': '',
-                     'time': HistoricTime.utcfromtimestamp(time.time())})
+    origin = Origin({'id': 'test', 'lat': 0, 'lon': 0, 'depth': 5.0,
+                     'mag': 7.0, 'netid': 'us', 'network': '',
+                     'locstring': '', 'time':
+                     HistoricTime.utcfromtimestamp(time.time())})
 
     file = os.path.join(homedir, 'rupture_data/cascadia.json')
     rup_original = get_rupture(origin, file)
