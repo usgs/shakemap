@@ -44,6 +44,7 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">date</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
@@ -77,6 +78,7 @@
 <span class="kn">from</span> <span class="nn">shakemap.c.clib</span> <span class="k">import</span> <span class="p">(</span><span class="n">make_sigma_matrix</span><span class="p">,</span>
                              <span class="n">geodetic_distance_fast</span><span class="p">,</span>
                              <span class="n">make_sd_array</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.exception</span> <span class="k">import</span> <span class="n">TerminateShakeMap</span>
 
 <span class="kn">from</span> <span class="nn">shakelib.directivity.rowshandel2013</span> <span class="k">import</span> <span class="n">Rowshandel2013</span>
 
@@ -191,6 +193,10 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Setting output params...&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setOutputParams</span><span class="p">()</span>
+
+        <span class="n">landmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getLandMask</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">landmask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">landmask</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">TerminateShakeMap</span><span class="p">(</span><span class="s2">&quot;Mapped area is entirely water&quot;</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># If the gmpe doesn&#39;t break down its stardard deviation into</span>
@@ -352,7 +358,7 @@
         <span class="c1"># We&#39;re going to need masked arrays of the output grids later, so</span>
         <span class="c1"># make them now.</span>
         <span class="c1">#</span>
-        <span class="n">moutgrid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getMaskedGrids</span><span class="p">()</span>
+        <span class="n">moutgrid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getMaskedGrids</span><span class="p">(</span><span class="n">landmask</span><span class="p">)</span>
 
         <span class="c1">#</span>
         <span class="c1"># Get the info dictionary that will become info.json, and</span>
@@ -440,10 +446,12 @@
         <span class="c1"># Processing parameters</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_workers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;max_workers&#39;</span><span class="p">]</span>
+
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Do we apply the generic amplification factors?</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;apply_generic_amp_factors&#39;</span><span class="p">]</span>
+
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Bias parameters</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
@@ -452,6 +460,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bias_max_mag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;bias&#39;</span><span class="p">][</span><span class="s1">&#39;max_mag&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bias_max_dsigma</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;bias&#39;</span><span class="p">][</span><span class="s1">&#39;max_delta_sigma&#39;</span><span class="p">]</span>
+
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Outlier parameters</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
@@ -459,15 +468,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">outlier_deviation_level</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;outlier&#39;</span><span class="p">][</span><span class="s1">&#39;max_deviation&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outlier_max_mag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;outlier&#39;</span><span class="p">][</span><span class="s1">&#39;max_mag&#39;</span><span class="p">]</span>
+
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># These are the IMTs we want to make</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">imt_out_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;imt_list&#39;</span><span class="p">])</span>
+
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># The x and y resolution of the output grid</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;xres&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;yres&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;nmax&#39;</span><span class="p">]</span>
+
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Get the Vs30 file name</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
@@ -546,6 +559,9 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="p">,</span>
                     <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span>
                 <span class="p">)</span>
+
+            <span class="c1"># Adjust resolution to be under nmax</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_adjustResolution</span><span class="p">()</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">fromBounds</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
@@ -773,7 +789,10 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">iterlist</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">period</span> <span class="ow">in</span> <span class="n">iterlist</span><span class="p">:</span>
-                <span class="n">oqimt</span> <span class="o">=</span> <span class="n">gmice_imt</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">period</span><span class="p">:</span>
+                    <span class="n">oqimt</span> <span class="o">=</span> <span class="n">gmice_imt</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">oqimt</span> <span class="o">=</span> <span class="n">gmice_imt</span><span class="p">()</span>
                 <span class="n">imtstr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="p">)</span>
 
                 <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
@@ -1258,7 +1277,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;total time for </span><span class="si">%s</span><span class="s1">=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time1</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_getMaskedGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_getLandMask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the landmask for this map. Land will be False, water will</span>
+<span class="sd">        be True (because of the way masked arrays work).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grid</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">gd</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromBox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">)</span>
+        <span class="n">maskfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;landmask&#39;</span><span class="p">,</span> <span class="s1">&#39;landmask_nb.grd&#39;</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mapio</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">maskfile</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">gd</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">doPadding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">padValue</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">bmask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">bmask</span>
+
+    <span class="k">def</span> <span class="nf">_getMaskedGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bmask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For each grid in the output, generate a grid with the water areas</span>
 <span class="sd">        masked out.</span>
@@ -1268,13 +1303,6 @@
             <span class="k">for</span> <span class="n">imtout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">imt_out_set</span><span class="p">:</span>
                 <span class="n">moutgrid</span><span class="p">[</span><span class="n">imtout</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="p">[</span><span class="n">imtout</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">moutgrid</span>
-        <span class="n">gd</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromBox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span>
-                                       <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">)</span>
-        <span class="n">maskfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;landmask&#39;</span><span class="p">,</span> <span class="s1">&#39;landmask_nb.grd&#39;</span><span class="p">)</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">mapio</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">maskfile</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">gd</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                 <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">doPadding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                 <span class="n">padValue</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">bmask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">imtout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">imt_out_set</span><span class="p">:</span>
             <span class="n">moutgrid</span><span class="p">[</span><span class="n">imtout</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="p">[</span><span class="n">imtout</span><span class="p">],</span> <span class="n">mask</span><span class="o">=</span><span class="n">bmask</span><span class="p">)</span>
@@ -1292,6 +1320,7 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># This is the metadata for creating info.json</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="s1">&#39;strec&#39;</span>
         <span class="n">ip</span> <span class="o">=</span> <span class="s1">&#39;input&#39;</span>
         <span class="n">ei</span> <span class="o">=</span> <span class="s1">&#39;event_information&#39;</span>
         <span class="n">op</span> <span class="o">=</span> <span class="s1">&#39;output&#39;</span>
@@ -1308,6 +1337,14 @@
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">hypo_depth</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span>
+
+        <span class="c1"># look for the presence of a strec_results file and read it in</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">)</span>
+        <span class="n">strecfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;strec_results.json&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">strecfile</span><span class="p">):</span>
+            <span class="n">strec_results</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">strecfile</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">))</span>
+            <span class="n">info</span><span class="p">[</span><span class="n">st</span><span class="p">]</span> <span class="o">=</span> <span class="n">strec_results</span>
 
         <span class="c1"># the following items are primarily useful for PDL</span>
         <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span>
@@ -1993,7 +2030,59 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">mean</span> <span class="o">+=</span> <span class="n">fd</span>
 
-        <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span></div>
+        <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span>
+
+    <span class="k">def</span> <span class="nf">_adjustResolution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a helper function to adjust the resolution to be under</span>
+<span class="sd">        the maximum value specified in the config.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># We want to only use resolutions that are multiples of 1 minute or</span>
+        <span class="c1"># an integer division of 1 minute.</span>
+        <span class="n">one_minute</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">60</span>
+        <span class="n">multiples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+        <span class="n">divisions</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">multiples</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">divisions</span><span class="p">,</span> <span class="n">multiples</span><span class="p">))))</span>
+        <span class="n">ok_res</span> <span class="o">=</span> <span class="n">one_minute</span> <span class="o">*</span> <span class="n">factors</span>
+        <span class="n">latspan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span>
+
+        <span class="c1"># Deal with possible 180 longitude disontinuity</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">:</span>
+            <span class="n">lonspan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">+</span> <span class="mi">360</span>
+            <span class="n">lonspan</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span>
+        <span class="n">nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">lonspan</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">ny</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">latspan</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">ngrid</span> <span class="o">=</span> <span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span>
+        <span class="n">nmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmax</span>
+        <span class="k">if</span> <span class="n">ngrid</span> <span class="o">&gt;</span> <span class="n">nmax</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Extent and resolution of shakemap results in &#39;</span>
+                             <span class="s1">&#39;too many grid points. Adjusting resolution...&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Longitude span: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">lonspan</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Latitude span: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">latspan</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Current dx: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Current dy: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Current number of grid points: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ngrid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Max grid points allowed: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">nmax</span><span class="p">)</span>
+            <span class="n">target_res</span> <span class="o">=</span> \
+                <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">latspan</span> <span class="o">+</span> <span class="n">lonspan</span><span class="p">)</span> <span class="o">-</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">latspan</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">lonspan</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                         <span class="mi">2</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">*</span>
+                         <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">nmax</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">nmax</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">ok_res</span> <span class="o">&gt;</span> <span class="n">target_res</span><span class="p">):</span>
+                <span class="n">sel_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ok_res</span><span class="p">[</span><span class="n">ok_res</span> <span class="o">&gt;</span> <span class="n">target_res</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sel_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ok_res</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span> <span class="o">=</span> <span class="n">sel_res</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span> <span class="o">=</span> <span class="n">sel_res</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updated dx: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updatd dy: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">)</span>
+            <span class="n">nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">lonspan</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">ny</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">latspan</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updated number of grid points: </span><span class="si">%i</span><span class="s1">&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span><span class="p">))</span></div>
 
 
 <span class="k">def</span> <span class="nf">_round_float</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">digits</span><span class="p">):</span>

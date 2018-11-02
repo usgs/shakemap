@@ -37,6 +37,32 @@
   <div class="section" id="module-shakelib.utils.utils">
 <span id="shakelib-utils-utils"></span><h1>shakelib.utils.utils<a class="headerlink" href="#module-shakelib.utils.utils" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
+<dt id="shakelib.utils.utils.replace_dyfi">
+<code class="descclassname">shakelib.utils.utils.</code><code class="descname">replace_dyfi</code><span class="sig-paren">(</span><em>stationfile</em>, <em>dyfi_xml</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#replace_dyfi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.replace_dyfi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove any non-instrumented data from station file, add DYFI.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stationfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Existing station data file, presumed to
+contain old DYFI data.</li>
+<li><strong>dyfi_xml</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – DYFI XML data file, which will be added to
+instrumented station data.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Object containing merged data.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="shakelib.station.html#shakelib.station.StationList" title="shakelib.station.StationList">StationList</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="shakelib.utils.utils.get_extent">
 <code class="descclassname">shakelib.utils.utils.</code><code class="descname">get_extent</code><span class="sig-paren">(</span><em>rupture=None</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#get_extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.get_extent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to compute map extent from rupture. There are numerous methods for
@@ -49,7 +75,7 @@ file, or</li>
 <li>it can be based on the MultiGMPE for the event.</li>
 </ul>
 </div></blockquote>
-<p>All methods excetp for the first requires a rupture object.</p>
+<p>All methods except for the first requires a rupture object.</p>
 <p>If no config is provided then a rupture is required and the extent is based
 on a generic set of active/stable.</p>
 <table class="docutils field-list" frame="void" rules="none">

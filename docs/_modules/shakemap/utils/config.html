@@ -39,6 +39,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 
 <span class="c1"># third party libraries</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -173,6 +174,8 @@
         <span class="s1">&#39;file_type&#39;</span><span class="p">:</span> <span class="n">file_type</span><span class="p">,</span>
         <span class="s1">&#39;directory_type&#39;</span><span class="p">:</span> <span class="n">directory_type</span><span class="p">,</span>
         <span class="s1">&#39;annotatedfloat_type&#39;</span><span class="p">:</span> <span class="n">annotatedfloat_type</span><span class="p">,</span>
+        <span class="s1">&#39;nanfloat_type&#39;</span><span class="p">:</span> <span class="n">nanfloat_type</span><span class="p">,</span>
+        <span class="s1">&#39;nanfloat_list&#39;</span><span class="p">:</span> <span class="n">nanfloat_list</span><span class="p">,</span>
         <span class="s1">&#39;gmpe_list&#39;</span><span class="p">:</span> <span class="n">gmpe_list</span><span class="p">,</span>
         <span class="s1">&#39;weight_list&#39;</span><span class="p">:</span> <span class="n">weight_list</span><span class="p">,</span>
         <span class="s1">&#39;extent_list&#39;</span><span class="p">:</span> <span class="n">extent_list</span><span class="p">,</span>
@@ -246,6 +249,51 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: ccf </span><span class="si">%s</span><span class="s1"> not in ccf_modules&#39;</span> <span class="o">%</span>
                      <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="check_all_configs"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_all_configs">[docs]</a><span class="k">def</span> <span class="nf">check_all_configs</span><span class="p">(</span><span class="n">configdir</span><span class="p">):</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_data_path</span><span class="p">()</span>
+    <span class="n">specfiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="s1">&#39;*spec*.conf&#39;</span><span class="p">))</span>
+    <span class="n">missing_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">issues</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">exceptions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">tspecfile</span> <span class="ow">in</span> <span class="n">specfiles</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">specfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tspecfile</span><span class="p">)</span>
+        <span class="n">configfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">configdir</span><span class="p">,</span> <span class="n">specfile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;spec&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">configfile</span><span class="p">):</span>
+            <span class="n">missing_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">configfile</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">configfile</span><span class="p">,</span> <span class="n">configspec</span><span class="o">=</span><span class="n">tspecfile</span><span class="p">,</span>
+                           <span class="n">interpolation</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">preserve_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">exceptions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="c1"># results = flatten_errors(config, results)</span>
+            <span class="n">issues</span><span class="p">[</span><span class="n">specfile</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">missing_files</span><span class="p">,</span> <span class="n">issues</span><span class="p">,</span> <span class="n">exceptions</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="nanfloat_type"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.nanfloat_type">[docs]</a><span class="k">def</span> <span class="nf">nanfloat_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks to see if value is a float, or NaN, nan, Inf, -Inf, etc.</span>
+<span class="sd">    Raises a ValidateError exception on failure.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (str): A string representing a float NaN or Inf.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The input value converted to its float equivalent.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="annotatedfloat_type"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.annotatedfloat_type">[docs]</a><span class="k">def</span> <span class="nf">annotatedfloat_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -332,6 +380,39 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;weights must sum to 1.0: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
 
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="nanfloat_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.nanfloat_list">[docs]</a><span class="k">def</span> <span class="nf">nanfloat_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks to see if value is a list of floats, including NaN and Inf.</span>
+<span class="sd">    Raises a ValidateError exception on failure.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (str): A string representing a list of floats.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: The input string converted to a list of floats.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;[]&#39;</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;extent list must contain </span><span class="si">%i</span><span class="s2"> entries&quot;</span> <span class="o">%</span> <span class="nb">min</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a list of </span><span class="si">%i</span><span class="s2"> floats&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
