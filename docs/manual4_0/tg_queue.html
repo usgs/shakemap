@@ -38,11 +38,11 @@
 <span id="sec-queue-4"></span><h1>2.4. Queueing Events<a class="headerlink" href="#queueing-events" title="Permalink to this headline">¶</a></h1>
 <p>Many regional operators will require an automated method of
 triggering ShakeMap runs. Shakemap v4 provides a flexible mechanism
-for filtering events and initiating runs via the <strong>sm_queue</strong>
-program. <strong>sm_queue</strong> may be initiated via an init script (see
-<strong>init.sh</strong> in the <em>contrib</em> directory, for example) which can
+for filtering events and initiating runs via the <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>
+program. <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> may be initiated via an init script (see
+<code class="docutils literal notranslate"><span class="pre">init.sh</span></code> in the <code class="docutils literal notranslate"><span class="pre">contrib</span></code> directory, for example) which can
 started by a system startup script, or maintained by crontab.</p>
-<p><strong>sm_queue</strong> waits on a socket for messages from an external
+<p><code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> waits on a socket for messages from an external
 process or database. The messages – serialized JSON – may be
 of several types, and when received from a trusted source,
 instruct the queue to take certain actions: rerun the event,
@@ -106,22 +106,22 @@ informmation. Here is an example of an origin-type dictionary:</p>
 <p>For all “type” values other than “origin”, the “data” dictionary
 need only specify the “id” key and its value. The “origin” type
 will be treated as a new or updated origin, and will trigger a
-run of <strong>shake</strong> subject to the rules described below. The
-“cancel” type will will run <strong>shake</strong> with the <strong>cancel</strong> module
-(assuming that there has been a previous run of <strong>shake</strong> for that
+run of <code class="docutils literal notranslate"><span class="pre">shake</span></code> subject to the rules described below. The
+“cancel” type will will run <code class="docutils literal notranslate"><span class="pre">shake</span></code> with the <code class="docutils literal notranslate"><span class="pre">cancel</span></code> module
+(assuming that there has been a previous run of <code class="docutils literal notranslate"><span class="pre">shake</span></code> for that
 event). The “test” type will print a message and take no further
 action. All other values of “type” will be treated as if something
-has changed for that event, and <strong>sm_queue</strong> should consider rerunning
+has changed for that event, and <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> should consider rerunning
 the event subject to the same rules as an updated origin. The “type”
 of the trigger will be printed in the log.</p>
 <p>The library module <code class="docutils literal notranslate"><span class="pre">shakemap.utils.queue</span></code> provides a helper function
 <code class="docutils literal notranslate"><span class="pre">send_queue</span></code> that will send a message to the local instance of
-<strong>sm_queue</strong>. For code written in other languages, the message must
+<code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. For code written in other languages, the message must
 be serialized JSON encoded in UTF-8.</p>
 <p><a class="pageref" href="#basic-queue">Figure  1</a> is a simplified example of a generic
-implementation of <strong>sm_queue</strong>. The figure shows two example messages
+implementation of <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. The figure shows two example messages
 that might be sent by a triggering process (“User Process”) to
-<strong>sm_queue</strong>. <strong>sm_queue</strong>
+<code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. <a href="#id1"><span class="problematic" id="id2">``</span></a>sm_queue`
 listens on a socket for incoming messages and, when they arrive,
 decides their disposition. It then goes back to listening for new
 messages. If no input is received for 30 seconds, the process checks
@@ -129,11 +129,11 @@ for any scheduled repeats that it may need to initiate, tends to any
 other unfinished business (reaping dead child processes, removing old
 events from the database, etc.) and then goes back to listening on
 the socket.</p>
-<div class="figure align-left" id="id3">
+<div class="figure align-left" id="id5">
 <span id="basic-queue"></span><a class="reference internal image-reference" href="../_images/queue_basic.png"><img alt="../_images/queue_basic.png" src="../_images/queue_basic.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 1: A simplified flowchart for <strong>sm_queue</strong> and a triggering process.</span></p>
+<p class="caption"><span class="caption-text">Figure 1: A simplified flowchart for <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> and a triggering process.</span></p>
 </div>
-<p>When a trigger is received by <strong>sm_queue</strong>, it uses the process
+<p>When a trigger is received by <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>, it uses the process
 illustrated in <a class="pageref" href="#process-origin">Figure  2</a> to determine the
 disposition of the event. The purpose of the logic illustrated
 in <a class="pageref" href="#process-origin">Figure  2</a> is twofold: 1) to determine if
@@ -142,35 +142,35 @@ to run, and 2) to prevent too many re-runs of events when
 trigger messages come very frequently. See <em>queue.conf</em> for
 details on the parameters and their effects on the processing
 logic.</p>
-<div class="figure align-left" id="id4">
+<div class="figure align-left" id="id6">
 <span id="process-origin"></span><a class="reference internal image-reference" href="../_images/process_origin.png"><img alt="../_images/process_origin.png" src="../_images/process_origin.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 2: A flowchart illustrating the decision-making process of
-<strong>sm_queue</strong>.</span></p>
+<code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>.</span></p>
 </div>
 <div class="section" id="aqms">
 <h2>2.4.1. AQMS<a class="headerlink" href="#aqms" title="Permalink to this headline">¶</a></h2>
-<p>For AQMS systems that currently use the ShakeMap v3.5 <strong>queue</strong> process,
+<p>For AQMS systems that currently use the ShakeMap v3.5 <code class="docutils literal notranslate"><span class="pre">queue</span></code> process,
 we have provided a simple drop-in replacement that emulates the existing
 functionality through the GitHub repository
 <a class="reference external" href="https://github.com/cbworden/shakemap-aqms">https://github.com/cbworden/shakemap-aqms</a>.
-In this setup, illustrated in <a href="#id1"><span class="problematic" id="id2">:nun:`Figure #queue-aqms`</span></a>, <strong>sm_queue</strong> is
-configured as discussed above, but another process, <strong>aqms_queue</strong> is also
-runs alongside it. <strong>aqms_queue</strong> is designed to receive the same messages
-as the old ShakeMap v3.5 <strong>queue</strong> (that is, the messages from <strong>shake_alarm</strong>
-and <strong>shake_cancel</strong>). When a trigger is received by <strong>aqms_queue</strong>, it
-retrieves the relevant event parameters from the AQMS database, and sends
-them to <strong>sm_queue</strong> as described above. In this way, the existing
-triggering mechanisms of ShakeMap v3.5 will continue to work unmodified
-(though Python versions of <strong>shake_alarm</strong> and <strong>shake_cancel</strong> are
-provided for operators who wish to update from the older Perl versions).</p>
-<div class="figure align-left" id="id5">
+In this setup, illustrated in <a href="#id3"><span class="problematic" id="id4">:nun:`Figure #queue-aqms`</span></a>, <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> is
+configured as discussed above, but another process, <code class="docutils literal notranslate"><span class="pre">aqms_queue</span></code> is also
+runs alongside it. <code class="docutils literal notranslate"><span class="pre">aqms_queue</span></code> is designed to receive the same messages
+as the old ShakeMap v3.5 <code class="docutils literal notranslate"><span class="pre">queue</span></code> (that is, the messages from
+<code class="docutils literal notranslate"><span class="pre">shake_alarm</span></code> and <code class="docutils literal notranslate"><span class="pre">shake_cancel</span></code>). When a trigger is received by
+<code class="docutils literal notranslate"><span class="pre">aqms_queue</span></code>, it retrieves the relevant event parameters from the AQMS
+database, and sends them to <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> as described above. In this way,
+the existing triggering mechanisms of ShakeMap v3.5 will continue to work
+unmodified (though Python versions of <code class="docutils literal notranslate"><span class="pre">shake_alarm</span></code> and <code class="docutils literal notranslate"><span class="pre">shake_cancel</span></code>
+are provided for operators who wish to update from the older Perl versions).</p>
+<div class="figure align-left" id="id7">
 <span id="queue-aqms"></span><a class="reference internal image-reference" href="../_images/queue_aqms.png"><img alt="../_images/queue_aqms.png" src="../_images/queue_aqms.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 3: A flowchart illustrating the use of the AQMS extensions
 to ShakeMap v4.</span></p>
 </div>
-<p>The AQMS repositiory also contains a coremod for <strong>shake</strong> called
-<strong>aqms_db2xml</strong> that takes the place of <strong>db2xml</strong> in ShakeMap v3.5.
-This module should appear before <strong>assemble</strong> in the <strong>shake</strong> module
+<p>The AQMS repositiory also contains a coremod for <code class="docutils literal notranslate"><span class="pre">shake</span></code> called
+<code class="docutils literal notranslate"><span class="pre">aqms_db2xml</span></code> that takes the place of <code class="docutils literal notranslate"><span class="pre">db2xml</span></code> in ShakeMap v3.5.
+This module should appear before <code class="docutils literal notranslate"><span class="pre">assemble</span></code> in the <code class="docutils literal notranslate"><span class="pre">shake</span></code> module
 list. See the AQMS repository for more on installing the AQMS
 extensions to ShakeMap v4.</p>
 </div>

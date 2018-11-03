@@ -22,7 +22,7 @@ as a default) and dependency headaches.
 Configuration
 =============
 
-After running **sm_profile** the newly-created profile will have its 
+After running ``sm_profile`` the newly-created profile will have its 
 *config* directory populated with a default set of configuration files.
 These files should be reviewed by the operator prior to running 
 ShakeMap. Additionally, the config files sometimes change when the
@@ -43,7 +43,7 @@ file in an event directory to have event-specific config options.
 In the event-specific *model.conf* it is only necessary to list parameters
 that differ from those in the global file. Note that you must include
 any section or sub-section indicators for the parameter in question. For
-instance, to set the `max_deviation` parameter in an event-specific
+instance, to set the ``max_deviation`` parameter in an event-specific
 model.conf file, you would include the lines::
 
     [data]
@@ -69,13 +69,13 @@ select.conf
 -----------
 
 Config options for GMPE selection, which are used by
-the `select` module. Note that if/when the `select` module runs, it
-creates the file `model_select.conf` in the event's _current_ directory,
-which overrides the GMPE set in the `model.conf` file located in the
+the ``select`` module. Note that if/when the ``select`` module runs, it
+creates the file ``model_select.conf`` in the event's _current_ directory,
+which overrides the GMPE set in the ``model.conf`` file located in the
 global config directory, but the config settings in an event-specific
-`model.conf` take precedence over the settings in `model_select.conf`.
-Thus, if there are any event-specific changes to the `model.conf`,
-a sensible approach is to rename `model_select.conf` to `model.conf`
+``model.conf`` take precedence over the settings in ``model_select.conf``.
+Thus, if there are any event-specific changes to the ``model.conf``,
+a sensible approach is to rename ``model_select.conf`` to ``model.conf``
 and then add any other config options to it.
 
 
@@ -89,16 +89,16 @@ products.conf
 
 Options for the various ShakeMap products, such as
 contours, rasters, and maps. Additional explanation is
-available as comments in the `products.conf` file.
+available as comments in the ``products.conf`` file.
 
 
 gmpe_sets.conf
 --------------
 
 This file defines the GMPE sets that are available to be set in
-`model.conf`. These sets can be as simple as a single GMPE with a
-weight of 1.0. The GMPE sets can be selected directly from `model.conf`,
-or a the custom GMPE set created by the **select** module can be
+``model.conf``. These sets can be as simple as a single GMPE with a
+weight of 1.0. The GMPE sets can be selected directly from ``model.conf``,
+or a the custom GMPE set created by the ``select`` module can be
 selected.
 
 
@@ -117,16 +117,16 @@ shake.conf
 ----------
 
 This config file is only for very general configuration options relating
-to the operation of **shake**. It allows the operator to configure additional
+to the operation of ``shake``. It allows the operator to configure additional
 repositories of ShakeMap modules ("plugins," if you will). It also allows
-the user to set the modules for "automatic", called `autorun_modules`. The
+the user to set the modules for "automatic", called ``autorun_modules``. The
 general idea is that shake can be run specifying specific modules like this::
 
   shake <event id> module1 module2
 
-But since there are many modules and `shake` is often invoked via
+But since there are many modules and ``shake`` is often invoked via
 automated processes, it is convenient to configure a list of
-`autorun_modules` which will be used when no module is specified
+``autorun_modules`` which will be used when no module is specified
 on the command line like this::
 
   shake <event id>
@@ -144,16 +144,15 @@ transfer.conf
 -------------
 
 Controls the transfer of ShakeMap products to remote systems via the
-**transfer** module. See the 
-documentation within the file itself for explanation of the available
-options.
+``transfer`` module. See the documentation within the file itself for
+explanation of the available options.
 
 migrate.conf
 ------------
 
 Parameters that determine how ShakeMap 3.5 data directories are 
 migrated to ShakeMap 4.0-compatible directories via the program
-**sm_migrate**. This file allows the user to choose which OpenQuake
+``sm_migrate``. This file allows the user to choose which OpenQuake
 GMPE should be used in place of the ShakeMap GMPE previously used
 for each event.
 
@@ -164,32 +163,32 @@ Downloading and Configuring Vs30 and Topography
 We provide three files available by FTP at 
 ftp://hazards.cr.usgs.gov/shakemap:
 
-* `global_vs30.grd` -- The 30 arcsecond resolution Vs30 data set for the entire globe.
-* `topo_30sec.grd` -- The 30 arcsecond resolution topography data for the entire globe.
-* `topo_15sec.grd` -- The 15 arcsecond resolution topography data for the entire globe.
+* ``global_vs30.grd`` -- The 30 arcsecond resolution Vs30 data set for the entire globe.
+* ``topo_30sec.grd`` -- The 30 arcsecond resolution topography data for the entire globe.
+* ``topo_15sec.grd`` -- The 15 arcsecond resolution topography data for the entire globe.
 
 By 'entire globe' we mean from 56 degrees south to 84 degrees north latitude.
 
-Note that **sm_profile** allows the user to download the 30-arcsecond topo and
-Vs30 files as part of the creation of a profile. If **sm_profile** is called 
-with the **-a** option, these files will be downloaded automatically and the
-profile will be configured to use them.
+Note that ``sm_profile`` allows the user to download the 30-arcsecond topo
+and Vs30 files as part of the creation of a profile. If ``sm_profile`` is
+called with the ``-a`` option, these files will be downloaded automatically
+and the profile will be configured to use them.
 
-If you have not had **sm_profile** download the grids, you have a choice of 15 or
-30 second resolution topography. 15 second data shows
-more detail at small scales, but causes ShakeMap to take *significantly* longer
-to make the various output maps. The ShakeMap system at the National Earthquake
-Information Center uses the 30 second data. If you plan to use the 15 second
-data, modify the topo file name below to topo_15sec.grd. 
+If you have not had ``sm_profile`` download the grids, you have a choice
+of 15 or 30 second resolution topography. 15 second data shows
+more detail at small scales, but causes ShakeMap to take *significantly*
+longer to make the various output maps. The ShakeMap system at the National
+Earthquake Information Center uses the 30 second data. If you plan to use
+the 15 second data, modify the topo file name below to topo_15sec.grd. 
 
 Note that these files are somewhat large: the 30-second topo is 238 Mb, the
 30-second Vs30 is 582 Mb, and the 15-second topo is 745 Mb.
 
 To download the files, do::
 
-    > mkdir /[home]/shakemap_data
-    > mkdir /[home]/shakemap_data/vs30
-    > mkdir /[home]/shakemap_data/topo
+    > mkdir [home]/shakemap_data
+    > mkdir [home]/shakemap_data/vs30
+    > mkdir [home]/shakemap_data/topo
     > cd [home]/shakemap_data/vs30
     > curl ftp://hazards.cr.usgs.gov/shakemap/global_vs30.grd -o global_vs30.grd
     > cd [home]/shakemap_data/topo
@@ -201,7 +200,7 @@ names::
 
     > cd [home]/shakemap_profiles/[profile]/install/config
 
-Modify `model.conf` to change the line::
+Modify ``model.conf`` to change the line::
 
     vs30file = <DATA_DIR>/vs30/global_vs30.grd
 
@@ -211,5 +210,5 @@ change the line::
     topography = <DATA_DIR>/topo/topo_30sec.grd
 
 to the path to your topography file. Note that ShakeMap completes
-the macro <INSTALL_DIR> for the profile in question, but you may set 
+the macro ``<INSTALL_DIR>`` for the profile in question, but you may set 
 the paths to any absolute path on your system.

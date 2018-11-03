@@ -43,11 +43,12 @@ Global ShakeMap system because it serves as the basis for the selection
 of ground motion prediction equations (GMPEs). GMPE selection has a
 significant impact on the estimated ground motion intensities. The revised
 ground motion selection algorithm provides a probability that the earthquake
-occurred in all possible seismotectonic classifications. These classifications
-are configured to be associated with an appropriate GMPE (or weighted set of
-GMPEs) and the GMPEs associated with each classification are then combined
-based on the probability associated with each classification.</p>
-<p>The <strong>select</strong> module reads an event’s <em>event.xml</em> file for origin
+occurred in all possible seismotectonic classifications. These
+classifications are configured to be associated with an appropriate GMPE
+(or weighted set of GMPEs) and the GMPEs associated with each classification
+are then combined based on the probability associated with each
+classification.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">select</span></code> module reads an event’s <em>event.xml</em> file for origin
 information and then constructs a GMPE set for the event based on the
 event’s residence within, and proximity to, a set of predefined tectonic
 regions and user-defined geographic areas. The GMPE set, and the
@@ -59,9 +60,9 @@ the configuration may select an intensity prediction equation module
 and these, too, will be written to <em>model_select.conf</em>. Any modules
 that are not specified for a particular region will default back to
 the modules set in the global <em>model.conf</em>.</p>
-<p>The behavior of <strong>select</strong> is controlled by the <em>select.conf</em>
+<p>The behavior of <code class="docutils literal notranslate"><span class="pre">select</span></code> is controlled by the <em>select.conf</em>
 configuration file. See the documentation in <em>select.conf</em> for more on
-customizing <strong>select</strong>.</p>
+customizing <code class="docutils literal notranslate"><span class="pre">select</span></code>.</p>
 <p>The tectonic regions, and additional geographic layers, that the event
 may fall within are defined by the STREC configuration. See the STREC
 documentation for information on adding additional layers, then use
@@ -73,9 +74,10 @@ documentation.</p>
 <div class="section" id="tectonic-regions">
 <h2>2.2.2. Tectonic Regions<a class="headerlink" href="#tectonic-regions" title="Permalink to this headline">¶</a></h2>
 <p><a class="pageref" href="#select-regions">Figure  1</a> shows a global map of the first layer of
-information, which is a set of four mutually exclusive and globally exhaustive
-classes, which we refer to as <strong>tectonic regions</strong>: active crustal region (ACR),
-stable continental region (SCR), subduction, and volcanic.</p>
+information, which is a set of four mutually exclusive and globally
+exhaustive classes, which we refer to as <strong>tectonic regions</strong>: active
+crustal region (ACR), stable continental region (SCR), subduction, and
+volcanic.</p>
 <div class="figure align-left" id="id1">
 <span id="select-regions"></span><a class="reference internal image-reference" href="../_images/select_regions.png"><img alt="../_images/select_regions.png" src="../_images/select_regions.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 1: Map of main tectonic regions.</span></p>
@@ -148,7 +150,7 @@ Intraslab</td>
 <p>Note that currently the only subtypes that are made use of are the subduction
 zone subtypes.</p>
 <p>There are a number of configuration options for how the tectonic regions are
-modeled in <cite>select.conf</cite>. Here is an example of for ACR:</p>
+modeled in <code class="docutils literal notranslate"><span class="pre">select.conf</span></code>. Here is an example of for ACR:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">tectonic_regions</span><span class="p">]</span>
     <span class="p">[[</span><span class="n">acr</span><span class="p">]]</span>
         <span class="n">horizontal_buffer</span> <span class="o">=</span> <span class="mi">100</span>
@@ -163,23 +165,23 @@ modeled in <cite>select.conf</cite>. Here is an example of for ACR:</p>
 </div>
 <p>where:</p>
 <ul class="simple">
-<li><cite>horizontal_buffer</cite> - The buffer distance (km) that extends into neighboring
-regions across which the GMPEs are blended.</li>
-<li><cite>vertical_buffer</cite> - The buffer distance (km) that blends the depth dependence
-of the GMPEs within this tectonic region.</li>
-<li><cite>gmpe</cite> - A list of one or more GMPE sets found in gmpe_sets.conf.</li>
-<li><cite>min_depth</cite> - A list of one or more minimum depths (km) corresponding to
-the GMPEs listed under <cite>gmpe</cite>.</li>
-<li><cite>max_depth</cite> - A list of one or more maximum depths (km) corresponding to
-the GMPEs listed under <cite>gmpe</cite>.</li>
-<li><cite>ipe</cite> - An intensity prediction module; must be found in the
-collection of ipe_modules in <cite>modules.conf</cite>.</li>
-<li><cite>gmice</cite> - A ground motion to intensity module; must be found in the
-collection of gmice_modules in <cite>modules.conf</cite>.</li>
-<li><cite>ccf</cite> - A cross-correlation module; must be found in the collection of
+<li><code class="docutils literal notranslate"><span class="pre">horizontal_buffer</span></code> - The buffer distance (km) that extends into
+neighboring regions across which the GMPEs are blended.</li>
+<li><code class="docutils literal notranslate"><span class="pre">vertical_buffer</span></code> - The buffer distance (km) that blends the depth
+dependence of the GMPEs within this tectonic region.</li>
+<li><code class="docutils literal notranslate"><span class="pre">gmpe</span></code> - A list of one or more GMPE sets found in gmpe_sets.conf.</li>
+<li><code class="docutils literal notranslate"><span class="pre">min_depth</span></code> - A list of one or more minimum depths (km) corresponding to
+the GMPEs listed under <code class="docutils literal notranslate"><span class="pre">gmpe</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">max_depth</span></code> - A list of one or more maximum depths (km) corresponding to
+the GMPEs listed under <code class="docutils literal notranslate"><span class="pre">gmpe</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">ipe</span></code> - An intensity prediction module; must be found in the
+collection of ipe_modules in <code class="docutils literal notranslate"><span class="pre">modules.conf</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">gmice</span></code> - A ground motion to intensity module; must be found in the
+collection of gmice_modules in <code class="docutils literal notranslate"><span class="pre">modules.conf</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">ccf</span></code> - A cross-correlation module; must be found in the collection of
 ccf_modules in modules.conf.</li>
 </ul>
-<p>The process by which <strong>select</strong> builds a GMPE set is somewhat complicated.
+<p>The process by which <code class="docutils literal notranslate"><span class="pre">select</span></code> builds a GMPE set is somewhat complicated.
 STREC reports the tectonic region the earthquake lies within, as well
 as the distance to the closest polygon of the other tectonic region
 types. For example, for an earthquake in California STREC would report
@@ -197,35 +199,39 @@ question.</p>
 was 40 km from the “acr” region, and the ‘acr’ region’s horizontal
 buffer was 100 km, then the ‘scr’ region would be given a weight
 of 1.0, and the ‘acr’ region would be given (100 - 40) / 100 = 0.6.
-Normalizing
-by the total, the final weights would be 0.625 ‘scr’ and 0.375 ‘acr’.</p>
+Normalizing by the total, the final weights would be 0.625 ‘scr’ and
+0.375 ‘acr’.</p>
 <p><a class="pageref" href="#tectonic-region-example">Figure  2</a> maps the probabilities for the main
-tectonic regions in the northwest US. This illustrates how the horizontal buffer
-smoothly transitions between the regions.</p>
+tectonic regions in the northwest US. This illustrates how the horizontal
+buffer smoothly transitions between the regions.</p>
 <div class="figure align-left" id="id2">
 <span id="tectonic-region-example"></span><a class="reference internal image-reference" href="../_images/select_example_tect_regions.png"><img alt="../_images/select_example_tect_regions.png" src="../_images/select_example_tect_regions.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 2: Maps of the probability of the four main tectonic regions in the northwest US.
-Top left: active crustal region (ACR); Top right: stable continental region(SCR);
+<p class="caption"><span class="caption-text">Figure 2: Maps of the probability of the four main tectonic regions in the
+northwest US.
+Top left: active crustal region (ACR); Top right: stable continental
+region(SCR);
 Bottom left: subduction (SUB); Bottom right: volcanic (VOL).</span></p>
 </div>
 <p>Each region’s GMPE set is in turn comprised of a weighted set of other
 GMPE sets, based on the earthquake’s depth. For each of the non-subduction
-regions, <strong>select</strong> builds a weighted combination of the configured GMPE sets
+regions, <code class="docutils literal notranslate"><span class="pre">select</span></code> builds a weighted combination of the configured GMPE sets
 based on the event’s depth. If the earthquake falls within a subduction
-region, STREC reports the probabilities that the earthquake is crustal, on the
-subduction interface, or within the subducting slab. <strong>select</strong> combines the
-GMPE sets for each of these regimes, weighted by their probabilities, into a
-subduction GMPE set that is specific to the earthquake’s location.</p>
+region, STREC reports the probabilities that the earthquake is crustal, on
+the subduction interface, or within the subducting slab. <code class="docutils literal notranslate"><span class="pre">select</span></code> combines
+the GMPE sets for each of these regimes, weighted by their probabilities,
+into a subduction GMPE set that is specific to the earthquake’s location.</p>
 </div>
 <div class="section" id="subduction-subtypes">
 <h2>2.2.3. Subduction Subtypes<a class="headerlink" href="#subduction-subtypes" title="Permalink to this headline">¶</a></h2>
-<p>Within subduction zones, we distribute the probability given to the subduction zone
-tectonic region between its three subtypes. By default, this primarily relies on the
+<p>Within subduction zones, we distribute the probability given to the
+subduction zone tectonic region between its three subtypes. By default,
+this primarily relies on the
 <a class="reference external" href="https://www.sciencebase.gov/catalog/item/5aa1b00ee4b0b1c392e86467">Hayes (2018) Slab2</a>
 model.</p>
-<p>Although this rarely occurs,  events that are located in a subduction zone but the slab
-model is not defined, we compute the probability of the interface subtype as a function
-of depth and magnitude. The relevant section of <cite>select.conf</cite> is:</p>
+<p>Although this rarely occurs,  events that are located in a subduction zone
+but the slab model is not defined, we compute the probability of the
+interface subtype as a function of depth and magnitude. The relevant section
+of <code class="docutils literal notranslate"><span class="pre">select.conf</span></code> is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">subduction</span><span class="p">]</span>
     <span class="n">default_slab_depth</span> <span class="o">=</span> <span class="mf">36.0</span>
     <span class="p">[[</span><span class="n">p_int_mag</span><span class="p">]]</span>
@@ -245,33 +251,35 @@ of depth and magnitude. The relevant section of <cite>select.conf</cite> is:</p>
         <span class="n">p2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
 </pre></div>
 </div>
-<p>These parameters define taper functions that give more probability to interface
-for larger magnitudes, crustal for shallow events, interface for intermediate depth
-events, and slab for deeper events, as illustrated in <a class="pageref" href="#sub-no-slab">Figure  3</a>.</p>
+<p>These parameters define taper functions that give more probability to
+interface for larger magnitudes, crustal for shallow events, interface for
+intermediate depth events, and slab for deeper events, as illustrated
+in <a class="pageref" href="#sub-no-slab">Figure  3</a>.</p>
 <div class="figure align-left" id="id3">
 <span id="sub-no-slab"></span><a class="reference internal image-reference" href="../_images/sub_no_slab.png"><img alt="../_images/sub_no_slab.png" src="../_images/sub_no_slab.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 3: Profiles showing the probability of crustal, interface, and interslab subuction
-subtypes (assuming the probability of subduction is 1.0) with depth for a
-magnitude of 7 (left), 8 (center), and 9 (right).</span></p>
+<p class="caption"><span class="caption-text">Figure 3: Profiles showing the probability of crustal, interface, and interslab
+subuction subtypes (assuming the probability of subduction is 1.0) with
+depth for a magnitude of 7 (left), 8 (center), and 9 (right).</span></p>
 </div>
-<p>The slab model is defined for most locations in subduction zones. When available,
-we distribute the probability the subtypes with a series of heuristic steps using
-the following parameters:</p>
+<p>The slab model is defined for most locations in subduction zones. When
+available, we distribute the probability the subtypes with a series of
+heuristic steps using the following parameters:</p>
 <ul class="simple">
-<li>The distance between the interface in the slab model and the hypocentral depth;
-see the <cite>p_int_hypo</cite> section of <cite>select.conf</cite>.</li>
+<li>The distance between the interface in the slab model and the hypocentral
+depth; see the <code class="docutils literal notranslate"><span class="pre">p_int_hypo</span></code> section of <code class="docutils literal notranslate"><span class="pre">select.conf</span></code>.</li>
 <li>The angle of rotation between the plane tangent to the slab at the location
-of the earthquake and the focal mechanism; see the <cite>p_int_kagan</cite> section of
-<cite>select.conf</cite> (the angle is sometimes called the “Kagan angle”).</li>
-<li>The position of the hypocenter relative to teh maximum depth of the seismogenic
-zone, as given by the slab mode; see the <cite>p_int_sz</cite> section of <cite>select.conf</cite>.</li>
-<li>The position of the hypocenter relative to interface in the slab model; see the
-<cite>p_crust_slab</cite> section of <cite>select.conf</cite>.</li>
-<li>The absolute depth of the hypocenter; see the  <cite>p_crust_hypo</cite> section of
-<cite>select.conf</cite>.</li>
+of the earthquake and the focal mechanism; see the <code class="docutils literal notranslate"><span class="pre">p_int_kagan</span></code> section
+of <code class="docutils literal notranslate"><span class="pre">select.conf</span></code> (the angle is sometimes called the “Kagan angle”).</li>
+<li>The position of the hypocenter relative to teh maximum depth of the
+seismogenic zone, as given by the slab mode; see the <code class="docutils literal notranslate"><span class="pre">p_int_sz</span></code> section
+of <code class="docutils literal notranslate"><span class="pre">select.conf</span></code>.</li>
+<li>The position of the hypocenter relative to interface in the slab model;
+see the <code class="docutils literal notranslate"><span class="pre">p_crust_slab</span></code> section of <code class="docutils literal notranslate"><span class="pre">select.conf</span></code>.</li>
+<li>The absolute depth of the hypocenter; see the <code class="docutils literal notranslate"><span class="pre">p_crust_hypo</span></code> section of
+<code class="docutils literal notranslate"><span class="pre">select.conf</span></code>.</li>
 </ul>
-<p>Because of the unique treatment of the tectonic subtypes for subduction zones, its
-section in <cite>select.conf</cite> includes some additional settings:</p>
+<p>Because of the unique treatment of the tectonic subtypes for subduction
+zones, its section in <code class="docutils literal notranslate"><span class="pre">select.conf</span></code> includes some additional settings:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">subduction</span><span class="p">]]</span>
     <span class="n">horizontal_buffer</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">vertical_buffer</span> <span class="o">=</span> <span class="mi">5</span>
@@ -290,21 +298,23 @@ section in <cite>select.conf</cite> includes some additional settings:</p>
         <span class="n">gmpe</span> <span class="o">=</span> <span class="n">subduction_slab_nshmp2014</span>
 </pre></div>
 </div>
-<p>Note that the additionl subsections (e.g., <cite>[[[crustal]]]</cite>) and their associated GMPEs
-after the <cite>use_slab</cite> key are used when the slab model is being used to distribute the
-subduction probabilities. In this case, the results based on the previously listed <cite>gmpe</cite>,
-<cite>min_depth</cite> and <cite>max_depth</cite> are overwritten. If <cite>use_slab</cite> is set to False, then subtype
-subsections are ignored and the subduction zone is treated like all the other tectonic
-regions (e.g., configurable with the <cite>gmpe</cite>, <cite>min_depth</cite>, and <cite>max_depth</cite> keys).</p>
+<p>Note that the additionl subsections (e.g., <code class="docutils literal notranslate"><span class="pre">[[[crustal]]]</span></code>) and their
+associated GMPEs after the <code class="docutils literal notranslate"><span class="pre">use_slab</span></code> key are used when the slab model is
+being used to distribute the subduction probabilities. In this case, the
+results based on the previously listed <code class="docutils literal notranslate"><span class="pre">gmpe</span></code>, <code class="docutils literal notranslate"><span class="pre">min_depth</span></code> and
+<code class="docutils literal notranslate"><span class="pre">max_depth</span></code> are overwritten. If <code class="docutils literal notranslate"><span class="pre">use_slab</span></code> is set to False, then subtype
+subsections are ignored and the subduction zone is treated like all the
+other tectonic regions (e.g., configurable with the <code class="docutils literal notranslate"><span class="pre">gmpe</span></code>, <code class="docutils literal notranslate"><span class="pre">min_depth</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">max_depth</span></code> keys).</p>
 </div>
 <div class="section" id="geographic-regionalization">
 <h2>2.2.4. Geographic Regionalization<a class="headerlink" href="#geographic-regionalization" title="Permalink to this headline">¶</a></h2>
-<p>The <strong>select</strong> module also considers the earthquake’s presence within, or
-distance from, any number of user-defined geographic layers. If the earthquake
-is within a layer, that layer’s parameters (as configured in <em>select.conf</em>)
-replace any or all of the parameters of the corresponding tectonic regions, and
-the calculation of a weighted GMPE set proceeds as before. For example,
-the layer section of <em>select.conf</em> might contain:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">select</span></code> module also considers the earthquake’s presence within, or
+distance from, any number of user-defined geographic layers. If the
+earthquake is within a layer, that layer’s parameters (as configured in
+<em>select.conf</em>) replace any or all of the parameters of the corresponding
+tectonic regions, and the calculation of a weighted GMPE set proceeds as
+before. For example, the layer section of <em>select.conf</em> might contain:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">layers</span><span class="p">]</span>
     <span class="p">[[</span><span class="n">california</span><span class="p">]]</span>
         <span class="n">horizontal_buffer</span> <span class="o">=</span> <span class="mi">50</span>
@@ -325,20 +335,20 @@ in addition, the ‘acr’ region would have its GMPE selection reset to the
 GMPE set ‘Special_California_GMPE’ for earthquakes of all depths. Similarly,
 the IPE would be set to “Allen2012” and the GMICE to “WGRW12”.</p>
 <p>If the earthquake is not inside a custom geographic layer, but within the
-horizontal buffer distance of one, the GMPE sets for the modified and unmodified
-tectonic regions are each determined separately and a weighted combination of
-the two is computed (where the weights are based on the distance and the
-horizontal buffer, as described above).</p>
+horizontal buffer distance of one, the GMPE sets for the modified and
+unmodified tectonic regions are each determined separately and a weighted
+combination of the two is computed (where the weights are based on the
+distance and the horizontal buffer, as described above).</p>
 <p>Unlike the tectonic regions, the geographic layers consider only the
 nearest layer. If an earthquake falls within more than one layer (possible if
-layers are nested), the first one encountered in <em>select.conf</em> is used and any
-other(s) will be ignored.</p>
+layers are nested), the first one encountered in <em>select.conf</em> is used and
+any other(s) will be ignored.</p>
 <p>The polygons for geograhpic regionalization are located in the
-<cite>data/layers</cite> subdirectory of the current shakemap profile install directory.
-The files are associated to the key name within  the <cite>[layers]</cite> section of
-<em>select.conf</em>. Using the example above, when <strong>select</strong> sees the
-<cite>[[california]]</cite> key name, it will look for a file called <cite>california.wkt</cite>
-in <cite>&lt;install_dir&gt;/data/layers</cite>.</p>
+<code class="docutils literal notranslate"><span class="pre">data/layers</span></code> subdirectory of the current shakemap profile install
+directory.  The files are associated to the key name within  the
+<code class="docutils literal notranslate"><span class="pre">[layers]</span></code> section of <em>select.conf</em>. Using the example above, when
+<code class="docutils literal notranslate"><span class="pre">select</span></code> sees the <code class="docutils literal notranslate"><span class="pre">[[california]]</span></code> key name, it will look for a file
+called <code class="docutils literal notranslate"><span class="pre">california.wkt</span></code> in <code class="docutils literal notranslate"><span class="pre">&lt;install_dir&gt;/data/layers</span></code>.</p>
 </div>
 </div>
 
