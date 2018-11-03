@@ -16,7 +16,7 @@ The Wiki does a pretty good job of explaining the installation process,
 which is fairly automated. Here we will just reiterate that things will
 go most smoothly if you use the bash shell and conda virtual environment.
 Taking a more manual approach will likely lead to conflicts with system
-software (ShakeMap runs on Python 3.6, while most systems still use 2.7
+software (ShakeMap runs on Python 3.6, while many systems still use 2.7
 as a default) and dependency headaches.
 
 Configuration
@@ -25,7 +25,12 @@ Configuration
 After running **sm_profile** the newly-created profile will have its 
 *config* directory populated with a default set of configuration files.
 These files should be reviewed by the operator prior to running 
-ShakeMap. The configuration files are discussed in the sections below:
+ShakeMap. Additionally, the config files sometimes change when the
+code is updated and so it is fairly common for errors encountered after
+an update to be related to changes in the configs. We hope that the
+configs will become more stable as the code matures.
+
+The configuration files are discussed in the sections below.
 
 model.conf
 ----------
@@ -69,6 +74,10 @@ creates the file `model_select.conf` in the event's _current_ directory,
 which overrides the GMPE set in the `model.conf` file located in the
 global config directory, but the config settings in an event-specific
 `model.conf` take precedence over the settings in `model_select.conf`.
+Thus, if there are any event-specific changes to the `model.conf`,
+a sensible approach is to rename `model_select.conf` to `model.conf`
+and then add any other config options to it.
+
 
 Please see the
 :ref:`Ground Motion Selection section <sec-select-4>` for
@@ -79,7 +88,8 @@ products.conf
 -------------
 
 Options for the various ShakeMap products, such as
-contours, rasters, and maps.
+contours, rasters, and maps. Additional explanation is
+available as comments in the `products.conf` file.
 
 
 gmpe_sets.conf
@@ -87,20 +97,17 @@ gmpe_sets.conf
 
 This file defines the GMPE sets that are available to be set in
 `model.conf`. These sets can be as simple as a single GMPE with a
-weight of 1.0. The GMPE sets can be
-selected directly in `model.conf`, or a new GMPE set is created by the
-**select** module, which combines multiple GMPE sets associated with
-specific tectonic environments to account for uncertainty in the
-tectonic classification (e.g., if an event is located near the boundary
-between active and stable regions).
+weight of 1.0. The GMPE sets can be selected directly from `model.conf`,
+or a the custom GMPE set created by the **select** module can be
+selected.
 
 
 modules.conf
 ------------
 
-Controls what GMPEs are available for
-constructing GMPE sets. Generally, this only needs to be edited if you
-wish to use a GMPE that is not currently imported. The GMPEs are imported
+Controls what GMPEs are available for constructing GMPE sets. Generally,
+this only needs to be edited if you wish to use a GMPE that is not
+currently imported. The GMPEs are imported
 from the `OpenQuake Engine <https://github.com/gem/oq-engine>`_
 `hazardlib <https://github.com/gem/oq-engine/tree/master/openquake/hazardlib>`_
 library.
@@ -110,10 +117,20 @@ shake.conf
 ----------
 
 This config file is only for very general configuration options relating
-to the operation of **shake**. It allows the operator to configure  additional
+to the operation of **shake**. It allows the operator to configure additional
 repositories of ShakeMap modules ("plugins," if you will). It also allows
-the user to set the modules for automatic runs (i.e., those where
-**shake -a** is used).
+the user to set the modules for "automatic", called `autorun_modules`. The
+general idea is that shake can be run specifying specific modules like this::
+
+  shake <event id> module1 module2
+
+But since there are many modules and `shake` is often invoked via
+automated processes, it is convenient to configure a list of
+`autorun_modules` which will be used when no module is specified
+on the command line like this::
+
+  shake <event id>
+
 
 
 logging.conf
