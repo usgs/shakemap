@@ -44,6 +44,7 @@ def get_parser():
                         help='Event longitude')
     parser.add_argument('--preferred-depth', type=float, help='Event depth')
     parser.add_argument('--preferred-eventtime', help='Event time')
+    parser.add_argument('--eventids', type=str, help='Alternate event IDs')
 
     return parser
 
@@ -93,7 +94,8 @@ def main(args):
 
     if args.status == 'DELETE':
         event = {'id': args.preferred_eventid,
-                 'netid': args.preferred_eventsource}
+                 'netid': args.preferred_eventsource,
+                 'alt_eventids': args.eventids}
         queue.send_queue('cancel', event, config['port'])
         logger.info('Sending cancel event %s to queue.' %
                     args.preferred_eventid)
@@ -121,7 +123,8 @@ def main(args):
              'lon': args.preferred_longitude,
              'depth': args.preferred_depth,
              'mag': args.preferred_magnitude,
-             'locstring': args.property_title}
+             'locstring': args.property_title,
+             'alt_eventids': args.eventids}
     logger.info('Sending event %s to queue.' % args.preferred_eventid)
 
     # Poke the queue to run shake on this event.
