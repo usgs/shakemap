@@ -10,6 +10,7 @@ import time as time
 import argparse
 import psutil
 import copy
+import shutil
 
 # Third-party imports
 import daemon
@@ -168,6 +169,16 @@ def write_event_xml(data_path, event, logger):
     return
 
 
+def move_event_directory(oldid, newid, data_path, logger):
+    try:
+        shutil.move(os.path.join(data_path, oldid),
+                    os.path.join(data_path, newid))
+    except shutil.Error as e:
+        logger("Error trying to move data directory %s to %s: %s" %
+               (oldid, newid, str(e)))
+    return
+
+
 def process_origin(event, action, handler, data_path, logger, config,
                    children):
     """ Determine if an event should be processed (or reprocessed) and
@@ -188,22 +199,47 @@ def process_origin(event, action, handler, data_path, logger, config,
         nothing: Nothing.
     """
     current_time = int(time.time())
+    force_run = False
     #
     # See if we already have this event, make a decision
     #
     existing = handler.getEvent(event['id'])
+    if existing is None:
+        for eid in event['alt_eventids'].split(','):
+            if eid == event['id']:
+                continue
+            alt_exists = handler.getEvent(eid)
+            if alt_exists is None:
+                continue
+            # If the old event is currently running, kill it
+            if eid in children:
+                children[eid]['popen'].kill()
+                children[eid]['popen'].wait()
+            # Delete the old event from the database
+            handler.deleteEvent(eid)
+            # Move the old event directory to the new ID
+            move_event_directory(eid, event['id'], data_path, logger)
+            # Now treat the the new event ID as a new event.
+            existing = None
+            # But force it to run (because we want to update the event ID),
+            # bypassing date and magnitude checks
+            force_run = True
+            break
+
     if existing is None:
         #
         # This is a new event
         #
         update = False
         # Do we want to run this event?
-        if queue.magnitude_too_small(event['mag'], event['lon'], event['lat'],
-                                     config):
+        if not force_run and queue.magnitude_too_small(event['mag'],
+                                                       event['lon'],
+                                                       event['lat'],
+                                                       config):
             logger.info('Event %s (mag=%f) too small, skipping' %
                         (event['id'], event['mag']))
             return
-        if queue.event_too_old_or_in_future(event, config):
+        if not force_run and queue.event_too_old_or_in_future(event, config):
             logger.info('Event %s too old or too far in the future, skipping' %
                         event['id'])
             return
@@ -292,8 +328,7 @@ def process_origin(event, action, handler, data_path, logger, config,
     return
 
 
-def process_other(eventid, action, handler, data_path, logger, config,
-                  children):
+def process_other(data, action, handler, data_path, logger, config, children):
     """A trigger has been issued for an event. Treat this as
     an origin update. If the event in question is not in our
     database, ignore the message.
@@ -312,12 +347,23 @@ def process_other(eventid, action, handler, data_path, logger, config,
     Returns:
         nothing: Nothing.
     """
+    eventid = data['id']
     existing = handler.getEvent(eventid)
     if existing:
         process_origin(existing, action, handler, data_path, logger, config,
                        children)
     else:
-        logger.info('Trigger is for unprocessed event %s: ignoring' % eventid)
+        if 'alt_eventids' in data:
+            for eid in data['alt_eventids'].split(','):
+                if eid == eventid:
+                    continue
+                existing = handler.getEvent(eid)
+                if existing:
+                    process_origin(existing, action, handler, data_path,
+                                   logger, config, children)
+                    return
+        logger.info('Trigger is for unprocessed event %s: ignoring' %
+                    data['id'])
     return
 
 
@@ -337,12 +383,19 @@ def process_cancel(data, handler, logger, config, children):
     """
     eventid = data['id']
     existing = handler.getEvent(eventid)
-    if not existing:
-        logger.info('cancel is for unprocessed event %s: ignoring' % eventid)
+    if existing:
+        queue.dispatch_event(eventid, logger, children, 'cancel', config)
         return
 
-    queue.dispatch_event(eventid, logger, children, 'cancel', config)
+    for eid in data['alt_eventids'].split(','):
+        if eid == eventid:
+            continue
+        existing = handler.getEvent(eid)
+        if existing:
+            queue.dispatch_event(eid, logger, children, 'cancel', config)
+            return
 
+    logger.info('cancel is for unprocessed event %s: ignoring' % eventid)
     return
 
 
@@ -500,7 +553,7 @@ def main(pargs):
             else:
                 logger.info('Received "%s" for event %s' %
                             cmd['type'], cmd['data']['id'])
-                process_other(cmd['data']['id'], cmd['type'], handler,
+                process_other(cmd['data'], cmd['type'], handler,
                               data_path, logger, config, children)
 
 
