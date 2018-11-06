@@ -29,6 +29,8 @@ from shakemap.utils.logging import get_logging_config
 from shakemap.utils.amps import AmplitudeHandler
 from shakelib.rupture import constants
 
+SAVE_FILE = '.saved'
+
 
 class AssembleModule(CoreModule):
     """
@@ -106,6 +108,11 @@ class AssembleModule(CoreModule):
         pdl_path = os.path.join(datadir, 'pdl')
         if os.path.isdir(pdl_path):
             shutil.rmtree(pdl_path, ignore_errors=True)
+
+        # Look for any .transferred file and delete it
+        save_file = os.path.join(datadir, SAVE_FILE)
+        if os.path.isfile(save_file):
+            os.remove(save_file)
 
         #
         # Look for global configs in install_path/config

@@ -18,14 +18,20 @@ def test_macros():
     test_dict = {'LON': '-118.5357',
                  'LAT': '34.213',
                  'DATE': 'Jan 01, 1994',
-                 'DEP': 'northridge',
+                 'DEP': '18.0',
                  'MAG': '6.7',
                  'LOC': 'Northridge',
                  'NETID': 'ci',
                  'DATETIME': '1994-01-17T12:30:55.000000Z',
                  'EVENTID': 'northridge',
+                 'VERSION': '1',
+                 'PRODUCT_CODE': 'northridge',
                  'TIME': '12:30:55'}
-    assert macros == test_dict
+    assert list(sorted(macros.keys())) == list(sorted(test_dict.keys()))
+    for key, mvalue in macros.items():
+        tvalue = test_dict[key]
+        print('Testing key %s: %s vs %s.' % (key, mvalue, tvalue))
+        assert mvalue == tvalue
 
 
 if __name__ == '__main__':

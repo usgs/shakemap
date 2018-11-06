@@ -26,7 +26,6 @@ from shakemap.coremods.mapping import MappingModule
 from shakemap.coremods.plotregr import PlotRegr
 from shakemap.coremods.kml import KMLModule
 from shakemap.coremods.gridxml import GridXMLModule, _oq_to_gridxml
-from shakemap.coremods.transfer import TransferModule
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
 from mapio.shake import ShakeGrid
@@ -370,13 +369,6 @@ def test_products():
         #
         do_contour(evid, datapath)
 #        do_contour_command_line(evid, datapath)
-
-        check_failures(evid, datapath, TransferModule)
-        mod = TransferModule(evid)
-        mod.execute()
-        bufiles = glob.glob(os.path.join(datapath, evid, 'backup*'))
-        for bufile in bufiles:
-            shutil.rmtree(bufile)
 
     finally:
         pass

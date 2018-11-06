@@ -27,7 +27,9 @@ def get_macros(info):
               - DATETIME Event date/time (i.e., 2018-01-18T11:34:25.123456)
               - DATE Event date (i.e., "Jan 31, 2018")
               - TIME Event time (i.e., "11:34:23")
+              - VERSION ShakeMap map version (i.e., 1, 2, 3, etc.)
               - EVENTID Earthquake event ID.
+              - PRODUCT_CODE Unique code describing the ShakeMap product.
               - NETID Earthquake network ID.
     """
     macros = {}
@@ -43,8 +45,10 @@ def get_macros(info):
         dtime = datetime.strptime(macros['DATETIME'], constants.ALT_TIMEFMT)
     macros['DATE'] = dtime.strftime(DATE_STR_FMT)
     macros['TIME'] = dtime.strftime(TIME_OF_DAY_FMT)
-    macros['EVENTID'] = macros['DEP'] = \
-        info['input']['event_information']['event_id']
+    macros['VERSION'] = str(
+        info['processing']['shakemap_versions']['map_version'])
+    macros['EVENTID'] = info['input']['event_information']['event_id']
+    macros['PRODUCT_CODE'] = info['input']['event_information']['productcode']
     if 'netid' in info['input']['event_information']:
         macros['NETID'] = info['input']['event_information']['netid']
     else:

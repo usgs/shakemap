@@ -26,6 +26,8 @@ from shakemap.utils.dependencies import CommandDatabase
 from shakemap.utils.exception import TerminateShakeMap
 from shakelib.rupture.origin import read_event_file
 
+CANCEL_FILE = 'CANCELED'
+
 
 def _get_config():
     """
@@ -201,7 +203,7 @@ def main(args):
             'modules are specified.')
 
     event_path = os.path.join(data_path, args.eventid, 'current')
-    cancel_file = os.path.join(event_path, 'CANCELED')
+    cancel_file = os.path.join(event_path, CANCEL_FILE)
     if os.path.isfile(cancel_file):
         logger.error(
             'Event %s has been canceled: aborting run' % args.eventid)
@@ -232,6 +234,9 @@ def main(args):
             else:
                 # cancel option was set
                 logger.info('Cancelling shakemap, using cancel_modules...')
+                with open(cancel_file, 'wt') as f:
+                    f.write('\n')
+
                 args.cmds = shlex.split(_config_['cancel_modules'])
                 if len(args.cmds):
                     logger.info('Cancel modules found: %s' % args.cmds)
