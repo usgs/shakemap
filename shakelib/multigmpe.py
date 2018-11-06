@@ -297,17 +297,17 @@ class MultiGMPE(GMPE):
                     selected_gmpe,
                     filter_imt=filter_imt)
             else:
-                raise KeyError("%s must consist exclusively of keys in "
-                               "conf['gmpe_modules'] or conf['gmpe_sets']"
-                               % selected_gmpe)
+                raise TypeError("%s must consist exclusively of keys in "
+                                "conf['gmpe_modules'] or conf['gmpe_sets']"
+                                % selected_gmpe)
         elif selected_gmpe in conf['gmpe_modules'].keys():
             modinfo = conf['gmpe_modules'][selected_gmpe]
             mod = import_module(modinfo[1])
             tmpclass = getattr(mod, modinfo[0])
             out = MultiGMPE.from_list([tmpclass()], [1.0], imc=IMC)
         else:
-            raise KeyError("conf['modeling']['gmpe'] must be a key in "
-                           "conf['gmpe_modules'] or conf['gmpe_sets']")
+            raise TypeError("conf['modeling']['gmpe'] must be a key in "
+                            "conf['gmpe_modules'] or conf['gmpe_sets']")
 
         out.DESCRIPTION = selected_gmpe
         return out
@@ -889,7 +889,7 @@ def filter_gmpe_list(gmpes, wts, imt):
                 swts.append(wts[i])
 
     if len(sgmpe) == 0:
-        raise Exception('No applicable GMPEs from GMPE list for %s' % imt)
+        raise KeyError('No applicable GMPEs from GMPE list for %s' % str(imt))
 
     # Scale weights to sum to one
     swts = np.array(swts)
