@@ -34,19 +34,30 @@ class SCPTransfer(TransferBaseModule):
         # get the properties needed for the sender
         properties, product_properties = self.getProperties(self.info)
 
+        # get the products directory
+        product_dir = os.path.join(self.datadir, 'products')
+
         # loop over all possible scp destinations, send products to
         # each one
         for destination, params in self.config['scp'].items():
+            # append the event ID to the remote_directory
+            pdir = params['remote_directory']
+            params['remote_directory'] = os.path.join(pdir, self._eventid)
+
             params.update(properties)
             fmt = 'Doing SCP transfer to %s...' % destination
             logging.debug(fmt)
 
             sender = SecureSender(properties=params,
-                                  local_directory=self.datadir)
+                                  local_directory=product_dir)
             if self.cancel:
                 msg = sender.cancel()
             else:
-                nfiles, msg = sender.send()
+                try:
+                    nfiles, msg = sender.send()
+                except Exception as e:
+                    logging.warning(str(e))
+                    raise(e)
                 fmt = '%i files sent.  Message from sender: \n"%s"'
                 tpl = (nfiles, msg)
                 logging.info(fmt % tpl)

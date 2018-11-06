@@ -5,6 +5,9 @@ import os.path
 from datetime import datetime
 import sys
 import logging
+import glob
+import shutil
+import re
 
 # third party imports
 from impactutils.io.smcontainers import ShakeMapOutputContainer
@@ -19,6 +22,7 @@ from shakemap.utils.config import (get_config_paths,
 from shakelib.rupture import constants
 
 NO_TRANSFER = 'NO_TRANSFER'
+SAVE_FILE = '.saved'
 
 
 class TransferBaseModule(CoreModule):
@@ -71,6 +75,16 @@ class TransferBaseModule(CoreModule):
         # extract the info.json object from the container
         self.info = container.getMetadata()
         container.close()
+
+        # check for the presence of a .saved file. If found, do nothing.
+        # Otherwise, create the backup directory.
+        save_file = os.path.join(self.datadir, SAVE_FILE)
+        if not os.path.isfile(save_file):
+            logging.info('Making backup directory...')
+            self._make_backup(data_path)
+            with open(save_file, 'wt') as f:
+                tnow = datetime.utcnow().strftime(constants.TIMEFMT)
+                f.write('Saved %s by %s\n' % (tnow, self.command_name))
 
     def getProperties(self, info):
         properties = {}
@@ -137,21 +151,14 @@ class TransferBaseModule(CoreModule):
             product_properties['maxpsa30'] = psa30_info['max']
             product_properties['maxpsa30-grid'] = psa30_info['max_grid']
 
-        product_properties['minimum-longitude'] = \
-            info['output']['map_information']['min']['longitude']
-        product_properties['minimum-latitude'] = \
-            info['output']['map_information']['min']['latitude']
-        product_properties['maximum-longitude'] = \
-            info['output']['map_information']['max']['longitude']
-        product_properties['maximum-latitude'] = \
-            info['output']['map_information']['max']['latitude']
+        product_properties['minimum-longitude'] = info['output']['map_information']['min']['longitude']
+        product_properties['minimum-latitude'] = info['output']['map_information']['min']['latitude']
+        product_properties['maximum-longitude'] = info['output']['map_information']['max']['longitude']
+        product_properties['maximum-latitude'] = info['output']['map_information']['max']['latitude']
 
-        product_properties['process-timestamp'] = \
-            info['processing']['shakemap_versions']['process_time']
-        product_properties['version'] = \
-            info['processing']['shakemap_versions']['map_version']
-        product_properties['map-status'] = \
-            info['processing']['shakemap_versions']['map_status']
+        product_properties['process-timestamp'] = info['processing']['shakemap_versions']['process_time']
+        product_properties['version'] = info['processing']['shakemap_versions']['map_version']
+        product_properties['map-status'] = info['processing']['shakemap_versions']['map_status']
 
         # if this process is being run manually, set the review-status property
         # to "reviewed". If automatic, then set to "automatic".
@@ -164,6 +171,27 @@ class TransferBaseModule(CoreModule):
         product_properties['gmice'] = gmice
 
         return (properties, product_properties)
+
+    def _make_backup(self, data_path):
+        data_dir = os.path.join(data_path, self._eventid)
+        current_dir = os.path.join(data_dir, 'current')
+        backup_dirs = glob.glob(os.path.join(data_dir, 'backup*'))
+        latest_version = 0
+
+        # and get the most recent version number
+        for backup_dir in backup_dirs:
+            if not os.path.isdir(backup_dir):
+                continue
+            match = re.search('[0-9]*$', backup_dir)
+            if match is not None:
+                version = int(match.group())
+                if version > latest_version:
+                    latest_version = version
+
+        new_version = latest_version + 1
+        backup = os.path.join(data_dir, 'backup%04i' % new_version)
+        shutil.copytree(current_dir, backup)
+        logging.debug('Created backup directory %s' % backup)
 
     def parseArgs(self, arglist):
         """
