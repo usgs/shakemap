@@ -6,11 +6,11 @@ import os.path
 import shutil
 import argparse
 
-from shakemap.coremods.transfer import _transfer
+# from shakemap.coremods.transfer import _transfer
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 
-def pdl_test(java, jarfile, keyfile, configfile):
+def dummy_pdl_test(java, jarfile, keyfile, configfile):
     homedir = os.path.dirname(os.path.abspath(__file__))
     cfile = os.path.join(homedir, '..', '..', 'data', 'containers',
                          'northridge', 'shake_result.hdf')
@@ -29,7 +29,7 @@ def pdl_test(java, jarfile, keyfile, configfile):
     _transfer(config, container.getMetadata(), pdl_dir, products_dir)
 
 
-def scp_test(remote_host, remote_directory, private_key):
+def dummy_scp_test(remote_host, remote_directory, private_key):
     homedir = os.path.dirname(os.path.abspath(__file__))
     cfile = os.path.join(homedir, '..', '..', 'data', 'containers',
                          'northridge', 'shake_result.hdf')
@@ -46,7 +46,7 @@ def scp_test(remote_host, remote_directory, private_key):
     _transfer(config, container.getMetadata(), pdl_dir, products_dir)
 
 
-def test_transfer():
+def dummy_test_transfer():
     homedir = os.path.dirname(os.path.abspath(__file__))
     cfile = os.path.join(homedir, '..', '..', 'data', 'containers',
                          'northridge', 'shake_result.hdf')
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         test_transfer()
     elif args.method == 'pdl':
         if args.java is None or args.jarfile is None or \
-          args.keyfile is None or args.configfile is None:
+                args.keyfile is None or args.configfile is None:
             print('--java, --jarfile, --keyfile, --configfile options must be '
                   'supplied for pdl.')
             sys.exit(1)
