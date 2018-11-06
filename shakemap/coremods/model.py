@@ -669,10 +669,25 @@ class ModelModule(CoreModule):
             for imtstr in dfn.imts:
                 oqimt = imt.from_string(imtstr)
                 gmpe = None
+                not_supported = False
                 if imtstr != 'MMI':
-                    gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-                pmean, pstddev = self._gmas(
-                    gmpe, dfn.sx, dfn.dx, oqimt, self.apply_gafs)
+                    try:
+                        gmpe = MultiGMPE.from_config(self.config,
+                                                     filter_imt=oqimt)
+                    except KeyError:
+                        self.logger.warn(
+                            "Input IMT %s not supported by GMPE: ignoring" %
+                            imtstr)
+                        not_supported = True
+                if not_supported:
+                    pmean = np.full_like(df[imtstr], np.nan)
+                    pstddev = [None] * 3
+                    pstddev[0] = np.full_like(df[imtstr], np.nan)
+                    pstddev[1] = np.full_like(df[imtstr], np.nan)
+                    pstddev[2] = np.full_like(df[imtstr], np.nan)
+                else:
+                    pmean, pstddev = self._gmas(gmpe, dfn.sx, dfn.dx, oqimt,
+                                                self.apply_gafs)
                 df[imtstr + '_pred'] = pmean
                 df[imtstr + '_pred_sigma'] = pstddev[0]
                 if self.total_sd_only:
@@ -700,18 +715,18 @@ class ModelModule(CoreModule):
                     # turn off nan warnings for this statement
                     #
                     np.seterr(invalid='ignore')
-                    flagged = \
-                        np.abs(df[imtstr + '_residual']) > \
-                        self.outlier_deviation_level * \
-                        df[imtstr + '_pred_sigma']
+                    flagged = np.isnan(df[imtstr + '_residual']) | \
+                        (np.abs(df[imtstr + '_residual']) >
+                         self.outlier_deviation_level *
+                         df[imtstr + '_pred_sigma'])
                     np.seterr(invalid='warn')
 
                     self.logger.debug('IMT: %s, flagged: %d' %
                                       (imtstr, np.sum(flagged)))
                     df[imtstr + '_outliers'] = flagged
                 else:
-                    df[imtstr + '_outliers'] = np.full(
-                        df[imtstr].shape, False, dtype=np.bool)
+                    flagged = np.isnan(df[imtstr + '_residual'])
+                    df[imtstr + '_outliers'] = flagged
                 #
                 # If uncertainty hasn't been set for MMI, give it
                 # the default value
@@ -773,9 +788,24 @@ class ModelModule(CoreModule):
                 #
                 # Get the predictions and stddevs
                 #
-                gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-                pmean, pstddev = self._gmas(
-                    gmpe, self.df2.sx, self.df2.dx, oqimt, self.apply_gafs)
+                not_supported = False
+                try:
+                    gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
+                except KeyError:
+                    self.logger.warn(
+                        "Input IMT %s not supported by GMPE: ignoring" %
+                        imtstr)
+                    not_supported = True
+                if not_supported:
+                    pmean = np.full_like(df2['MMI'], np.nan)
+                    pstddev = [None] * 3
+                    pstddev[0] = np.full_like(df2['MMI'], np.nan)
+                    pstddev[1] = np.full_like(df2['MMI'], np.nan)
+                    pstddev[2] = np.full_like(df2['MMI'], np.nan)
+                else:
+                    pmean, pstddev = self._gmas(gmpe, self.df2.sx,
+                                                self.df2.dx, oqimt,
+                                                self.apply_gafs)
                 df2[imtstr + '_pred'] = pmean
                 df2[imtstr + '_pred_sigma'] = pstddev[0]
                 if self.total_sd_only:
@@ -788,8 +818,7 @@ class ModelModule(CoreModule):
                     df2[imtstr + '_pred_tau'] = pstddev[1]
                     df2[imtstr + '_pred_phi'] = pstddev[2]
                 df2[imtstr + '_residual'] = df2[imtstr] - pmean
-                df2[imtstr + '_outliers'] = np.full(
-                    pmean.shape, False, dtype=np.bool)
+                df2[imtstr + '_outliers'] = np.isnan(df2[imtstr + '_residual'])
 
     def _deriveMMIFromIMTs(self):
         """
@@ -857,8 +886,7 @@ class ModelModule(CoreModule):
             df1['MMI' + '_pred_tau'] = pstddev[1]
             df1['MMI' + '_pred_phi'] = pstddev[2]
         df1['MMI' + '_residual'] = df1['MMI'] - pmean
-        df1['MMI' + '_outliers'] = np.full(pmean.shape, False,
-                                           dtype=np.bool)
+        df1['MMI' + '_outliers'] = np.isnan(df1['MMI' + '_residual'])
 
     def _fillDataArrays(self):
         """
@@ -962,14 +990,12 @@ class ModelModule(CoreModule):
             #
             # Build the covariance matrix of the residuals
             #
-            # time1 = time.time()
             nsta = np.size(sta_lons_rad_dl)
             matrix22 = np.empty((nsta, nsta), dtype=np.double)
             geodetic_distance_fast(sta_lons_rad_dl,
                                    sta_lats_rad_dl,
                                    sta_lons_rad_dl,
                                    sta_lats_rad_dl, matrix22)
-            # print("distance time %f" % (time.time() - time1))
             ones = np.ones((1, nsta), dtype=np.long)
             t1_22 = sta_period_ix_dl * ones
             t2_22 = sta_period_ix_dl.T * ones.T
@@ -1049,6 +1075,7 @@ class ModelModule(CoreModule):
         """
         Do the MVN computations
         """
+        self.logger.debug('computeMVN: doing IMT %s' % imtstr)
         time1 = time.time()
         #
         # Get the index of the (pesudo-) period of the output IMT
@@ -2238,7 +2265,7 @@ def _get_imt_lists(df):
         sa_imts = []
         if 'flagged' not in df.df or not df.df['flagged'][ix]:
             for this_imt in df.imts:
-                if not np.isnan(df.df[this_imt][ix]) and \
+                if not np.isnan(df.df[this_imt + '_residual'][ix]) and \
                         not df.df[this_imt + '_outliers'][ix]:
                     valid_imts.append(this_imt)
                     if this_imt.startswith('SA('):
