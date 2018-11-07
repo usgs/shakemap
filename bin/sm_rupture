@@ -8,6 +8,8 @@ length, ...).
 
 import argparse
 import numpy as np
+import copy
+
 
 from shakelib.rupture.factory import get_rupture
 from shakelib.rupture.origin import Origin
@@ -33,6 +35,9 @@ def is_float(s):
 
 
 def prompt_user(args, origin):
+    ref = input('  - Rupture reference? ')
+    origin.reference = ref
+
     n_quad = input('  - How many quadrilaterals are in this rupture? ')
     if is_int(n_quad):
         n_quad = int(n_quad)
@@ -102,7 +107,6 @@ def prompt_user(args, origin):
         out = input('    Dip (deg) of quadrilateral: ')
         if is_float(out):
             dip.append(float(out))
-            print('*** DIP: %s ***' % out)
         else:
             raise ValueError('Dip must be a float.')
 
@@ -123,16 +127,16 @@ def main(pparser, args):
     else:
         print("* No event.xml file specified, using dummy origin...")
         dummy = {
-            'mag': np.nan,
-            'id': 'dummy',
-            'locstring': 'dummy',
-            'mech': 'ALL',
+            'mag': '',
+            'id': '',
+            'mech': '',
             'lon': np.nan,
             'lat': np.nan,
-            'depth': np.nan,
-            'netid': "",
-            'network': "",
-            'time': ""
+            'depth': '',
+            'locstring': '',
+            'netid': '',
+            'network': '',
+            'time': ''
         }
         origin = Origin(dummy)
 
@@ -161,6 +165,16 @@ quadrilateral will be defined with the following geometry:
 '''
         print(explain_text)
         rup = prompt_user(args, origin)
+
+    # Remove any blank or nan origin info
+    odict = copy.copy(rup._origin.__dict__)
+    for k, v in odict.items():
+        if isinstance(v, str):
+            if not v:
+                rup._geojson['metadata'].pop(k, None)
+        if isinstance(v, float):
+            if np.isnan(v):
+                rup._geojson['metadata'].pop(k, None)
 
     # Write output
     rup.writeGeoJson(args.outfile)
