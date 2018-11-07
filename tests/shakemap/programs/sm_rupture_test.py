@@ -60,6 +60,7 @@ def test_rupture():
             shell=False
         )
         responses = (
+            'test\n' +
             '1\n' +
             str(px) + '\n' +
             str(py) + '\n' +
