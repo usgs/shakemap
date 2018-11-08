@@ -151,14 +151,17 @@ class TransferBaseModule(CoreModule):
             product_properties['maxpsa30'] = psa30_info['max']
             product_properties['maxpsa30-grid'] = psa30_info['max_grid']
 
-        product_properties['minimum-longitude'] = info['output']['map_information']['min']['longitude']
-        product_properties['minimum-latitude'] = info['output']['map_information']['min']['latitude']
-        product_properties['maximum-longitude'] = info['output']['map_information']['max']['longitude']
-        product_properties['maximum-latitude'] = info['output']['map_information']['max']['latitude']
+        mapinfo = info['output']['map_information']
+        product_properties['minimum-longitude'] = mapinfo['min']['longitude']
+        product_properties['minimum-latitude'] = mapinfo['min']['latitude']
+        product_properties['maximum-longitude'] = mapinfo['max']['longitude']
+        product_properties['maximum-latitude'] = mapinfo['max']['latitude']
 
-        product_properties['process-timestamp'] = info['processing']['shakemap_versions']['process_time']
-        product_properties['version'] = info['processing']['shakemap_versions']['map_version']
-        product_properties['map-status'] = info['processing']['shakemap_versions']['map_status']
+        vinfo = info['processing']['shakemap_versions']
+        product_properties['process-timestamp'] = vinfo['process_time']
+        product_properties['version'] = vinfo['map_version']
+        product_properties['map-status'] = vinfo['map_status']
+        product_properties['shakemap-code-version'] = vinfo['shakemap_revision']
 
         # if this process is being run manually, set the review-status property
         # to "reviewed". If automatic, then set to "automatic".
