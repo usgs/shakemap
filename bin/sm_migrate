@@ -16,7 +16,6 @@ from configobj import ConfigObj
 import numpy as np
 
 # local imports
-from shakemap.coremods import transfer
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.utils import (
     get_network_name,
@@ -356,23 +355,6 @@ def make_rupture(event_dir):
         os.remove(ffile)
 
 
-def parse_transfer(event_dir, tarball, member):
-    grindfile = tarball.extractfile(member)
-    lines = grindfile.readlines()
-    for line in lines:
-        if line.strip*().startswith('#'):
-            continue
-        if not len(line.strip()):
-            continue
-        if 'pdl_config' in line:
-            # this applies to the installation at NEIC
-            # more knowledge of regional SM installations is required
-            if 'ehpdev' in line:
-                notransfer = os.path.join(event_dir, transfer.NO_TRANSFER)
-                with open(notransfer, 'wt') as f:
-                    f.write('transfer blocked by sm_migrate.')
-
-
 def parse_config(event_dir, tarball, member, migrate_conf=None):
     errors = []
     conversions = {}
@@ -388,8 +370,6 @@ def parse_config(event_dir, tarball, member, migrate_conf=None):
         pass
     elif 'retrieve.conf' in member:
         pass
-    elif 'transfer.conf' in member:
-        parse_transfer(event_dir, tarball, member)
     else:
         errors.append('Unknown config file type %s' % member)
 
