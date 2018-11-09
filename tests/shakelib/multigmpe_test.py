@@ -177,6 +177,8 @@ def test_from_config_set_of_sets():
                 'weights': [0.8, 0.2]
             }
         },
+        'gmpe_limits': {
+        },
         'modeling': {
             'gmpe': 'active_crustal_80_stable_continental_20'
         },
@@ -286,6 +288,8 @@ def test_from_config_set_of_gmpes():
                 'weights_site_gmpes': []
             }
         },
+        'gmpe_limits': {
+        },
         'modeling': {
             'gmpe': 'stable_continental',
         },
@@ -385,6 +389,8 @@ def test_from_config_set_of_sets_3_sec():
                 'weights': [0.8, 0.2]
             }
         },
+        'gmpe_limits': {
+        },
         'modeling': {
             'gmpe': 'active_crustal_80_stable_continental_20'
         },
@@ -471,6 +477,8 @@ def test_from_config_single_gmpe():
                 'site_gmpes': ['ASK14'],
                 'weights_site_gmpes': []
             }
+        },
+        'gmpe_limits': {
         },
         'modeling': {
             'gmpe': 'ASK14',

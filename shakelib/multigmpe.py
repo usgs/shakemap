@@ -147,7 +147,7 @@ class MultiGMPE(GMPE):
             sites = MultiGMPE.set_sites_depth_parameters(sites, gmpe)
 
             # -----------------------------------------------------------------
-            # Evaluate GMPEs
+            # Select the IMT
             # -----------------------------------------------------------------
 
             gmpe_imts = [imt.__name__ for imt in
@@ -158,6 +158,34 @@ class MultiGMPE(GMPE):
                 timt = SA(1.0)
             else:
                 timt = imt
+
+            # -----------------------------------------------------------------
+            # Grab GMPE_LIMITS in gmpe instance for later as the multigmpe
+            # nests downward.
+            # -----------------------------------------------------------------
+            if hasattr(self, 'GMPE_LIMITS'):
+                # Remember that GMPE_LIMITS is only present if it is getting
+                # loaded from a config... we could change this eventually.
+                gmpe.GMPE_LIMITS = self.GMPE_LIMITS
+
+            # -----------------------------------------------------------------
+            # Apply GMPE_LIMITS if applicable
+            # -----------------------------------------------------------------
+            if hasattr(self, 'GMPE_LIMITS'):
+                gmpes_with_limits = list(self.GMPE_LIMITS.keys())
+                gmpe_class_str = str(self).replace('()', '')
+                if gmpe_class_str in gmpes_with_limits:
+                    limit_dict = self.GMPE_LIMITS[gmpe_class_str]
+                    for k, v in limit_dict.items():
+                        if k is 'vs30':
+                            vs30min = float(v[0])
+                            vs30max = float(v[1])
+                            sites.vs30 = np.clip(sites.vs30, vs30min, vs30max)
+            
+
+            # -----------------------------------------------------------------
+            # Evaluate
+            # -----------------------------------------------------------------
 
             lmean, lsd = gmpe.get_mean_and_stddevs(sites, rup, dists, timt,
                                                    stddev_types)
@@ -310,6 +338,22 @@ class MultiGMPE(GMPE):
                             "conf['gmpe_modules'] or conf['gmpe_sets']")
 
         out.DESCRIPTION = selected_gmpe
+
+        # ---------------------------------------------------------------------
+        # Deal with GMPE limits
+        # ---------------------------------------------------------------------
+        gmpe_lims = conf['gmpe_limits']
+
+        # We need to replace the short name in the dictionary key with module 
+        # name here since the conf is not available within the MultiGMPE class.
+        mods = conf['gmpe_modules']
+        mod_keys = mods.keys()
+        for k, v in gmpe_lims.items():
+            if k in mod_keys:
+                gmpe_lims[mods[k][0]] = gmpe_lims.pop(k)
+
+        out.GMPE_LIMITS = gmpe_lims
+
         return out
 
     def __multigmpe_from_gmpe_set(conf, set_name, filter_imt=None):
