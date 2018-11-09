@@ -880,6 +880,8 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
             mlon = mmi_dict['lon'][i]
             mmi = mmi_dict['mmi'][i]
             mcolor = intensity_colormap.getDataColor(mmi)
+            if np.isnan(mmi):
+                mcolor = (mcolor[0], mcolor[1], mcolor[2], 0.0)
             ax.plot(mlon, mlat, 'o', markerfacecolor=mcolor,
                     markeredgecolor='k', markersize=4, mew=0.5,
                     zorder=STATIONS_ZORDER, transform=geoproj)
@@ -893,6 +895,8 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
             #
             mmi = inst_dict['mmi'][i]
             mcolor = intensity_colormap.getDataColor(mmi)
+            if np.isnan(mmi):
+                mcolor = (mcolor[0], mcolor[1], mcolor[2], 0.0)
             ax.plot(mlon, mlat, '^',
                     markerfacecolor=mcolor, markeredgecolor='k',
                     markersize=6, zorder=STATIONS_ZORDER, mew=0.5,
