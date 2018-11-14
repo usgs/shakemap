@@ -27,9 +27,85 @@ from shakemap.utils.layers import (validate_config,
 from shakemap.coremods.dyfi import _get_dyfi_dataframe
 from shakelib.rupture import constants
 from shakelib.utils.utils import replace_dyfi
+from shakelib.station import StationList
 
 TIMEFMT2 = '%Y-%m-%dT%H:%M:%S'
 KM2SEC = 3600.0/111  # seconds per kilometer
+
+
+def write_instrumented(data_file, event_dir):
+    # load the file, nuke any data not from an instrument
+    instrumented = StationList.loadFromFiles([data_file])
+    db = instrumented.db
+    cursor = instrumented.cursor
+    cursor.execute('SELECT count(*) FROM station')
+    nrows = cursor.fetchone()[0]
+    sys.stderr.write('Original data set had %i total stations.\n' % nrows)
+    query1 = 'SELECT id FROM station WHERE instrumented != 1'
+    cursor.execute(query1)
+    srows = cursor.fetchall()
+    for srow in srows:
+        sid = srow[0]
+        query2 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        cursor.execute(query2)
+        db.commit()
+        query3 = 'DELETE FROM station WHERE id="%s"' % sid
+        cursor.execute(query3)
+        db.commit()
+
+    cursor.execute('SELECT count(*) FROM station')
+    nrows = cursor.fetchone()[0]
+    instrument_file = None
+    if nrows:
+        jsonstr = instrumented.getGeoJson()
+        instrument_file = os.path.join(event_dir, 'instrumented_dat.json')
+        with open(instrument_file, 'wt') as f:
+            json.dump(jsonstr, f)
+    return instrument_file
+
+
+def write_macroseismic(data_file, event_dir):
+    # load the file, nuke any data that is not macroseismic
+    macroseismic = StationList.loadFromFiles([data_file])
+    db = macroseismic.db
+    cursor = macroseismic.cursor
+    cursor.execute('SELECT count(*) FROM station')
+    nrows = cursor.fetchone()[0]
+    sys.stderr.write('Original data set had %i total stations.\n' % nrows)
+    # first remove instruments
+    query1 = 'SELECT id FROM station WHERE instrumented == 1'
+    cursor.execute(query1)
+    srows = cursor.fetchall()
+    for srow in srows:
+        sid = srow[0]
+        query2 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        cursor.execute(query2)
+        db.commit()
+        query3 = 'DELETE FROM station WHERE id="%s"' % sid
+        cursor.execute(query3)
+        db.commit()
+    # next, remove DYFI
+    query4 = 'SELECT id FROM station WHERE network in ("DYFI", "CIIM")'
+    cursor.execute(query4)
+    srows = cursor.fetchall()
+    for srow in srows:
+        sid = srow[0]
+        query5 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        cursor.execute(query5)
+        db.commit()
+        query6 = 'DELETE FROM station WHERE id="%s"' % sid
+        cursor.execute(query6)
+        db.commit()
+    cursor.execute('SELECT count(*) FROM station')
+    nrows = cursor.fetchone()[0]
+    macro_file = None
+    if nrows:
+        jsonstr = macroseismic.getGeoJson()
+        macro_file = os.path.join(event_dir, 'macroseismic_dat.json')
+        with open(macro_file, 'wt') as f:
+            json.dump(jsonstr, f)
+
+    return macro_file
 
 
 def get_parser():
@@ -233,7 +309,7 @@ def main(args):
                       % detail.id)
                 dataframe, msg = _get_dyfi_dataframe(detail)
                 if dataframe is not None:
-                    data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
+                    data_file = os.path.join(event_dir, 'dyfi_dat.xml')
                     reference = 'USGS Did You Feel It? System'
                     dataframe_to_xml(dataframe, data_file, reference)
         else:
@@ -251,24 +327,21 @@ def main(args):
             data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
             shakemap.getContent('stationlist.xml', filename=data_file)
 
-            # let's grab any dyfi product we find, and replace the
-            # non-instrumented data in the stationlist with the (presumably
-            # updated) dyfi data
+            # let's try to write out the input data in as many as three files:
+            # 1) dyfi_dat.xml, the most up to date DYFI we have.
+            # 2) instrumented_dat.son, all of the instrumented data from stationlist.xml
+            # 3) macroseismic_dat.json, all of the macroseismic data from stationlist.xml
             dataframe, msg = _get_dyfi_dataframe(detail)
             if dataframe is not None:
-                dyfi_file = os.path.join(
-                    event_dir, '%s_dyfi_dat.xml' % eventid)
+                dyfi_file = os.path.join(event_dir, 'dyfi_dat.xml')
                 reference = 'USGS Did You Feel It? System'
                 dataframe_to_xml(dataframe, dyfi_file, reference)
-                if os.path.isfile(data_file):
-                    stations = replace_dyfi(data_file, dyfi_file)
-                    json_data = stations.getGeoJson()
-                    new_data_file = os.path.join(
-                        event_dir, '%s_dat.json' % eventid)
-                    with open(new_data_file, 'wt') as f:
-                        json.dump(json_data, f)
-                    os.remove(data_file)
-                    os.remove(dyfi_file)
+
+            instrument_file = write_instrumented(data_file, event_dir)
+            macro_file = write_macroseismic(data_file, event_dir)
+
+            # delete the data file now that we've split it apart
+            os.remove(data_file)
 
             fault_files = shakemap.getContentsMatching('fault.txt')
             if len(fault_files):
