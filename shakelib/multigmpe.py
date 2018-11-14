@@ -171,17 +171,16 @@ class MultiGMPE(GMPE):
             # -----------------------------------------------------------------
             # Apply GMPE_LIMITS if applicable
             # -----------------------------------------------------------------
-            if hasattr(self, 'GMPE_LIMITS'):
-                gmpes_with_limits = list(self.GMPE_LIMITS.keys())
-                gmpe_class_str = str(self).replace('()', '')
+            if hasattr(gmpe, 'GMPE_LIMITS'):
+                gmpes_with_limits = list(gmpe.GMPE_LIMITS.keys())
+                gmpe_class_str = str(gmpe).replace('()', '')
                 if gmpe_class_str in gmpes_with_limits:
-                    limit_dict = self.GMPE_LIMITS[gmpe_class_str]
+                    limit_dict = gmpe.GMPE_LIMITS[gmpe_class_str]
                     for k, v in limit_dict.items():
-                        if k is 'vs30':
+                        if k == 'vs30':
                             vs30min = float(v[0])
                             vs30max = float(v[1])
                             sites.vs30 = np.clip(sites.vs30, vs30min, vs30max)
-            
 
             # -----------------------------------------------------------------
             # Evaluate
@@ -344,7 +343,7 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
         gmpe_lims = conf['gmpe_limits']
 
-        # We need to replace the short name in the dictionary key with module 
+        # We need to replace the short name in the dictionary key with module
         # name here since the conf is not available within the MultiGMPE class.
         mods = conf['gmpe_modules']
         mod_keys = mods.keys()
