@@ -777,7 +777,7 @@ class MultiGMPE(GMPE):
             else:
                 sites.z2pt5 = sites.z2pt5_cb14_cal
         if gmpe == 'ChiouYoungs2008()' or \
-           gmpe == 'Bradley20i3()' or \
+           gmpe == 'Bradley2013()' or \
            gmpe == 'Bradley2013Volc()':
             sites.z1pt0 = sites.z1pt0_cy08
         if gmpe == 'CampbellBozorgnia2008()':
