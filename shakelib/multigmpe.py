@@ -172,12 +172,12 @@ class MultiGMPE(GMPE):
             # Apply GMPE_LIMITS if applicable
             # -----------------------------------------------------------------
             if hasattr(self, 'GMPE_LIMITS'):
-                gmpes_with_limits = list(self.GMPE_LIMITS.keys())
-                gmpe_class_str = str(self).replace('()', '')
+                gmpes_with_limits = list(gmpe.GMPE_LIMITS.keys())
+                gmpe_class_str = str(gmpe).replace('()', '')
                 if gmpe_class_str in gmpes_with_limits:
                     limit_dict = self.GMPE_LIMITS[gmpe_class_str]
                     for k, v in limit_dict.items():
-                        if k is 'vs30':
+                        if k == 'vs30':
                             vs30min = float(v[0])
                             vs30max = float(v[1])
                             sites.vs30 = np.clip(sites.vs30, vs30min, vs30max)
