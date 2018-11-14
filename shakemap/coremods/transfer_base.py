@@ -26,6 +26,10 @@ SAVE_FILE = '.saved'
 
 
 class TransferBaseModule(CoreModule):
+    """
+    Base class for transfer modules.
+    """
+
     def __init__(self, eventid, cancel=False):
         """
         Instantiate a CoreModule class with an event ID.

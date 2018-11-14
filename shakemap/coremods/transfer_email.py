@@ -14,7 +14,9 @@ from shakemap.utils.macros import get_macros
 
 
 class EmailTransfer(TransferBaseModule):
-
+    """
+    transfer_email - Transfer content via Email.
+    """
     command_name = 'transfer_email'
     dependencies = [('products/*', False)]
 

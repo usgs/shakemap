@@ -12,7 +12,9 @@ from .transfer_base import TransferBaseModule
 
 
 class SaveTransfer(TransferBaseModule):
-
+    """
+    save - Create backup directory and prep for next ShakeMap map version.
+    """
     command_name = 'save'
     dependencies = [('products/*', False)]
 
