@@ -12,7 +12,9 @@ from .transfer_base import TransferBaseModule
 
 
 class SCPTransfer(TransferBaseModule):
-
+    """
+    transfer_pdl - Transfer content via SCP to a remote server.
+    """
     command_name = 'transfer_scp'
     dependencies = [('products/*', False)]
 

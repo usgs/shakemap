@@ -12,7 +12,9 @@ from .transfer_base import TransferBaseModule
 
 
 class PDLTransfer(TransferBaseModule):
-
+    """
+    transfer_pdl - Transfer content via PDL to a remote server.
+    """
     command_name = 'transfer_pdl'
     dependencies = [('products/*', False)]
 
