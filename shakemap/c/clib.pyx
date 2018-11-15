@@ -20,6 +20,7 @@ def make_sigma_matrix(double[:, ::1]corr12, double[:, ::1]corr_adj12,
     cdef double *c12p
     cdef double *cap
     cdef double sdval
+    cdef double tmp
     cdef Py_ssize_t x, y
 
     for y in prange(ny, nogil=True, schedule=dynamic):
@@ -27,7 +28,12 @@ def make_sigma_matrix(double[:, ::1]corr12, double[:, ::1]corr_adj12,
         cap = &corr_adj12[y, 0]
         sdval = sdarr[y]
         for x in range(nx):
-            c12p[x] = c12p[x] * cap[x] * sdsta[x] * sdval
+            # Putting these operations all on one line seems to
+            # allow the compiler to do things that result in the
+            # output matrix being very slightly asymmetric.
+            tmp = sdsta[x] * sdval
+            tmp = cap[x] * tmp
+            c12p[x] = c12p[x] * tmp
     return
 
 
