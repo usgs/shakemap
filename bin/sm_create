@@ -9,17 +9,19 @@ import datetime
 import json
 import warnings
 from collections import OrderedDict
+import copy
 
 # third party imports
 from libcomcat.search import get_event_by_id
 from configobj import ConfigObj
 from impactutils.time.ancient_time import HistoricTime
 from amptools.table import dataframe_to_xml
+import numpy as np
 
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakelib.rupture.origin import write_event_file, Origin
-from shakelib.rupture.factory import text_to_json, rupture_from_dict_and_origin
+from shakelib.rupture.factory import get_rupture
 from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
 from shakemap.utils.probs import get_weights
 from shakemap.utils.layers import (validate_config,
@@ -40,7 +42,7 @@ def write_instrumented(data_file, event_dir):
     cursor = instrumented.cursor
     cursor.execute('SELECT count(*) FROM station')
     nrows = cursor.fetchone()[0]
-    sys.stderr.write('Original data set had %i total stations.\n' % nrows)
+    # sys.stderr.write('Original data set had %i total stations.\n' % nrows)
     query1 = 'SELECT id FROM station WHERE instrumented != 1'
     cursor.execute(query1)
     srows = cursor.fetchall()
@@ -71,7 +73,7 @@ def write_macroseismic(data_file, event_dir):
     cursor = macroseismic.cursor
     cursor.execute('SELECT count(*) FROM station')
     nrows = cursor.fetchone()[0]
-    sys.stderr.write('Original data set had %i total stations.\n' % nrows)
+    # sys.stderr.write('Original data set had %i total stations.\n' % nrows)
     # first remove instruments
     query1 = 'SELECT id FROM station WHERE instrumented == 1'
     cursor.execute(query1)
@@ -348,9 +350,20 @@ def main(args):
                 fault_file = os.path.join(event_dir, fault_files[0])
                 shakemap.getContent(fault_files[0], filename=fault_file)
                 try:
-                    jdict = text_to_json(fault_file, new_format=False)
-                    origin = Origin(edict)
-                    rupt = rupture_from_dict_and_origin(jdict, origin)
+                    # edict['time'] = HistoricTime(edict['time'])
+                    origin = Origin.fromFile(event_xml_file)
+                    rupt = get_rupture(origin, file=fault_file, new_format=False)
+                    
+                    # Remove any blank or nan origin info
+                    odict = copy.copy(rupt._origin.__dict__)
+                    for k, v in odict.items():
+                        if isinstance(v, str):
+                            if not v:
+                                rupt._geojson['metadata'].pop(k, None)
+                        if isinstance(v, float):
+                            if np.isnan(v):
+                                rupt._geojson['metadata'].pop(k, None)
+                                
                     jsonfile = os.path.join(event_dir, 'rupture.json')
                     rupt.writeGeoJson(jsonfile)
                     os.remove(fault_file)
