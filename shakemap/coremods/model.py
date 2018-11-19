@@ -65,7 +65,8 @@ from shakelib.directivity.rowshandel2013 import Rowshandel2013
 SM_CONSTS = {
     'default_mmi_stddev': 0.3,
     'min_mmi_convert': 4.0,
-    'default_stddev_inter': 0.35
+    'default_stddev_inter': 0.35,
+    'default_stddev_inter_mmi': 0.4
 }
 
 
@@ -139,7 +140,22 @@ class ModelModule(CoreModule):
             ipe_gmpe = MultiGMPE.from_config(self.config, filter_imt=pgv_imt)
             self.ipe = VirtualIPE.fromFuncs(ipe_gmpe, self.gmice)
         else:
-            self.ipe = get_object_from_config('ipe', 'modeling', self.config)
+            ipe = get_object_from_config('ipe', 'modeling', self.config)
+            if 'vs30' not in ipe.REQUIRES_SITES_PARAMETERS:
+                ipe.REQUIRES_SITES_PARAMETERS.add('vs30')
+            ipe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
+                oqconst.IMC.GREATER_OF_TWO_HORIZONTAL
+            self.ipe = MultiGMPE.from_list([ipe], [1.0])
+
+        ipe_sd_types = self.ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        if len(ipe_sd_types) == 1:
+            self.ipe_total_sd_only = True
+            self.ipe_stddev_types = [oqconst.StdDev.TOTAL]
+        else:
+            self.ipe_total_sd_only = False
+            self.ipe_stddev_types = [oqconst.StdDev.TOTAL,
+                                     oqconst.StdDev.INTER_EVENT,
+                                     oqconst.StdDev.INTRA_EVENT]
 
         # ---------------------------------------------------------------------
         # Get the rupture object and rupture context
@@ -170,13 +186,13 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         gmpe_sd_types = self.default_gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
         if len(gmpe_sd_types) == 1:
-            self.total_sd_only = True
-            self.stddev_types = [oqconst.StdDev.TOTAL]
+            self.gmpe_total_sd_only = True
+            self.gmpe_stddev_types = [oqconst.StdDev.TOTAL]
         else:
-            self.total_sd_only = False
-            self.stddev_types = [oqconst.StdDev.TOTAL,
-                                 oqconst.StdDev.INTER_EVENT,
-                                 oqconst.StdDev.INTRA_EVENT]
+            self.gmpe_total_sd_only = False
+            self.gmpe_stddev_types = [oqconst.StdDev.TOTAL,
+                                      oqconst.StdDev.INTER_EVENT,
+                                      oqconst.StdDev.INTRA_EVENT]
 
         # ---------------------------------------------------------------------
         # Are we going to include directivity?
@@ -690,8 +706,13 @@ class ModelModule(CoreModule):
                                                 self.apply_gafs)
                 df[imtstr + '_pred'] = pmean
                 df[imtstr + '_pred_sigma'] = pstddev[0]
-                if self.total_sd_only:
+                if imtstr != 'MMI':
+                    total_only = self.gmpe_total_sd_only
                     tau_guess = SM_CONSTS['default_stddev_inter']
+                else:
+                    total_only = self.ipe_total_sd_only
+                    tau_guess = SM_CONSTS['default_stddev_inter_mmi']
+                if total_only:
                     df[imtstr + '_pred_tau'] = np.full_like(
                         df[imtstr + '_pred'], tau_guess)
                     df[imtstr + '_pred_phi'] = np.sqrt(
@@ -808,8 +829,13 @@ class ModelModule(CoreModule):
                                                 self.apply_gafs)
                 df2[imtstr + '_pred'] = pmean
                 df2[imtstr + '_pred_sigma'] = pstddev[0]
-                if self.total_sd_only:
+                if imtstr != 'MMI':
+                    total_only = self.gmpe_total_sd_only
                     tau_guess = SM_CONSTS['default_stddev_inter']
+                else:
+                    total_only = self.ipe_total_sd_only
+                    tau_guess = SM_CONSTS['default_stddev_inter_mmi']
+                if total_only:
                     df2[imtstr + '_pred_tau'] = np.full_like(
                         df2[imtstr + '_pred'], tau_guess)
                     df2[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
@@ -876,8 +902,8 @@ class ModelModule(CoreModule):
             self.apply_gafs)
         df1['MMI' + '_pred'] = pmean
         df1['MMI' + '_pred_sigma'] = pstddev[0]
-        if self.total_sd_only:
-            tau_guess = SM_CONSTS['default_stddev_inter']
+        if self.ipe_total_sd_only:
+            tau_guess = SM_CONSTS['default_stddev_inter_mmi']
             df1['MMI' + '_pred_tau'] = np.full_like(
                 df1['MMI' + '_pred'], tau_guess)
             df1['MMI' + '_pred_phi'] = np.sqrt(
@@ -1118,13 +1144,16 @@ class ModelModule(CoreModule):
         # Get an array of the within-event standard deviations for the
         # output IMT at the output points
         #
-        if self.total_sd_only:
-            self.psd[imtstr] = np.sqrt(
-                pout_sd[0]**2 - SM_CONSTS['default_stddev_inter']**2)
-            self.psd_raw[imtstr] = np.sqrt(
-                pout_sd[1]**2 - SM_CONSTS['default_stddev_inter']**2)
-            self.tsd[imtstr] = np.full_like(
-                self.psd[imtstr], SM_CONSTS['default_stddev_inter'])
+        if imtstr != 'MMI':
+            total_only = self.gmpe_total_sd_only
+            tau_guess = SM_CONSTS['default_stddev_inter']
+        else:
+            total_only = self.ipe_total_sd_only
+            tau_guess = SM_CONSTS['default_stddev_inter_mmi']
+        if total_only:
+            self.psd[imtstr] = np.sqrt(pout_sd[0]**2 - tau_guess**2)
+            self.psd_raw[imtstr] = np.sqrt(pout_sd[1]**2 - tau_guess**2)
+            self.tsd[imtstr] = np.full_like(self.psd[imtstr], tau_guess)
         else:
             self.psd[imtstr] = pout_sd[2]
             self.psd_raw[imtstr] = pout_sd[5]
@@ -1634,7 +1663,7 @@ class ModelModule(CoreModule):
                 else:
                     value = np.exp(myamp) * 100
                     units = '%g'
-                if self.total_sd_only:
+                if self.gmpe_total_sd_only:
                     mytau = 0
                 else:
                     mytau = sdf[key + '_tau'][six]
@@ -1941,8 +1970,10 @@ class ModelModule(CoreModule):
         """
         if 'MMI' in oqimt:
             pe = self.ipe
+            sd_types = self.ipe_stddev_types
         else:
             pe = gmpe
+            sd_types = self.gmpe_stddev_types
 
             # --------------------------------------------------------------------
             # Describe the MultiGMPE
@@ -1956,7 +1987,7 @@ class ModelModule(CoreModule):
         mean, stddevs = pe.get_mean_and_stddevs(
             copy.deepcopy(sx), self.rx,
             copy.deepcopy(dx), oqimt,
-            self.stddev_types)
+            sd_types)
 
         # Include generic amp factors?
         if apply_gafs:

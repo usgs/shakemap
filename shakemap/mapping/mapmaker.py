@@ -366,7 +366,8 @@ def _draw_imt_legend(fig, palette, imtype, gmice):
         left = right
 
 
-def _draw_mmi_legend(fig, palette, gmice, process_time, map_version, point_source):
+def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
+                     point_source):
     """Create a legend axis for MMI plots.
 
     Args:
@@ -451,7 +452,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version, point_sourc
     yloc_second_line = 10/14
     yloc_third_line = 8/14
     yloc_fourth_line = 6/14
-    yloc_fifth_line = 4/14
+    # yloc_fifth_line = 4/14
 
     bottom = 4/14
 
@@ -1045,8 +1046,8 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # get the proj4 string - used by Grid2D project() method
     projstr = proj.proj4_init
 
-    # this is a workaround to an occasional problem where some vector layers are
-    # not rendered. See
+    # this is a workaround to an occasional problem where some vector layers
+    # are not rendered. See
     # https://github.com/SciTools/cartopy/issues/1155#issuecomment-432941088
     proj._threshold /= 6
 
@@ -1250,8 +1251,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     # get the proj4 string - used by Grid2D project() method
     projstr = proj.proj4_init
 
-    # this is a workaround to an occasional problem where some vector layers are
-    # not rendered. See
+    # this is a workaround to an occasional problem where some vector layers
+    # are not rendered. See
     # https://github.com/SciTools/cartopy/issues/1155#issuecomment-432941088
     proj._threshold /= 6
 
@@ -1303,7 +1304,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
                               my_gmice)
 
     # get a color palette for the levels we have
-    levels = [c['properties']['value'] for c in contour_objects]
+    # levels = [c['properties']['value'] for c in contour_objects]
 
     # cartopy shapely feature has some weird behaviors, so I had to go rogue
     # and draw contour lines/labels myself.
@@ -1429,7 +1430,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     rupture = rupture_from_dict(container.getRuptureDict())
     if not isinstance(rupture, PointRupture):
         json_dict = rupture._geojson
-        shapes = []
+        # shapes = []
         for feature in json_dict['features']:
             rup_shape = sShape(feature['geometry'])
             sfeature = cfeature.ShapelyFeature(rup_shape, geoproj)

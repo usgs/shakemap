@@ -9,6 +9,7 @@ build
 shakemap.egg-info/
 **/shake_data.hdf
 **/.gmtcommands4
+**/gmt.history
 **/.ropeproject
 htmlcov
 tests/data/eventdata/*/current/products
