@@ -95,8 +95,10 @@ def contour(container, imtype, component, filter_size, gmice):
             #
             coords = measure.approximate_polygon(coords, filter_size / 20)
 
-            mylons = coords[:, 1] * lonspan / nlon + lonstart
-            mylats = (nlat - coords[:, 0]) * latspan / nlat + latstart
+            mylons = np.around(coords[:, 1] * lonspan / nlon + lonstart,
+                               decimals=6)
+            mylats = np.around((nlat - coords[:, 0]) * latspan / nlat +
+                               latstart, decimals=6)
 
             contours[ic] = np.hstack((mylons[:].reshape((-1, 1)),
                                       mylats[:].reshape((-1, 1))))
