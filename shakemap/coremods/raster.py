@@ -8,6 +8,8 @@ from impactutils.io.smcontainers import ShakeMapOutputContainer
 from mapio.gdal import GDALGrid
 from mapio.geodict import GeoDict
 from mapio.grid2d import Grid2D
+from impactutils.colors.cpalette import ColorPalette
+from PIL import Image
 
 # local imports
 from .base import CoreModule
@@ -37,7 +39,7 @@ class RasterModule(CoreModule):
         'title': 'ESRI Raster Files',
         'caption': 'Data and uncertainty grids in ESRI raster format',
         'formats': [{'filename': 'raster.zip',
-                    'type': 'application/zip'}]
+                     'type': 'application/zip'}]
     }
 
     def execute(self):
@@ -107,8 +109,30 @@ class RasterModule(CoreModule):
             zfile.write(std_hdr, '%s_std.hdr' % fileimt)
 
         zfile.close()
-        container.close()
 
         # nuke all of the copies of the files we just put in the zipfile
         for file_written in files_written:
             os.remove(file_written)
+
+        # make a transparent PNG of intensity and a world file
+        imclist = container.getComponents('MMI')
+        mmidict = container.getIMTGrids('MMI', imclist[0])
+        mmi_array = mmidict['mean']
+        geodict = GeoDict(mmidict['mean_metadata'])
+        palette = ColorPalette.fromPreset('mmi')
+        mmi_rgb = palette.getDataColor(mmi_array, color_format='array')
+        img = Image.fromarray(mmi_rgb)
+        pngfile = os.path.join(datadir, 'intensity_overlay.png')
+        img.save(pngfile, "PNG")
+
+        # write out a world file
+        # https://en.wikipedia.org/wiki/World_file
+        worldfile = os.path.join(datadir, 'intensity_overlay.pngw')
+        with open(worldfile, 'wt') as f:
+            f.write('%.4f\n' % geodict.dx)
+            f.write('0.0\n')
+            f.write('0.0\n')
+            f.write('-%.4f\n' % geodict.dy)
+            f.write('%.4f\n' % geodict.xmin)
+            f.write('%.4f\n' % geodict.ymax)
+        container.close()
