@@ -1484,6 +1484,42 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     _draw_imt_legend(fig, mmimap, imtype, gmice)
 
+    # ------------------------------------------ #
+    # ***** Temp stuff for drawing circles ***** #
+    # ------------------------------------------ #
+    # Note this expects a file named 'circles.conf' to be located in the
+    # event's 'current' directory. It can have a structure as follows, where
+    # the radius is given in km:
+    #
+    # [line1]
+    #     radius = 60
+    #     marker = --k
+    #     width = 2.0
+    # [line2]
+    #     radius = 120
+    #     marker = --k
+    #     width = 1.0
+    #
+    install_path, data_path = get_config_paths()
+    datadir = os.path.join(
+        data_path, info['input']['event_information']['id'], 'current')
+    circle_conf = os.path.join(datadir, 'circles.conf')
+    if os.path.isfile(circle_conf):
+        cir_conf = ConfigObj(circle_conf)
+        for k, v in cir_conf.items():
+            # convert radius from km to m
+            radius = float(v['radius']) * 1000
+            pproj = pyproj.Proj(proj.proj4_init)
+            cx, cy = pproj(origin.lon, origin.lat)
+            npts = 500
+            rad = np.linspace(0, 2*np.pi, npts)
+            cir_x = np.cos(rad) * radius + cx
+            cir_y = np.sin(rad) * radius + cy
+            ax.plot(cir_x, cir_y, v['marker'], linewidth=float(v['width']))
+    # ---------------------------------------------- #
+    # ***** End temp stuff for drawing circles ***** #
+    # ---------------------------------------------- #
+
     # save plot to file
     fileimt = oq_to_file(imtype)
     plt.draw()
