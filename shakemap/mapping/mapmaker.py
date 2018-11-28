@@ -1,6 +1,7 @@
 # stdlib imports
 from datetime import datetime
 import os.path
+from configobj import ConfigObj
 
 # third party imports
 import numpy as np
@@ -44,6 +45,7 @@ from shakelib.plotting.contour import contour, getContourLevels
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.gmice.wgrw12 import WGRW12
 from shakemap.utils.utils import get_object_from_config
+from shakemap.utils.config import get_config_paths
 
 # define some constants
 WATERCOLOR = '#7AA1DA'
@@ -1166,6 +1168,42 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     ax.outline_patch.set_linewidth(lw)
     ax.outline_patch.set_joinstyle('round')
     ax.outline_patch.set_capstyle('round')
+
+    # ------------------------------------------ #
+    # ***** Temp stuff for drawing circles ***** #
+    # ------------------------------------------ #
+    # Note this expects a file named 'circles.conf' to be located in the
+    # event's 'current' directory. It can have a structure as follows, where
+    # the radius is given in km:
+    #
+    # [line1]
+    #     radius = 60
+    #     marker = --k
+    #     width = 2.0
+    # [line2]
+    #     radius = 120
+    #     marker = --k
+    #     width = 1.0
+    #
+    install_path, data_path = get_config_paths()
+    datadir = os.path.join(
+        data_path, info['input']['event_information']['id'], 'current')
+    circle_conf = os.path.join(datadir, 'circles.conf')
+    if os.path.isfile(circle_conf):
+        cir_conf = ConfigObj(circle_conf)
+        for k, v in cir_conf.items():
+            # convert radius from km to m
+            radius = float(v['radius']) * 1000
+            pproj = pyproj.Proj(proj.proj4_init)
+            cx, cy = pproj(origin.lon, origin.lat)
+            npts = 500
+            rad = np.linspace(0, 2*np.pi, npts)
+            cir_x = np.cos(rad) * radius + cx
+            cir_y = np.sin(rad) * radius + cy
+            ax.plot(cir_x, cir_y, v['marker'], linewidth=float(v['width']))
+    # ---------------------------------------------- #
+    # ***** End temp stuff for drawing circles ***** #
+    # ---------------------------------------------- #
 
     # create pdf and png output file names
     pdf_file = os.path.join(outpath, 'intensity.pdf')
