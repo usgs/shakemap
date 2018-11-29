@@ -1217,7 +1217,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     fig2 = plt.figure(figsize=figsize)
     _draw_mmi_legend(fig2, mmimap, gmice, process_time,
                      map_version, point_source)
-    legend_file = os.path.join(outpath, 'mmi_legend.pdf')
+    legend_file = os.path.join(outpath, 'mmi_legend.png')
     plt.savefig(legend_file, bbox_inches='tight')
 
     return (pdf_file, jpg_file, legend_file)
