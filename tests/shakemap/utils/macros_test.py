@@ -17,7 +17,7 @@ def test_macros():
     macros = get_macros(info)
     test_dict = {'LON': '-118.5357',
                  'LAT': '34.213',
-                 'DATE': 'Jan 01, 1994',
+                 'DATE': 'Jan 17, 1994',
                  'DEP': '18.0',
                  'MAG': '6.7',
                  'LOC': 'Northridge',
