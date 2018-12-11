@@ -6,7 +6,7 @@ from datetime import datetime
 
 from shakelib.rupture import constants
 
-DATE_STR_FMT = '%b %m, %Y'
+DATE_STR_FMT = '%b %d, %Y'
 TIME_OF_DAY_FMT = '%H:%M:%S'
 
 
