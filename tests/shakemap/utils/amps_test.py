@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os.path
-from datetime import datetime
+from datetime import datetime, timezone
 import shutil
 import time
 
@@ -61,8 +61,10 @@ def test_amps():
         info = handler.getStats()
         assert info['events'] == 1
         assert info['stations'] == 1
-        assert info['station_min'] == datetime(2018, 3, 7, 18, 4, 49)
-        assert info['station_max'] == datetime(2018, 3, 7, 18, 4, 49)
+        assert info['station_min'] == datetime(2018, 3, 7, 18, 4, 49,
+                                               tzinfo=timezone.utc)
+        assert info['station_max'] == datetime(2018, 3, 7, 18, 4, 49,
+                                               tzinfo=timezone.utc)
         assert info['channels'] == 3
         assert info['pgms'] == 15
         eqtime = timestr_to_timestamp(event['time'])
