@@ -87,7 +87,7 @@ class XTestPlotSpectra(CoreModule):
         axa[0].set_title(self._eventid)
         axa[0].grid()
         axa[1].grid()
-        axa[1].set_ylim(ymin=0)
+        axa[1].set_ylim(bottom=0)
         pfile = os.path.join(datadir, self._eventid + '_spectra_plot.pdf')
         plt.savefig(pfile)
         pfile = os.path.join(datadir, self._eventid + '_spectra_plot.png')
