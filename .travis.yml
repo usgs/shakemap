@@ -8,7 +8,6 @@ python:
 
 install:
     # Install shakemap and requirements
-    - ./test.sh
     - bash install.sh
     - . $HOME/miniconda/etc/profile.d/conda.sh
     - conda activate shakemap
