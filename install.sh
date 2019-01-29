@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Set some things that vary based on system type
 unamestr=`uname`
 if [ "$unamestr" == 'Linux' ]; then
     prof=~/.bashrc
@@ -36,6 +37,17 @@ while getopts rd FLAG; do
       ;;
   esac
 done
+
+
+# Are we on Travis? If so, use the python version set in .travis.yml, otherwise
+# use default version
+if [ -z "$TRAVIS_PYTHON_VERSION" ]; then
+    py_version="3.6"
+else
+    py_version=$TRAVIS_PYTHON_VERSION
+fi
+
+
 
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d "$matplotlibdir" ]; then
@@ -126,7 +138,7 @@ dev_list=(
 
 # Package list:
 package_list=(
-      "python"
+      "python=$py_version"
       "amptools"
       "cartopy"
       "cython"
