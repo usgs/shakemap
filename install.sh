@@ -5,14 +5,10 @@ if [ "$unamestr" == 'Linux' ]; then
     prof=~/.bashrc
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     matplotlibdir=~/.config/matplotlib
-    channel_url=ftp://ftpext.usgs.gov/pub/cr/co/golden/emthompson/shakemap-linux.tar
-    channel=shakemap-linux
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
-    channel_url=ftp://ftpext.usgs.gov/pub/cr/co/golden/emthompson/shakemap-osx.tar
-    channel=shakemap-osx
 else
     echo "Unsupported environment. Exiting."
     exit
@@ -97,25 +93,9 @@ else
     echo "conda detected, installing $VENV environment..."
 fi
 
-if [ $reset == 0 ]; then
-    # Download frozen channel
-    echo "Downloading shakemap channel..."
-    curl $channel_url -o $channel.tar
-    # if curl fails, bow out gracefully
-    if [ $? -ne 0 ];then
-	echo "Failed to download channel. Exiting."
-	exit 1
-    fi
 
-    # Un tar the channel
-    tar -xvf $channel.tar
-    if [ $? -ne 0 ];then
-	echo "Failed to extract channel. Exiting."
-	exit 1
-    fi
-else
-    echo "Installing packages from conda-forge"
-fi
+echo "Installing packages from conda-forge"
+
 
 # Choose an environment file based on platform
 # only add this line if it does not already exist

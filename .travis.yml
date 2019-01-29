@@ -2,12 +2,13 @@ language: python
 sudo: false
 python:
     - "3.6"
-    - "3.6-dev"
-    - "3.7"
-    - "3.7-dev"
+#    - "3.6-dev"
+#    - "3.7"
+#    - "3.7-dev"
 
 install:
     # Install shakemap and requirements
+    - ./test.sh
     - bash install.sh
     - . $HOME/miniconda/etc/profile.d/conda.sh
     - conda activate shakemap
