@@ -180,6 +180,7 @@ CResult contour_grid(double *grid, size_t gnx, size_t gny, double gdx,
                      int outstyle, int verb) {
 
   int i, j, k; 
+  size_t ui;
   double cv;
   CResult cresult;
 
@@ -243,8 +244,8 @@ CResult contour_grid(double *grid, size_t gnx, size_t gny, double gdx,
   /*
    * get contour info
    */
-  for(i = 0; i < ncont; i++) {
-      add_contour(contour_levels[i]);
+  for(ui = 0; ui < ncont; ui++) {
+      add_contour(contour_levels[ui]);
   }
 
   /*
