@@ -146,7 +146,7 @@ dev_list=(
 
 # Package list:
 package_list=(
-      "python=3.5"
+      "python>=3.6"
       "amptools"
       "cartopy"
       "cython"
