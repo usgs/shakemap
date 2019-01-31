@@ -7,7 +7,9 @@ from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 import numpy
 
-os.environ['CC'] = 'gcc'
+# This should be handled by conda when we install a platform-specific
+# compiler
+# os.environ['CC'] = 'gcc'
 
 sourcefiles = ["shakemap/c/pcontour.pyx", "shakemap/c/contour.c"]
 

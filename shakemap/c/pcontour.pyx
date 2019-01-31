@@ -48,7 +48,7 @@ cdef extern from "contour.h":
 
 def pcontour(np.ndarray[double, ndim=2, mode='c']grid, dx, dy, ul_x, ul_y,
              np.ndarray[double, ndim=1, mode='c']contour_levels, outstyle,
-             verb=0):
+             verb=0, fmt=0):
     cdef Py_ssize_t ny = grid.shape[0]
     cdef Py_ssize_t nx = grid.shape[1]
     cdef np.ndarray[double, ndim=1] fg = grid.flatten(order='C')
@@ -75,15 +75,21 @@ def pcontour(np.ndarray[double, ndim=2, mode='c']grid, dx, dy, ul_x, ul_y,
             else:
                 crlist = &(cres.carray[i])
             cv = crlist[0].cv
-            feature = {"type": "Feature",
-                    "properties": {
-                        "value": cv
-                        },
-                    "geometry": {
-                        "type": "MultiPolygon",
-                        "coordinates": []
-                        }
-                    }
+            if fmt == 0:
+                feature = {"type": "Feature",
+                           "properties": {"value": cv},
+                           "geometry": {"type": "MultiPolygon",
+                                        "coordinates": []} }
+            else:
+                feature = {"type": "Feature",
+                           "properties": {"AREA": 0,
+                                          "PERIMETER": 0,
+                                          "PGAPOL_": i + 1,
+                                          "PGAPOL_ID": i + 1,
+                                          "GRID_CODE": 0,
+                                          "PARAMVALUE": cv},
+                           "geometry": {"type": "MultiPolygon",
+                                        "coordinates": []} }
             cp = crlist[0].closed
             while cp != NULL:
                 clist = []

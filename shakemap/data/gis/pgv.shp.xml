@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+ <idinfo>
+  <citation>
+   <citeinfo>
+    <origin>USGS</origin>
+    <pubdate>19990101</pubdate>
+    <title>Peak Ground Velocity Shapefile Polygons</title>
+    <geoform>Vector Digital Data Set (Polygon)</geoform>
+   </citeinfo>
+  </citation>
+  <descript>
+   <abstract>Peak Ground Velocity Polygon Shapefiles</abstract>
+   <purpose>Ground Motion Metric</purpose>
+  </descript>
+  <timeperd>
+   <timeinfo>
+    <rngdates>
+     <begdate>19990101</begdate>
+     <enddate>Present</enddate>
+    </rngdates>
+   </timeinfo>
+   <current>ground condition</current>
+  </timeperd>
+  <status>
+   <progress>In work</progress>
+   <update>As needed</update>
+  </status>
+  <spdom>
+   <bounding>
+    <westbc>0</westbc>
+    <eastbc>0</eastbc>
+    <northbc>0</northbc>
+    <southbc>0</southbc>
+   </bounding>
+  </spdom>
+  <keywords>
+   <theme>
+    <themekt>None</themekt>
+    <themekey>earthquake</themekey>
+   </theme>
+  </keywords>
+  <accconst>None. Please see 'Distribution Info' for details.</accconst>
+  <useconst>None. Users are advised to read the data set's metadata thoroughly to understand appropriate use and data limitations.</useconst>
+  <ptcontac>
+   <cntinfo>
+    <cntorgp>
+     <cntorg>U.S. Geological Survey, NORTHWEST REGION</cntorg>
+     <cntper>Charles B Worden</cntper>
+    </cntorgp>
+    <cntaddr>
+     <addrtype>mailing address</addrtype>
+     <address>Mail Stop MS 966, 1711 Illinois St</address>
+     <city>Golden</city>
+     <state>CO</state>
+     <postal>80401</postal>
+    </cntaddr>
+    <cntvoice></cntvoice>
+    <cntemail>cbworden@usgs.gov</cntemail>
+   </cntinfo>
+  </ptcontac>
+  <native>Environment as of Metadata Creation: Microsoft Windows 7 Version 6.1 (Build 7601) Service Pack 1; Esri ArcGIS 10.3.1 (Build 4959) Service Pack N/A (Build N/A)</native>
+ </idinfo>
+ <dataqual>
+  <attracc>
+   <attraccr>No formal attribute accuracy tests were conducted.</attraccr>
+  </attracc>
+  <logic>No formal logical accuracy tests were conducted.</logic>
+  <complete>Data set is considered complete for the information presented, as described in the abstract. Users are advised to read the rest of the metadata record carefully for additional details.</complete>
+  <posacc>
+   <horizpa>
+    <horizpar>A formal accuracy assessment of the horizontal positional information in the data set has not been conducted.</horizpar>
+   </horizpa>
+   <vertacc>
+    <vertaccr>A formal accuracy assessment of the vertical positional information in the data set has either not been conducted, or is not applicable.</vertaccr>
+   </vertacc>
+  </posacc>
+  <lineage>
+   <procstep>
+    <procdesc>Development of the data set by the agency / individuals identified in the 'Originator' element in the Identification Info section of the record.</procdesc>
+    <procdate>19990101</procdate>
+   </procstep>
+  </lineage>
+ </dataqual>
+ <spdoinfo>
+  <direct>Vector</direct>
+  <ptvctinf>
+   <sdtsterm>
+    <sdtstype>G-polygon</sdtstype>
+    <ptvctcnt>0</ptvctcnt>
+   </sdtsterm>
+  </ptvctinf>
+ </spdoinfo>
+ <spref>
+  <horizsys>
+   <geograph>
+    <latres>0</latres>
+    <longres>0</longres>
+    <geogunit>Decimal seconds</geogunit>
+   </geograph>
+   <geodetic>
+    <horizdn>D_WGS_1984</horizdn>
+    <ellips>WGS_1984</ellips>
+    <semiaxis>6378137.0</semiaxis>
+    <denflat>298.257223563</denflat>
+   </geodetic>
+  </horizsys>
+ </spref>
+ <eainfo>
+  <detailed>
+   <enttyp>
+    <enttypl>Attribute Table</enttypl>
+    <enttypd>Table containing attribute information associated with the data set.</enttypd>
+    <enttypds>Producer defined</enttypds>
+   </enttyp>
+   <attr>
+    <attrlabl>AREA</attrlabl>
+    <attrdef>Unknown</attrdef>
+    <attrdefs>Producer defined</attrdefs>
+    <attrdomv>
+     <udom>Unknown</udom>
+    </attrdomv>
+   </attr>
+   <attr>
+    <attrlabl>PERIMETER</attrlabl>
+    <attrdef>Unknown</attrdef>
+    <attrdefs>Producer defined</attrdefs>
+    <attrdomv>
+     <udom>Unknown</udom>
+    </attrdomv>
+   </attr>
+   <attr>
+    <attrlabl>PGAPOL_</attrlabl>
+    <attrdef>Unknown</attrdef>
+    <attrdefs>Producer defined</attrdefs>
+    <attrdomv>
+     <udom>Unknown</udom>
+    </attrdomv>
+   </attr>
+   <attr>
+    <attrlabl>PGAPOL_ID</attrlabl>
+    <attrdef>Unknown</attrdef>
+    <attrdefs>Producer defined</attrdefs>
+    <attrdomv>
+     <udom>Unknown</udom>
+    </attrdomv>
+   </attr>
+   <attr>
+    <attrlabl>GRID_CODE</attrlabl>
+    <attrdef>Peak Ground Velocity (cm/sec, binned)</attrdef>
+    <attrdefs>Producer defined</attrdefs>
+    <attrdomv>
+     <udom>Peak Ground Velocity (cm/sec, binned)</udom>
+    </attrdomv>
+   </attr>
+   <attr>
+    <attrlabl>PARAMVALUE</attrlabl>
+    <attrdef>Peak Ground Velocity (cm/sec)</attrdef>
+    <attrdefs>Producer defined</attrdefs>
+    <attrdomv>
+     <udom>Peak Ground Velocity (cm/sec)</udom>
+    </attrdomv>
+   </attr>
+  </detailed>
+  <overview>
+   <eaover>The entity and attribute information provided here describes the tabular data associated with the data set. Please review the detailed descriptions that are provided (the individual attribute descriptions) for information on the values that appear as fields/table entries of the data set.</eaover>
+   <eadetcit>The entity and attribute information was generated by the individual and/or agency identified as the originator of the data set. Please review the rest of the metadata record for additional details and information.</eadetcit>
+  </overview>
+ </eainfo>
+ <distinfo>
+  <distrib>
+   <cntinfo>
+    <cntorgp>
+     <cntorg>U.S. Geological Survey, NORTHWEST REGION</cntorg>
+     <cntper>Charles B Worden</cntper>
+    </cntorgp>
+    <cntaddr>
+     <addrtype>mailing address</addrtype>
+     <address>Mail Stop MS 966, 1711 Illinois St</address>
+     <city>Golden</city>
+     <state>CO</state>
+     <postal>80401</postal>
+    </cntaddr>
+    <cntvoice></cntvoice>
+    <cntemail>cbworden@usgs.gov</cntemail>
+   </cntinfo>
+  </distrib>
+  <distliab>Distributor assumes no liability for misuse of data.</distliab>
+  <stdorder>
+   <digform>
+    <digtinfo>
+     <formname>Vector Digital Data Set (Polygon)</formname>
+    </digtinfo>
+    <digtopt>
+     <onlinopt>
+      <computer>
+       <networka>
+        <networkr>http://earthquake.usgs.gov/data/shakemap/</networkr>
+       </networka>
+      </computer>
+     </onlinopt>
+    </digtopt>
+   </digform>
+   <fees>None. No fees are applicable for obtaining the data set.</fees>
+  </stdorder>
+ </distinfo>
+ <metainfo>
+  <metd>20160329</metd>
+  <metc>
+   <cntinfo>
+    <cntperp>
+     <cntper>Charles B Worden</cntper>
+     <cntorg>U.S. Geological Survey, NORTHWEST REGION</cntorg>
+    </cntperp>
+    <cntaddr>
+     <addrtype>mailing address</addrtype>
+     <address>Mail Stop MS 966, 1711 Illinois St</address>
+     <city>Golden</city>
+     <state>CO</state>
+     <postal>80401</postal>
+    </cntaddr>
+    <cntvoice></cntvoice>
+    <cntemail>cbworden@usgs.gov</cntemail>
+   </cntinfo>
+  </metc>
+  <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+  <metstdv>FGDC-STD-001-1998</metstdv>
+ </metainfo>
+</metadata>

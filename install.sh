@@ -7,12 +7,14 @@ if [ "$unamestr" == 'Linux' ]; then
     matplotlibdir=~/.config/matplotlib
     channel_url=ftp://ftpext.usgs.gov/pub/cr/co/golden/emthompson/shakemap-linux.tar
     channel=shakemap-linux
+    CC=gcc_linux-64
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
     channel_url=ftp://ftpext.usgs.gov/pub/cr/co/golden/emthompson/shakemap-osx.tar
     channel=shakemap-osx
+    CC=clangxx_osx-64
 else
     echo "Unsupported environment. Exiting."
     exit
@@ -146,7 +148,7 @@ dev_list=(
 
 # Package list:
 package_list=(
-      "python=3.5"
+      "python=3.6"
       "amptools"
       "cartopy"
       "cython"
@@ -155,7 +157,7 @@ package_list=(
       "docutils"
       "configobj"
       "fiona"
-      "gcc"
+      "$CC"
       "gdal"
       "h5py"
       "impactutils"
