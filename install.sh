@@ -126,7 +126,7 @@ dev_list=(
 
 # Package list:
 package_list=(
-      "python=3.6"
+      "python=$py_ver"
       "amptools"
       "cartopy"
       "cython"
