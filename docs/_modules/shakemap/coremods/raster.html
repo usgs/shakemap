@@ -14,7 +14,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -43,6 +43,8 @@
 <span class="kn">from</span> <span class="nn">mapio.gdal</span> <span class="k">import</span> <span class="n">GDALGrid</span>
 <span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
+<span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="k">import</span> <span class="n">ColorPalette</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
@@ -72,7 +74,7 @@
         <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;ESRI Raster Files&#39;</span><span class="p">,</span>
         <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Data and uncertainty grids in ESRI raster format&#39;</span><span class="p">,</span>
         <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;raster.zip&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/zip&#39;</span><span class="p">}]</span>
+                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/zip&#39;</span><span class="p">}]</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="RasterModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.raster.html#shakemap.coremods.raster.RasterModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -142,11 +144,33 @@
             <span class="n">zfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">std_hdr</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_std.hdr&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
 
         <span class="n">zfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="c1"># nuke all of the copies of the files we just put in the zipfile</span>
         <span class="k">for</span> <span class="n">file_written</span> <span class="ow">in</span> <span class="n">files_written</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_written</span><span class="p">)</span></div></div>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_written</span><span class="p">)</span>
+
+        <span class="c1"># make a transparent PNG of intensity and a world file</span>
+        <span class="n">imclist</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
+        <span class="n">mmidict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="n">imclist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">mmi_array</span> <span class="o">=</span> <span class="n">mmidict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+        <span class="n">geodict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">mmidict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">])</span>
+        <span class="n">palette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+        <span class="n">mmi_rgb</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">mmi_array</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">)</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">mmi_rgb</span><span class="p">)</span>
+        <span class="n">pngfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;intensity_overlay.png&#39;</span><span class="p">)</span>
+        <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pngfile</span><span class="p">,</span> <span class="s2">&quot;PNG&quot;</span><span class="p">)</span>
+
+        <span class="c1"># write out a world file</span>
+        <span class="c1"># https://en.wikipedia.org/wiki/World_file</span>
+        <span class="n">worldfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;intensity_overlay.pngw&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">worldfile</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">geodict</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;0.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;0.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;-</span><span class="si">%.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">geodict</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">geodict</span><span class="o">.</span><span class="n">xmin</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">geodict</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
 
           </div>

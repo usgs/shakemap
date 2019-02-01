@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import os
 import os.path
 import tempfile
@@ -6,7 +7,6 @@ import zipfile
 import json
 import glob
 import subprocess
-import shutil
 
 import numpy as np
 from osgeo import gdal
@@ -26,6 +26,7 @@ from shakemap.coremods.mapping import MappingModule
 from shakemap.coremods.plotregr import PlotRegr
 from shakemap.coremods.kml import KMLModule
 from shakemap.coremods.gridxml import GridXMLModule, _oq_to_gridxml
+from shakemap.coremods.shape import ShapeModule
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
 from mapio.shake import ShakeGrid
@@ -346,7 +347,13 @@ def test_products():
         mod = KMLModule(evid)
         mod.execute()
         mod.writeContents()
+        del mod
 
+        # This just exercises the ShapeModule code without actually
+        # checking for valid results.
+        mod = ShapeModule(evid)
+        mod.execute()
+        mod.writeContents()
         del mod
 
         #

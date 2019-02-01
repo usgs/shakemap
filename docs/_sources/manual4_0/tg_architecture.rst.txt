@@ -463,6 +463,16 @@ plane(s) supplied via the input file *<>_fault.txt* or *<>_fault.json*.
 See :meth:`shakemap.coremods.rupture` for the module's API
 documentation.
 
+shape
+`````
+
+``shape`` reads an event's *shake_result.hdf* and produces a set of
+ESRI-style shape files for the ground motion parameters found therein.
+The shape files are zipped together with supporting .lyr, .prj, and
+metadata XML files and distributed as a file called *shape.zip*. The
+use of the shape files is deprecated and it is preferable to use the
+ESRI raster file (see the ``raster`` section, above.)
+
 stations
 ````````
 

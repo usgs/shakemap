@@ -45,10 +45,17 @@ class ContourModule(CoreModule):
     contour_page = {'title': 'Ground Motion Contours', 'slug': 'contours'}
     contents = OrderedDict.fromkeys(['miContour', 'pgaContour', 'pgvContour',
                                      'psa[PERIOD]Contour'])
+    contents['mmiContour'] = {'title': 'Intensity Contours',
+                              'caption': 'Contours of macroseismic intensity.',
+                              'page': contour_page,
+                              'formats': [{'filename': 'cont_*mmi.json',
+                                           'type': 'application/json'}
+                                          ]
+                              }
     contents['miContour'] = {'title': 'Intensity Contours',
                              'caption': 'Contours of macroseismic intensity.',
                              'page': contour_page,
-                             'formats': [{'filename': 'cont_*mmi.json',
+                             'formats': [{'filename': 'cont_*mi.json',
                                           'type': 'application/json'}
                                          ]
                              }
@@ -215,7 +222,7 @@ def contour_to_files(container, output_dir, logger,
         # even redirecting stderr/stdout to IO streams
         # not sure where the warning is coming from,
         # but there appears to be no way to stop it...
-        with fiona.drivers():
+        with fiona.Env():
             if imtype == 'MMI':
                 selected_schema = mmi_schema
             else:

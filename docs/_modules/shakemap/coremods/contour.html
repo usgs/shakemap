@@ -14,7 +14,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -80,10 +80,17 @@
     <span class="n">contour_page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ground Motion Contours&#39;</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="s1">&#39;contours&#39;</span><span class="p">}</span>
     <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;miContour&#39;</span><span class="p">,</span> <span class="s1">&#39;pgaContour&#39;</span><span class="p">,</span> <span class="s1">&#39;pgvContour&#39;</span><span class="p">,</span>
                                      <span class="s1">&#39;psa[PERIOD]Contour&#39;</span><span class="p">])</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;mmiContour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Contours&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of macroseismic intensity.&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
+                              <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*mmi.json&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+                                          <span class="p">]</span>
+                              <span class="p">}</span>
     <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;miContour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Contours&#39;</span><span class="p">,</span>
                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of macroseismic intensity.&#39;</span><span class="p">,</span>
                              <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
-                             <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*mmi.json&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*mi.json&#39;</span><span class="p">,</span>
                                           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
                                          <span class="p">]</span>
                              <span class="p">}</span>
@@ -250,7 +257,7 @@
         <span class="c1"># even redirecting stderr/stdout to IO streams</span>
         <span class="c1"># not sure where the warning is coming from,</span>
         <span class="c1"># but there appears to be no way to stop it...</span>
-        <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">drivers</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">Env</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                 <span class="n">selected_schema</span> <span class="o">=</span> <span class="n">mmi_schema</span>
             <span class="k">else</span><span class="p">:</span>

@@ -14,7 +14,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -395,12 +395,11 @@
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
 
     <span class="c1"># look for the productcode attribute in the xml,</span>
-    <span class="c1"># otherwise use the event directory name.</span>
+    <span class="c1"># otherwise use the event id</span>
     <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eventxml</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">path_parts</span> <span class="o">=</span> <span class="n">eventxml</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_parts</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># It&#39;s up to the user of this data how to construct the</span>
         <span class="c1"># product code</span>
@@ -409,12 +408,14 @@
     <span class="c1"># Support old event file date/times</span>
     <span class="k">if</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
-                                                   <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
-                                                       <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+                <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                    <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                    <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t convert </span><span class="si">%s</span><span class="s2"> to HistoricTime&quot;</span> <span class="o">%</span>
                                  <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
@@ -423,12 +424,13 @@
            <span class="s1">&#39;day&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> <span class="s1">&#39;hour&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> \
            <span class="s1">&#39;minute&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> <span class="s1">&#39;second&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing date/time elements in event file.&quot;</span><span class="p">)</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">],</span>
-                                               <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">],</span>
-                                               <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">],</span>
-                                               <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">],</span>
-                                               <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">],</span>
-                                               <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
 
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
@@ -512,26 +514,37 @@
             <span class="n">mrt</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rt</span>
             <span class="n">mrp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rp</span>
             <span class="n">mtp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_tp</span>
-            <span class="n">params</span> <span class="o">=</span> <span class="n">fill_tensor_from_components</span><span class="p">(</span><span class="n">mrr</span><span class="p">,</span> <span class="n">mtt</span><span class="p">,</span>
-                                                 <span class="n">mpp</span><span class="p">,</span> <span class="n">mrt</span><span class="p">,</span>
-                                                 <span class="n">mrp</span><span class="p">,</span> <span class="n">mtp</span><span class="p">,</span>
-                                                 <span class="n">source</span><span class="o">=</span><span class="n">msource</span><span class="p">,</span>
-                                                 <span class="n">mtype</span><span class="o">=</span><span class="n">mtype</span><span class="p">)</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">fill_tensor_from_components</span><span class="p">(</span>
+                <span class="n">mrr</span><span class="p">,</span> <span class="n">mtt</span><span class="p">,</span>
+                <span class="n">mpp</span><span class="p">,</span> <span class="n">mrt</span><span class="p">,</span>
+                <span class="n">mrp</span><span class="p">,</span> <span class="n">mtp</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">msource</span><span class="p">,</span>
+                <span class="n">mtype</span><span class="o">=</span><span class="n">mtype</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">plane1</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_1</span>
         <span class="n">plane2</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_2</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
-                         <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
-                         <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">rake</span><span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
-                         <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
-                         <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span><span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
-                       <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
-                       <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
-                       <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
+            <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
+            <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">rake</span>
+        <span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
+            <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
+            <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span>
+        <span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="p">}</span>
 
     <span class="n">moment</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;moment&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">moment</span></div>

@@ -14,7 +14,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -425,19 +425,28 @@ plane(s) supplied via the input file <em>&lt;&gt;_fault.txt</em> or <em>&lt;&gt;
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.rupture.html#module-shakemap.coremods.rupture" title="shakemap.coremods.rupture"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.rupture()</span></code></a> for the module’s API
 documentation.</p>
 </div>
+<div class="section" id="shape">
+<h4>2.3.2.3.14. shape<a class="headerlink" href="#shape" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">shape</span></code> reads an event’s <em>shake_result.hdf</em> and produces a set of
+ESRI-style shape files for the ground motion parameters found therein.
+The shape files are zipped together with supporting .lyr, .prj, and
+metadata XML files and distributed as a file called <em>shape.zip</em>. The
+use of the shape files is deprecated and it is preferable to use the
+ESRI raster file (see the <code class="docutils literal notranslate"><span class="pre">raster</span></code> section, above.)</p>
+</div>
 <div class="section" id="stations">
-<h4>2.3.2.3.14. stations<a class="headerlink" href="#stations" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.15. stations<a class="headerlink" href="#stations" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">stations</span></code> reads an event’s <em>shake_result.hdf</em> and produces a
 JSON file, <em>stationlist.json</em>, of the input station data.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.stations.html#module-shakemap.coremods.stations" title="shakemap.coremods.stations"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.stations()</span></code></a> for the module’s API
 documentation.</p>
 </div>
 <div class="section" id="transfer">
-<h4>2.3.2.3.15. transfer<a class="headerlink" href="#transfer" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.2.3.16. transfer<a class="headerlink" href="#transfer" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">transfer</span></code> allows the operator to transfer ShakeMap products to
 other system via PDL or ssh. See the documentation in <em>transfer.conf</em>
 for details on configuring <code class="docutils literal notranslate"><span class="pre">transfer</span></code>.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.transfer.html#module-shakemap.coremods.transfer" title="shakemap.coremods.transfer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.transfer()</span></code></a> for the module’s API
+<p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.transfer()</span></code> for the module’s API
 documentation.</p>
 </div>
 </div>
@@ -563,8 +572,9 @@ usage and notes.</p>
 <li class="toctree-l8"><a class="reference internal" href="#plotregr">2.3.2.3.11. plotregr</a></li>
 <li class="toctree-l8"><a class="reference internal" href="#raster">2.3.2.3.12. raster</a></li>
 <li class="toctree-l8"><a class="reference internal" href="#rupture">2.3.2.3.13. rupture</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#stations">2.3.2.3.14. stations</a></li>
-<li class="toctree-l8"><a class="reference internal" href="#transfer">2.3.2.3.15. transfer</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#shape">2.3.2.3.14. shape</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#stations">2.3.2.3.15. stations</a></li>
+<li class="toctree-l8"><a class="reference internal" href="#transfer">2.3.2.3.16. transfer</a></li>
 </ul>
 </li>
 </ul>
