@@ -14,7 +14,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -41,7 +41,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">GMPE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">GMPE</span><span class="p">,</span> <span class="n">IPE</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_2014</span> <span class="k">import</span> <span class="n">BooreEtAl2014</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">CampbellBozorgnia2014</span><span class="p">)</span>
@@ -182,7 +182,7 @@
             <span class="n">sites</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">set_sites_depth_parameters</span><span class="p">(</span><span class="n">sites</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">)</span>
 
             <span class="c1"># -----------------------------------------------------------------</span>
-            <span class="c1"># Evaluate GMPEs</span>
+            <span class="c1"># Select the IMT</span>
             <span class="c1"># -----------------------------------------------------------------</span>
 
             <span class="n">gmpe_imts</span> <span class="o">=</span> <span class="p">[</span><span class="n">imt</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span>
@@ -193,6 +193,33 @@
                 <span class="n">timt</span> <span class="o">=</span> <span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">timt</span> <span class="o">=</span> <span class="n">imt</span>
+
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="c1"># Grab GMPE_LIMITS in gmpe instance for later as the multigmpe</span>
+            <span class="c1"># nests downward.</span>
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;GMPE_LIMITS&#39;</span><span class="p">):</span>
+                <span class="c1"># Remember that GMPE_LIMITS is only present if it is getting</span>
+                <span class="c1"># loaded from a config... we could change this eventually.</span>
+                <span class="n">gmpe</span><span class="o">.</span><span class="n">GMPE_LIMITS</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GMPE_LIMITS</span>
+
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="c1"># Apply GMPE_LIMITS if applicable</span>
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="s1">&#39;GMPE_LIMITS&#39;</span><span class="p">):</span>
+                <span class="n">gmpes_with_limits</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">gmpe</span><span class="o">.</span><span class="n">GMPE_LIMITS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">gmpe_class_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gmpe</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">gmpe_class_str</span> <span class="ow">in</span> <span class="n">gmpes_with_limits</span><span class="p">:</span>
+                    <span class="n">limit_dict</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">GMPE_LIMITS</span><span class="p">[</span><span class="n">gmpe_class_str</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">limit_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;vs30&#39;</span><span class="p">:</span>
+                            <span class="n">vs30min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="n">vs30max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">sites</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="n">vs30min</span><span class="p">,</span> <span class="n">vs30max</span><span class="p">)</span>
+
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="c1"># Evaluate</span>
+            <span class="c1"># -----------------------------------------------------------------</span>
 
             <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">timt</span><span class="p">,</span>
                                                    <span class="n">stddev_types</span><span class="p">)</span>
@@ -332,19 +359,35 @@
                     <span class="n">selected_gmpe</span><span class="p">,</span>
                     <span class="n">filter_imt</span><span class="o">=</span><span class="n">filter_imt</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> must consist exclusively of keys in &quot;</span>
-                               <span class="s2">&quot;conf[&#39;gmpe_modules&#39;] or conf[&#39;gmpe_sets&#39;]&quot;</span>
-                               <span class="o">%</span> <span class="n">selected_gmpe</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> must consist exclusively of keys in &quot;</span>
+                                <span class="s2">&quot;conf[&#39;gmpe_modules&#39;] or conf[&#39;gmpe_sets&#39;]&quot;</span>
+                                <span class="o">%</span> <span class="n">selected_gmpe</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">selected_gmpe</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_modules&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">modinfo</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_modules&#39;</span><span class="p">][</span><span class="n">selected_gmpe</span><span class="p">]</span>
             <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">modinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">tmpclass</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">modinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_list</span><span class="p">([</span><span class="n">tmpclass</span><span class="p">()],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">imc</span><span class="o">=</span><span class="n">IMC</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;conf[&#39;modeling&#39;][&#39;gmpe&#39;] must be a key in &quot;</span>
-                           <span class="s2">&quot;conf[&#39;gmpe_modules&#39;] or conf[&#39;gmpe_sets&#39;]&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;conf[&#39;modeling&#39;][&#39;gmpe&#39;] must be a key in &quot;</span>
+                            <span class="s2">&quot;conf[&#39;gmpe_modules&#39;] or conf[&#39;gmpe_sets&#39;]&quot;</span><span class="p">)</span>
 
         <span class="n">out</span><span class="o">.</span><span class="n">DESCRIPTION</span> <span class="o">=</span> <span class="n">selected_gmpe</span>
+
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Deal with GMPE limits</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">gmpe_lims</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_limits&#39;</span><span class="p">]</span>
+
+        <span class="c1"># We need to replace the short name in the dictionary key with module</span>
+        <span class="c1"># name here since the conf is not available within the MultiGMPE class.</span>
+        <span class="n">mods</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_modules&#39;</span><span class="p">]</span>
+        <span class="n">mod_keys</span> <span class="o">=</span> <span class="n">mods</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">gmpe_lims</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mod_keys</span><span class="p">:</span>
+                <span class="n">gmpe_lims</span><span class="p">[</span><span class="n">mods</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">gmpe_lims</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="n">out</span><span class="o">.</span><span class="n">GMPE_LIMITS</span> <span class="o">=</span> <span class="n">gmpe_lims</span>
+
         <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="k">def</span> <span class="nf">__multigmpe_from_gmpe_set</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">set_name</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -547,8 +590,8 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
 
         <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">GMPE</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> is not a GMPE instance.&quot;</span> <span class="o">%</span> <span class="n">g</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">GMPE</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">IPE</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> is not a GMPE or IPE instance.&quot;</span> <span class="o">%</span> <span class="n">g</span><span class="p">)</span>
 
         <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span> <span class="o">=</span> <span class="n">gmpes</span>
@@ -769,7 +812,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb14_cal</span>
         <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2008()&#39;</span> <span class="ow">or</span> \
-           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;Bradley20i3()&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;Bradley2013()&#39;</span> <span class="ow">or</span> \
            <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;Bradley2013Volc()&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_cy08</span>
         <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2008()&#39;</span><span class="p">:</span>
@@ -924,7 +967,7 @@
                 <span class="n">swts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sgmpe</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No applicable GMPEs from GMPE list for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;No applicable GMPEs from GMPE list for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">imt</span><span class="p">))</span>
 
     <span class="c1"># Scale weights to sum to one</span>
     <span class="n">swts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">swts</span><span class="p">)</span>

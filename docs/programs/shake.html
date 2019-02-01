@@ -14,7 +14,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -105,7 +105,6 @@
 <dd>file.</dd>
 </dl>
 </li>
-<li>cancel – Send a cancel message via any configured transfer mechanisms.</li>
 <li><dl class="first docutils">
 <dt>contour – Generate contours of all IMT values from the</dt>
 <dd>shake_result.hdf output file.</dd>
@@ -125,10 +124,14 @@
 </dl>
 </li>
 <li>rupture – Generate rupture.json from shake_result.hdf.</li>
+<li>save - Create backup directory and prep for next ShakeMap map version.</li>
 <li>select - Parse STREC output, make a GMPE set, create model_select.conf.</li>
+<li>shape – Generate shape files of the ground motion parameters</li>
 <li>sleep – Sleep for a number of seconds.</li>
 <li>stations – Generate stationlist.json from shake_result.hdf.</li>
-<li>transfer – Transfer data via any configured methods (ftp, pdl, etc.)</li>
+<li>transfer_email - Transfer content via Email.</li>
+<li>transfer_pdl - Transfer content via PDL to a remote server.</li>
+<li>transfer_pdl - Transfer content via SCP to a remote server.</li>
 </ul>
 </dd>
 </dl>

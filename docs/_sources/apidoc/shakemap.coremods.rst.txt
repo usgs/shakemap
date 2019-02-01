@@ -9,7 +9,6 @@ Submodules
    shakemap.coremods.associate
    shakemap.coremods.augment
    shakemap.coremods.base
-   shakemap.coremods.cancel
    shakemap.coremods.contour
    shakemap.coremods.dyfi
    shakemap.coremods.exception
@@ -21,10 +20,15 @@ Submodules
    shakemap.coremods.plotregr
    shakemap.coremods.raster
    shakemap.coremods.rupture
+   shakemap.coremods.save
    shakemap.coremods.select
+   shakemap.coremods.shape
    shakemap.coremods.sleep
    shakemap.coremods.stations
-   shakemap.coremods.transfer
+   shakemap.coremods.transfer_base
+   shakemap.coremods.transfer_email
+   shakemap.coremods.transfer_pdl
+   shakemap.coremods.transfer_scp
    shakemap.coremods.xtestimage
    shakemap.coremods.xtestplot
    shakemap.coremods.xtestplot_multi

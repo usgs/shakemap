@@ -14,7 +14,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -130,8 +130,10 @@
             <span class="c1">#</span>
             <span class="n">coords</span> <span class="o">=</span> <span class="n">measure</span><span class="o">.</span><span class="n">approximate_polygon</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">filter_size</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span>
 
-            <span class="n">mylons</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">/</span> <span class="n">nlon</span> <span class="o">+</span> <span class="n">lonstart</span>
-            <span class="n">mylats</span> <span class="o">=</span> <span class="p">(</span><span class="n">nlat</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">/</span> <span class="n">nlat</span> <span class="o">+</span> <span class="n">latstart</span>
+            <span class="n">mylons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">/</span> <span class="n">nlon</span> <span class="o">+</span> <span class="n">lonstart</span><span class="p">,</span>
+                               <span class="n">decimals</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+            <span class="n">mylats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">((</span><span class="n">nlat</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">/</span> <span class="n">nlat</span> <span class="o">+</span>
+                               <span class="n">latstart</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 
             <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">mylons</span><span class="p">[:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
                                       <span class="n">mylats</span><span class="p">[:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>

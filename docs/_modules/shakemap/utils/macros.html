@@ -14,7 +14,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -41,7 +41,7 @@
 
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
-<span class="n">DATE_STR_FMT</span> <span class="o">=</span> <span class="s1">&#39;%b %m, %Y&#39;</span>
+<span class="n">DATE_STR_FMT</span> <span class="o">=</span> <span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y&#39;</span>
 <span class="n">TIME_OF_DAY_FMT</span> <span class="o">=</span> <span class="s1">&#39;%H:%M:%S&#39;</span>
 
 
@@ -62,7 +62,9 @@
 <span class="sd">              - DATETIME Event date/time (i.e., 2018-01-18T11:34:25.123456)</span>
 <span class="sd">              - DATE Event date (i.e., &quot;Jan 31, 2018&quot;)</span>
 <span class="sd">              - TIME Event time (i.e., &quot;11:34:23&quot;)</span>
+<span class="sd">              - VERSION ShakeMap map version (i.e., 1, 2, 3, etc.)</span>
 <span class="sd">              - EVENTID Earthquake event ID.</span>
+<span class="sd">              - PRODUCT_CODE Unique code describing the ShakeMap product.</span>
 <span class="sd">              - NETID Earthquake network ID.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">macros</span> <span class="o">=</span> <span class="p">{}</span>
@@ -78,8 +80,10 @@
         <span class="n">dtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">macros</span><span class="p">[</span><span class="s1">&#39;DATETIME&#39;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
     <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;DATE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">DATE_STR_FMT</span><span class="p">)</span>
     <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIME_OF_DAY_FMT</span><span class="p">)</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;EVENTID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;DEP&#39;</span><span class="p">]</span> <span class="o">=</span> \
-        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;VERSION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;shakemap_versions&#39;</span><span class="p">][</span><span class="s1">&#39;map_version&#39;</span><span class="p">])</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;EVENTID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;PRODUCT_CODE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="s1">&#39;netid&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]:</span>
         <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;NETID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>

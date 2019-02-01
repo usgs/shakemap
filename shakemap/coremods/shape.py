@@ -80,6 +80,22 @@ class ShapeModule(CoreModule):
 
 
 def create_polygons(container, datadir, logger):
+    """ Generates a set of closed polygons (with or without holes) using
+    the pcontour function, and uses fiona to convert the resulting GeoJSON
+    objects into ESRI-style shape files which are then zipped into an
+    archive along with .prj, .lyr, and metadata .xml files. A warning will
+    be emitted if .lyr, or .xml files cannot be found for the ground motion
+    parameter in question.
+
+    Args:
+        container (ShakeMapOutputContainer): An open ShakeMap output
+            container object.
+        datadir (str): The products directory for the event in question.
+        logger (logger): This module's logger object.
+
+    Returns:
+        (nothing): Nothing.
+    """
 
     component = list(container.getComponents())[0]
     imts = container.getIMTs(component)
@@ -105,11 +121,15 @@ def create_polygons(container, datadir, logger):
                 fgrid = np.exp(fgrid)
                 cont_max = np.ceil(np.max(fgrid)) + 2.0
                 contour_levels = np.arange(1.0, cont_max, 2.0)
+                if contour_levels.size == 0:
+                    contour_levels = np.array([1.0])
                 fname = 'pgv'
             else:
                 fgrid = np.exp(fgrid)
                 cont_max = (np.ceil(100 * np.max(fgrid)) + 2.0) / 100.0
                 contour_levels = np.arange(0.01, cont_max, 0.02)
+                if contour_levels.size == 0:
+                    contour_levels = np.array([0.01])
                 fname = oq_to_file(imt)
             gjson = pcontour(fgrid,
                              gdict['mean_metadata']['dx'],
