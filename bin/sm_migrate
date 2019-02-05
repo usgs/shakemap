@@ -16,7 +16,10 @@ from configobj import ConfigObj
 import numpy as np
 
 # local imports
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
 from shakemap.utils.utils import (
     get_network_name,
     migrate_gmpe,
@@ -131,7 +134,12 @@ def main(args):
 
     # load the migrate.conf file specified by user, if any
     if args.migrate_file:
-        migrate_conf = ConfigObj(args.migrate_file)
+        spec_file = get_configspec('migrate')
+        validator = get_custom_validator()
+        migrate_conf = ConfigObj(args.migrate_file, configspec=spec_file)
+        results = migrate_conf.validate(validator)
+        if not isinstance(results, bool) or not results:
+            config_error(migrate_conf, results)
     else:
         migrate_conf = None
 

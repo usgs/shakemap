@@ -19,16 +19,21 @@ from amptools.table import dataframe_to_xml
 import numpy as np
 
 # local imports
-from shakemap.utils.config import get_config_paths
-from shakelib.rupture.origin import write_event_file, Origin
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
+from shakelib.rupture.origin import (write_event_file,
+                                     Origin)
 from shakelib.rupture.factory import get_rupture
-from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
+from shakemap.utils.utils import (get_network_name,
+                                  migrate_gmpe,
+                                  set_gmpe)
 from shakemap.utils.probs import get_weights
 from shakemap.utils.layers import (validate_config,
                                    update_config_regions)
 from shakemap.coremods.dyfi import _get_dyfi_dataframe
 from shakelib.rupture import constants
-from shakelib.utils.utils import replace_dyfi
 from shakelib.station import StationList
 
 TIMEFMT2 = '%Y-%m-%dT%H:%M:%S'
@@ -217,7 +222,12 @@ def main(args):
 
     # get the global config for migrate.conf
     migrate_file = os.path.join(install_path, 'config', 'migrate.conf')
-    migrate_conf = ConfigObj(migrate_file)
+    spec_file = get_configspec('migrate')
+    validator = get_custom_validator()
+    migrate_conf = ConfigObj(migrate_file, configspec=spec_file)
+    results = migrate_conf.validate(validator)
+    if not isinstance(results, bool) or not results:
+        config_error(migrate_conf, results)
 
     if args.event:
         locstring = ''
@@ -331,8 +341,10 @@ def main(args):
 
             # let's try to write out the input data in as many as three files:
             # 1) dyfi_dat.xml, the most up to date DYFI we have.
-            # 2) instrumented_dat.son, all of the instrumented data from stationlist.xml
-            # 3) macroseismic_dat.json, all of the macroseismic data from stationlist.xml
+            # 2) instrumented_dat.son, all of the instrumented data from
+            #    stationlist.xml
+            # 3) macroseismic_dat.json, all of the macroseismic data from
+            #    stationlist.xml
             dataframe, msg = _get_dyfi_dataframe(detail)
             if dataframe is not None:
                 dyfi_file = os.path.join(event_dir, 'dyfi_dat.xml')
@@ -352,8 +364,9 @@ def main(args):
                 try:
                     # edict['time'] = HistoricTime(edict['time'])
                     origin = Origin.fromFile(event_xml_file)
-                    rupt = get_rupture(origin, file=fault_file, new_format=False)
-                    
+                    rupt = get_rupture(origin, file=fault_file,
+                                       new_format=False)
+
                     # Remove any blank or nan origin info
                     odict = copy.copy(rupt._origin.__dict__)
                     for k, v in odict.items():
@@ -363,7 +376,7 @@ def main(args):
                         if isinstance(v, float):
                             if np.isnan(v):
                                 rupt._geojson['metadata'].pop(k, None)
-                                
+
                     jsonfile = os.path.join(event_dir, 'rupture.json')
                     rupt.writeGeoJson(jsonfile)
                     os.remove(fault_file)
@@ -409,7 +422,8 @@ def main(args):
                 ])
                 model['modeling'] = {}
                 model['modeling']['gmpe'] = gmpe_set
-                model['modeling']['mechanism'] = strec_results['FocalMechanism']
+                model['modeling']['mechanism'] = \
+                    strec_results['FocalMechanism']
                 if gmm_dict['ipe']:
                     model['modeling']['ipe'] = gmm_dict['ipe']
                 if gmm_dict['gmice']:
