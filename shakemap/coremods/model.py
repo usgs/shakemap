@@ -43,7 +43,7 @@ from shakemap.utils.generic_amp import get_generic_amp_factors
 from shakemap.c.clib import (make_sigma_matrix,
                              geodetic_distance_fast,
                              make_sd_array)
-from shakemap.utils.exception import TerminateShakeMap
+# from shakemap.utils.exception import TerminateShakeMap
 
 from shakelib.directivity.rowshandel2013 import Rowshandel2013
 
@@ -176,8 +176,10 @@ class ModelModule(CoreModule):
         self._setOutputParams()
 
         landmask = self._getLandMask()
-        if landmask is not None and np.all(landmask):
-            raise TerminateShakeMap("Mapped area is entirely water")
+        # We used to do this, but we've decided not to. Leaving the code
+        # in place in case we change our minds.
+        # if landmask is not None and np.all(landmask):
+        #     raise TerminateShakeMap("Mapped area is entirely water")
 
         # ---------------------------------------------------------------------
         # If the gmpe doesn't break down its stardard deviation into
