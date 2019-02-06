@@ -17,6 +17,7 @@ import pytest
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.model import ModelModule
 from shakemap.coremods.assemble import AssembleModule
+from shakemap.coremods.history import HistoryModule
 from shakemap.coremods.contour import ContourModule
 from shakemap.coremods.info import InfoModule
 from shakemap.coremods.raster import RasterModule
@@ -314,6 +315,16 @@ def test_products():
         res_file = os.path.join(datapath, evid, 'current', 'products',
                                 'shake_result.hdf')
         oc = ShakeMapOutputContainer.load(res_file)
+
+        #
+        # The history module just outputs some info to the operator, so
+        # here we just run it to make sure it doesn't crash anything.
+        # Actual testing should be done via bug reports/feature requests
+        # from users.
+        #
+        history = HistoryModule(evid)
+        history.execute()
+        del history
 
         #
         # Test the creation of products -- currently not checking results
