@@ -13,6 +13,7 @@ Submodules
    shakemap.coremods.dyfi
    shakemap.coremods.exception
    shakemap.coremods.gridxml
+   shakemap.coremods.history
    shakemap.coremods.info
    shakemap.coremods.kml
    shakemap.coremods.mapping

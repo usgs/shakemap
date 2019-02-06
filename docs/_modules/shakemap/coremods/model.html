@@ -78,7 +78,7 @@
 <span class="kn">from</span> <span class="nn">shakemap.c.clib</span> <span class="k">import</span> <span class="p">(</span><span class="n">make_sigma_matrix</span><span class="p">,</span>
                              <span class="n">geodetic_distance_fast</span><span class="p">,</span>
                              <span class="n">make_sd_array</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.exception</span> <span class="k">import</span> <span class="n">TerminateShakeMap</span>
+<span class="c1"># from shakemap.utils.exception import TerminateShakeMap</span>
 
 <span class="kn">from</span> <span class="nn">shakelib.directivity.rowshandel2013</span> <span class="k">import</span> <span class="n">Rowshandel2013</span>
 
@@ -211,8 +211,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_setOutputParams</span><span class="p">()</span>
 
         <span class="n">landmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getLandMask</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">landmask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">landmask</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">TerminateShakeMap</span><span class="p">(</span><span class="s2">&quot;Mapped area is entirely water&quot;</span><span class="p">)</span>
+        <span class="c1"># We used to do this, but we&#39;ve decided not to. Leaving the code</span>
+        <span class="c1"># in place in case we change our minds.</span>
+        <span class="c1"># if landmask is not None and np.all(landmask):</span>
+        <span class="c1">#     raise TerminateShakeMap(&quot;Mapped area is entirely water&quot;)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># If the gmpe doesn&#39;t break down its stardard deviation into</span>
@@ -484,6 +486,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">outlier_deviation_level</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;outlier&#39;</span><span class="p">][</span><span class="s1">&#39;max_deviation&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outlier_max_mag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;outlier&#39;</span><span class="p">][</span><span class="s1">&#39;max_mag&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outlier_valid_stations</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;outlier&#39;</span><span class="p">][</span><span class="s1">&#39;valid_stations&#39;</span><span class="p">]</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># These are the IMTs we want to make</span>
@@ -768,19 +772,32 @@
                         <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="p">,</span> <span class="n">PointRupture</span><span class="p">)</span> <span class="ow">or</span>
                          <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outlier_max_mag</span><span class="p">):</span>
                     <span class="c1">#</span>
+                    <span class="c1"># Make a boolean array of stations that have been</span>
+                    <span class="c1"># manually rehabilitated by the operator</span>
+                    <span class="c1">#</span>
+                    <span class="n">is_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]),</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">valid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outlier_valid_stations</span><span class="p">:</span>
+                        <span class="n">is_valid</span> <span class="o">|=</span> <span class="n">valid</span> <span class="o">==</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+                    <span class="c1">#</span>
                     <span class="c1"># turn off nan warnings for this statement</span>
                     <span class="c1">#</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
-                    <span class="n">flagged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">])</span> <span class="o">|</span> \
-                        <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">])</span> <span class="o">&gt;</span>
-                         <span class="bp">self</span><span class="o">.</span><span class="n">outlier_deviation_level</span> <span class="o">*</span>
-                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">])</span>
+                    <span class="n">flagged</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">])</span> <span class="o">&gt;</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">outlier_deviation_level</span> <span class="o">*</span>
+                               <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">is_valid</span><span class="p">)</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># Add NaN values to the list of outliers</span>
+                    <span class="c1">#</span>
+                    <span class="n">flagged</span> <span class="o">|=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">])</span>
 
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;IMT: </span><span class="si">%s</span><span class="s1">, flagged: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
                                       <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flagged</span><span class="p">)))</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flagged</span>
                 <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># Not doing outliers, but should still flag NaNs</span>
+                    <span class="c1">#</span>
                     <span class="n">flagged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">])</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flagged</span>
                 <span class="c1">#</span>
