@@ -19,7 +19,7 @@ class HistoryModule(CoreModule):
 
     command_name = 'history'
 
-    def __init__(self, eventid, filter=None):
+    def __init__(self, eventid):
         """
         Instantiate a ContourModule class with an event ID.
         """
@@ -35,7 +35,7 @@ class HistoryModule(CoreModule):
         Raises:
             NotADirectoryError: When the event data directory does not exist.
         """
-        install_path, data_path = get_config_paths()
+        _, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current')
         backups = glob.glob(os.path.join(data_path, self._eventid, 'backup*'))
         backups.sort(reverse=True)
