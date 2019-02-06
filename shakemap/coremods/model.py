@@ -740,7 +740,7 @@ class ModelModule(CoreModule):
                     # Make a boolean array of stations that have been
                     # manually rehabilitated by the operator
                     #
-                    is_valid = np.full(np.shape(df['id'], False, dtype=bool))
+                    is_valid = np.full(np.shape(df['id']), False, dtype=bool)
                     for valid in self.outlier_valid_stations:
                         is_valid |= valid == df['id']
                     #
