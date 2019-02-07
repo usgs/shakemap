@@ -43,7 +43,7 @@ from shakemap.utils.generic_amp import get_generic_amp_factors
 from shakemap.c.clib import (make_sigma_matrix,
                              geodetic_distance_fast,
                              make_sd_array)
-from shakemap.utils.exception import TerminateShakeMap
+# from shakemap.utils.exception import TerminateShakeMap
 
 from shakelib.directivity.rowshandel2013 import Rowshandel2013
 
@@ -176,8 +176,10 @@ class ModelModule(CoreModule):
         self._setOutputParams()
 
         landmask = self._getLandMask()
-        if landmask is not None and np.all(landmask):
-            raise TerminateShakeMap("Mapped area is entirely water")
+        # We used to do this, but we've decided not to. Leaving the code
+        # in place in case we change our minds.
+        # if landmask is not None and np.all(landmask):
+        #     raise TerminateShakeMap("Mapped area is entirely water")
 
         # ---------------------------------------------------------------------
         # If the gmpe doesn't break down its stardard deviation into
@@ -449,6 +451,8 @@ class ModelModule(CoreModule):
         self.outlier_deviation_level = \
             self.config['data']['outlier']['max_deviation']
         self.outlier_max_mag = self.config['data']['outlier']['max_mag']
+        self.outlier_valid_stations = \
+            self.config['data']['outlier']['valid_stations']
 
         # ---------------------------------------------------------------------
         # These are the IMTs we want to make
@@ -733,19 +737,32 @@ class ModelModule(CoreModule):
                         (not isinstance(self.rupture_obj, PointRupture) or
                          self.rx.mag <= self.outlier_max_mag):
                     #
+                    # Make a boolean array of stations that have been
+                    # manually rehabilitated by the operator
+                    #
+                    is_valid = np.full(np.shape(df['id']), False, dtype=bool)
+                    for valid in self.outlier_valid_stations:
+                        is_valid |= valid == df['id']
+                    #
                     # turn off nan warnings for this statement
                     #
                     np.seterr(invalid='ignore')
-                    flagged = np.isnan(df[imtstr + '_residual']) | \
-                        (np.abs(df[imtstr + '_residual']) >
-                         self.outlier_deviation_level *
-                         df[imtstr + '_pred_sigma'])
+                    flagged = (np.abs(df[imtstr + '_residual']) >
+                               self.outlier_deviation_level *
+                               df[imtstr + '_pred_sigma']) & (~is_valid)
                     np.seterr(invalid='warn')
+                    #
+                    # Add NaN values to the list of outliers
+                    #
+                    flagged |= np.isnan(df[imtstr + '_residual'])
 
                     self.logger.debug('IMT: %s, flagged: %d' %
                                       (imtstr, np.sum(flagged)))
                     df[imtstr + '_outliers'] = flagged
                 else:
+                    #
+                    # Not doing outliers, but should still flag NaNs
+                    #
                     flagged = np.isnan(df[imtstr + '_residual'])
                     df[imtstr + '_outliers'] = flagged
                 #

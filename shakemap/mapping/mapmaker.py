@@ -1147,7 +1147,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
             rup_shape = sShape(feature['geometry'])
             sfeature = cfeature.ShapelyFeature(rup_shape, geoproj)
             ax.add_feature(sfeature, zorder=FAULT_ZORDER,
-                           lw=2, edgecolor='k', facecolor=(0, 0, 0, 0))
+                           lw=1, edgecolor='k', facecolor=(0, 0, 0, 0))
 
     # draw graticules, ticks, tick labels
     _draw_graticules(ax, *bounds)
@@ -1473,7 +1473,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
             rup_shape = sShape(feature['geometry'])
             sfeature = cfeature.ShapelyFeature(rup_shape, geoproj)
             ax.add_feature(sfeature, zorder=FAULT_ZORDER,
-                           lw=2, edgecolor='k', facecolor=(0, 0, 0, 0))
+                           lw=1, edgecolor='k', facecolor=(0, 0, 0, 0))
 
     # draw the station data on the map
     stations = container.getStationDict()
