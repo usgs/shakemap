@@ -6,7 +6,7 @@ import json
 # third party imports
 from libcomcat.search import get_event_by_id
 from libcomcat.classes import DetailEvent
-from amptools.table import dataframe_to_xml
+from impactutils.io.table import dataframe_to_xml
 import pandas as pd
 import numpy as np
 
