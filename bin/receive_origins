@@ -5,6 +5,9 @@ import argparse
 import os.path
 import sys
 
+# third-party imports
+from libcomcat.search import get_event_by_id
+
 # local imports
 from shakemap.utils.config import get_config_paths
 import shakemap.utils.queue as queue
@@ -106,6 +109,12 @@ def main(args):
        or not args.preferred_magnitude:
         logger.info('Missing event parameters for event %s, skipping',
                     args.preferred_eventid)
+        sys.exit(0)
+
+    detail = get_event_by_id(args.preferred_eventid)
+    if detail.id != args.preferred_eventid:
+        logger.info('Event id %s is not authoritative; (authoritative=%s)' %
+                    (args.preferred_eventid, detail.id))
         sys.exit(0)
 
     # We've weeded out the messages we don't want, so construct an event
