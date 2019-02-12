@@ -1,14 +1,29 @@
 #!/usr/bin/env python
 
+#
+# This program is intended to be called by PDL in response to the arrival
+# of an origin product. It is used by the Global ShakeMap system at NEIC,
+# and therefor has a number NEIC-specific features (like the queries to
+# ComCat). If you are adapting this program for your own use, make sure
+# to copy it out of the ShakeMap repository so that your changes won't
+# be overwritten the next time you update the ShakeMap code.
+#
+
 # stdlib imports
 import argparse
 import os.path
 import sys
 
+# third-party imports
+from libcomcat.search import get_event_by_id
+from impactutils.comcat.query import GeoServe
+from impactutils.mapping.compass import get_compass_dir_azimuth
+
 # local imports
 from shakemap.utils.config import get_config_paths
 import shakemap.utils.queue as queue
 from shakemap.utils.logging import get_generic_logger
+from shakemap.utils.utils import get_network_name
 
 LOGFILE = 'origins.log'
 
@@ -108,27 +123,64 @@ def main(args):
                     args.preferred_eventid)
         sys.exit(0)
 
+    detail = get_event_by_id(args.preferred_eventid)
+    if detail.id != args.preferred_eventid:
+        logger.info('Event id %s is not authoritative; (authoritative=%s)' %
+                    (args.preferred_eventid, detail.id))
+        sys.exit(0)
+
     # We've weeded out the messages we don't want, so construct an event
     # dictionary and send it to the queue
     if not args.property_title:
-        args.property_title = ''
-    args.property_title = ' '.join(args.property_title)
+        gs = GeoServe(args.preferred_latitude, args.preferred_longitude,
+                      maxradius=250, minpop=1000)
+        places = gs.getPlaces()
+        if len(places):
+            props = places[0]['properties']
+            if props['country_code'] == 'US':
+                country = ''
+            else:
+                country = props['country_code']
+            azimuth = props['azimuth'] + 180
+            if azimuth > 360:
+                azimuth = azimuth - 360
+            location = '%d km %s of %s, %s, %s' % (
+                int(props['distance']),
+                get_compass_dir_azimuth(azimuth, resolution='meteorological'),
+                props['name'], props['admin1_name'], country)
+        else:
+            region = gs.getRegions()
+            try:
+                location = region['fe']['features'][0]['properties']['name']
+            except KeyError:
+                location = ''
+            except IndexError:
+                location = ''
+    else:
+        location = ' '.join(args.property_title)
+
     if not args.preferred_eventsource:
         args.preferred_eventsource = ''
+        network = ''
+    else:
+        network = get_network_name(args.preferred_eventsource)
+        if network == 'unknown':
+            network = ''
     event = {'id': args.preferred_eventid,
              'netid': args.preferred_eventsource,
-             'network': '',
+             'network': network,
              'time': args.preferred_eventtime,
              'lat': args.preferred_latitude,
              'lon': args.preferred_longitude,
              'depth': args.preferred_depth,
              'mag': args.preferred_magnitude,
-             'locstring': args.property_title,
+             'locstring': location,
              'alt_eventids': args.eventids}
     logger.info('Sending event %s to queue.' % args.preferred_eventid)
 
     # Poke the queue to run shake on this event.
-    queue.send_queue('origin', event, config['port'])
+    # queue.send_queue('origin', event, config['port'])
+    print(event)
 
 
 if __name__ == '__main__':
