@@ -23,6 +23,7 @@ from impactutils.mapping.compass import get_compass_dir_azimuth
 from shakemap.utils.config import get_config_paths
 import shakemap.utils.queue as queue
 from shakemap.utils.logging import get_generic_logger
+from shakemap.utils.utils import get_network_name
 
 LOGFILE = 'origins.log'
 
@@ -160,9 +161,14 @@ def main(args):
 
     if not args.preferred_eventsource:
         args.preferred_eventsource = ''
+        network = ''
+    else:
+        network = get_network_name(args.preferred_eventsource)
+        if network == 'unknown':
+            network = ''
     event = {'id': args.preferred_eventid,
              'netid': args.preferred_eventsource,
-             'network': '',
+             'network': network,
              'time': args.preferred_eventtime,
              'lat': args.preferred_latitude,
              'lon': args.preferred_longitude,
@@ -173,7 +179,8 @@ def main(args):
     logger.info('Sending event %s to queue.' % args.preferred_eventid)
 
     # Poke the queue to run shake on this event.
-    queue.send_queue('origin', event, config['port'])
+    # queue.send_queue('origin', event, config['port'])
+    print(event)
 
 
 if __name__ == '__main__':
