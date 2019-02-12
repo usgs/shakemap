@@ -279,7 +279,8 @@ def _get_map_info(gd):
     return (bounds, figsize, aspect)
 
 
-def _draw_imt_legend(fig, palette, imtype, gmice):
+def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
+                     point_source):
     """Create a legend axis for non MMI plots.
 
     Args:
@@ -366,6 +367,95 @@ def _draw_imt_legend(fig, palette, imtype, gmice):
              path_effects.Normal()]
         )
         left = right
+
+    # Explanation of symbols: triangle is instrument, circle is mmi,
+    # epicenter is black star
+    # thick black line is rupture (if available)
+    cax = fig.add_axes([0.1, 0.09, 0.8, 0.04])
+    plt.axis('off')
+    cax_xmin, cax_xmax = cax.get_xlim()
+    bottom, top = cax.get_ylim()
+    plt.xlim(cax_xmin, cax_xmax)
+    plt.ylim(bottom, top)
+    item_sep = [0.2, 0.28, 0.15]
+    left_offset = 0.005
+    label_pad = 0.02
+
+    yloc_sixth_row = 0.6
+    yloc_seventh_row = 0.15
+
+    # Instrument
+    triangle_marker_x = left_offset
+    triangle_text_x = triangle_marker_x + label_pad
+    plt.plot(triangle_marker_x, yloc_seventh_row, '^', markerfacecolor='w',
+             markeredgecolor='k', markersize=6, mew=0.5, clip_on=False)
+    plt.text(triangle_text_x,
+             yloc_seventh_row,
+             'Seismic Instrument',
+             va='center',
+             ha='left')
+
+    # Macroseismic
+    circle_marker_x = triangle_text_x + item_sep[0]
+    circle_text_x = circle_marker_x + label_pad
+    plt.plot(circle_marker_x,
+             yloc_seventh_row, 'o',
+             markerfacecolor='w',
+             markeredgecolor='k',
+             markersize=4,
+             mew=0.5)
+    plt.text(circle_text_x,
+             yloc_seventh_row,
+             'Macroseismic Observation',
+             va='center',
+             ha='left')
+
+    # Epicenter
+    star_marker_x = circle_marker_x + item_sep[1]
+    star_text_x = star_marker_x + label_pad
+    plt.plot(star_marker_x,
+             yloc_seventh_row, 'k*',
+             markersize=12,
+             mew=0.5)
+    plt.text(star_text_x,
+             yloc_seventh_row,
+             'Epicenter',
+             va='center',
+             ha='left')
+
+    if not point_source:
+        rup_marker_x = star_marker_x + item_sep[2]
+        rup_text_x = rup_marker_x + label_pad
+        rwidth = 0.02
+        rheight = 0.05
+        rup = patches.Rectangle(
+            xy=(rup_marker_x - rwidth,
+                yloc_seventh_row-0.5*rheight),
+            width=rwidth,
+            height=rheight,
+            linewidth=2,
+            edgecolor='k',
+            facecolor='w'
+        )
+        cax.add_patch(rup)
+        plt.text(rup_text_x,
+                 yloc_seventh_row,
+                 'Rupture',
+                 va='center',
+                 ha='left')
+
+    # Add conversion reference and shakemap version/process time
+    version_x = 1.0
+    tpl = (map_version, process_time)
+    plt.text(version_x, yloc_sixth_row,
+             'Version %i: Processed %s' % tpl,
+             ha='right', va='center')
+
+    ref = gmice.name
+    refx = 0
+    plt.text(refx, yloc_sixth_row,
+             'Scale based on %s' % ref,
+             va='center')
 
 
 def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
@@ -1466,7 +1556,9 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     # draw the rupture polygon(s) in black, if not point rupture
     rupture = rupture_from_dict(container.getRuptureDict())
+    point_source = True
     if not isinstance(rupture, PointRupture):
+        point_source = False
         json_dict = rupture._geojson
         # shapes = []
         for feature in json_dict['features']:
@@ -1482,7 +1574,10 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     _draw_title(imtype, container, operator)
 
-    _draw_imt_legend(fig, mmimap, imtype, gmice)
+    process_time = info['processing']['shakemap_versions']['process_time']
+    map_version = int(info['processing']['shakemap_versions']['map_version'])
+    _draw_imt_legend(fig, mmimap, imtype, gmice, process_time, map_version,
+                     point_source)
 
     # ------------------------------------------ #
     # ***** Temp stuff for drawing circles ***** #
