@@ -179,8 +179,7 @@ def main(args):
     logger.info('Sending event %s to queue.' % args.preferred_eventid)
 
     # Poke the queue to run shake on this event.
-    # queue.send_queue('origin', event, config['port'])
-    print(event)
+    queue.send_queue('origin', event, config['port'])
 
 
 if __name__ == '__main__':
