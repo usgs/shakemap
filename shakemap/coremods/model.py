@@ -2,6 +2,8 @@
 Process a ShakeMap, based on the configuration and data found in
 shake_data.hdf, and produce output in shake_result.hdf.
 """
+import argparse
+import inspect
 import os.path
 import time as time
 import copy
@@ -99,6 +101,49 @@ class ModelModule(CoreModule):
         }]
     }
 
+    no_seismic = False
+    no_macroseismic = False
+    no_rupture = False
+
+    def parseArgs(self, arglist):
+        """
+        Set up the object to accept the --no_seismic, --no_macroseismic,
+        and --no_rupture flags.
+        """
+        parser = argparse.ArgumentParser(
+            prog=self.__class__.command_name,
+            description=inspect.getdoc(self.__class__))
+        parser.add_argument('-s', '--no_seismic', action='store_true',
+                            help='Exclude instrumental seismic data from '
+                            'the processing, ignoring any that may exist in '
+                            'the input directory.')
+        parser.add_argument('-m', '--no_macroseismic', action='store_true',
+                            help='Exclude macroseismic data from the '
+                            'processing, ignoring any that may exist in the '
+                            'input directory.')
+        parser.add_argument('-r', '--no_rupture', action='store_true',
+                            help='Exclude a rupture model from the '
+                            'processing, ignoring any that may exist in the '
+                            'input directory.')
+        #
+        # This line should be in any modules that overrides this
+        # one. It will collect up everything after the current
+        # modules options in args.rem, which should be returned
+        # by this function. Note: doing parser.parse_known_args()
+        # will not work as it will suck up any later modules'
+        # options that are the same as this one's.
+        #
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
+                            help=argparse.SUPPRESS)
+        args = parser.parse_args(arglist)
+        if args.no_seismic:
+            self.no_seismic = True
+        if args.no_macroseismic:
+            self.no_macroseismic = True
+        if args.no_rupture:
+            self.no_rupture = True
+        return args.rem
+
     def execute(self):
         """
         Interpolate ground motions to a grid or list of locations.
@@ -161,6 +206,9 @@ class ModelModule(CoreModule):
         # Get the rupture object and rupture context
         # ---------------------------------------------------------------------
         self.rupture_obj = self.ic.getRuptureObject()
+        # If the --no_rupture flag is used, switch to a PointRupture
+        if self.no_rupture:
+            self.rupture_obj = PointRupture(self.rupture_obj._origin)
         if 'mechanism' in self.config['modeling']:
             self.rupture_obj._origin.setMechanism(
                 mech=self.config['modeling']['mechanism'])
@@ -603,6 +651,10 @@ class ModelModule(CoreModule):
         if self.stations is None:
             return
         for dfid, val in (('df1', True), ('df2', False)):
+            if dfid == 'df1' and self.no_seismic:
+                continue
+            if dfid == 'df2' and self.no_macroseismic:
+                continue
             sdf, imts = self.stations.getStationDictionary(instrumented=val)
             if sdf is not None:
                 df = DataFrame()
@@ -1610,7 +1662,8 @@ class ModelModule(CoreModule):
         # Now go through the GeoJSON and add various properties and
         # amps from the df_dict dictionaries
         #
-        for station in sjdict['features']:
+        sjdict_copy = copy.copy(sjdict['features'])
+        for station in sjdict_copy:
             if station['id'] in sta_ix['df1']:
                 ndf = 'df1'
                 station['properties']['station_type'] = 'seismic'
@@ -1618,8 +1671,13 @@ class ModelModule(CoreModule):
                 ndf = 'df2'
                 station['properties']['station_type'] = 'macroseismic'
             else:
-                raise ValueError('Unknown station %s in stationlist' %
-                                 (station['id']))
+                # We're probably using --no_seismic or --no_macroseismic
+                if self.no_seismic or self.no_macroseismic:
+                    sjdict['features'].remove(station)
+                    continue
+                else:
+                    raise ValueError('Unknown station %s in stationlist' %
+                                     (station['id']))
             dfx = getattr(self, ndf)
             sdf = dfx.df
             six = sta_ix[ndf][station['id']]
