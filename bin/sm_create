@@ -15,7 +15,7 @@ import copy
 from libcomcat.search import get_event_by_id
 from configobj import ConfigObj
 from impactutils.time.ancient_time import HistoricTime
-from amptools.table import dataframe_to_xml
+from impactutils.io.table import dataframe_to_xml
 import numpy as np
 
 # local imports
@@ -37,7 +37,7 @@ from shakelib.rupture import constants
 from shakelib.station import StationList
 
 TIMEFMT2 = '%Y-%m-%dT%H:%M:%S'
-KM2SEC = 3600.0/111  # seconds per kilometer
+KM2SEC = 3600.0 / 111  # seconds per kilometer
 
 
 def write_instrumented(data_file, event_dir):
