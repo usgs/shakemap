@@ -1,6 +1,9 @@
 # stdlib imports
 import os.path
 from collections import OrderedDict
+# from multiprocessing import Pool
+import concurrent.futures as cf
+import copy
 
 # third party
 from configobj import ConfigObj
@@ -149,16 +152,6 @@ class MappingModule(CoreModule):
         # create contour files
         self.logger.debug('Mapping...')
 
-        # get the contour filter_size setting from config
-        # get the path to the products.conf file, load the config
-        config_file = os.path.join(install_path, 'config', 'products.conf')
-        spec_file = get_configspec('products')
-        validator = get_custom_validator()
-        config = ConfigObj(config_file, configspec=spec_file)
-        results = config.validate(validator)
-        if not isinstance(results, bool) or not results:
-            config_error(config, results)
-
         # get the filter size from the products.conf
         filter_size = config['products']['contour']['filter_size']
 
@@ -169,6 +162,9 @@ class MappingModule(CoreModule):
         layers = config['products']['mapping']['layers']
         oceanfile = layers['oceans']
         topofile = layers['topography']
+
+        # Get the number of parallel workers
+        max_workers = config['products']['mapping']['max_workers']
 
         # Reading HDF5 files currently takes a long time, due to poor
         # programming in MapIO.  To save us some time until that issue is
@@ -198,75 +194,95 @@ class MappingModule(CoreModule):
                         samplegeodict=sampledict,
                         resample=False)
 
+        model_config = container.getConfig()
+
         imtlist = container.getIMTs()
+
+        alist = []
         for imtype in imtlist:
             component, imtype = imtype.split('/')
+            comp = container.getComponents(imtype)[0]
+            d = {'imtype': imtype,
+                 'topogrid': topogrid,
+                 'oceanfile': oceanfile,
+                 'datadir': datadir,
+                 'operator': operator,
+                 'filter_size': filter_size,
+                 'info': info,
+                 'component': comp,
+                 'imtdict': container.getIMTGrids(imtype, comp),
+                 'ruptdict': copy.deepcopy(container.getRuptureDict()),
+                 'stationdict': container.getStationDict(),
+                 'config': model_config
+                 }
+            alist.append(d)
             if imtype == 'MMI':
-                self.logger.debug('Drawing intensity map...')
-                intensity_pdf, intensity_png, legend_file = draw_intensity(
-                    container,
-                    topogrid,
-                    oceanfile,
-                    datadir,
-                    operator
-                )
-                self.logger.debug('Created intensity map %s' % intensity_pdf)
-                self.make_pin_thumbnail(container, component, datadir)
-            else:
-                self.logger.debug('Drawing %s contour map...' % imtype)
+                g = copy.deepcopy(d)
+                g['imtype'] = 'thumbnail'
+                alist.append(g)
 
-                contour_pdf, contour_png = draw_contour(
-                    container,
-                    imtype, topogrid,
-                    oceanfile,
-                    datadir,
-                    operator, filter_size
-                )
-                self.logger.debug('Created contour map %s' % contour_pdf)
+        if max_workers > 0:
+            with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
+                results = ex.map(make_map, alist)
+                list(results)
+        else:
+            for adict in alist:
+                make_map(adict)
 
         container.close()
 
-    def make_pin_thumbnail(self, container, component, datadir):
-        """Make the artsy-thumbnail for the pin on the USGS webpages.
-        """
-        imtdict = container.getIMTGrids("MMI", component)
-        grid = imtdict['mean']
-        metadata = imtdict['mean_metadata']
-        num_pixels = 300
-        randx = np.random.rand(num_pixels)
-        randy = np.random.rand(num_pixels)
-        rx = (randx * metadata['nx']).astype(np.int)
-        ry = (randy * metadata['ny']).astype(np.int)
-        rvals = np.arange(num_pixels)
 
-        x_grid = np.arange(400)
-        y_grid = np.arange(400)
+def make_map(adict):
 
-        mx_grid, my_grid = np.meshgrid(x_grid, y_grid)
+    imtype = adict['imtype']
+    if imtype == 'MMI':
+        intensity_pdf, intensity_png, legend_file = draw_intensity(adict)
+    elif imtype == 'thumbnail':
+        make_pin_thumbnail(adict)
+    else:
+        contour_pdf, contour_png = draw_contour(adict)
 
-        grid = griddata(np.hstack([randx.reshape((-1, 1)) * 400,
-                                   randy.reshape((-1, 1)) * 400]),
-                        grid[ry, rx], (mx_grid, my_grid), method='nearest')
-        grid = (grid * 10 + 0.5).astype(np.int).astype(np.float) / 10.0
 
-        rgrid = griddata(np.hstack([randx.reshape((-1, 1)) * 400,
-                                    randy.reshape((-1, 1)) * 400]),
-                         rvals, (mx_grid, my_grid), method='nearest')
-        irgrid = rgrid.astype(np.int32)
-        mypols = [p[0]['coordinates']
-                  for p in rasterio.features.shapes(irgrid)]
+def make_pin_thumbnail(adict):
+    """Make the artsy-thumbnail for the pin on the USGS webpages.
+    """
+    imtdict = adict['imtdict']
+    grid = imtdict['mean']
+    metadata = imtdict['mean_metadata']
+    num_pixels = 300
+    randx = np.random.rand(num_pixels)
+    randy = np.random.rand(num_pixels)
+    rx = (randx * metadata['nx']).astype(np.int)
+    ry = (randy * metadata['ny']).astype(np.int)
+    rvals = np.arange(num_pixels)
 
-        mmimap = ColorPalette.fromPreset('mmi')
-        plt.figure(figsize=(2.75, 2.75), dpi=96, frameon=False)
-        plt.axis('off')
-        plt.tight_layout()
-        plt.imshow(grid, cmap=mmimap.cmap, vmin=1.5, vmax=9.5)
-        for pol in mypols:
-            mycoords = list(zip(*pol[0]))
-            plt.plot(mycoords[0], mycoords[1], color='#cccccc', linewidth=0.2)
-        plt.savefig(
-            os.path.join(datadir, "pin-thumbnail.png"),
-            dpi=96,
-            bbox_inches=matplotlib.transforms.Bbox(
-                [[0.47, 0.39], [2.50, 2.50]]),
-            pad_inches=0)
+    x_grid = np.arange(400)
+    y_grid = np.arange(400)
+
+    mx_grid, my_grid = np.meshgrid(x_grid, y_grid)
+
+    grid = griddata(np.hstack([randx.reshape((-1, 1)) * 400,
+                               randy.reshape((-1, 1)) * 400]),
+                    grid[ry, rx], (mx_grid, my_grid), method='nearest')
+    grid = (grid * 10 + 0.5).astype(np.int).astype(np.float) / 10.0
+
+    rgrid = griddata(np.hstack([randx.reshape((-1, 1)) * 400,
+                                randy.reshape((-1, 1)) * 400]),
+                     rvals, (mx_grid, my_grid), method='nearest')
+    irgrid = rgrid.astype(np.int32)
+    mypols = [p[0]['coordinates'] for p in rasterio.features.shapes(irgrid)]
+
+    mmimap = ColorPalette.fromPreset('mmi')
+    plt.figure(figsize=(2.75, 2.75), dpi=96, frameon=False)
+    plt.axis('off')
+    plt.tight_layout()
+    plt.imshow(grid, cmap=mmimap.cmap, vmin=1.5, vmax=9.5)
+    for pol in mypols:
+        mycoords = list(zip(*pol[0]))
+        plt.plot(mycoords[0], mycoords[1], color='#cccccc', linewidth=0.2)
+    plt.savefig(
+        os.path.join(adict['datadir'], "pin-thumbnail.png"),
+        dpi=96,
+        bbox_inches=matplotlib.transforms.Bbox(
+            [[0.47, 0.39], [2.50, 2.50]]),
+        pad_inches=0)

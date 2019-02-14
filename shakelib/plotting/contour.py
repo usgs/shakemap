@@ -10,7 +10,7 @@ import numpy as np
 from openquake.hazardlib import imt
 
 
-def contour(container, imtype, component, filter_size, gmice):
+def contour(imtdict, imtype, filter_size, gmice):
     """
     Generate contours of a specific IMT and return as a Shapely
     MultiLineString object.
@@ -20,7 +20,6 @@ def contour(container, imtype, component, filter_size, gmice):
             with ShakeMap output data.
         imtype (str): String containing the name of an Intensity
             Measure Type found in container.
-        component (str): Intensity Measure component found in container.
         filter_size (int): Integer filter (see
             https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)
     Returns:
@@ -38,7 +37,6 @@ def contour(container, imtype, component, filter_size, gmice):
     oqimt = imt.from_string(imtype)
 
     intensity_colormap = ColorPalette.fromPreset('mmi')
-    imtdict = container.getIMTGrids(imtype, component)
     grid = imtdict['mean']
     metadata = imtdict['mean_metadata']
     if imtype == 'MMI':
