@@ -234,8 +234,8 @@ def contour_to_files(container, output_dir, logger,
                 crs=crs
             )
 
-            line_strings = contour(container, imtype, component, filter_size,
-                                   my_gmice)
+            line_strings = contour(container.getIMTGrids(imtype, component),
+                                   imtype, filter_size, my_gmice)
 
             for feature in line_strings:
                 vector_file.write(feature)

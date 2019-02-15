@@ -279,7 +279,8 @@ def _get_map_info(gd):
     return (bounds, figsize, aspect)
 
 
-def _draw_imt_legend(fig, palette, imtype, gmice):
+def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
+                     point_source):
     """Create a legend axis for non MMI plots.
 
     Args:
@@ -366,6 +367,95 @@ def _draw_imt_legend(fig, palette, imtype, gmice):
              path_effects.Normal()]
         )
         left = right
+
+    # Explanation of symbols: triangle is instrument, circle is mmi,
+    # epicenter is black star
+    # thick black line is rupture (if available)
+    cax = fig.add_axes([0.1, 0.09, 0.8, 0.04])
+    plt.axis('off')
+    cax_xmin, cax_xmax = cax.get_xlim()
+    bottom, top = cax.get_ylim()
+    plt.xlim(cax_xmin, cax_xmax)
+    plt.ylim(bottom, top)
+    item_sep = [0.2, 0.28, 0.15]
+    left_offset = 0.005
+    label_pad = 0.02
+
+    yloc_sixth_row = 0.6
+    yloc_seventh_row = 0.15
+
+    # Instrument
+    triangle_marker_x = left_offset
+    triangle_text_x = triangle_marker_x + label_pad
+    plt.plot(triangle_marker_x, yloc_seventh_row, '^', markerfacecolor='w',
+             markeredgecolor='k', markersize=6, mew=0.5, clip_on=False)
+    plt.text(triangle_text_x,
+             yloc_seventh_row,
+             'Seismic Instrument',
+             va='center',
+             ha='left')
+
+    # Macroseismic
+    circle_marker_x = triangle_text_x + item_sep[0]
+    circle_text_x = circle_marker_x + label_pad
+    plt.plot(circle_marker_x,
+             yloc_seventh_row, 'o',
+             markerfacecolor='w',
+             markeredgecolor='k',
+             markersize=4,
+             mew=0.5)
+    plt.text(circle_text_x,
+             yloc_seventh_row,
+             'Macroseismic Observation',
+             va='center',
+             ha='left')
+
+    # Epicenter
+    star_marker_x = circle_marker_x + item_sep[1]
+    star_text_x = star_marker_x + label_pad
+    plt.plot(star_marker_x,
+             yloc_seventh_row, 'k*',
+             markersize=12,
+             mew=0.5)
+    plt.text(star_text_x,
+             yloc_seventh_row,
+             'Epicenter',
+             va='center',
+             ha='left')
+
+    if not point_source:
+        rup_marker_x = star_marker_x + item_sep[2]
+        rup_text_x = rup_marker_x + label_pad
+        rwidth = 0.02
+        rheight = 0.05
+        rup = patches.Rectangle(
+            xy=(rup_marker_x - rwidth,
+                yloc_seventh_row-0.5*rheight),
+            width=rwidth,
+            height=rheight,
+            linewidth=2,
+            edgecolor='k',
+            facecolor='w'
+        )
+        cax.add_patch(rup)
+        plt.text(rup_text_x,
+                 yloc_seventh_row,
+                 'Rupture',
+                 va='center',
+                 ha='left')
+
+    # Add conversion reference and shakemap version/process time
+    version_x = 1.0
+    tpl = (map_version, process_time)
+    plt.text(version_x, yloc_sixth_row,
+             'Version %i: Processed %s' % tpl,
+             ha='right', va='center')
+
+    ref = gmice.name
+    refx = 0
+    plt.text(refx, yloc_sixth_row,
+             'Scale based on %s' % ref,
+             va='center')
 
 
 def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
@@ -767,7 +857,7 @@ def _get_shaded(ptopo, contour_colormap):
     return draped_hsv
 
 
-def _draw_title(imt, container, operator):
+def _draw_title(imt, adict):
     """Draw the map title.
     Args:
         imt (str): IMT that is being drawn on the map ('MMI', 'PGV',
@@ -776,7 +866,7 @@ def _draw_title(imt, container, operator):
         operator (str): Configured ShakeMap operator (NEIC, CISN, etc.)
     """
     # Add a title
-    edict = container.getMetadata()['input']['event_information']
+    edict = adict['info']['input']['event_information']
     hlon = float(edict['longitude'])
     hlat = float(edict['latitude'])
     eloc = edict['event_description']
@@ -805,7 +895,7 @@ def _draw_title(imt, container, operator):
     else:
         fmt = ('%s\n%s ShakeMap: %s\n %s UTC M%.1f %s %s '
                'Depth: %.1fkm\nID:%s')
-    tstr = fmt % (imtstr, operator, eloc, timestr, mag, latstr,
+    tstr = fmt % (imtstr, adict['operator'], eloc, timestr, mag, latstr,
                   lonstr, dep, eid)
     plt.title(tstr, fontsize=10, verticalalignment='bottom')
 
@@ -979,8 +1069,7 @@ def _clip_bounds(bbox, filename):
     return gc
 
 
-def draw_intensity(container, topobase, oceanfile, outpath, operator,
-                   borderfile=None, override_scenario=False):
+def draw_intensity(adict, borderfile=None, override_scenario=False):
     """Create a contour map showing MMI contours over greyscale population.
 
     Args:
@@ -999,15 +1088,14 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
         str: Path to intensity JPG file.
     """
     # get the geodict for the ShakeMap
-    comp = container.getComponents('MMI')[0]
-    imtdict = container.getIMTGrids('MMI', comp)
+    imtdict = adict['imtdict']
     mmidata = imtdict['mean']
     mmidict = imtdict['mean_metadata']
     gd = GeoDict(mmidict)
     mmigrid = Grid2D(mmidata, gd)
 
     # Retrieve the epicenter - this will get used on the map
-    rupture = rupture_from_dict(container.getRuptureDict())
+    rupture = rupture_from_dict(adict['ruptdict'])
     origin = rupture.getOrigin()
     center_lat = origin.lat
     center_lon = origin.lon
@@ -1054,7 +1142,8 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     proj._threshold /= 6
 
     # get the projected MMI and topo grids
-    pmmigrid, ptopogrid = _get_projected_grids(mmigrid, topobase, projstr)
+    pmmigrid, ptopogrid = _get_projected_grids(mmigrid, adict['topogrid'],
+                                               projstr)
 
     # get the projected geodict
     proj_gd = pmmigrid.getGeoDict()
@@ -1098,7 +1187,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
 
     # clip the ocean data to the shakemap
     bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-    oceanshapes = _clip_bounds(bbox, oceanfile)
+    oceanshapes = _clip_bounds(bbox, adict['oceanfile'])
 
     ax.add_feature(ShapelyFeature(oceanshapes, crs=geoproj),
                    facecolor=WATERCOLOR, zorder=OCEAN_ZORDER)
@@ -1108,7 +1197,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
                     draw_dots=True)
 
     # draw the station data on the map
-    stations = container.getStationDict()
+    stations = adict['stationdict']
 
     _draw_stations(ax, stations, 'MMI', mmimap, geoproj)
 
@@ -1118,10 +1207,10 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
              zorder=EPICENTER_ZORDER, transform=geoproj)
 
     # draw the map title
-    _draw_title('MMI', container, operator)
+    _draw_title('MMI', adict)
 
     # is this event a scenario?
-    info = container.getMetadata()
+    info = adict['info']
     etype = info['input']['event_information']['event_type']
     is_scenario = etype == 'SCENARIO'
 
@@ -1154,7 +1243,7 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
 
     # draw a separate intensity colorbar in a separate axes
     # _draw_colorbar(fig, mmimap)
-    config = container.getConfig()
+    config = adict['config']
     gmice = get_object_from_config('gmice', 'modeling', config)
     process_time = info['processing']['shakemap_versions']['process_time']
     map_version = int(info['processing']['shakemap_versions']['map_version'])
@@ -1206,8 +1295,8 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     # ---------------------------------------------- #
 
     # create pdf and png output file names
-    pdf_file = os.path.join(outpath, 'intensity.pdf')
-    jpg_file = os.path.join(outpath, 'intensity.jpg')
+    pdf_file = os.path.join(adict['datadir'], 'intensity.pdf')
+    jpg_file = os.path.join(adict['datadir'], 'intensity.jpg')
 
     # save to pdf/jpeg
     plt.savefig(pdf_file, bbox_inches='tight')
@@ -1217,27 +1306,29 @@ def draw_intensity(container, topobase, oceanfile, outpath, operator,
     fig2 = plt.figure(figsize=figsize)
     _draw_mmi_legend(fig2, mmimap, gmice, process_time,
                      map_version, point_source)
-    legend_file = os.path.join(outpath, 'mmi_legend.png')
+    legend_file = os.path.join(adict['datadir'], 'mmi_legend.png')
     plt.savefig(legend_file, bbox_inches='tight')
 
     return (pdf_file, jpg_file, legend_file)
 
 
-def draw_contour(container, imtype, topobase, oceanfile, outpath,
-                 operator, filter_size, borderfile=None,
-                 override_scenario=False):
+def draw_contour(adict, borderfile=None, override_scenario=False):
     """Draw IMT contour lines over hill-shaded topography.
 
     Args:
-        container (ShakeMapOutputContainer): HDF container of ShakeMap output.
-        imtype (str): Type of IMT to be rendered.
-        topobase (Grid2D): Topography grid to trim and project.
-        oceanfile (str): Path to file containing ocean vector data in a
-                         format compatible with fiona.
-        outpath (str): Directory where output intensity.pdf and
-                       intensity.jpg files will be made.
-        operator (str): Configured ShakeMap operator (NEIC, CISN, etc.)
-        filter_size (str): Smoothing filter size for contouring algorithm.
+        adict (dictionary): A dictionary containing the following keys:
+            'imtype' (str): The intensity measure type
+            'topogrid' (Grid2d): A topography grid
+            'oceanfile' (str): A file containing the ocean boundaries
+            'datadir' (str): The path into which to deposit products
+            'operator' (str): The producer of this shakemap
+            'filter_size' (int): The size of the filter used before contouring
+            'info' (dictionary): The shakemap info structure
+            'component' (str): The intensity measure component being plotted
+            'imtdict' (dictionary): Dict containing the IMT grids
+            'rupdict' (dictionary): Dict containing the rupture data
+            'stationdict' (dictionary): Dict of station data
+            'config' (dictionary): The configuration data for this shakemap
         borderfile (str): Shapefile containing country/state borders.
         override_scenario (bool): Turn off scenario watermark.
 
@@ -1245,8 +1336,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
         str: Path to intensity PDF file.
         str: Path to intensity JPG file.
     """
-    comp = container.getComponents(imtype)[0]
-    imtdict = container.getIMTGrids(imtype, comp)
+    imtype = adict['imtype']
+    imtdict = adict['imtdict']
     imtdata = imtdict['mean']
     gd = GeoDict(imtdict['mean_metadata'])
     imtgrid = Grid2D(imtdata, gd)
@@ -1254,7 +1345,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     gd = imtgrid.getGeoDict()
 
     # Retrieve the epicenter - this will get used on the map
-    rupture = rupture_from_dict(container.getRuptureDict())
+    rupture = rupture_from_dict(adict['ruptdict'])
     origin = rupture.getOrigin()
     center_lat = origin.lat
 
@@ -1295,7 +1386,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     proj._threshold /= 6
 
     # get the projected MMI and topo grids
-    pimtgrid, ptopogrid = _get_projected_grids(imtgrid, topobase, projstr)
+    pimtgrid, ptopogrid = _get_projected_grids(imtgrid, adict['topogrid'],
+                                               projstr)
 
     # get the projected geodict
     proj_gd = pimtgrid.getGeoDict()
@@ -1321,13 +1413,12 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     plt.imshow(hillshade, origin='upper', extent=img_extent,
                zorder=IMG_ZORDER, interpolation='none')
 
-    config = container.getConfig()
+    config = adict['config']
     gmice = get_object_from_config('gmice', 'modeling', config)
     gmice_imts = gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
     gmice_pers = gmice.DEFINED_FOR_SA_PERIODS
 
     oqimt = imt.from_string(imtype)
-    component = container.getComponents(imtype)[0]
 
     if imtype == 'MMI' or not isinstance(oqimt, tuple(gmice_imts)) or \
             (isinstance(oqimt, imt.SA) and oqimt.period not in gmice_pers):
@@ -1337,9 +1428,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     # call the contour module in plotting to get the vertices of the contour
     # lines
-    contour_objects = contour(container, imtype,
-                              component, filter_size,
-                              my_gmice)
+    contour_objects = contour(imtdict, imtype, adict['filter_size'], my_gmice)
 
     # get a color palette for the levels we have
     # levels = [c['properties']['value'] for c in contour_objects]
@@ -1408,7 +1497,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
 
     # clip the ocean data to the shakemap
     bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-    oceanshapes = _clip_bounds(bbox, oceanfile)
+    oceanshapes = _clip_bounds(bbox, adict['oceanfile'])
 
     ax.add_feature(
         ShapelyFeature(oceanshapes, crs=geoproj),
@@ -1431,7 +1520,7 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     _draw_graticules(ax, *bounds)
 
     # is this event a scenario?
-    info = container.getMetadata()
+    info = adict['info']
     etype = info['input']['event_information']['event_type']
     is_scenario = etype == 'SCENARIO'
 
@@ -1465,8 +1554,10 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
              zorder=EPICENTER_ZORDER, transform=geoproj)
 
     # draw the rupture polygon(s) in black, if not point rupture
-    rupture = rupture_from_dict(container.getRuptureDict())
+    rupture = rupture_from_dict(adict['ruptdict'])
+    point_source = True
     if not isinstance(rupture, PointRupture):
+        point_source = False
         json_dict = rupture._geojson
         # shapes = []
         for feature in json_dict['features']:
@@ -1476,13 +1567,16 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
                            lw=1, edgecolor='k', facecolor=(0, 0, 0, 0))
 
     # draw the station data on the map
-    stations = container.getStationDict()
+    stations = adict['stationdict']
     mmimap = ColorPalette.fromPreset('mmi')
     _draw_stations(ax, stations, imtype, mmimap, geoproj)
 
-    _draw_title(imtype, container, operator)
+    _draw_title(imtype, adict)
 
-    _draw_imt_legend(fig, mmimap, imtype, gmice)
+    process_time = info['processing']['shakemap_versions']['process_time']
+    map_version = int(info['processing']['shakemap_versions']['map_version'])
+    _draw_imt_legend(fig, mmimap, imtype, gmice, process_time, map_version,
+                     point_source)
 
     # ------------------------------------------ #
     # ***** Temp stuff for drawing circles ***** #
@@ -1523,8 +1617,8 @@ def draw_contour(container, imtype, topobase, oceanfile, outpath,
     # save plot to file
     fileimt = oq_to_file(imtype)
     plt.draw()
-    pdf_file = os.path.join(outpath, '%s.pdf' % (fileimt))
-    jpg_file = os.path.join(outpath, '%s.jpg' % (fileimt))
+    pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
+    jpg_file = os.path.join(adict['datadir'], '%s.jpg' % (fileimt))
     plt.savefig(pdf_file, bbox_inches='tight')
     plt.savefig(jpg_file, bbox_inches='tight')
 

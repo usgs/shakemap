@@ -479,8 +479,8 @@ def create_contours(container, document):
     component = list(container.getComponents())[0]
     imts = container.getIMTs(component)
     for imt in imts:
-        line_strings = contour(container, imt, component, DEFAULT_FILTER_SIZE,
-                               None)
+        line_strings = contour(container.getIMTGrids(imt, component), imt,
+                               DEFAULT_FILTER_SIZE, None)
         # make a folder for the contours
         imt_folder = folder.newfolder(name='%s Contours' % imt,
                                       visibility=0)

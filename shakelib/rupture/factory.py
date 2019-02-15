@@ -3,6 +3,7 @@
 # stdlib modules
 import json
 import logging
+import copy
 
 # third party imports
 import numpy as np
@@ -151,6 +152,9 @@ def rupture_from_dict(d):
 
     """
     validate_json(d)
+
+    # We don't want to mess with the input just in case it gets used again
+    d = copy.deepcopy(d)
 
     try:
         d['metadata']['time'] = HistoricTime.strptime(d['metadata']['time'],
