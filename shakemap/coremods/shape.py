@@ -5,16 +5,21 @@ import logging
 import zipfile
 import tempfile
 from shutil import copyfile
+import concurrent.futures as cf
 
 # third party imports
 import fiona
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 import numpy as np
+from configobj import ConfigObj
 
 # local imports
 from .base import CoreModule
 from shakemap.utils.config import (get_data_path,
-                                   get_config_paths)
+                                   get_config_paths,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
 from shakemap.utils.logging import get_logging_config
 from shakemap.c.pcontour import pcontour
 from shakelib.utils.imt_string import oq_to_file
@@ -74,12 +79,22 @@ class ShapeModule(CoreModule):
             raise NotImplementedError('shape module can only contour '
                                       'gridded data, not sets of points')
 
-        create_polygons(container, datadir, self.logger)
+        config_file = os.path.join(install_path, 'config', 'products.conf')
+        spec_file = get_configspec('products')
+        validator = get_custom_validator()
+        config = ConfigObj(config_file, configspec=spec_file)
+        results = config.validate(validator)
+        if not isinstance(results, bool) or not results:
+            config_error(config, results)
+
+        max_workers = config['products']['mapping']['max_workers']
+
+        create_polygons(container, datadir, self.logger, max_workers)
 
         container.close()
 
 
-def create_polygons(container, datadir, logger):
+def create_polygons(container, datadir, logger, max_workers):
     """ Generates a set of closed polygons (with or without holes) using
     the pcontour function, and uses fiona to convert the resulting GeoJSON
     objects into ESRI-style shape files which are then zipped into an
@@ -110,6 +125,7 @@ def create_polygons(container, datadir, logger):
 
     smdata = os.path.join(get_data_path(), 'gis')
     # Make a directory for the files to live in prior to being zipped
+    alist = []
     with tempfile.TemporaryDirectory(dir=datadir) as tdir:
         for imt in imts:
             gdict = container.getIMTGrids(imt, component)
@@ -131,16 +147,16 @@ def create_polygons(container, datadir, logger):
                 if contour_levels.size == 0:
                     contour_levels = np.array([0.01])
                 fname = oq_to_file(imt)
-            gjson = pcontour(fgrid,
-                             gdict['mean_metadata']['dx'],
-                             gdict['mean_metadata']['dy'],
-                             gdict['mean_metadata']['xmin'],
-                             gdict['mean_metadata']['ymax'],
-                             contour_levels, 4, 0, fmt=1)
-            with fiona.open(os.path.join(tdir, fname + '.shp'), 'w',
-                            'ESRI Shapefile', schema) as c:
-                for jobj in gjson['features']:
-                    c.write(jobj)
+            a = {'fgrid': fgrid,
+                 'dx': gdict['mean_metadata']['dx'],
+                 'dy': gdict['mean_metadata']['dy'],
+                 'xmin': gdict['mean_metadata']['xmin'],
+                 'ymax': gdict['mean_metadata']['ymax'],
+                 'contour_levels': contour_levels,
+                 'tdir': tdir,
+                 'fname': fname,
+                 'schema': schema}
+            alist.append(a)
             copyfile(os.path.join(smdata, 'WGS1984.prj'),
                      os.path.join(tdir, fname + '.prj'))
             lyrfile = os.path.join(smdata, fname + '.lyr')
@@ -153,6 +169,15 @@ def create_polygons(container, datadir, logger):
                 logger.warning("No " + fname + ".shp.xml file in " + smdata)
             else:
                 copyfile(xmlfile, os.path.join(tdir, fname + '.shp.xml'))
+
+        if max_workers > 0:
+            with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
+                results = ex.map(make_shape_files, alist)
+                list(results)
+        else:
+            for adict in alist:
+                make_shape_files(adict)
+
         zfilename = os.path.join(datadir, 'shape.zip')
         zfile = zipfile.ZipFile(zfilename, mode='w',
                                 compression=zipfile.ZIP_DEFLATED)
@@ -163,3 +188,21 @@ def create_polygons(container, datadir, logger):
         for sfile in filelist:
             zfile.write(os.path.join(tdir, sfile), sfile)
         zfile.close()
+
+
+def make_shape_files(adict):
+    fgrid = adict['fgrid']
+    dx = adict['dx']
+    dy = adict['dy']
+    xmin = adict['xmin']
+    ymax = adict['ymax']
+    contour_levels = adict['contour_levels']
+    tdir = adict['tdir']
+    fname = adict['fname']
+    schema = adict['schema']
+
+    gjson = pcontour(fgrid, dx, dy, xmin, ymax, contour_levels, 4, 0, fmt=1)
+    with fiona.open(os.path.join(tdir, fname + '.shp'), 'w',
+                    'ESRI Shapefile', schema) as c:
+        for jobj in gjson['features']:
+            c.write(jobj)
