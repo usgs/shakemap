@@ -286,10 +286,11 @@ def test_points():
     model.execute()
     del model
 
-    mod = MappingModule(evid)
+    mapping = MappingModule(evid)
     # Mapping should raise exception
     with pytest.raises(NotImplementedError):
-        mod.execute()
+        mapping.execute()
+    del mapping
 
 
 def test_products():

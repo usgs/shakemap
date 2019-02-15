@@ -1,9 +1,10 @@
 # stdlib
 import os.path
 from collections import OrderedDict
+import concurrent.futures as cf
 
 # third party
-
+from configobj import ConfigObj
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -11,7 +12,10 @@ import numpy as np
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
 from .base import CoreModule
 from shakelib.utils.imt_string import oq_to_file
 
@@ -73,7 +77,7 @@ class PlotRegr(CoreModule):
             FileNotFoundError: When the the shake_result HDF file does not
                 exist.
         """
-        _, data_path = get_config_paths()
+        install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
@@ -86,6 +90,19 @@ class PlotRegr(CoreModule):
         if oc.getDataType() != 'grid':
             raise NotImplementedError('plotregr module can only operate on '
                                       'gridded data not sets of points')
+
+        # get the path to the products.conf file, load the config
+        config_file = os.path.join(install_path, 'config', 'products.conf')
+        spec_file = get_configspec('products')
+        validator = get_custom_validator()
+        config = ConfigObj(config_file, configspec=spec_file)
+        results = config.validate(validator)
+        if not isinstance(results, bool) or not results:
+            config_error(config, results)
+
+        # If mapping runs in parallel, then we want this module too, as well.
+        # Otherwise we get weird errors from matplotlib
+        max_workers = config['products']['mapping']['max_workers']
 
         #
         # Cheating here a bit by assuming that the IMTs are the same
@@ -113,97 +130,130 @@ class PlotRegr(CoreModule):
         #
         # Make plots
         #
+        alist = []
         for myimt in imtlist:
-            plt.figure(figsize=(10, 10))
+            a = {'myimt': myimt,
+                 'rockgrid': rockgrid,
+                 'soilgrid': soilgrid,
+                 'rocksd': rocksd,
+                 'soilsd': soilsd,
+                 'stations': stations,
+                 'distances': distances,
+                 'eventid': self._eventid,
+                 'datadir': datadir
+                 }
+            alist.append(a)
 
-            plt.semilogx(distances, rockgrid[myimt], 'r', label='rock')
-            plt.semilogx(distances, soilgrid[myimt], 'g', label='soil')
-            plt.semilogx(distances, rockgrid[myimt] + rocksd[myimt], 'r--',
-                         label='rock +/- stddev')
-            plt.semilogx(distances, rockgrid[myimt] - rocksd[myimt], 'r--')
-            plt.semilogx(distances, soilgrid[myimt] + soilsd[myimt], 'g--',
-                         label='soil +/- stddev')
-            plt.semilogx(distances, soilgrid[myimt] - soilsd[myimt], 'g--')
+        if max_workers > 0:
+            with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
+                results = ex.map(make_plots, alist)
+                list(results)
+        else:
+            for adict in alist:
+                make_plots(adict)
 
-            for station in stations['features']:
-                dist = station['properties']['distance']
-                if dist > distances[-1]:
-                    continue
-                if station['properties']['station_type'] == 'seismic':
-                    symbol = '^'
-                    if myimt == 'MMI':
-                        value = station['properties']['intensity']
-                        if value != 'null':
-                            plt.semilogx(dist, value, symbol + 'k', mfc='none')
-                    else:
-                        imtstr = myimt.lower()
-                        value = np.nan
-                        for chan in station['properties']['channels']:
-                            if chan['name'].endswith('Z') or \
-                               chan['name'].endswith('U'):
-                                continue
-                            for amp in chan['amplitudes']:
-                                if amp['name'] != imtstr:
-                                    continue
-                                if amp['flag'] != '' and amp['flag'] != '0':
-                                    break
-                                if amp['value'] is None or \
-                                        amp['value'] == 'null':
-                                    break
-                                if isinstance(amp['value'], str):
-                                    thisamp = float(amp['value'])
-                                else:
-                                    thisamp = amp['value']
-                                if thisamp <= 0:
-                                    break
-                                if myimt == 'PGV':
-                                    tmpval = np.log(thisamp)
-                                else:
-                                    tmpval = np.log(thisamp / 100.)
-                                if np.isnan(value) or tmpval > value:
-                                    value = tmpval
-                                break
-                        if not np.isnan(value):
-                            plt.semilogx(dist, value, symbol + 'k', mfc='none')
-                else:
-                    symbol = 'o'
-                    if myimt == 'MMI':
-                        amp = station['properties']['intensity']
-                        flag = station['properties']['intensity_flag']
-                        if flag == '' or flag == '0':
-                            if amp is not None and amp != 'null':
-                                if isinstance(amp, str):
-                                    value = float(amp)
-                                else:
-                                    value = amp
-                                plt.semilogx(dist, value, symbol + 'k',
-                                             mfc='none')
-                    else:
-                        imtstr = myimt.lower()
-                        for thing in station['properties']['pgm_from_mmi']:
-                            if thing['name'] != imtstr:
-                                continue
-                            amp = thing['value']
-                            if amp is not None and amp != 'null' and amp != 0:
-                                if myimt == 'PGV':
-                                    amp = np.log(amp)
-                                else:
-                                    amp = np.log(amp / 100.)
-                                plt.semilogx(dist, amp, symbol + 'k',
-                                             mfc='none')
-                            break
 
-            plt.title(self._eventid + ': ' + myimt + ' mean')
-            plt.xlabel('Rrup (km)')
+def make_plots(adict):
+    myimt = adict['myimt']
+    eventid = adict['eventid']
+    datadir = adict['datadir']
+    rockgrid = adict['rockgrid']
+    soilgrid = adict['soilgrid']
+    rocksd = adict['rocksd']
+    soilsd = adict['soilsd']
+    stations = adict['stations']
+    distances = adict['distances']
+
+    plt.figure(figsize=(10, 10))
+
+    plt.semilogx(distances, rockgrid[myimt], 'r', label='rock')
+    plt.semilogx(distances, soilgrid[myimt], 'g', label='soil')
+    plt.semilogx(distances, rockgrid[myimt] + rocksd[myimt], 'r--',
+                 label='rock +/- stddev')
+    plt.semilogx(distances, rockgrid[myimt] - rocksd[myimt], 'r--')
+    plt.semilogx(distances, soilgrid[myimt] + soilsd[myimt], 'g--',
+                 label='soil +/- stddev')
+    plt.semilogx(distances, soilgrid[myimt] - soilsd[myimt], 'g--')
+
+    for station in stations['features']:
+        dist = station['properties']['distance']
+        if dist > distances[-1]:
+            continue
+        if station['properties']['station_type'] == 'seismic':
+            symbol = '^'
             if myimt == 'MMI':
-                plt.ylabel('MMI')
-            elif myimt == 'PGV':
-                plt.ylabel('PGV ln(cm/s)')
+                value = station['properties']['intensity']
+                if value != 'null':
+                    plt.semilogx(dist, value, symbol + 'k', mfc='none')
             else:
-                plt.ylabel(myimt + ' ln(g)')
-            plt.legend()
+                imtstr = myimt.lower()
+                value = np.nan
+                for chan in station['properties']['channels']:
+                    if chan['name'].endswith('Z') or \
+                       chan['name'].endswith('U'):
+                        continue
+                    for amp in chan['amplitudes']:
+                        if amp['name'] != imtstr:
+                            continue
+                        if amp['flag'] != '' and amp['flag'] != '0':
+                            break
+                        if amp['value'] is None or \
+                                amp['value'] == 'null':
+                            break
+                        if isinstance(amp['value'], str):
+                            thisamp = float(amp['value'])
+                        else:
+                            thisamp = amp['value']
+                        if thisamp <= 0:
+                            break
+                        if myimt == 'PGV':
+                            tmpval = np.log(thisamp)
+                        else:
+                            tmpval = np.log(thisamp / 100.)
+                        if np.isnan(value) or tmpval > value:
+                            value = tmpval
+                        break
+                if not np.isnan(value):
+                    plt.semilogx(dist, value, symbol + 'k', mfc='none')
+        else:
+            symbol = 'o'
+            if myimt == 'MMI':
+                amp = station['properties']['intensity']
+                flag = station['properties']['intensity_flag']
+                if flag == '' or flag == '0':
+                    if amp is not None and amp != 'null':
+                        if isinstance(amp, str):
+                            value = float(amp)
+                        else:
+                            value = amp
+                        plt.semilogx(dist, value, symbol + 'k',
+                                     mfc='none')
+            else:
+                imtstr = myimt.lower()
+                for thing in station['properties']['pgm_from_mmi']:
+                    if thing['name'] != imtstr:
+                        continue
+                    amp = thing['value']
+                    if amp is not None and amp != 'null' and amp != 0:
+                        if myimt == 'PGV':
+                            amp = np.log(amp)
+                        else:
+                            amp = np.log(amp / 100.)
+                        plt.semilogx(dist, amp, symbol + 'k',
+                                     mfc='none')
+                    break
 
-            fileimt = oq_to_file(myimt)
-            pfile = os.path.join(datadir, fileimt + '_regr.png')
-            plt.savefig(pfile)
-            plt.close()
+    plt.title(eventid + ': ' + myimt + ' mean')
+    plt.xlabel('Rrup (km)')
+    if myimt == 'MMI':
+        plt.ylabel('MMI')
+    elif myimt == 'PGV':
+        plt.ylabel('PGV ln(cm/s)')
+    else:
+        plt.ylabel(myimt + ' ln(g)')
+    plt.legend()
+
+    fileimt = oq_to_file(myimt)
+    pfile = os.path.join(datadir, fileimt + '_regr.png')
+    plt.savefig(pfile)
+    plt.close()
