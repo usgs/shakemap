@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import subprocess
+import shlex
 
 from configobj import ConfigObj
 from validate import Validator
@@ -239,7 +240,7 @@ def get_logger(logpath, attached):
     return logger
 
 
-def dispatch_event(eventid, logger, children, action, config):
+def dispatch_event(eventid, logger, children, action, config, shake_config):
     """ Start a subprocess to run the specified event and add its data
     to the children structure.
 
@@ -253,6 +254,7 @@ def dispatch_event(eventid, logger, children, action, config):
                       shake process. See the configuration file 'queue.conf'
                       for the exact commands that will be run.
         config (dict): The configuration dictionary.
+        shake_config (dict): The parsed shake.conf config file.
 
     Returns:
         nothing: Nothing.
@@ -267,10 +269,28 @@ def dispatch_event(eventid, logger, children, action, config):
         logger.info('Testing event %s' % eventid)
         p = subprocess.Popen(['echo', eventid])
     else:
-        logger.info('Running event %s due to action %s' % (eventid, action))
+        logger.info('Running event %s due to action "%s"' % (eventid, action))
+        #
+        # Add the action as the assemble/augment comment, or replace the
+        # comment if it is already there.
+        #
+        shake_cmds = shlex.split(shake_config['autorun_modules'])
+        for ix, shcmd in enumerate(shake_cmds):
+            if shcmd not in ['assemble', 'augment']:
+                continue
+            if len(shake_cmds) == ix + 1:  # This shouldn't happen
+                shake_cmds.append('-c')
+                shake_cmds.append('"%s"' % action)
+            elif shake_cmds[ix + 1] == '-c':
+                shake_cmds[ix + 2] = '"%s"' % action
+            else:
+                shake_cmds.insert(ix + 1, '-c')
+                shake_cmds.insert(ix + 2, '"%s"' % action)
+            break
+
         cmd = config['shake_command'].replace('shake', config['shake_path'])
         cmd = cmd.replace('<EVID>', eventid)
-        cmd = cmd.split()
+        cmd = cmd.split() + shake_cmds
         p = subprocess.Popen(cmd)
 
     children[eventid] = {'popen': p, 'start_time': time.time()}

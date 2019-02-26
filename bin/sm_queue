@@ -11,13 +11,17 @@ import argparse
 import psutil
 import copy
 import shutil
+from configobj import ConfigObj
+from validate import Validator
 
 # Third-party imports
 import daemon
 import lockfile
 
 # Local imports
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   config_error)
 import shakemap.utils.queue as queue
 from shakelib.rupture.origin import write_event_file
 from shakemap.utils.amps import AmplitudeHandler
@@ -28,7 +32,8 @@ ASSOCIATE_UPDATE_TIME = 0
 DB_MAINTENANCE_TIME = 0
 
 
-def do_periodic_tasks(handler, logger, data_path, config, children):
+def do_periodic_tasks(handler, logger, data_path, config, children,
+                      shake_config):
     """ Check for finished children and start any needed timed repeats.
 
     Args:
@@ -37,6 +42,9 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
         data_path (str): The path where the ShakeMap data directories
                          live.
         config (dict): The configuration data.
+        children (dict): The data structure maintaining the state of child
+                         processes.
+        shake_config (dict): The parsed shake.conf configuration file.
 
     Returns:
         nothing: Nothing.
@@ -70,7 +78,7 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
             # Update the XML because the DB may have newer information
             write_event_xml(data_path, event, logger)
             queue.dispatch_event(eventid, logger, children,
-                                 'scheduled_repeat', config)
+                                 'Scheduled repeat', config, shake_config)
             rep_list.pop(0)
             if len(rep_list) == 0:
                 rep_list = None
@@ -93,7 +101,8 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
     if config['associate_interval'] >= 0 and \
        ASSOCIATE_UPDATE_TIME + config['associate_interval'] < current_time:
         ASSOCIATE_UPDATE_TIME = current_time
-        associate_all(handler, data_path, logger, config, children)
+        associate_all(handler, data_path, logger, config, children,
+                      shake_config)
 
     #
     # Do the occasional DB cleanup once per day; keep amps for 30
@@ -107,7 +116,8 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
         #
         if config['associate_interval'] >= 0:
             ASSOCIATE_UPDATE_TIME = current_time
-            associate_all(handler, data_path, logger, config, children)
+            associate_all(handler, data_path, logger, config, children,
+                          shake_config)
         #
         # Now clean out the amps and events
         #
@@ -117,15 +127,28 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
     return
 
 
-def associate_all(handler, data_path, logger, config, children):
+def associate_all(handler, data_path, logger, config, children, shake_config):
     """Do the associateAll method of the the AmplitudeHandler and
     then process all of the events with updated data.
+
+    Args:
+        handler (AmplitudeHandler object): An object of type AmplitudeHandler.
+        data_path (str): The path where the ShakeMap data directories
+                         live.
+        logger (object): The process logging object.
+        config (dict): The configuration data.
+        children (dict): The data structure maintaining the state of child
+                         processes.
+        shake_config (dict): The parsed shake.conf configuration file.
+
+    Returns:
+        nothing: Nothing.
     """
     event_list = handler.associateAll(pretty_print=True)
     for eventid in event_list:
         event = handler.getEvent(eventid)
-        process_origin(event, 'data_association', handler, data_path,
-                       logger, config, children)
+        process_origin(event, 'Data association', handler, data_path,
+                       logger, config, children, shake_config)
 
     return
 
@@ -180,7 +203,7 @@ def move_event_directory(oldid, newid, data_path, logger):
 
 
 def process_origin(event, action, handler, data_path, logger, config,
-                   children):
+                   children, shake_config):
     """ Determine if an event should be processed (or reprocessed) and
     dispatch it for processing.
 
@@ -194,6 +217,9 @@ def process_origin(event, action, handler, data_path, logger, config,
                          live.
         logger (object): The process logging object.
         config (dict): The (cleaned-up) configuration object.
+        children (dict): The data structure maintaining the state of child
+                         processes.
+        shake_config (dict): The parsed shake.conf config file.
 
     Returns:
         nothing: Nothing.
@@ -323,12 +349,14 @@ def process_origin(event, action, handler, data_path, logger, config,
 
     write_event_xml(data_path, event, logger)
 
-    queue.dispatch_event(event['id'], logger, children, action, config)
+    queue.dispatch_event(event['id'], logger, children, action, config,
+                         shake_config)
 
     return
 
 
-def process_other(data, action, handler, data_path, logger, config, children):
+def process_other(data, action, handler, data_path, logger, config, children,
+                  shake_config):
     """A trigger has been issued for an event. Treat this as
     an origin update. If the event in question is not in our
     database, ignore the message.
@@ -343,6 +371,9 @@ def process_other(data, action, handler, data_path, logger, config, children):
                          live.
         logger (object): The process logging object.
         config (dict): The (cleaned-up) configuration object.
+        children (dict): The data structure maintaining the state of child
+                         processes.
+        shake_config (dict): The parsed shake.conf config file.
 
     Returns:
         nothing: Nothing.
@@ -351,7 +382,7 @@ def process_other(data, action, handler, data_path, logger, config, children):
     existing = handler.getEvent(eventid)
     if existing:
         process_origin(existing, action, handler, data_path, logger, config,
-                       children)
+                       children, shake_config)
     else:
         if 'alt_eventids' in data:
             for eid in data['alt_eventids'].split(','):
@@ -360,14 +391,14 @@ def process_other(data, action, handler, data_path, logger, config, children):
                 existing = handler.getEvent(eid)
                 if existing:
                     process_origin(existing, action, handler, data_path,
-                                   logger, config, children)
+                                   logger, config, children, shake_config)
                     return
         logger.info('Trigger is for unprocessed event %s: ignoring' %
                     data['id'])
     return
 
 
-def process_cancel(data, handler, logger, config, children):
+def process_cancel(data, handler, logger, config, children, shake_config):
     """We've received a cancellation of an event: run 'shake cancel'.
 
     Args:
@@ -377,6 +408,9 @@ def process_cancel(data, handler, logger, config, children):
                                            AmplitudeHandler object.
         logger (object): The process logging object.
         config (dict): The (cleaned-up) configuration object.
+        children (dict): The data structure maintaining the state of child
+                         processes.
+        shake_config (dict): The parsed shake.conf config file.
 
     Returns:
         nothing: Nothing.
@@ -384,7 +418,8 @@ def process_cancel(data, handler, logger, config, children):
     eventid = data['id']
     existing = handler.getEvent(eventid)
     if existing:
-        queue.dispatch_event(eventid, logger, children, 'cancel', config)
+        queue.dispatch_event(eventid, logger, children, 'cancel', config,
+                             shake_config)
         return
 
     for eid in data['alt_eventids'].split(','):
@@ -392,7 +427,8 @@ def process_cancel(data, handler, logger, config, children):
             continue
         existing = handler.getEvent(eid)
         if existing:
-            queue.dispatch_event(eid, logger, children, 'cancel', config)
+            queue.dispatch_event(eid, logger, children, 'cancel', config,
+                                 shake_config)
             return
 
     logger.info('cancel is for unprocessed event %s: ignoring' % eventid)
@@ -454,6 +490,15 @@ def main(pargs):
 
     config = queue.get_config(install_path)
     #
+    # Get shake.conf for the autorun modules
+    #
+    config_file = os.path.join(install_path, 'config', 'shake.conf')
+    spec_file = get_configspec('shake')
+    shake_config = ConfigObj(config_file, configspec=spec_file)
+    results = shake_config.validate(Validator())
+    if not isinstance(results, bool) or not results:
+        config_error(shake_config, results)
+    #
     # Turn this process into a daemon
     #
     logpath = os.path.join(install_path, 'logs')
@@ -486,7 +531,8 @@ def main(pargs):
             #
             # Do routine stuff
             #
-            do_periodic_tasks(handler, logger, data_path, config, children)
+            do_periodic_tasks(handler, logger, data_path, config, children,
+                              shake_config)
             #
             # Now wait for a connection
             #
@@ -543,18 +589,22 @@ def main(pargs):
             if cmd['type'] == 'origin':
                 logger.info('Received "origin" for event %s' %
                             cmd['data']['id'])
-                process_origin(cmd['data'], 'origin', handler, data_path,
-                               logger, config, children)
+                if 'action' in cmd['data']:
+                    action = cmd['data']['action']
+                else:
+                    action = 'origin'
+                process_origin(cmd['data'], action, handler, data_path,
+                               logger, config, children, shake_config)
             elif cmd['type'] == 'cancel':
                 logger.info('Received "cancel" for event %s' %
                             cmd['data']['id'])
                 process_cancel(cmd['data'], handler,  logger,
-                               config, children)
+                               config, children, shake_config)
             else:
                 logger.info('Received "%s" for event %s' %
                             cmd['type'], cmd['data']['id'])
-                process_other(cmd['data'], cmd['type'], handler,
-                              data_path, logger, config, children)
+                process_other(cmd['data'], cmd['type'], handler, data_path,
+                              logger, config, children, shake_config)
 
 
 if __name__ == '__main__':
