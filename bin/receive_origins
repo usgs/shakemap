@@ -166,6 +166,10 @@ def main(args):
         network = get_network_name(args.preferred_eventsource)
         if network == 'unknown':
             network = ''
+    if args.action == 'EVENT_ADDED':
+        action = "Event added"
+    else:
+        action = "Origin updated"
     event = {'id': args.preferred_eventid,
              'netid': args.preferred_eventsource,
              'network': network,
@@ -175,7 +179,8 @@ def main(args):
              'depth': args.preferred_depth,
              'mag': args.preferred_magnitude,
              'locstring': location,
-             'alt_eventids': args.eventids}
+             'alt_eventids': args.eventids,
+             'action': action}
     logger.info('Sending event %s to queue.' % args.preferred_eventid)
 
     # Poke the queue to run shake on this event.
