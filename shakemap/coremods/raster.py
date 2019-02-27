@@ -34,12 +34,25 @@ class RasterModule(CoreModule):
     targets = [r'products/raster\.zip']
     dependencies = [('products/shake_result.hdf', True)]
 
-    contents = OrderedDict.fromkeys(['rasterData'])
+    contents = OrderedDict.fromkeys(['rasterData',
+                                     'intensityOverlay'])
     contents['rasterData'] = {
         'title': 'ESRI Raster Files',
         'caption': 'Data and uncertainty grids in ESRI raster format',
         'formats': [{'filename': 'raster.zip',
                      'type': 'application/zip'}]
+    }
+    contents['intensityOverlay'] = {
+        'title': 'Intensity Overlay and World File',
+        'caption': 'Macroseismic intensity rendered as a PNG overlay '
+                   'and associated world file',
+        'formats': [{
+            'filename': 'intensity_overlay.png',
+            'type': 'image/png'
+        }, {
+            'filename': 'intensity_overlay.pngw',
+            'type': 'text/plain'
+        }]
     }
 
     def execute(self):
