@@ -1823,19 +1823,19 @@ class ModelModule(CoreModule):
             #
             mflag = '0'
             if ndf == 'df1' and sdf['flagged'][six]:
-                mflag = 'M'
+                mflag = 'ManuallyFlagged'
             for channel in station['properties']['channels']:
                 for amp in channel['amplitudes']:
                     if amp['flag'] != '0':
-                        amp['flag'] += mflag
+                        amp['flag'] += ',' + mflag
                     else:
                         amp['flag'] = mflag
                     Name = amp['name'].upper()
                     if sdf[Name + '_outliers'][six]:
                         if amp['flag'] == '0':
-                            amp['flag'] = 'T'
+                            amp['flag'] = 'Outlier'
                         else:
-                            amp['flag'] += ',T'
+                            amp['flag'] += ',Outlier'
         return sjdict
 
     def _storeGriddedData(self, oc):

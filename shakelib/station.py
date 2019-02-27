@@ -389,7 +389,7 @@ class StationList(object):
             }
             self.cursor.execute(
                 'SELECT a.amp, i.imt_type, a.original_channel, '
-                'a.flag, a.stddev '
+                'a.flag, a.stddev, a.orientation '
                 'FROM amp a, imt i '
                 'WHERE a.station_id = "%s" '
                 'AND a.imt_id = i.id' % (str(sta[0]))
@@ -430,10 +430,24 @@ class StationList(object):
                     if value != 'null':
                         value = float('%.4f' % (np.exp(value) * 100))
                     units = '%g'
+                aflag = str(amp[3])
+                if 'I' in aflag and 'IncompleteRecord' not in aflag:
+                    aflag = aflag.replace('I', 'IncompleteRecord')
+                if 'G' in aflag and 'Glitch' not in aflag:
+                    aflag = aflag.replace('G', 'Glitch')
+                if 'T' in aflag and 'Outlier' not in aflag:
+                    aflag = aflag.replace('T', 'Outlier')
+                if 'M' in aflag and 'ManuallyFlagged' not in aflag:
+                    aflag = aflag.replace('M', 'ManuallyFlagged')
+                if amp[5] == 'U':
+                    if aflag == '0':
+                        aflag = 'UnknownOrientation'
+                    else:
+                        aflag = str(amp[3]) + ',UnknownOrientation'
                 this_amp = {'name': amp[1].lower(),
                             'value': value,
                             'units': units,
-                            'flag': str(amp[3]),
+                            'flag': aflag,
                             sd_string: sigma
                             }
                 channels[amp[2]]['amplitudes'].append(this_amp)
