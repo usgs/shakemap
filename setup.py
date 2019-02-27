@@ -75,6 +75,7 @@ setup(name='shakemap',
           'bin/sm_profile',
           'bin/sm_queue',
           'bin/sm_rupture',
+          'bin/sm_batch',
           'bin/sm_sync'],
       cmdclass=cmdclass,
       ext_modules=cythonize(ext_modules)
