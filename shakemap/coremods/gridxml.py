@@ -153,7 +153,7 @@ class GridXMLModule(CoreModule):
 
             if xml_type == 'grid':
                 grid_data, _ = container.getArray([], 'vs30')
-                units = metadata['units']
+                units = 'm/s'
                 digits = metadata['digits']
                 layers['SVEL'] = grid_data
                 field_keys['SVEL'] = (units, digits)
@@ -180,6 +180,14 @@ class GridXMLModule(CoreModule):
             event_dict['event_description'] = event_info['location']
             event_dict['event_network'] = \
                 info['input']['event_information']['eventsource']
+            event_dict['intensity_observations'] =\
+                info['input']['event_information']['intensity_observations']
+            event_dict['seismic_stations'] =\
+                info['input']['event_information']['seismic_stations']
+            if info['input']['event_information']['fault_ref'] == 'Origin':
+                event_dict['point_source'] = 'True'
+            else:
+                event_dict['point_source'] = 'False'
 
             # shake dictionary
             shake_dict = {}
