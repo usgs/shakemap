@@ -1492,17 +1492,24 @@ class ModelModule(CoreModule):
             elif myimt == 'PGV':
                 units = 'cms'
             else:
-                units = 'ln(g)'
+                units = 'g'
             info[op][gm][myimt]['units'] = units
             if myimt in self.nominal_bias:
                 info[op][gm][myimt]['bias'] = \
                     _string_round(self.nominal_bias[myimt], 3)
             else:
                 info[op][gm][myimt]['bias'] = None
-            info[op][gm][myimt]['max_grid'] = \
-                _string_round(np.max(self.outgrid[myimt]), 3)
-            info[op][gm][myimt]['max'] = \
-                _string_round(np.max(moutgrid[myimt]), 3)
+            if myimt == 'MMI' or myimt == 'PGV':
+                info[op][gm][myimt]['max_grid'] = \
+                    _string_round(np.max(self.outgrid[myimt]), 3)
+                info[op][gm][myimt]['max'] = \
+                    _string_round(np.max(moutgrid[myimt]), 3)
+            else:
+                info[op][gm][myimt]['max_grid'] = \
+                    _string_round(np.exp(np.max(self.outgrid[myimt])), 3)
+                info[op][gm][myimt]['max'] = \
+                    _string_round(np.exp(np.max(moutgrid[myimt])), 3)
+
         info[op][mi] = {}
         info[op][mi]['grid_points'] = {}
         info[op][mi]['grid_points']['longitude'] = str(self.smnx)

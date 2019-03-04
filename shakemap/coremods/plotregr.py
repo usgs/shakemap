@@ -40,7 +40,7 @@ class PlotRegr(CoreModule):
         'title': 'Intensity Regression',
         'caption': 'Regression plot of macroseismic intensity.',
         'page': regr_page,
-        'formats': [{'filename': 'MMI_regr.png',
+        'formats': [{'filename': 'mmi_regr.png',
                      'type': 'image/png'}]
     }
 
