@@ -79,7 +79,7 @@ def main(args):
     logfile = os.path.join(install_path, 'logs', LOGFILE)
     logger = get_generic_logger(logfile=logfile)
 
-    if args.type != 'origin':
+    if args.type != 'origin' and args.type != 'trump-origin':
         logger.info('No action on product type %s' % args.type)
         sys.exit(0)
 
