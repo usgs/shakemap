@@ -1506,9 +1506,9 @@ class ModelModule(CoreModule):
                     _string_round(np.max(moutgrid[myimt]), 3)
             else:
                 info[op][gm][myimt]['max_grid'] = \
-                    np.exp(_string_round(np.max(self.outgrid[myimt]), 3))
+                    _string_round(np.exp(np.max(self.outgrid[myimt])), 3)
                 info[op][gm][myimt]['max'] = \
-                    np.exp(_string_round(np.max(moutgrid[myimt]), 3))
+                    _string_round(np.exp(np.max(moutgrid[myimt])), 3)
 
         info[op][mi] = {}
         info[op][mi]['grid_points'] = {}
