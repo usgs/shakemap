@@ -12,7 +12,7 @@ from mapio.shake import ShakeGrid
 from mapio.geodict import GeoDict
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 import shakemap
 from shakelib.rupture import constants
@@ -78,19 +78,9 @@ class GridXMLModule(CoreModule):
     targets = [r'products/grid\.xml', r'products/uncertainty\.xml']
     dependencies = [('products/shake_result.hdf', True)]
 
-    contents = {'xmlGrids': {'title': 'XML Grid',
-                             'caption': 'XML grid of ground motions',
-                             'formats': [{'filename': 'grid.xml',
-                                          'type': 'text/xml'}
-                                         ]
-                             },
-                'uncertaintyGrid': {'title': 'Uncertainty Grid',
-                                    'caption': 'XML grid of uncertainties',
-                                    'formats': [{'filename': 'uncertainty.xml',
-                                                 'type': 'text/xml'}
-                                                ]
-                                    }
-                }
+    def __init__(self, eventid):
+        super(GridXMLModule, self).__init__(eventid)
+        self.contents = Contents('XML Grids', 'gridxml', eventid)
 
     def execute(self):
         """Create grid.xml and uncertainty.xml files.
@@ -217,5 +207,12 @@ class GridXMLModule(CoreModule):
             fname = os.path.join(datadir, '%s.xml' % xml_type)
             logger.debug('Saving IMT grids to %s' % fname)
             shake_grid.save(fname)  # TODO - set grid version number
+
+        self.contents.addFile('xmlGrids', 'XML Grid',
+                              'XML grid of ground motions',
+                              'grid.xml', 'text/xml')
+        self.contents.addFile('uncertaintyGrid', 'Uncertainty Grid',
+                              'XML grid of uncertainties',
+                              'uncertainty.xml', 'text/xml')
 
         container.close()

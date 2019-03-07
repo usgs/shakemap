@@ -40,10 +40,7 @@ class AugmentModule(CoreModule):
         """
         Instantiate a CoreModule class with an event ID.
         """
-        self._eventid = eventid
-        log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
-        self.logger = logging.getLogger(log_name)
+        super(AugmentModule, self).__init__(eventid)
         if comment is not None:
             self.comment = comment
 

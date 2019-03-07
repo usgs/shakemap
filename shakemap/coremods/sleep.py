@@ -5,14 +5,12 @@ Sleep for a specified number of seconds.
 # stdlib imports
 import argparse
 import inspect
-import logging
 import time
 
 # third party imports
 
 # local imports
 from .base import CoreModule
-from shakemap.utils.logging import get_logging_config
 
 
 class SleepModule(CoreModule):
@@ -24,12 +22,9 @@ class SleepModule(CoreModule):
 
     def __init__(self, eventid, seconds=None):
         """
-        Instantiate a CoreModule class with an event ID.
+        Instantiate a SleepModule class with an event ID.
         """
-        self._eventid = eventid
-        log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
-        self.logger = logging.getLogger(log_name)
+        super(SleepModule, self).__init__(eventid)
         if seconds is not None:
             self.seconds = seconds
 

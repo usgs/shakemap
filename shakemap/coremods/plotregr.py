@@ -1,6 +1,5 @@
 # stdlib
 import os.path
-from collections import OrderedDict
 import concurrent.futures as cf
 
 # third party
@@ -10,13 +9,14 @@ import numpy as np
 
 # neic imports
 from impactutils.io.smcontainers import ShakeMapOutputContainer
+from openquake.hazardlib import imt
 
 # local imports
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakelib.utils.imt_string import oq_to_file
 
 
@@ -29,46 +29,9 @@ class PlotRegr(CoreModule):
     targets = [r'products/.*_regr\.png']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    regr_page = {'title': 'Regression Plots', 'slug': 'regression'}
-    contents = OrderedDict.fromkeys(['miRegr',
-                                     'pgaRegr',
-                                     'pgvRegr',
-                                     'psa[PERIOD]Regr'])
-    contents['miRegr'] = {
-        'title': 'Intensity Regression',
-        'caption': 'Regression plot of macroseismic intensity.',
-        'page': regr_page,
-        'formats': [{'filename': 'mmi_regr.png',
-                     'type': 'image/png'}]
-    }
-
-    contents['pgaRegr'] = {
-        'title': 'PGA Regression',
-        'caption': 'Regression plot of [COMPONENT] peak ground '
-                   'acceleration (%g).',
-        'page': regr_page,
-        'formats': [{'filename': 'pga_regr.png',
-                     'type': 'image/png'}]
-    }
-    contents['pgvRegr'] = {
-        'title': 'PGV Regression',
-        'caption': 'Regression plot of [COMPONENT] peak ground '
-                   'velocity (cm/s).',
-        'page': regr_page,
-        'formats': [{'filename': 'pgv_regr.png',
-                     'type': 'image/png'}]
-    }
-    psacap = 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped ' \
-             'pseudo-spectral acceleration(%g).'
-    contents['psa[PERIOD]Regr'] = {
-        'title': 'PSA[PERIOD] Regression',
-        'page': regr_page,
-        'caption': psacap,
-        'formats': [{'filename': 'psa[0-9]p[0-9]_regr.png',
-                     'type': 'image/png'}]
-    }
+    def __init__(self, eventid):
+        super(PlotRegr, self).__init__(eventid)
+        self.contents = Contents('Regression Plots', 'regression', eventid)
 
     def execute(self):
         """
@@ -143,6 +106,32 @@ class PlotRegr(CoreModule):
                  'datadir': datadir
                  }
             alist.append(a)
+            if myimt == 'MMI':
+                self.contents.addFile('miRegr', 'Intensity Regression',
+                                      'Regression plot of macroseismic '
+                                      'intensity.',
+                                      'mmi_regr.png', 'image/png')
+            elif myimt == 'PGA':
+                self.contents.addFile('pgaRegr', 'PGA Regression',
+                                      'Regression plot of peak '
+                                      'ground acceleration (%g).',
+                                      'pga_regr.png', 'image/png')
+            elif myimt == 'PGV':
+                self.contents.addFile('pgvRegr', 'PGV Regression',
+                                      'Regression plot of peak ground '
+                                      'velocity (cm/s).',
+                                      'pgv_regr.png', 'image/png')
+            else:
+                oqimt = imt.from_string(myimt)
+                period = str(oqimt.period)
+                filebase = oq_to_file(myimt)
+                psacap = 'Regression plot of ' + period + ' sec 5% damped ' \
+                         'pseudo-spectral acceleration(%g).'
+                self.contents.addFile(filebase + 'Regr',
+                                      'PSA ' + period + ' sec Regression',
+                                      psacap,
+                                      filebase + '_regr.png',
+                                      'image/png')
 
         if max_workers > 0:
             with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:

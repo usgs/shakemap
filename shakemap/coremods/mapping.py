@@ -1,6 +1,5 @@
 # stdlib imports
 import os.path
-from collections import OrderedDict
 # from multiprocessing import Pool
 import concurrent.futures as cf
 import copy
@@ -24,8 +23,9 @@ from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.mapping.mapmaker import (draw_intensity, draw_contour)
+from shakelib.utils.imt_string import oq_to_file
 
 
 class MappingModule(CoreModule):
@@ -43,81 +43,9 @@ class MappingModule(CoreModule):
     dependencies = [('products/shake_result.hdf', True)]
     configs = ['products.conf']
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    mapping_page = {
-        'title': 'Ground Motion Maps',
-        'slug': 'maps'
-    }
-    contents = OrderedDict.fromkeys(
-        ['intensityMap',
-         'intensityThumbnail',
-         'pgaMap',
-         'pgvMap',
-         'psa[PERIOD]Map'])
-    contents['intensityMap'] = {
-        'title': 'Intensity Map',
-        'caption': 'Map of macroseismic intensity.',
-        'page': mapping_page,
-        'formats': [{
-            'filename': 'intensity.jpg',
-            'type': 'image/jpeg'
-        }, {
-            'filename': 'intensity.pdf',
-            'type': 'application/pdf'}
-        ]
-    }
-
-    contents['intensityThumbnail'] = {
-        'title': 'Intensity Thumbnail',
-        'caption': 'Thumbnail of intensity map.',
-        'page': mapping_page,
-        'formats': [{
-            'filename':
-            'pin-thumbnail.png',
-            'type': 'image/png'
-        }]
-    }
-
-    contents['pgaMap'] = {
-        'title': 'PGA Map',
-        'caption': 'Map of peak ground acceleration (%g).',
-        'page': mapping_page,
-        'formats': [{
-            'filename': 'pga.jpg',
-            'type': 'image/jpeg'
-        }, {
-            'filename': 'pga.pdf',
-            'type': 'image/jpeg'
-        }]
-    }
-    contents['pgvMap'] = {
-        'title': 'PGV Map',
-        'caption': 'Map of peak ground velocity (cm/s).',
-        'page': mapping_page,
-        'formats': [{
-            'filename': 'pgv.jpg',
-            'type': 'image/jpeg'
-        }, {
-            'filename': 'pgv.pdf',
-            'type': 'application/pdf'
-        }]
-    }
-    psacap = 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'
-    contents['psa[PERIOD]Map'] = {
-        'title': 'PSA[PERIOD] Map',
-        'page': mapping_page,
-        'caption': psacap,
-        'formats': [{
-            'filename':
-            'psa[0-9]p[0-9].jpg',
-            'type': 'image/jpeg'
-        }, {
-            'filename':
-            'psa[0-9]p[0-9].pdf',
-            'type': 'application/pdf'
-        }]
-    }
+    def __init__(self, eventid):
+        super(MappingModule, self).__init__(eventid)
+        self.contents = Contents('Ground Motion Maps', 'maps', eventid)
 
     def execute(self):
         """
@@ -220,6 +148,26 @@ class MappingModule(CoreModule):
                 g = copy.deepcopy(d)
                 g['imtype'] = 'thumbnail'
                 alist.append(g)
+                self.contents.addFile('intensityMap', 'Intensity Map',
+                                      'Map of macroseismic intensity.',
+                                      'intensity.jpg', 'image/jpeg')
+                self.contents.addFile('intensityMap', 'Intensity Map',
+                                      'Map of macroseismic intensity.',
+                                      'intensity.pdf', 'application/pdf')
+                self.contents.addFile('intensityThumbnail',
+                                      'Intensity Thumbnail',
+                                      'Thumbnail of intensity map.',
+                                      'pin-thumbnail.png', 'image/png')
+            else:
+                fileimt = oq_to_file(imtype)
+                self.contents.addFile(fileimt + 'Map',
+                                      fileimt.upper() + ' Map',
+                                      'Map of ' + imtype + '.',
+                                      fileimt + '.jpg', 'image/jpeg')
+                self.contents.addFile(fileimt + 'Map',
+                                      fileimt.upper() + ' Map',
+                                      'Map of ' + imtype + '.',
+                                      fileimt + '.pdf', 'application/pdf')
 
         if max_workers > 0:
             with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
