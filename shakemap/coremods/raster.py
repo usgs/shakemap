@@ -1,7 +1,6 @@
 # stdlib imports
 import os.path
 import zipfile
-from collections import OrderedDict
 
 # third party imports
 from impactutils.io.smcontainers import ShakeMapOutputContainer
@@ -12,7 +11,7 @@ from impactutils.colors.cpalette import ColorPalette
 from PIL import Image
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 from shakelib.utils.imt_string import oq_to_file
 
@@ -34,26 +33,9 @@ class RasterModule(CoreModule):
     targets = [r'products/raster\.zip']
     dependencies = [('products/shake_result.hdf', True)]
 
-    contents = OrderedDict.fromkeys(['rasterData',
-                                     'intensityOverlay'])
-    contents['rasterData'] = {
-        'title': 'ESRI Raster Files',
-        'caption': 'Data and uncertainty grids in ESRI raster format',
-        'formats': [{'filename': 'raster.zip',
-                     'type': 'application/zip'}]
-    }
-    contents['intensityOverlay'] = {
-        'title': 'Intensity Overlay and World File',
-        'caption': 'Macroseismic intensity rendered as a PNG overlay '
-                   'and associated world file',
-        'formats': [{
-            'filename': 'intensity_overlay.png',
-            'type': 'image/png'
-        }, {
-            'filename': 'intensity_overlay.pngw',
-            'type': 'text/plain'
-        }]
-    }
+    def __init__(self, eventid):
+        super(RasterModule, self).__init__(eventid)
+        self.contents = Contents(None, None, eventid)
 
     def execute(self):
         """
@@ -149,3 +131,18 @@ class RasterModule(CoreModule):
             f.write('%.4f\n' % geodict.xmin)
             f.write('%.4f\n' % geodict.ymax)
         container.close()
+
+        self.contents.addFile('rasterData', 'ESRI Raster Files',
+                              'Data and uncertainty grids in ESRI raster '
+                              'format',
+                              'raster.zip', 'application/zip')
+        self.contents.addFile('intensityOverlay',
+                              'Intensity Overlay and World File',
+                              'Macroseismic intensity rendered as a PNG '
+                              'overlay and associated world file',
+                              'intensity_overlay.png', 'image/png')
+        self.contents.addFile('intensityOverlay',
+                              'Intensity Overlay and World File',
+                              'Macroseismic intensity rendered as a PNG '
+                              'overlay and associated world file',
+                              'intensity_overlay.pngw', 'text/plain')

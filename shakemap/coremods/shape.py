@@ -1,11 +1,10 @@
 # stdlib imports
 import os.path
-from collections import OrderedDict
-import logging
 import zipfile
 import tempfile
 from shutil import copyfile
 import concurrent.futures as cf
+from collections import OrderedDict
 
 # third party imports
 import fiona
@@ -14,13 +13,12 @@ import numpy as np
 from configobj import ConfigObj
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import (get_data_path,
                                    get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
-from shakemap.utils.logging import get_logging_config
 from shakemap.c.pcontour import pcontour
 from shakelib.utils.imt_string import oq_to_file
 
@@ -34,26 +32,12 @@ class ShapeModule(CoreModule):
     targets = [r'products/shape\.zip']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    shape_page = {'title': 'GIS Shape Files', 'slug': 'shape files'}
-    contents = OrderedDict.fromkeys(['shakemap_shapefiles'])
-    ftype = 'application/zip'
-    contents['shakemap_shapefiles'] = {'title': 'ShakeMap Shape Files',
-                                       'caption': 'Shape Files.',
-                                       'page': shape_page,
-                                       'formats': [{'filename': 'shape.zip',
-                                                    'type': ftype}]
-                                       }
-
     def __init__(self, eventid):
         """
         Instantiate a ShapeModule class with an event ID.
         """
-        self._eventid = eventid
-        log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
-        self.logger = logging.getLogger(log_name)
+        super(ShapeModule, self).__init__(eventid)
+        self.contents = Contents('GIS Shape Files', 'shape files', eventid)
 
     def execute(self):
         """
@@ -92,6 +76,10 @@ class ShapeModule(CoreModule):
         create_polygons(container, datadir, self.logger, max_workers)
 
         container.close()
+
+        self.contents.addFile('shakemap_shapefiles', 'ShakeMap Shape Files',
+                              'Shape Files.',
+                              'shape.zip', 'application/zip')
 
 
 def create_polygons(container, datadir, logger, max_workers):

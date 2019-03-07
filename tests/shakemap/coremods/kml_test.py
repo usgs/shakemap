@@ -9,6 +9,7 @@ from xml.dom import minidom
 
 import configobj
 
+from shakemap.coremods.base import Contents
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
@@ -38,7 +39,8 @@ def test_create_kmz():
         oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
 
         logger = logging.getLogger(__name__)
-        kmzfile = create_kmz(container, tempdir, oceanfile, logger)
+        contents = Contents(None, None, 'northridge')
+        kmzfile = create_kmz(container, tempdir, oceanfile, logger, contents)
         myzip = zipfile.ZipFile(kmzfile, mode='r')
         kmlstr = myzip.read('shakemap.kml').decode('utf-8')
         root = minidom.parseString(kmlstr)

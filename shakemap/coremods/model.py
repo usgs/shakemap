@@ -9,7 +9,6 @@ import time as time
 import copy
 from time import gmtime, strftime
 import shutil
-from collections import OrderedDict
 from datetime import date
 import json
 
@@ -23,7 +22,7 @@ import mapio.reader
 import concurrent.futures as cf
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.sites import Sites
 from shakelib.distance import (Distance,
@@ -89,21 +88,13 @@ class ModelModule(CoreModule):
     targets = [r'products/shake_result\.hdf']
     dependencies = [('shake_data.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    contents = OrderedDict.fromkeys(['shakemapHDF'])
-    contents['shakemapHDF'] = {
-        'title': 'Comprehensive ShakeMap HDF Data File',
-        'caption': 'HDF file containing all ShakeMap results.',
-        'formats': [{
-            'filename': 'shake_result.hdf',
-            'type': 'application/x-bag'
-        }]
-    }
-
     no_seismic = False
     no_macroseismic = False
     no_rupture = False
+
+    def __init__(self, eventid):
+        super(ModelModule, self).__init__(eventid)
+        self.contents = Contents(None, None, eventid)
 
     def parseArgs(self, arglist):
         """
@@ -424,6 +415,11 @@ class ModelModule(CoreModule):
 
         oc.close()
         self.ic.close()
+
+        self.contents.addFile('shakemapHDF',
+                              'Comprehensive ShakeMap HDF Data File',
+                              'HDF file containing all ShakeMap results.',
+                              'shake_result.hdf', 'application/x-bag')
     # -------------------------------------------------------------------------
     # End execute()
     # -------------------------------------------------------------------------

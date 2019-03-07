@@ -1,6 +1,5 @@
 # stdlib imports
 import os.path
-from collections import OrderedDict
 import json
 
 # third party imports
@@ -8,7 +7,7 @@ import numpy as np
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 
 
@@ -21,16 +20,9 @@ class InfoModule(CoreModule):
     targets = [r'products/info\.json']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    contents = OrderedDict.fromkeys(['supplementalInformation'])
-    cap = 'ShakeMap processing parameters and map summary information.'
-    contents['supplementalInformation'] = {
-        'title': 'Supplemental Information',
-        'caption': cap,
-        'formats': [{'filename': 'info.json',
-                     'type': 'application/json'}]
-    }
+    def __init__(self, eventid):
+        super(InfoModule, self).__init__(eventid)
+        self.contents = Contents(None, None, eventid)
 
     def execute(self):
         """
@@ -69,3 +61,7 @@ class InfoModule(CoreModule):
         f.write(infostring)
         f.close()
         container.close()
+        cap = 'ShakeMap processing parameters and map summary information.'
+        self.contents.addFile('supplementalInformation',
+                              'Supplemental Information', cap,
+                              'info.json', 'application/json')
