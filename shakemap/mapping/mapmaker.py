@@ -406,7 +406,7 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
              mew=0.5)
     plt.text(circle_text_x,
              yloc_seventh_row,
-             'Macroseismic Observation',
+             'Reported Intensity',
              va='center',
              ha='left')
 
@@ -604,7 +604,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
              mew=0.5)
     plt.text(circle_text_x,
              yloc_seventh_row,
-             'Macroseismic Observation',
+             'Reported Intensity',
              va='center',
              ha='left')
 
