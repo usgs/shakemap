@@ -3,9 +3,6 @@
 import numpy as np
 import pytest
 
-import os
-import sys
-
 from openquake.hazardlib.imt import PGA, PGV, MMI
 
 from shakelib.gmice.wald99 import Wald99
@@ -26,6 +23,19 @@ dadm_target = {PGA(): set([1.0 / (x * lfact) for x in [3.66, 2.20]]),
 
 def test_wgrw12():
     gmice = Wald99()
+
+    df = {'PGA': amps_in,
+          'PGV': amps_in + np.log(100)}
+
+    mi = gmice.getPreferredMI(df)
+    mi_target = np.array(
+        [3.18167182, 4.23133858, 5.68946656, 6.84666436, 7.47561075,
+         7.90914817, 8.24542592, 9.29])
+
+    if do_test is True:
+        np.testing.assert_allclose(mi, mi_target)
+    else:
+        print(repr(mi))
 
     mi, dmda = gmice.getMIfromGM(amps_in, PGA(), dists=None, mag=None)
     mi_target = np.array(
