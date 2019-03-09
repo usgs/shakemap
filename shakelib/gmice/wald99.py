@@ -53,16 +53,16 @@ class Wald99(GMICE):
         if 'PGA' not in df or 'PGV' not in df:
             if 'PGV' in df:
                 oqimt = imt.from_string('PGV')
-                return self.getMIfromGM(df['PGV'], oqimt, dists, mag)
+                return self.getMIfromGM(df['PGV'], oqimt, dists, mag)[0]
             elif 'PGA' in df:
                 oqimt = imt.from_string('PGA')
-                return self.getMIfromGM(df['PGA'], oqimt, dists, mag)
+                return self.getMIfromGM(df['PGA'], oqimt, dists, mag)[0]
             else:
                 return None
         oqimt = imt.from_string('PGA')
-        mmi_pga = self.getMIfromGM(df['PGA'], oqimt, dists, mag)
+        mmi_pga = self.getMIfromGM(df['PGA'], oqimt, dists, mag)[0]
         oqimt = imt.from_string('PGV')
-        mmi_pgv = self.getMIfromGM(df['PGV'], oqimt, dists, mag)
+        mmi_pgv = self.getMIfromGM(df['PGV'], oqimt, dists, mag)[0]
         vscale = (mmi_pga - 5) / 2
         vscale[vscale < 0] = 0
         vscale[vscale > 1] = 1
