@@ -1,6 +1,7 @@
 # stdlib
 import os.path
 import concurrent.futures as cf
+import json
 
 # third party
 from configobj import ConfigObj
@@ -77,18 +78,17 @@ class PlotRegr(CoreModule):
         soilsd = {}
         imtlist = oc.getIMTs('GREATER_OF_TWO_HORIZONTAL')
         for myimt in imtlist:
-            rockgrid[myimt], _ = oc.getArray(['regression', 'rock', myimt],
+            rockgrid[myimt], _ = oc.getArray(['attenuation', 'rock', myimt],
                                              'mean')
-            soilgrid[myimt], _ = oc.getArray(['regression', 'soil', myimt],
+            soilgrid[myimt], _ = oc.getArray(['attenuation', 'soil', myimt],
                                              'mean')
-            rocksd[myimt], _ = oc.getArray(['regression', 'rock', myimt],
+            rocksd[myimt], _ = oc.getArray(['attenuation', 'rock', myimt],
                                            'std')
-            soilsd[myimt], _ = oc.getArray(['regression', 'soil', myimt],
+            soilsd[myimt], _ = oc.getArray(['attenuation', 'soil', myimt],
                                            'std')
-        distances, _ = oc.getArray(['regression'], 'distances')
+        distances, _ = oc.getArray(['attenuation', 'distances'], 'rjb')
 
         stations = oc.getStationDict()
-        oc.close()
 
         #
         # Make plots
@@ -140,6 +140,39 @@ class PlotRegr(CoreModule):
         else:
             for adict in alist:
                 make_plots(adict)
+
+        #
+        # Make attenuation_curves.json
+        #
+        jdict = {'eventid': self._eventid}
+        jdict['gmpe'] = {}
+        for site in ['soil', 'rock']:
+            jdict['gmpe'][site] = {}
+            for myimt in imtlist:
+                jdict['gmpe'][site][myimt] = {}
+                jdict['gmpe'][site][myimt]['mean'] = oc.getArray(
+                    ['attenuation', site, myimt], 'mean')[0].tolist()
+                jdict['gmpe'][site][myimt]['stddev'] = oc.getArray(
+                    ['attenuation', site, myimt], 'std')[0].tolist()
+        jdict['distances'] = {}
+        for dtype in ['repi', 'rhypo', 'rjb', 'rrup']:
+            jdict['distances'][dtype] = oc.getArray(
+                ['attenuation', 'distances'], dtype)[0].tolist()
+        jdict['mean_bias'] = {}
+        info = oc.getMetadata()
+        for myimt in imtlist:
+            jdict['mean_bias'][myimt] = info['output']['ground_motions'][
+                                             myimt]['bias']
+        jstring = json.dumps(jdict, allow_nan=False)
+        jfile = os.path.join(datadir, 'attenuation_curves.json')
+        f = open(jfile, 'wt')
+        f.write(jstring)
+        f.close()
+        oc.close()
+        cap = "Nominal attenuation curves"
+        self.contents.addFile('attenuationCurves', 'Attenuation Curves',
+                              cap, 'attenuation_curves.json',
+                              'application/json')
 
 
 def make_plots(adict):
