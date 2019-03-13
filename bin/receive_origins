@@ -13,6 +13,8 @@
 import argparse
 import os.path
 import sys
+from datetime import datetime
+import time
 
 # third-party imports
 from libcomcat.search import get_event_by_id
@@ -24,6 +26,7 @@ from shakemap.utils.config import get_config_paths
 import shakemap.utils.queue as queue
 from shakemap.utils.logging import get_generic_logger
 from shakemap.utils.utils import get_network_name
+from shakelib.rupture import constants
 
 LOGFILE = 'origins.log'
 
@@ -123,39 +126,89 @@ def main(args):
                     args.preferred_eventid)
         sys.exit(0)
 
-    detail = get_event_by_id(args.preferred_eventid)
-    if detail.id != args.preferred_eventid:
-        logger.info('Event id %s is not authoritative; (authoritative=%s)' %
-                    (args.preferred_eventid, detail.id))
-        sys.exit(0)
+    fails = 0
+    while fails < 3:
+        try:
+            detail = get_event_by_id(args.preferred_eventid)
+        except Exception as e:
+            fails += 1
+            logger.warn('Libcomcat error: %s' % (str(e)))
+            logger.warn('Error retrieving event data from comcat for event '
+                        '%s, will try %d more times' % (args.preferred_eventid,
+                                                        3 - fails))
+            time.sleep(20)
+            continue
+        else:
+            break
+    if fails == 3:
+        logger.warn('Unable to retrieve event data from comcat for event %s'
+                    % (args.preferred_eventid))
+        dt = datetime.strptime(args.preferred_eventtime, constants.TIMEFMT)
+        event_age = (datetime.utcnow() - dt).total_seconds()
+        if event_age > 86400:
+            # If the event is more than a day old, and -- lacking an
+            # authoritative event id -- we just assume that we've run it
+            # before (or not) based on better information
+            logger.warn("Event %s is older than cutoff, skipping" %
+                        (args.preferred_eventid))
+            sys.exit(0)
+        else:
+            # Let's run the event
+            pass
+    else:
+        if detail.id != args.preferred_eventid:
+            logger.info('Event id %s is not authoritative; (authoritative=%s)'
+                        % (args.preferred_eventid, detail.id))
+            sys.exit(0)
 
     # We've weeded out the messages we don't want, so construct an event
     # dictionary and send it to the queue
     if not args.property_title:
-        gs = GeoServe(args.preferred_latitude, args.preferred_longitude,
-                      maxradius=250, minpop=1000)
-        places = gs.getPlaces()
-        if len(places):
-            props = places[0]['properties']
-            if props['country_code'] == 'US':
-                country = ''
-            else:
-                country = props['country_code']
-            azimuth = props['azimuth'] + 180
-            if azimuth > 360:
-                azimuth = azimuth - 360
-            location = '%d km %s of %s, %s, %s' % (
-                int(props['distance']),
-                get_compass_dir_azimuth(azimuth, resolution='meteorological'),
-                props['name'], props['admin1_name'], country)
-        else:
-            region = gs.getRegions()
+        fails = 0
+        while fails < 3:
             try:
-                location = region['fe']['features'][0]['properties']['name']
-            except KeyError:
-                location = ''
-            except IndexError:
-                location = ''
+                gs = GeoServe(args.preferred_latitude,
+                              args.preferred_longitude,
+                              maxradius=250, minpop=1000)
+            except Exception as e:
+                fails += 1
+                places = []
+                logger.warn('Error in GeoServe getPlaces: %s' % str(e))
+                logger.warn('Failure communicating with comcat; will try '
+                            '%d more times' % (3 - fails))
+                time.sleep(20)
+            else:
+                places = gs.getPlaces()
+                break
+        if fails < 3:
+            if len(places):
+                props = places[0]['properties']
+                if props['country_code'] == 'US':
+                    country = ''
+                else:
+                    country = props['country_code']
+                azimuth = props['azimuth'] + 180
+                if azimuth > 360:
+                    azimuth = azimuth - 360
+                location = '%d km %s of %s, %s, %s' % (
+                    int(props['distance']),
+                    get_compass_dir_azimuth(azimuth,
+                                            resolution='meteorological'),
+                    props['name'], props['admin1_name'], country)
+            else:
+                region = gs.getRegions()
+                if region is not None:
+                    try:
+                        location = region['fe']['features'][0]['properties'][
+                                          'name']
+                    except KeyError:
+                        location = ''
+                    except IndexError:
+                        location = ''
+                else:
+                    location = ''
+        else:
+            location = ''
     else:
         location = ' '.join(args.property_title)
 

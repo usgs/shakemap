@@ -92,6 +92,9 @@ class ModelModule(CoreModule):
     no_macroseismic = False
     no_rupture = False
 
+    rock_vs30 = 760.0
+    soil_vs30 = 180.0
+
     def __init__(self, eventid):
         super(ModelModule, self).__init__(eventid)
         self.contents = Contents(None, None, eventid)
@@ -207,6 +210,17 @@ class ModelModule(CoreModule):
         # TODO: figure out how to not have to do this
         if self.rx.rake is None:
             self.rx.rake = 0
+
+        #
+        # Set up the coordinates for the attenuation curves
+        #
+        repi = np.logspace(-1, 3, 200)
+        pt = self.rupture_obj._origin.getHypo()
+        self.atten_coords = {
+            'lons': np.full_like(repi, pt.x),
+            'lats': np.array([pt.y + x / 111.0 for x in repi])
+        }
+        self.point_source = PointRupture(self.rupture_obj._origin)
 
         # ---------------------------------------------------------------------
         # The output locations: either a grid or a list of points
@@ -346,12 +360,12 @@ class ModelModule(CoreModule):
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
 
         #
-        # Places to put the results for the regression plots
+        # Places to put the results for the attenuation plots
         #
-        self.rockgrid = {}
-        self.soilgrid = {}
-        self.rocksd = {}
-        self.soilsd = {}
+        self.atten_rock_mean = {}
+        self.atten_soil_mean = {}
+        self.atten_rock_sd = {}
+        self.atten_soil_sd = {}
 
         self.logger.debug('Doing MVN...')
         if self.max_workers > 0:
@@ -410,8 +424,7 @@ class ModelModule(CoreModule):
         else:
             self._storePointData(oc)
 
-        if self.do_grid:
-            self._storeRegressionData(oc)
+        self._storeAttenuationData(oc)
 
         oc.close()
         self.ic.close()
@@ -601,11 +614,6 @@ class ModelModule(CoreModule):
             )
             self.smnx, self.smny = self.sites_obj_out.getNxNy()
             self.sx_out = self.sites_obj_out.getSitesContext()
-            #
-            # Grids on rock and soil for the regression plots
-            #
-            self.sx_rock = self.sites_obj_out.getSitesContext(rock_vs30=760)
-            self.sx_soil = self.sites_obj_out.getSitesContext(rock_vs30=180)
             lons, lats = np.meshgrid(self.sx_out.lons,
                                      self.sx_out.lats)
             self.sx_out.lons = lons.copy()
@@ -623,6 +631,19 @@ class ModelModule(CoreModule):
         # requirements of both
         #
         self.dx_out = dist_obj_out.getDistanceContext()
+        #
+        # Set up the sites and distance contexts for the attenuation curves
+        #
+        self.atten_sx_rock = self.sites_obj_out.getSitesContext(
+            self.atten_coords, rock_vs30=self.rock_vs30)
+        self.atten_sx_soil = self.sites_obj_out.getSitesContext(
+            self.atten_coords, rock_vs30=self.soil_vs30)
+        self.atten_dx = Distance(
+            self.default_gmpe,
+            self.atten_coords['lons'],
+            self.atten_coords['lats'],
+            np.zeros_like(self.atten_coords['lons']),
+            rupture=self.point_source).getDistanceContext()
 
         self.lons_out_rad = np.radians(self.lons)
         self.lats_out_rad = np.radians(self.lats)
@@ -703,6 +724,10 @@ class ModelModule(CoreModule):
                 'lats': df['lat']
             }
             dfn.sx = self.sites_obj_out.getSitesContext(lldict)
+            dfn.sx_rock = copy.deepcopy(dfn.sx)
+            dfn.sx_rock.vs30 = np.full_like(dfn.sx.vs30, self.rock_vs30)
+            dfn.sx_soil = copy.deepcopy(dfn.sx)
+            dfn.sx_soil.vs30 = np.full_like(dfn.sx.vs30, self.soil_vs30)
             dist_obj = Distance(
                 self.default_gmpe, df['lon'], df['lat'],
                 df['depth'], self.rupture_obj
@@ -749,15 +774,32 @@ class ModelModule(CoreModule):
                         not_supported = True
                 if not_supported:
                     pmean = np.full_like(df[imtstr], np.nan)
+                    pmean_rock = np.full_like(df[imtstr], np.nan)
+                    pmean_soil = np.full_like(df[imtstr], np.nan)
                     pstddev = [None] * 3
                     pstddev[0] = np.full_like(df[imtstr], np.nan)
                     pstddev[1] = np.full_like(df[imtstr], np.nan)
                     pstddev[2] = np.full_like(df[imtstr], np.nan)
+                    pstddev_rock = [None] * 1
+                    pstddev_soil = [None] * 1
+                    pstddev_rock[0] = np.full_like(df[imtstr], np.nan)
+                    pstddev_soil[0] = np.full_like(df[imtstr], np.nan)
                 else:
                     pmean, pstddev = self._gmas(gmpe, dfn.sx, dfn.dx, oqimt,
                                                 self.apply_gafs)
+                    pmean_rock, pstddev_rock = self._gmas(gmpe, dfn.sx_rock,
+                                                          dfn.dx, oqimt,
+                                                          self.apply_gafs)
+                    pmean_soil, pstddev_soil = self._gmas(gmpe, dfn.sx_soil,
+                                                          dfn.dx, oqimt,
+                                                          self.apply_gafs)
                 df[imtstr + '_pred'] = pmean
                 df[imtstr + '_pred_sigma'] = pstddev[0]
+                df[imtstr + '_pred_rock'] = pmean_rock
+                df[imtstr + '_pred_sigma_rock'] = pstddev_rock[0]
+                df[imtstr + '_pred_soil'] = pmean_soil
+                df[imtstr + '_pred_sigma_soil'] = pstddev_soil[0]
+
                 if imtstr != 'MMI':
                     total_only = self.gmpe_total_sd_only
                     tau_guess = SM_CONSTS['default_stddev_inter']
@@ -892,8 +934,20 @@ class ModelModule(CoreModule):
                     pmean, pstddev = self._gmas(gmpe, self.df2.sx,
                                                 self.df2.dx, oqimt,
                                                 self.apply_gafs)
+                    pmean_rock, pstddev_rock = self._gmas(gmpe,
+                                                          self.df2.sx_rock,
+                                                          self.df2.dx, oqimt,
+                                                          self.apply_gafs)
+                    pmean_soil, pstddev_soil = self._gmas(gmpe,
+                                                          self.df2.sx_soil,
+                                                          self.df2.dx, oqimt,
+                                                          self.apply_gafs)
                 df2[imtstr + '_pred'] = pmean
                 df2[imtstr + '_pred_sigma'] = pstddev[0]
+                df2[imtstr + '_pred_rock'] = pmean_rock
+                df2[imtstr + '_pred_sigma_rock'] = pstddev_rock[0]
+                df2[imtstr + '_pred_soil'] = pmean_soil
+                df2[imtstr + '_pred_sigma_soil'] = pstddev_soil[0]
                 if imtstr != 'MMI':
                     total_only = self.gmpe_total_sd_only
                     tau_guess = SM_CONSTS['default_stddev_inter']
@@ -965,8 +1019,18 @@ class ModelModule(CoreModule):
         pmean, pstddev = self._gmas(
             gmpe, self.df1.sx, self.df1.dx, imt.from_string('MMI'),
             self.apply_gafs)
+        pmean_rock, pstddev_rock = self._gmas(
+            gmpe, self.df1.sx_rock, self.df1.dx, imt.from_string('MMI'),
+            self.apply_gafs)
+        pmean_soil, pstddev_soil = self._gmas(
+            gmpe, self.df1.sx_soil, self.df1.dx, imt.from_string('MMI'),
+            self.apply_gafs)
         df1['MMI' + '_pred'] = pmean
         df1['MMI' + '_pred_sigma'] = pstddev[0]
+        df1['MMI' + '_pred_rock'] = pmean_rock
+        df1['MMI' + '_pred_sigma_rock'] = pstddev_rock[0]
+        df1['MMI' + '_pred_soil'] = pmean_soil
+        df1['MMI' + '_pred_sigma_soil'] = pstddev_soil[0]
         if self.ipe_total_sd_only:
             tau_guess = SM_CONSTS['default_stddev_inter_mmi']
             df1['MMI' + '_pred_tau'] = np.full_like(
@@ -1155,6 +1219,18 @@ class ModelModule(CoreModule):
                 mtype=1
             )
             self.dir_results.append((dir_out, self.dx_out))
+            # Precompute directivity for the attenuation curves
+            dir_out = Rowshandel2013(
+                self.rupture_obj._origin, self.rupture_obj,
+                self.atten_coords['lats'].reshape((1, -1)),
+                self.atten_coords['lons'].reshape((1, -1)),
+                np.zeros_like((len(self.atten_coords['lats']), 1)),
+                dx=1.0,
+                T=Rowshandel2013.getPeriods(),
+                a_weight=0.5,
+                mtype=1
+            )
+            self.dir_results.append((dir_out, self.atten_dx))
             directivity_time = time.time() - time1
             self.logger.debug(
                 'Directivity prediction evaluation time: %f sec'
@@ -1177,24 +1253,30 @@ class ModelModule(CoreModule):
         # Get the predictions at the output points
         #
         oqimt = imt.from_string(imtstr)
-        gmpe = None
         if imtstr != 'MMI':
             gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
+        else:
+            gmpe = self.ipe
+
         pout_mean, pout_sd = self._gmas(
             gmpe, self.sx_out, self.dx_out, oqimt, self.apply_gafs)
 
-        if self.do_grid:
-            #
-            # Fill the grids for the regression plots
-            #
-            x_mean, x_sd = self._gmas(
-                gmpe, self.sx_rock, self.dx_out, oqimt, False)
-            self.rockgrid[imtstr] = x_mean
-            self.rocksd[imtstr] = x_sd[0]
-            x_mean, x_sd = self._gmas(
-                gmpe, self.sx_soil, self.dx_out, oqimt, False)
-            self.soilgrid[imtstr] = x_mean
-            self.soilsd[imtstr] = x_sd[0]
+        #
+        # While we have the gmpe for this IMT, we should make
+        # the attenuation curves
+        #
+        x_mean, x_sd = self._gmas(gmpe,
+                                  self.atten_sx_rock,
+                                  self.atten_dx,
+                                  oqimt, self.apply_gafs)
+        self.atten_rock_mean[imtstr] = x_mean
+        self.atten_rock_sd[imtstr] = x_sd[0]
+        x_mean, x_sd = self._gmas(gmpe,
+                                  self.atten_sx_soil,
+                                  self.atten_dx,
+                                  oqimt, self.apply_gafs)
+        self.atten_soil_mean[imtstr] = x_mean
+        self.atten_soil_sd[imtstr] = x_sd[0]
 
         #
         # If there are no data, just use the unbiased prediction
@@ -1610,7 +1692,8 @@ class ModelModule(CoreModule):
         Get the station JSON dictionary and then add a bunch of stuff to it.
         """
         if not hasattr(self, 'stations') or self.stations is None:
-            return {'features': []}
+            return {'eventid': self._eventid,
+                    'features': []}
         sjdict = {}
         # ---------------------------------------------------------------------
         # Compute a bias for all the IMTs in the data frames
@@ -1724,22 +1807,34 @@ class ModelModule(CoreModule):
                 if not key.endswith('_pred'):
                     continue
                 myamp = sdf[key][six]
+                myamp_rock = sdf[key + '_rock'][six]
+                myamp_soil = sdf[key + '_soil'][six]
                 tau_str = 'ln_tau'
                 phi_str = 'ln_phi'
                 sigma_str = 'ln_sigma'
+                sigma_str_rock = 'ln_sigma_rock'
+                sigma_str_soil = 'ln_sigma_soil'
                 bias_str = 'ln_bias'
                 if key.startswith('PGV'):
                     value = np.exp(myamp)
+                    value_rock = np.exp(myamp_rock)
+                    value_soil = np.exp(myamp_soil)
                     units = 'cm/s'
                 elif key.startswith('MMI'):
                     value = myamp
+                    value_rock = myamp_rock
+                    value_soil = myamp_soil
                     units = 'intensity'
                     tau_str = 'tau'
                     phi_str = 'phi'
                     sigma_str = 'sigma'
+                    sigma_str_rock = 'sigma_rock'
+                    sigma_str_soil = 'sigma_soil'
                     bias_str = 'bias'
                 else:
                     value = np.exp(myamp) * 100
+                    value_rock = np.exp(myamp_rock) * 100
+                    value_soil = np.exp(myamp_soil) * 100
                     units = '%g'
                 if self.gmpe_total_sd_only:
                     mytau = 0
@@ -1747,15 +1842,21 @@ class ModelModule(CoreModule):
                     mytau = sdf[key + '_tau'][six]
                 myphi = sdf[key + '_phi'][six]
                 mysigma = np.sqrt(mytau**2 + myphi**2)
+                mysigma_rock = sdf[key + '_sigma_rock'][six]
+                mysigma_soil = sdf[key + '_sigma_soil'][six]
                 imt_name = key.lower().replace('_pred', '')
                 mybias = sdf[imt_name.upper() + '_bias'][six]
                 station['properties']['predictions'].append({
                     'name': imt_name,
                     'value': _round_float(value, 4),
+                    'value_rock': _round_float(value_rock, 4),
+                    'value_soil': _round_float(value_soil, 4),
                     'units': units,
                     tau_str: _round_float(mytau, 4),
                     phi_str: _round_float(myphi, 4),
                     sigma_str: _round_float(mysigma, 4),
+                    sigma_str_rock: _round_float(mysigma_rock, 4),
+                    sigma_str_soil: _round_float(mysigma_soil, 4),
                     bias_str: _round_float(mybias, 4),
                 })
             #
@@ -1839,6 +1940,7 @@ class ModelModule(CoreModule):
                             amp['flag'] = 'Outlier'
                         else:
                             amp['flag'] += ',Outlier'
+        sjdict['metadata'] = {'eventid': self._eventid}
         return sjdict
 
     def _storeGriddedData(self, oc):
@@ -1966,54 +2068,26 @@ class ModelModule(CoreModule):
                             self.outsd[key].ravel(), std_metadata,
                             component)
 
-    def _storeRegressionData(self, oc):
+    def _storeAttenuationData(self, oc):
         """
-        Average the regression grids in distance bins and output the arrays
+        Output arrays of rock and soil attenuation curves
         """
-        rrup = self.dx_out.rrup
-        dx = self.smdx * 111.0
-        dmax = np.max(rrup)
-        dists = np.arange(0, dmax + dx, dx)
-        ndists = np.size(dists)
-        rockmean = {}
-        soilmean = {}
-        rocksd = {}
-        soilsd = {}
-        mean_dists = np.zeros(ndists - 1)
-        for imtstr in self.rockgrid.keys():
-            rockmean[imtstr] = np.zeros(ndists - 1)
-            soilmean[imtstr] = np.zeros(ndists - 1)
-            rocksd[imtstr] = np.zeros(ndists - 1)
-            soilsd[imtstr] = np.zeros(ndists - 1)
 
-        bad_ix = []
-        for ix in range(ndists - 1):
-            ixx = (rrup >= dists[ix]) & (rrup < dists[ix+1])
-            mean_dists[ix] = (dists[ix] + dists[ix+1]) / 2.0
-            if not np.any(ixx):
-                bad_ix.append(ix)
-                continue
-            for imtstr in self.rockgrid.keys():
-                rockmean[imtstr][ix] = np.mean(self.rockgrid[imtstr][ixx])
-                soilmean[imtstr][ix] = np.mean(self.soilgrid[imtstr][ixx])
-                rocksd[imtstr][ix] = np.mean(self.rocksd[imtstr][ixx])
-                soilsd[imtstr][ix] = np.mean(self.soilsd[imtstr][ixx])
+        for dist_type in ['repi', 'rhypo', 'rrup', 'rjb']:
+            oc.setArray(['attenuation', 'distances'], dist_type,
+                        getattr(self.atten_dx, dist_type, None))
 
-        mean_dists = np.delete(mean_dists, bad_ix)
-        oc.setArray(['regression'], 'distances', mean_dists)
-        for imtstr in self.rockgrid.keys():
-            rockmean[imtstr] = np.delete(rockmean[imtstr], bad_ix)
-            soilmean[imtstr] = np.delete(soilmean[imtstr], bad_ix)
-            rocksd[imtstr] = np.delete(rocksd[imtstr], bad_ix)
-            soilsd[imtstr] = np.delete(soilsd[imtstr], bad_ix)
-            oc.setArray(['regression', 'rock', imtstr], 'mean',
-                        rockmean[imtstr])
-            oc.setArray(['regression', 'soil', imtstr], 'mean',
-                        soilmean[imtstr])
-            oc.setArray(['regression', 'rock', imtstr], 'std',
-                        rocksd[imtstr])
-            oc.setArray(['regression', 'soil', imtstr], 'std',
-                        soilsd[imtstr])
+        imtstrs = self.atten_rock_mean.keys()
+        for imtstr in imtstrs:
+            oc.setArray(['attenuation', 'rock', imtstr], 'mean',
+                        self.atten_rock_mean[imtstr])
+            oc.setArray(['attenuation', 'soil', imtstr], 'mean',
+                        self.atten_soil_mean[imtstr])
+            oc.setArray(['attenuation', 'rock', imtstr], 'std',
+                        self.atten_rock_sd[imtstr])
+            oc.setArray(['attenuation', 'soil', imtstr], 'std',
+                        self.atten_soil_sd[imtstr])
+        return
 
     #
     # Helper function to call get_mean_and_stddevs for the

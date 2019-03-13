@@ -101,7 +101,7 @@ class Distance(object):
             gmpe = [gmpe]
 
         # require rhypo always
-        requires = set(['rhypo', 'rrup', 'rjb'])
+        requires = set(['repi', 'rhypo', 'rrup', 'rjb'])
 
         for ig in gmpe:
             if not isinstance(ig, GMPE):
