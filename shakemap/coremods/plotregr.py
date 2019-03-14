@@ -198,7 +198,7 @@ def make_plots(adict):
     plt.semilogx(distances, soilgrid[myimt] - soilsd[myimt], 'g--')
 
     for station in stations['features']:
-        dist = station['properties']['distance']
+        dist = station['properties']['distances']['rhypo']
         if dist > distances[-1]:
             continue
         if station['properties']['station_type'] == 'seismic':
