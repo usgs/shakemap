@@ -103,6 +103,7 @@ class Contents(object):
 
     def addFile(self, key, title, caption, filename, mime_type):
 
+        filename = os.path.join("download", filename)
         if key in self.contents:
             self.contents[key]['formats'].append({'filename': filename,
                                                   'type': mime_type})
