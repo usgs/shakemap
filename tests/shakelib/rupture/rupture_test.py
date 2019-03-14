@@ -213,7 +213,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [42.38297204887224, 45.17551530849775])
+                                   [42.757296, 46.614723])
     else:
         print(rjb[0], rrup[0])
     # Various combinations of mech and tectonic region...
@@ -225,7 +225,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [42.38297204887224, 45.17551530849775])
+                                   [42.757296, 46.614723])
     else:
         print(rjb[0], rrup[0])
     rup_original._origin.mech = 'RS'
@@ -235,7 +235,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [39.82080242008069, 43.790368434017324])
+                                   [39.779893, 44.033556])
     else:
         print(rjb[0], rrup[0])
     rup_original._origin.mech = 'NM'
@@ -245,7 +245,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [40.926575292271664, 44.88593633468176])
+                                   [40.937772, 45.254891])
     else:
         print(rjb[0], rrup[0])
     rup_original._origin.mech = 'SS'
@@ -255,7 +255,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [46.25040107007744, 47.54090263729997])
+                                   [46.750567, 48.108934])
     else:
         print(rjb[0], rrup[0])
     rup_original._origin._tectonic_region = 'Stable Shallow Crust'
@@ -266,7 +266,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [43.563645263662636, 46.42217285643245])
+                                   [43.676648, 48.008276])
     else:
         print(rjb[0], rrup[0])
     rup_original._origin.mech = 'RS'
@@ -276,7 +276,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [42.58702826839786, 46.39811791109895])
+                                   [42.445057, 46.865434])
     else:
         print(rjb[0], rrup[0])
     rup_original._origin.mech = 'NM'
@@ -286,7 +286,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [43.31021890717387, 47.15925487179388])
+                                   [43.233314, 47.563079])
     else:
         print(rjb[0], rrup[0])
     rup_original._origin.mech = 'SS'
@@ -296,7 +296,7 @@ def test_rupture_from_dict():
                                        np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [47.40232617967255, 49.45750891908971])
+                                   [47.829729, 50.087485])
     else:
         print(rjb[0], rrup[0])
     rup_original._origin._tectonic_region = 'Somewhere Else'
@@ -307,7 +307,7 @@ def test_rupture_from_dict():
                                          np.array([0.0]))
     if do_tests is True:
         np.testing.assert_allclose([rjb[0], rrup[0]],
-                                   [42.38297204887224, 45.17551530849775])
+                                   [42.757296, 46.614723])
     else:
         print(rjb[0], rrup[0])
 
