@@ -86,7 +86,7 @@ class PlotRegr(CoreModule):
                                            'std')
             soilsd[myimt], _ = oc.getArray(['attenuation', 'soil', myimt],
                                            'std')
-        distances, _ = oc.getArray(['attenuation', 'distances'], 'rjb')
+        distances, _ = oc.getArray(['attenuation', 'distances'], 'rrup')
 
         stations = oc.getStationDict()
 
@@ -198,7 +198,7 @@ def make_plots(adict):
     plt.semilogx(distances, soilgrid[myimt] - soilsd[myimt], 'g--')
 
     for station in stations['features']:
-        dist = station['properties']['distances']['rhypo']
+        dist = station['properties']['distances']['rrup']
         if dist > distances[-1]:
             continue
         if station['properties']['station_type'] == 'seismic':
