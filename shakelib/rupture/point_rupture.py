@@ -229,7 +229,7 @@ class PointRupture(Rupture):
                 mindip_deg = 60.0
                 maxdip_deg = 90.0
         else:
-            logging.warn(
+            logging.warning(
                 'Unsupported tectonic region; using coefficients for unknown'
                 'tectonic region.')
             mscale = MagScaling.WC94

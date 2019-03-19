@@ -91,11 +91,11 @@ def get_network_name(netid):
                          'want to make sure that the pages of the form %s '
                          'still exist and contact the ShakeMap developers '
                          'if they do not.' % (netid, NETWORK_TEMPLATE))
-            logging.warn(error_str)
+            logging.warning(error_str)
             fails += 1
         except Exception as e:
-            logging.warn("Error in get_network_name: %s" % str(e))
-            logging.warn("Will try %d more times" % (3 - fails))
+            logging.warning("Error in get_network_name: %s" % str(e))
+            logging.warning("Will try %d more times" % (3 - fails))
             fails += 1
             time.sleep(20)
         else:
