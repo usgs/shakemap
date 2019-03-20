@@ -45,7 +45,7 @@
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
 
 
-<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../shakelib/shakelib.plotting.contour.html#shakelib.plotting.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">gmice</span><span class="p">):</span>
+<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../shakelib/shakelib.plotting.contour.html#shakelib.plotting.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">imtdict</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">gmice</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate contours of a specific IMT and return as a Shapely</span>
 <span class="sd">    MultiLineString object.</span>
@@ -55,7 +55,6 @@
 <span class="sd">            with ShakeMap output data.</span>
 <span class="sd">        imtype (str): String containing the name of an Intensity</span>
 <span class="sd">            Measure Type found in container.</span>
-<span class="sd">        component (str): Intensity Measure component found in container.</span>
 <span class="sd">        filter_size (int): Integer filter (see</span>
 <span class="sd">            https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)</span>
 <span class="sd">    Returns:</span>
@@ -73,7 +72,6 @@
     <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
 
     <span class="n">intensity_colormap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
-    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
     <span class="n">grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>

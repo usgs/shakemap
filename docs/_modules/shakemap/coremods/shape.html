@@ -35,22 +35,25 @@
   <h1>Source code for shakemap.coremods.shape</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="k">import</span> <span class="n">copyfile</span>
+<span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">cf</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
 <span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_data_path</span><span class="p">,</span>
-                                   <span class="n">get_config_paths</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.logging</span> <span class="k">import</span> <span class="n">get_logging_config</span>
+                                   <span class="n">get_config_paths</span><span class="p">,</span>
+                                   <span class="n">get_configspec</span><span class="p">,</span>
+                                   <span class="n">get_custom_validator</span><span class="p">,</span>
+                                   <span class="n">config_error</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">shakemap.c.pcontour</span> <span class="k">import</span> <span class="n">pcontour</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
 
@@ -64,26 +67,12 @@
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/shape\.zip&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
-    <span class="c1"># supply here a data structure with information about files that</span>
-    <span class="c1"># can be created by this module.</span>
-    <span class="n">shape_page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;GIS Shape Files&#39;</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="s1">&#39;shape files&#39;</span><span class="p">}</span>
-    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;shakemap_shapefiles&#39;</span><span class="p">])</span>
-    <span class="n">ftype</span> <span class="o">=</span> <span class="s1">&#39;application/zip&#39;</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;shakemap_shapefiles&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;ShakeMap Shape Files&#39;</span><span class="p">,</span>
-                                       <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Shape Files.&#39;</span><span class="p">,</span>
-                                       <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">shape_page</span><span class="p">,</span>
-                                       <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;shape.zip&#39;</span><span class="p">,</span>
-                                                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ftype</span><span class="p">}]</span>
-                                       <span class="p">}</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate a ShapeModule class with an event ID.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">=</span> <span class="n">eventid</span>
-        <span class="n">log_config</span> <span class="o">=</span> <span class="n">get_logging_config</span><span class="p">()</span>
-        <span class="n">log_name</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ShapeModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s1">&#39;GIS Shape Files&#39;</span><span class="p">,</span> <span class="s1">&#39;shape files&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShapeModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.shape.html#shakemap.coremods.shape.ShapeModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -109,12 +98,26 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;shape module can only contour &#39;</span>
                                       <span class="s1">&#39;gridded data, not sets of points&#39;</span><span class="p">)</span>
 
-        <span class="n">create_polygons</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
+        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">config_error</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
 
-        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+        <span class="n">max_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;max_workers&#39;</span><span class="p">]</span>
+
+        <span class="n">create_polygons</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">max_workers</span><span class="p">)</span>
+
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;shakemap_shapefiles&#39;</span><span class="p">,</span> <span class="s1">&#39;ShakeMap Shape Files&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;Shape Files.&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;shape.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;application/zip&#39;</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="create_polygons"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.shape.html#shakemap.coremods.shape.create_polygons">[docs]</a><span class="k">def</span> <span class="nf">create_polygons</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="create_polygons"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.shape.html#shakemap.coremods.shape.create_polygons">[docs]</a><span class="k">def</span> <span class="nf">create_polygons</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">max_workers</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Generates a set of closed polygons (with or without holes) using</span>
 <span class="sd">    the pcontour function, and uses fiona to convert the resulting GeoJSON</span>
 <span class="sd">    objects into ESRI-style shape files which are then zipped into an</span>
@@ -145,6 +148,7 @@
 
     <span class="n">smdata</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;gis&#39;</span><span class="p">)</span>
     <span class="c1"># Make a directory for the files to live in prior to being zipped</span>
+    <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">datadir</span><span class="p">)</span> <span class="k">as</span> <span class="n">tdir</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">imts</span><span class="p">:</span>
             <span class="n">gdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
@@ -166,16 +170,16 @@
                 <span class="k">if</span> <span class="n">contour_levels</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">contour_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.01</span><span class="p">])</span>
                 <span class="n">fname</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
-            <span class="n">gjson</span> <span class="o">=</span> <span class="n">pcontour</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span>
-                             <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;dx&#39;</span><span class="p">],</span>
-                             <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;dy&#39;</span><span class="p">],</span>
-                             <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;xmin&#39;</span><span class="p">],</span>
-                             <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;ymax&#39;</span><span class="p">],</span>
-                             <span class="n">contour_levels</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.shp&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;ESRI Shapefile&#39;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">jobj</span> <span class="ow">in</span> <span class="n">gjson</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
-                    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">jobj</span><span class="p">)</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fgrid&#39;</span><span class="p">:</span> <span class="n">fgrid</span><span class="p">,</span>
+                 <span class="s1">&#39;dx&#39;</span><span class="p">:</span> <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;dx&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;dy&#39;</span><span class="p">:</span> <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;dy&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;xmin&#39;</span><span class="p">:</span> <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;xmin&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;ymax&#39;</span><span class="p">:</span> <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;ymax&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;contour_levels&#39;</span><span class="p">:</span> <span class="n">contour_levels</span><span class="p">,</span>
+                 <span class="s1">&#39;tdir&#39;</span><span class="p">:</span> <span class="n">tdir</span><span class="p">,</span>
+                 <span class="s1">&#39;fname&#39;</span><span class="p">:</span> <span class="n">fname</span><span class="p">,</span>
+                 <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="n">schema</span><span class="p">}</span>
+            <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
             <span class="n">copyfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">smdata</span><span class="p">,</span> <span class="s1">&#39;WGS1984.prj&#39;</span><span class="p">),</span>
                      <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.prj&#39;</span><span class="p">))</span>
             <span class="n">lyrfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">smdata</span><span class="p">,</span> <span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.lyr&#39;</span><span class="p">)</span>
@@ -188,6 +192,15 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No &quot;</span> <span class="o">+</span> <span class="n">fname</span> <span class="o">+</span> <span class="s2">&quot;.shp.xml file in &quot;</span> <span class="o">+</span> <span class="n">smdata</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">copyfile</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.shp.xml&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">max_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">cf</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">make_shape_files</span><span class="p">,</span> <span class="n">alist</span><span class="p">)</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">adict</span> <span class="ow">in</span> <span class="n">alist</span><span class="p">:</span>
+                <span class="n">make_shape_files</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
+
         <span class="n">zfilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shape.zip&#39;</span><span class="p">)</span>
         <span class="n">zfile</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zfilename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
                                 <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span>
@@ -198,6 +211,24 @@
         <span class="k">for</span> <span class="n">sfile</span> <span class="ow">in</span> <span class="n">filelist</span><span class="p">:</span>
             <span class="n">zfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">sfile</span><span class="p">),</span> <span class="n">sfile</span><span class="p">)</span>
         <span class="n">zfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="make_shape_files"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.shape.html#shakemap.coremods.shape.make_shape_files">[docs]</a><span class="k">def</span> <span class="nf">make_shape_files</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>
+    <span class="n">fgrid</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;fgrid&#39;</span><span class="p">]</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">]</span>
+    <span class="n">xmin</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span>
+    <span class="n">ymax</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;ymax&#39;</span><span class="p">]</span>
+    <span class="n">contour_levels</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;contour_levels&#39;</span><span class="p">]</span>
+    <span class="n">tdir</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;tdir&#39;</span><span class="p">]</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;schema&#39;</span><span class="p">]</span>
+
+    <span class="n">gjson</span> <span class="o">=</span> <span class="n">pcontour</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">contour_levels</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.shp&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;ESRI Shapefile&#39;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">jobj</span> <span class="ow">in</span> <span class="n">gjson</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">jobj</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

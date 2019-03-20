@@ -37,9 +37,7 @@
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
@@ -47,8 +45,7 @@
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.logging</span> <span class="k">import</span> <span class="n">get_logging_config</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="k">import</span> <span class="n">contour</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
 <span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
@@ -75,64 +72,15 @@
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/cont_.*\.json&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
-    <span class="c1"># supply here a data structure with information about files that</span>
-    <span class="c1"># can be created by this module.</span>
-    <span class="n">contour_page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ground Motion Contours&#39;</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="s1">&#39;contours&#39;</span><span class="p">}</span>
-    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;miContour&#39;</span><span class="p">,</span> <span class="s1">&#39;pgaContour&#39;</span><span class="p">,</span> <span class="s1">&#39;pgvContour&#39;</span><span class="p">,</span>
-                                     <span class="s1">&#39;psa[PERIOD]Contour&#39;</span><span class="p">])</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;mmiContour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Contours&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of macroseismic intensity.&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
-                              <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*mmi.json&#39;</span><span class="p">,</span>
-                                           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                                          <span class="p">]</span>
-                              <span class="p">}</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;miContour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Contours&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of macroseismic intensity.&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
-                             <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*mi.json&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                                         <span class="p">]</span>
-                             <span class="p">}</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgaContour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PGA Contours&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of [COMPONENT] peak &#39;</span>
-                                         <span class="s1">&#39;ground acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
-                              <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*pga.json&#39;</span><span class="p">,</span>
-                                           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                                          <span class="p">]</span>
-                              <span class="p">}</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgvContour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PGV Contours&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of [COMPONENT] peak &#39;</span>
-                                         <span class="s1">&#39;ground velocity (cm/s).&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
-                              <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*pgv.json&#39;</span><span class="p">,</span>
-                                           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                                          <span class="p">]</span>
-                              <span class="p">}</span>
-    <span class="n">psacap</span> <span class="o">=</span> <span class="s1">&#39;Contours of [COMPONENT] [FPERIOD] sec 5</span><span class="si">% d</span><span class="s1">amped &#39;</span>\
-             <span class="s1">&#39;pseudo-spectral acceleration(</span><span class="si">%g</span><span class="s1">).&#39;</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;psa[PERIOD]Contour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PSA[PERIOD] Contour&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
-        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">psacap</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*psa[0-9]p[0-9].json&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                    <span class="p">]</span>
-    <span class="p">}</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Instantiate a ContourModule class with an event ID.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">=</span> <span class="n">eventid</span>
-        <span class="n">log_config</span> <span class="o">=</span> <span class="n">get_logging_config</span><span class="p">()</span>
-        <span class="n">log_name</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ContourModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">filter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span> <span class="o">=</span> <span class="nb">filter</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span> <span class="o">=</span> <span class="n">DEFAULT_FILTER_SIZE</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s2">&quot;Ground Motion Contours&quot;</span><span class="p">,</span> <span class="s2">&quot;contours&quot;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ContourModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -172,11 +120,12 @@
 
         <span class="c1"># create contour files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Contouring to files...&#39;</span><span class="p">)</span>
-        <span class="n">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">)</span>
+        <span class="n">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">,</span>
+                         <span class="n">filter_size</span><span class="p">)</span>
         <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="contour_to_files"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour_to_files">[docs]</a><span class="k">def</span> <span class="nf">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span>
+<div class="viewcode-block" id="contour_to_files"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour_to_files">[docs]</a><span class="k">def</span> <span class="nf">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span>
                      <span class="n">filter_size</span><span class="o">=</span><span class="n">DEFAULT_FILTER_SIZE</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate contours of all IMT values.</span>
@@ -235,6 +184,31 @@
             <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;cont_</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;cont_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+            <span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;mmiContour&#39;</span><span class="p">,</span> <span class="s1">&#39;Intensity Contours&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Contours of macroseismic intensity.&#39;</span><span class="p">,</span>
+                             <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+            <span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;miContour&#39;</span><span class="p">,</span> <span class="s1">&#39;Intensity Contours&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Contours of macroseismic intensity.&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;cont_mi.json&#39;</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;PGA&#39;</span><span class="p">:</span>
+            <span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;pgaContour&#39;</span><span class="p">,</span> <span class="s1">&#39;PGA Contours&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Contours of &#39;</span> <span class="o">+</span> <span class="n">component</span> <span class="o">+</span> <span class="s1">&#39; peak &#39;</span>
+                             <span class="s1">&#39;ground acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
+                             <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+            <span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;pgvContour&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV Contours&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Contours of &#39;</span> <span class="o">+</span> <span class="n">component</span> <span class="o">+</span> <span class="s1">&#39; peak &#39;</span>
+                             <span class="s1">&#39;ground velocity (cm/s).&#39;</span><span class="p">,</span>
+                             <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">imtype</span> <span class="o">+</span> <span class="s1">&#39;Contour&#39;</span><span class="p">,</span>
+                             <span class="n">imtype</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; Contours&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Contours of &#39;</span> <span class="o">+</span> <span class="n">component</span> <span class="o">+</span> <span class="s1">&#39; 5</span><span class="si">% d</span><span class="s1">amped &#39;</span> <span class="o">+</span>
+                             <span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="o">.</span><span class="n">period</span><span class="p">)</span> <span class="o">+</span>
+                             <span class="s1">&#39; sec spectral acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
+                             <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+
         <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
             <span class="n">fpath</span><span class="p">,</span> <span class="n">fext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -269,8 +243,8 @@
                 <span class="n">crs</span><span class="o">=</span><span class="n">crs</span>
             <span class="p">)</span>
 
-            <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span>
-                                   <span class="n">my_gmice</span><span class="p">)</span>
+            <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">),</span>
+                                   <span class="n">imtype</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">my_gmice</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">line_strings</span><span class="p">:</span>
                 <span class="n">vector_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>

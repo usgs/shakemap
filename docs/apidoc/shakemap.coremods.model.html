@@ -49,7 +49,6 @@ shake_data.hdf, and produce output in shake_result.hdf.</p>
 <em class="property">class </em><code class="descclassname">shakemap.coremods.model.</code><code class="descname">ModelModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/model.html#ModelModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.model.ModelModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <p>model – Interpolate ground motions to a grid or list of locations.</p>
-<p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="attribute">
 <dt id="shakemap.coremods.model.ModelModule.command_name">
 <code class="descname">command_name</code><em class="property"> = 'model'</em><a class="headerlink" href="#shakemap.coremods.model.ModelModule.command_name" title="Permalink to this definition">¶</a></dt>
@@ -66,9 +65,36 @@ shake_data.hdf, and produce output in shake_result.hdf.</p>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="shakemap.coremods.model.ModelModule.contents">
-<code class="descname">contents</code><em class="property"> = {'shakemapHDF': {'caption': 'HDF file containing all ShakeMap results.', 'formats': [{'filename': 'shake_result.hdf', 'type': 'application/x-bag'}], 'title': 'Comprehensive ShakeMap HDF Data File'}}</em><a class="headerlink" href="#shakemap.coremods.model.ModelModule.contents" title="Permalink to this definition">¶</a></dt>
+<dt id="shakemap.coremods.model.ModelModule.no_seismic">
+<code class="descname">no_seismic</code><em class="property"> = False</em><a class="headerlink" href="#shakemap.coremods.model.ModelModule.no_seismic" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.model.ModelModule.no_macroseismic">
+<code class="descname">no_macroseismic</code><em class="property"> = False</em><a class="headerlink" href="#shakemap.coremods.model.ModelModule.no_macroseismic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.model.ModelModule.no_rupture">
+<code class="descname">no_rupture</code><em class="property"> = False</em><a class="headerlink" href="#shakemap.coremods.model.ModelModule.no_rupture" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.model.ModelModule.rock_vs30">
+<code class="descname">rock_vs30</code><em class="property"> = 760.0</em><a class="headerlink" href="#shakemap.coremods.model.ModelModule.rock_vs30" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.model.ModelModule.soil_vs30">
+<code class="descname">soil_vs30</code><em class="property"> = 180.0</em><a class="headerlink" href="#shakemap.coremods.model.ModelModule.soil_vs30" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="shakemap.coremods.model.ModelModule.parseArgs">
+<code class="descname">parseArgs</code><span class="sig-paren">(</span><em>arglist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/model.html#ModelModule.parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.model.ModelModule.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the object to accept the –no_seismic, –no_macroseismic,
+and –no_rupture flags.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="shakemap.coremods.model.ModelModule.execute">

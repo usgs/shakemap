@@ -43,6 +43,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">logging.handlers</span> <span class="k">import</span> <span class="n">TimedRotatingFileHandler</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
 
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 <span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">Validator</span>
@@ -274,7 +275,7 @@
     <span class="k">return</span> <span class="n">logger</span></div>
 
 
-<div class="viewcode-block" id="dispatch_event"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.queue.html#shakemap.utils.queue.dispatch_event">[docs]</a><span class="k">def</span> <span class="nf">dispatch_event</span><span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="dispatch_event"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.queue.html#shakemap.utils.queue.dispatch_event">[docs]</a><span class="k">def</span> <span class="nf">dispatch_event</span><span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">shake_config</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Start a subprocess to run the specified event and add its data</span>
 <span class="sd">    to the children structure.</span>
 
@@ -288,6 +289,7 @@
 <span class="sd">                      shake process. See the configuration file &#39;queue.conf&#39;</span>
 <span class="sd">                      for the exact commands that will be run.</span>
 <span class="sd">        config (dict): The configuration dictionary.</span>
+<span class="sd">        shake_config (dict): The parsed shake.conf config file.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        nothing: Nothing.</span>
@@ -302,10 +304,28 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Testing event </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">eventid</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;echo&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running event </span><span class="si">%s</span><span class="s1"> due to action </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">action</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running event </span><span class="si">%s</span><span class="s1"> due to action &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">action</span><span class="p">))</span>
+        <span class="c1">#</span>
+        <span class="c1"># Add the action as the assemble/augment comment, or replace the</span>
+        <span class="c1"># comment if it is already there.</span>
+        <span class="c1">#</span>
+        <span class="n">shake_cmds</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;autorun_modules&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">shcmd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shake_cmds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">shcmd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;assemble&#39;</span><span class="p">,</span> <span class="s1">&#39;augment&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shake_cmds</span><span class="p">)</span> <span class="o">==</span> <span class="n">ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># This shouldn&#39;t happen</span>
+                <span class="n">shake_cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">)</span>
+                <span class="n">shake_cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">action</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">shake_cmds</span><span class="p">[</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;-c&#39;</span><span class="p">:</span>
+                <span class="n">shake_cmds</span><span class="p">[</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">action</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">shake_cmds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">)</span>
+                <span class="n">shake_cmds</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">action</span><span class="p">)</span>
+            <span class="k">break</span>
+
         <span class="n">cmd</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;shake_command&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;shake&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;shake_path&#39;</span><span class="p">])</span>
         <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVID&gt;&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="o">+</span> <span class="n">shake_cmds</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
 
     <span class="n">children</span><span class="p">[</span><span class="n">eventid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;popen&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()}</span>

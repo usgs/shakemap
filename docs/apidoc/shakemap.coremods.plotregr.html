@@ -41,7 +41,6 @@
 <em class="property">class </em><code class="descclassname">shakemap.coremods.plotregr.</code><code class="descname">PlotRegr</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/plotregr.html#PlotRegr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <p>plotregr – Plot the regression curves from a data file</p>
-<p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="attribute">
 <dt id="shakemap.coremods.plotregr.PlotRegr.command_name">
 <code class="descname">command_name</code><em class="property"> = 'plotregr'</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.command_name" title="Permalink to this definition">¶</a></dt>
@@ -55,21 +54,6 @@
 <dl class="attribute">
 <dt id="shakemap.coremods.plotregr.PlotRegr.dependencies">
 <code class="descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.dependencies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.plotregr.PlotRegr.regr_page">
-<code class="descname">regr_page</code><em class="property"> = {'slug': 'regression', 'title': 'Regression Plots'}</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.regr_page" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.plotregr.PlotRegr.contents">
-<code class="descname">contents</code><em class="property"> = {'miRegr': {'caption': 'Regression plot of macroseismic intensity.', 'formats': [{'filename': 'MMI_regr.png', 'type': 'image/png'}], 'page': {'slug': 'regression', 'title': 'Regression Plots'}, 'title': 'Intensity Regression'}, 'pgaRegr': {'caption': 'Regression plot of [COMPONENT] peak ground acceleration (%g).', 'formats': [{'filename': 'pga_regr.png', 'type': 'image/png'}], 'page': {'slug': 'regression', 'title': 'Regression Plots'}, 'title': 'PGA Regression'}, 'pgvRegr': {'caption': 'Regression plot of [COMPONENT] peak ground velocity (cm/s).', 'formats': [{'filename': 'pgv_regr.png', 'type': 'image/png'}], 'page': {'slug': 'regression', 'title': 'Regression Plots'}, 'title': 'PGV Regression'}, 'psa[PERIOD]Regr': {'caption': 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'formats': [{'filename': 'psa[0-9]p[0-9]_regr.png', 'type': 'image/png'}], 'page': {'slug': 'regression', 'title': 'Regression Plots'}, 'title': 'PSA[PERIOD] Regression'}}</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.contents" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.plotregr.PlotRegr.psacap">
-<code class="descname">psacap</code><em class="property"> = 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.psacap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -91,6 +75,11 @@ exist.</li>
 </dd></dl>
 
 </dd></dl>
+
+<dl class="function">
+<dt id="shakemap.coremods.plotregr.make_plots">
+<code class="descclassname">shakemap.coremods.plotregr.</code><code class="descname">make_plots</code><span class="sig-paren">(</span><em>adict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/plotregr.html#make_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.plotregr.make_plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 

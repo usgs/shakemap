@@ -44,7 +44,6 @@
 <dt>contour – Generate contours of all IMT values from the</dt>
 <dd>shake_result.hdf output file.</dd>
 </dl>
-<p>Instantiate a ContourModule class with an event ID.</p>
 <dl class="attribute">
 <dt id="shakemap.coremods.contour.ContourModule.command_name">
 <code class="descname">command_name</code><em class="property"> = 'contour'</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.command_name" title="Permalink to this definition">¶</a></dt>
@@ -58,21 +57,6 @@
 <dl class="attribute">
 <dt id="shakemap.coremods.contour.ContourModule.dependencies">
 <code class="descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.dependencies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.contour.ContourModule.contour_page">
-<code class="descname">contour_page</code><em class="property"> = {'slug': 'contours', 'title': 'Ground Motion Contours'}</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.contour_page" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.contour.ContourModule.contents">
-<code class="descname">contents</code><em class="property"> = {'miContour': {'caption': 'Contours of macroseismic intensity.', 'formats': [{'filename': 'cont_*mi.json', 'type': 'application/json'}], 'page': {'slug': 'contours', 'title': 'Ground Motion Contours'}, 'title': 'Intensity Contours'}, 'mmiContour': {'caption': 'Contours of macroseismic intensity.', 'formats': [{'filename': 'cont_*mmi.json', 'type': 'application/json'}], 'page': {'slug': 'contours', 'title': 'Ground Motion Contours'}, 'title': 'Intensity Contours'}, 'pgaContour': {'caption': 'Contours of [COMPONENT] peak ground acceleration (%g).', 'formats': [{'filename': 'cont_*pga.json', 'type': 'application/json'}], 'page': {'slug': 'contours', 'title': 'Ground Motion Contours'}, 'title': 'PGA Contours'}, 'pgvContour': {'caption': 'Contours of [COMPONENT] peak ground velocity (cm/s).', 'formats': [{'filename': 'cont_*pgv.json', 'type': 'application/json'}], 'page': {'slug': 'contours', 'title': 'Ground Motion Contours'}, 'title': 'PGV Contours'}, 'psa[PERIOD]Contour': {'caption': 'Contours of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'formats': [{'filename': 'cont_*psa[0-9]p[0-9].json', 'type': 'application/json'}], 'page': {'slug': 'contours', 'title': 'Ground Motion Contours'}, 'title': 'PSA[PERIOD] Contour'}}</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.contents" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.contour.ContourModule.psacap">
-<code class="descname">psacap</code><em class="property"> = 'Contours of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.psacap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -98,7 +82,7 @@ exist.</li>
 
 <dl class="function">
 <dt id="shakemap.coremods.contour.contour_to_files">
-<code class="descclassname">shakemap.coremods.contour.</code><code class="descname">contour_to_files</code><span class="sig-paren">(</span><em>container</em>, <em>output_dir</em>, <em>logger</em>, <em>filter_size=10</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#contour_to_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.contour.contour_to_files" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakemap.coremods.contour.</code><code class="descname">contour_to_files</code><span class="sig-paren">(</span><em>container</em>, <em>output_dir</em>, <em>logger</em>, <em>contents</em>, <em>filter_size=10</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#contour_to_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.contour.contour_to_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate contours of all IMT values.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
