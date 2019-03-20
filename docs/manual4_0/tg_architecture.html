@@ -261,14 +261,15 @@ parameters set in the other configuration files. Note: if both
 <em>model.conf</em> and <em>model_select.conf</em> exist in the event directory,
 <em>model.conf</em> will be processed and <em>model_select.conf</em> will be ignored.</p>
 <p><code class="docutils literal notranslate"><span class="pre">assemble</span></code> then reads any files with a <em>_dat.xml</em> extension
-and assembles them into a station list. See ??? for a description
-of the data file format. Similarly, <code class="docutils literal notranslate"><span class="pre">assmeble</span></code> will read a
-file with the <em>_fault.txt</em> (or <em>_fault.json</em>) extension and
-process it as a specification of a finite rupture. See ??? for
-a description of the rupture file formats. Note: only one rupture
-file should be present in the event’s input directory. If more
-than one file exists, only the first (lexicographically) will we
-processed.</p>
+and assembles them into a station list.</p>
+<p>Similarly, <code class="docutils literal notranslate"><span class="pre">assmeble</span></code> will read a file with the <em>_fault.txt</em>
+(or <em>_fault.json</em>) extension and process it as a specification of a
+finite rupture.</p>
+<p>See the <a class="reference internal" href="tg_input_formats.html#sec-input-formats-4"><span class="std std-ref">Input Data Formats</span></a> section
+for details of these input data forats.</p>
+<p>Note: only one rupture file should be present in the event’s input
+directory. If more than one file exists, only the first
+(lexicographically) will we processed.</p>
 <p>If no backups exist (i.e., event subdirectories named <em>.backup????</em>)
 then the ShakeMap history from an existing <em>shake_data.hdf</em> is
 extracted and updated. If there is no current <em>shake_data.hdf</em>, the

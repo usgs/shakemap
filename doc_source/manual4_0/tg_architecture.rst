@@ -266,14 +266,18 @@ parameters set in the other configuration files. Note: if both
 *model.conf* will be processed and *model_select.conf* will be ignored.
 
 ``assemble`` then reads any files with a *_dat.xml* extension
-and assembles them into a station list. See ??? for a description
-of the data file format. Similarly, ``assmeble`` will read a
-file with the *_fault.txt* (or *_fault.json*) extension and
-process it as a specification of a finite rupture. See ??? for
-a description of the rupture file formats. Note: only one rupture
-file should be present in the event's input directory. If more
-than one file exists, only the first (lexicographically) will we
-processed.
+and assembles them into a station list.
+
+Similarly, ``assmeble`` will read a file with the *_fault.txt*
+(or *_fault.json*) extension and process it as a specification of a
+finite rupture.
+
+See the :ref:`Input Data Formats <sec-input-formats-4>` section
+for details of these input data forats.
+
+Note: only one rupture file should be present in the event's input
+directory. If more than one file exists, only the first
+(lexicographically) will we processed.
 
 If no backups exist (i.e., event subdirectories named *.backup????*)
 then the ShakeMap history from an existing *shake_data.hdf* is

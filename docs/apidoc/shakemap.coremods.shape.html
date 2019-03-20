@@ -57,21 +57,6 @@
 <code class="descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.shape.ShapeModule.dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="shakemap.coremods.shape.ShapeModule.shape_page">
-<code class="descname">shape_page</code><em class="property"> = {'slug': 'shape files', 'title': 'GIS Shape Files'}</em><a class="headerlink" href="#shakemap.coremods.shape.ShapeModule.shape_page" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.shape.ShapeModule.contents">
-<code class="descname">contents</code><em class="property"> = {'shakemap_shapefiles': {'caption': 'Shape Files.', 'formats': [{'filename': 'shape.zip', 'type': 'application/zip'}], 'page': {'slug': 'shape files', 'title': 'GIS Shape Files'}, 'title': 'ShakeMap Shape Files'}}</em><a class="headerlink" href="#shakemap.coremods.shape.ShapeModule.contents" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.shape.ShapeModule.ftype">
-<code class="descname">ftype</code><em class="property"> = 'application/zip'</em><a class="headerlink" href="#shakemap.coremods.shape.ShapeModule.ftype" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="method">
 <dt id="shakemap.coremods.shape.ShapeModule.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/shape.html#ShapeModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.shape.ShapeModule.execute" title="Permalink to this definition">¶</a></dt>
@@ -95,7 +80,7 @@ exist.</li>
 
 <dl class="function">
 <dt id="shakemap.coremods.shape.create_polygons">
-<code class="descclassname">shakemap.coremods.shape.</code><code class="descname">create_polygons</code><span class="sig-paren">(</span><em>container</em>, <em>datadir</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/shape.html#create_polygons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.shape.create_polygons" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakemap.coremods.shape.</code><code class="descname">create_polygons</code><span class="sig-paren">(</span><em>container</em>, <em>datadir</em>, <em>logger</em>, <em>max_workers</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/shape.html#create_polygons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.shape.create_polygons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a set of closed polygons (with or without holes) using
 the pcontour function, and uses fiona to convert the resulting GeoJSON
 objects into ESRI-style shape files which are then zipped into an
@@ -123,6 +108,11 @@ container object.</li>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="function">
+<dt id="shakemap.coremods.shape.make_shape_files">
+<code class="descclassname">shakemap.coremods.shape.</code><code class="descname">make_shape_files</code><span class="sig-paren">(</span><em>adict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/shape.html#make_shape_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.shape.make_shape_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 

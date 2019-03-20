@@ -35,7 +35,6 @@
   <h1>Source code for shakemap.coremods.info</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
 <span class="c1"># third party imports</span>
@@ -43,7 +42,7 @@
 <span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 
 
@@ -56,16 +55,9 @@
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/info\.json&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
-    <span class="c1"># supply here a data structure with information about files that</span>
-    <span class="c1"># can be created by this module.</span>
-    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;supplementalInformation&#39;</span><span class="p">])</span>
-    <span class="n">cap</span> <span class="o">=</span> <span class="s1">&#39;ShakeMap processing parameters and map summary information.&#39;</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;supplementalInformation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Supplemental Information&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">cap</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;info.json&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}]</span>
-    <span class="p">}</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InfoModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="InfoModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.info.html#shakemap.coremods.info.InfoModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -103,7 +95,11 @@
         <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">info_file</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">infostring</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="s1">&#39;ShakeMap processing parameters and map summary information.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;supplementalInformation&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;Supplemental Information&#39;</span><span class="p">,</span> <span class="n">cap</span><span class="p">,</span>
+                              <span class="s1">&#39;info.json&#39;</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

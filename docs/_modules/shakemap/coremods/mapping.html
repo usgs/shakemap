@@ -35,7 +35,9 @@
   <h1>Source code for shakemap.coremods.mapping</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="c1"># from multiprocessing import Pool</span>
+<span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">cf</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 
 <span class="c1"># third party</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
@@ -56,8 +58,9 @@
                                    <span class="n">get_configspec</span><span class="p">,</span>
                                    <span class="n">get_custom_validator</span><span class="p">,</span>
                                    <span class="n">config_error</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakemap.mapping.mapmaker</span> <span class="k">import</span> <span class="p">(</span><span class="n">draw_intensity</span><span class="p">,</span> <span class="n">draw_contour</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
 
 
 <div class="viewcode-block" id="MappingModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule">[docs]</a><span class="k">class</span> <span class="nc">MappingModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -75,81 +78,9 @@
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
     <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;products.conf&#39;</span><span class="p">]</span>
 
-    <span class="c1"># supply here a data structure with information about files that</span>
-    <span class="c1"># can be created by this module.</span>
-    <span class="n">mapping_page</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ground Motion Maps&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="s1">&#39;maps&#39;</span>
-    <span class="p">}</span>
-    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span>
-        <span class="p">[</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">,</span>
-         <span class="s1">&#39;intensityThumbnail&#39;</span><span class="p">,</span>
-         <span class="s1">&#39;pgaMap&#39;</span><span class="p">,</span>
-         <span class="s1">&#39;pgvMap&#39;</span><span class="p">,</span>
-         <span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">])</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Map&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Map of macroseismic intensity.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity.jpg&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span>
-        <span class="p">},</span> <span class="p">{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity.pdf&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/pdf&#39;</span><span class="p">}</span>
-        <span class="p">]</span>
-    <span class="p">}</span>
-
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;intensityThumbnail&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Thumbnail&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Thumbnail of intensity map.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span>
-            <span class="s1">&#39;pin-thumbnail.png&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/png&#39;</span>
-        <span class="p">}]</span>
-    <span class="p">}</span>
-
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgaMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PGA Map&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Map of peak ground acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;pga.jpg&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span>
-        <span class="p">},</span> <span class="p">{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;pga.pdf&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span>
-        <span class="p">}]</span>
-    <span class="p">}</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgvMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PGV Map&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Map of peak ground velocity (cm/s).&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;pgv.jpg&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span>
-        <span class="p">},</span> <span class="p">{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;pgv.pdf&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/pdf&#39;</span>
-        <span class="p">}]</span>
-    <span class="p">}</span>
-    <span class="n">psacap</span> <span class="o">=</span> <span class="s1">&#39;Map of [FPERIOD] sec 5</span><span class="si">% d</span><span class="s1">amped pseudo-spectral acceleration(</span><span class="si">%g</span><span class="s1">).&#39;</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PSA[PERIOD] Map&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
-        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">psacap</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span>
-            <span class="s1">&#39;psa[0-9]p[0-9].jpg&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span>
-        <span class="p">},</span> <span class="p">{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span>
-            <span class="s1">&#39;psa[0-9]p[0-9].pdf&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/pdf&#39;</span>
-        <span class="p">}]</span>
-    <span class="p">}</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MappingModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s1">&#39;Ground Motion Maps&#39;</span><span class="p">,</span> <span class="s1">&#39;maps&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MappingModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -184,16 +115,6 @@
         <span class="c1"># create contour files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Mapping...&#39;</span><span class="p">)</span>
 
-        <span class="c1"># get the contour filter_size setting from config</span>
-        <span class="c1"># get the path to the products.conf file, load the config</span>
-        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
-        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s1">&#39;products&#39;</span><span class="p">)</span>
-        <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
-            <span class="n">config_error</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
-
         <span class="c1"># get the filter size from the products.conf</span>
         <span class="n">filter_size</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;contour&#39;</span><span class="p">][</span><span class="s1">&#39;filter_size&#39;</span><span class="p">]</span>
 
@@ -204,6 +125,9 @@
         <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">]</span>
         <span class="n">oceanfile</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">]</span>
         <span class="n">topofile</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Get the number of parallel workers</span>
+        <span class="n">max_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;max_workers&#39;</span><span class="p">]</span>
 
         <span class="c1"># Reading HDF5 files currently takes a long time, due to poor</span>
         <span class="c1"># programming in MapIO.  To save us some time until that issue is</span>
@@ -233,78 +157,118 @@
                         <span class="n">samplegeodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">,</span>
                         <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
+        <span class="n">model_config</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
+
         <span class="n">imtlist</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">()</span>
+
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">imtype</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
             <span class="n">component</span><span class="p">,</span> <span class="n">imtype</span> <span class="o">=</span> <span class="n">imtype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imtype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;imtype&#39;</span><span class="p">:</span> <span class="n">imtype</span><span class="p">,</span>
+                 <span class="s1">&#39;topogrid&#39;</span><span class="p">:</span> <span class="n">topogrid</span><span class="p">,</span>
+                 <span class="s1">&#39;oceanfile&#39;</span><span class="p">:</span> <span class="n">oceanfile</span><span class="p">,</span>
+                 <span class="s1">&#39;datadir&#39;</span><span class="p">:</span> <span class="n">datadir</span><span class="p">,</span>
+                 <span class="s1">&#39;operator&#39;</span><span class="p">:</span> <span class="n">operator</span><span class="p">,</span>
+                 <span class="s1">&#39;filter_size&#39;</span><span class="p">:</span> <span class="n">filter_size</span><span class="p">,</span>
+                 <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">,</span>
+                 <span class="s1">&#39;component&#39;</span><span class="p">:</span> <span class="n">comp</span><span class="p">,</span>
+                 <span class="s1">&#39;imtdict&#39;</span><span class="p">:</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">comp</span><span class="p">),</span>
+                 <span class="s1">&#39;ruptdict&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()),</span>
+                 <span class="s1">&#39;stationdict&#39;</span><span class="p">:</span> <span class="n">container</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">(),</span>
+                 <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="n">model_config</span>
+                 <span class="p">}</span>
+            <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Drawing intensity map...&#39;</span><span class="p">)</span>
-                <span class="n">intensity_pdf</span><span class="p">,</span> <span class="n">intensity_png</span><span class="p">,</span> <span class="n">legend_file</span> <span class="o">=</span> <span class="n">draw_intensity</span><span class="p">(</span>
-                    <span class="n">container</span><span class="p">,</span>
-                    <span class="n">topogrid</span><span class="p">,</span>
-                    <span class="n">oceanfile</span><span class="p">,</span>
-                    <span class="n">datadir</span><span class="p">,</span>
-                    <span class="n">operator</span>
-                <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created intensity map </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">intensity_pdf</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">make_pin_thumbnail</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">datadir</span><span class="p">)</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                <span class="n">g</span><span class="p">[</span><span class="s1">&#39;imtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;thumbnail&#39;</span>
+                <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">,</span> <span class="s1">&#39;Intensity Map&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;Map of macroseismic intensity.&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;intensity.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">,</span> <span class="s1">&#39;Intensity Map&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;Map of macroseismic intensity.&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;intensity.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;intensityThumbnail&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;Intensity Thumbnail&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;Thumbnail of intensity map.&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;pin-thumbnail.png&#39;</span><span class="p">,</span> <span class="s1">&#39;image/png&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Drawing </span><span class="si">%s</span><span class="s1"> contour map...&#39;</span> <span class="o">%</span> <span class="n">imtype</span><span class="p">)</span>
+                <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;Map&#39;</span><span class="p">,</span>
+                                      <span class="n">fileimt</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; Map&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;Map of &#39;</span> <span class="o">+</span> <span class="n">imtype</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                                      <span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;Map&#39;</span><span class="p">,</span>
+                                      <span class="n">fileimt</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; Map&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;Map of &#39;</span> <span class="o">+</span> <span class="n">imtype</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                                      <span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
 
-                <span class="n">contour_pdf</span><span class="p">,</span> <span class="n">contour_png</span> <span class="o">=</span> <span class="n">draw_contour</span><span class="p">(</span>
-                    <span class="n">container</span><span class="p">,</span>
-                    <span class="n">imtype</span><span class="p">,</span> <span class="n">topogrid</span><span class="p">,</span>
-                    <span class="n">oceanfile</span><span class="p">,</span>
-                    <span class="n">datadir</span><span class="p">,</span>
-                    <span class="n">operator</span><span class="p">,</span> <span class="n">filter_size</span>
-                <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created contour map </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">contour_pdf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">cf</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">make_map</span><span class="p">,</span> <span class="n">alist</span><span class="p">)</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">adict</span> <span class="ow">in</span> <span class="n">alist</span><span class="p">:</span>
+                <span class="n">make_map</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
 
-        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 
-<div class="viewcode-block" id="MappingModule.make_pin_thumbnail"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule.make_pin_thumbnail">[docs]</a>    <span class="k">def</span> <span class="nf">make_pin_thumbnail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">datadir</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Make the artsy-thumbnail for the pin on the USGS webpages.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s2">&quot;MMI&quot;</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">]</span>
-        <span class="n">num_pixels</span> <span class="o">=</span> <span class="mi">300</span>
-        <span class="n">randx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">)</span>
-        <span class="n">randy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">)</span>
-        <span class="n">rx</span> <span class="o">=</span> <span class="p">(</span><span class="n">randx</span> <span class="o">*</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
-        <span class="n">ry</span> <span class="o">=</span> <span class="p">(</span><span class="n">randy</span> <span class="o">*</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
-        <span class="n">rvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">)</span>
 
-        <span class="n">x_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
-        <span class="n">y_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+<div class="viewcode-block" id="make_map"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.make_map">[docs]</a><span class="k">def</span> <span class="nf">make_map</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>
 
-        <span class="n">mx_grid</span><span class="p">,</span> <span class="n">my_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x_grid</span><span class="p">,</span> <span class="n">y_grid</span><span class="p">)</span>
+    <span class="n">imtype</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;imtype&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+        <span class="n">intensity_pdf</span><span class="p">,</span> <span class="n">intensity_png</span><span class="p">,</span> <span class="n">legend_file</span> <span class="o">=</span> <span class="n">draw_intensity</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;thumbnail&#39;</span><span class="p">:</span>
+        <span class="n">make_pin_thumbnail</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">contour_pdf</span><span class="p">,</span> <span class="n">contour_png</span> <span class="o">=</span> <span class="n">draw_contour</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span></div>
 
-        <span class="n">grid</span> <span class="o">=</span> <span class="n">griddata</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">randx</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">400</span><span class="p">,</span>
-                                   <span class="n">randy</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">400</span><span class="p">]),</span>
-                        <span class="n">grid</span><span class="p">[</span><span class="n">ry</span><span class="p">,</span> <span class="n">rx</span><span class="p">],</span> <span class="p">(</span><span class="n">mx_grid</span><span class="p">,</span> <span class="n">my_grid</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="o">/</span> <span class="mf">10.0</span>
 
-        <span class="n">rgrid</span> <span class="o">=</span> <span class="n">griddata</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">randx</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">400</span><span class="p">,</span>
-                                    <span class="n">randy</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">400</span><span class="p">]),</span>
-                         <span class="n">rvals</span><span class="p">,</span> <span class="p">(</span><span class="n">mx_grid</span><span class="p">,</span> <span class="n">my_grid</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
-        <span class="n">irgrid</span> <span class="o">=</span> <span class="n">rgrid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-        <span class="n">mypols</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]</span>
-                  <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shapes</span><span class="p">(</span><span class="n">irgrid</span><span class="p">)]</span>
+<div class="viewcode-block" id="make_pin_thumbnail"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.make_pin_thumbnail">[docs]</a><span class="k">def</span> <span class="nf">make_pin_thumbnail</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make the artsy-thumbnail for the pin on the USGS webpages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;imtdict&#39;</span><span class="p">]</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">]</span>
+    <span class="n">num_pixels</span> <span class="o">=</span> <span class="mi">300</span>
+    <span class="n">randx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">)</span>
+    <span class="n">randy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">)</span>
+    <span class="n">rx</span> <span class="o">=</span> <span class="p">(</span><span class="n">randx</span> <span class="o">*</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="n">ry</span> <span class="o">=</span> <span class="p">(</span><span class="n">randy</span> <span class="o">*</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="n">rvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_pixels</span><span class="p">)</span>
 
-        <span class="n">mmimap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">2.75</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">mmimap</span><span class="o">.</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">9.5</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">mypols</span><span class="p">:</span>
-            <span class="n">mycoords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mycoords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mycoords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#cccccc&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">&quot;pin-thumbnail.png&quot;</span><span class="p">),</span>
-            <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
-            <span class="n">bbox_inches</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Bbox</span><span class="p">(</span>
-                <span class="p">[[</span><span class="mf">0.47</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.50</span><span class="p">,</span> <span class="mf">2.50</span><span class="p">]]),</span>
-            <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div></div>
+    <span class="n">x_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+    <span class="n">y_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">mx_grid</span><span class="p">,</span> <span class="n">my_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x_grid</span><span class="p">,</span> <span class="n">y_grid</span><span class="p">)</span>
+
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">griddata</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">randx</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">400</span><span class="p">,</span>
+                               <span class="n">randy</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">400</span><span class="p">]),</span>
+                    <span class="n">grid</span><span class="p">[</span><span class="n">ry</span><span class="p">,</span> <span class="n">rx</span><span class="p">],</span> <span class="p">(</span><span class="n">mx_grid</span><span class="p">,</span> <span class="n">my_grid</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="o">/</span> <span class="mf">10.0</span>
+
+    <span class="n">rgrid</span> <span class="o">=</span> <span class="n">griddata</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">randx</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">400</span><span class="p">,</span>
+                                <span class="n">randy</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">400</span><span class="p">]),</span>
+                     <span class="n">rvals</span><span class="p">,</span> <span class="p">(</span><span class="n">mx_grid</span><span class="p">,</span> <span class="n">my_grid</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="n">irgrid</span> <span class="o">=</span> <span class="n">rgrid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">mypols</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shapes</span><span class="p">(</span><span class="n">irgrid</span><span class="p">)]</span>
+
+    <span class="n">mmimap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">2.75</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">mmimap</span><span class="o">.</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">9.5</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">mypols</span><span class="p">:</span>
+        <span class="n">mycoords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mycoords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mycoords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#cccccc&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="s2">&quot;pin-thumbnail.png&quot;</span><span class="p">),</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
+        <span class="n">bbox_inches</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Bbox</span><span class="p">(</span>
+            <span class="p">[[</span><span class="mf">0.47</span><span class="p">,</span> <span class="mf">0.39</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.50</span><span class="p">,</span> <span class="mf">2.50</span><span class="p">]]),</span>
+        <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

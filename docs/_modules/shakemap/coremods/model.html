@@ -37,12 +37,13 @@
 <span class="sd">Process a ShakeMap, based on the configuration and data found in</span>
 <span class="sd">shake_data.hdf, and produce output in shake_result.hdf.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">date</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
@@ -56,7 +57,7 @@
 <span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">cf</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.point_rupture</span> <span class="k">import</span> <span class="n">PointRupture</span>
 <span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="k">import</span> <span class="n">Sites</span>
 <span class="kn">from</span> <span class="nn">shakelib.distance</span> <span class="k">import</span> <span class="p">(</span><span class="n">Distance</span><span class="p">,</span>
@@ -122,17 +123,55 @@
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/shake_result\.hdf&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
-    <span class="c1"># supply here a data structure with information about files that</span>
-    <span class="c1"># can be created by this module.</span>
-    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;shakemapHDF&#39;</span><span class="p">])</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;shakemapHDF&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Comprehensive ShakeMap HDF Data File&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;HDF file containing all ShakeMap results.&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span>
-            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/x-bag&#39;</span>
-        <span class="p">}]</span>
-    <span class="p">}</span>
+    <span class="n">no_seismic</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">no_macroseismic</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">no_rupture</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">rock_vs30</span> <span class="o">=</span> <span class="mf">760.0</span>
+    <span class="n">soil_vs30</span> <span class="o">=</span> <span class="mf">180.0</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ModelModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ModelModule.parseArgs"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.ModelModule.parseArgs">[docs]</a>    <span class="k">def</span> <span class="nf">parseArgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arglist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up the object to accept the --no_seismic, --no_macroseismic,</span>
+<span class="sd">        and --no_rupture flags.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="n">prog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">command_name</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">))</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--no_seismic&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Exclude instrumental seismic data from &#39;</span>
+                            <span class="s1">&#39;the processing, ignoring any that may exist in &#39;</span>
+                            <span class="s1">&#39;the input directory.&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--no_macroseismic&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Exclude macroseismic data from the &#39;</span>
+                            <span class="s1">&#39;processing, ignoring any that may exist in the &#39;</span>
+                            <span class="s1">&#39;input directory.&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--no_rupture&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Exclude a rupture model from the &#39;</span>
+                            <span class="s1">&#39;processing, ignoring any that may exist in the &#39;</span>
+                            <span class="s1">&#39;input directory.&#39;</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># This line should be in any modules that overrides this</span>
+        <span class="c1"># one. It will collect up everything after the current</span>
+        <span class="c1"># modules options in args.rem, which should be returned</span>
+        <span class="c1"># by this function. Note: doing parser.parse_known_args()</span>
+        <span class="c1"># will not work as it will suck up any later modules&#39;</span>
+        <span class="c1"># options that are the same as this one&#39;s.</span>
+        <span class="c1">#</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;rem&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">SUPPRESS</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">arglist</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">no_seismic</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">no_seismic</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">no_macroseismic</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">no_macroseismic</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">no_rupture</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">no_rupture</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">rem</span></div>
 
 <div class="viewcode-block" id="ModelModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.ModelModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -196,6 +235,9 @@
         <span class="c1"># Get the rupture object and rupture context</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">getRuptureObject</span><span class="p">()</span>
+        <span class="c1"># If the --no_rupture flag is used, switch to a PointRupture</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_rupture</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;mechanism&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">setMechanism</span><span class="p">(</span>
                 <span class="n">mech</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;mechanism&#39;</span><span class="p">])</span>
@@ -203,6 +245,17 @@
         <span class="c1"># TODO: figure out how to not have to do this</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">rake</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Set up the coordinates for the attenuation curves</span>
+        <span class="c1">#</span>
+        <span class="n">repi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="n">pt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">getHypo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;lons&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">repi</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">x</span><span class="p">),</span>
+            <span class="s1">&#39;lats&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">pt</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">x</span> <span class="o">/</span> <span class="mf">111.0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">repi</span><span class="p">])</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">point_source</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># The output locations: either a grid or a list of points</span>
@@ -342,12 +395,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span> <span class="o">=</span> <span class="p">{}</span>     <span class="c1"># Holds the standard deviation arrays keyed by IMT</span>
 
         <span class="c1">#</span>
-        <span class="c1"># Places to put the results for the regression plots</span>
+        <span class="c1"># Places to put the results for the attenuation plots</span>
         <span class="c1">#</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rockgrid</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">soilgrid</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rocksd</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">soilsd</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_rock_mean</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_soil_mean</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_rock_sd</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_soil_sd</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Doing MVN...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -406,11 +459,15 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_storePointData</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grid</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_storeRegressionData</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storeAttenuationData</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
 
         <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;shakemapHDF&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;Comprehensive ShakeMap HDF Data File&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;HDF file containing all ShakeMap results.&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">,</span> <span class="s1">&#39;application/x-bag&#39;</span><span class="p">)</span></div>
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># End execute()</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
@@ -592,11 +649,6 @@
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smny</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getNxNy</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getSitesContext</span><span class="p">()</span>
-            <span class="c1">#</span>
-            <span class="c1"># Grids on rock and soil for the regression plots</span>
-            <span class="c1">#</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sx_rock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getSitesContext</span><span class="p">(</span><span class="n">rock_vs30</span><span class="o">=</span><span class="mi">760</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sx_soil</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getSitesContext</span><span class="p">(</span><span class="n">rock_vs30</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
             <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lons</span><span class="p">,</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lats</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lons</span> <span class="o">=</span> <span class="n">lons</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -614,6 +666,19 @@
         <span class="c1"># requirements of both</span>
         <span class="c1">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span> <span class="o">=</span> <span class="n">dist_obj_out</span><span class="o">.</span><span class="n">getDistanceContext</span><span class="p">()</span>
+        <span class="c1">#</span>
+        <span class="c1"># Set up the sites and distance contexts for the attenuation curves</span>
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_sx_rock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getSitesContext</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span><span class="p">,</span> <span class="n">rock_vs30</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rock_vs30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_sx_soil</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getSitesContext</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span><span class="p">,</span> <span class="n">rock_vs30</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">soil_vs30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_dx</span> <span class="o">=</span> <span class="n">Distance</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_gmpe</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span><span class="p">[</span><span class="s1">&#39;lons&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span><span class="p">[</span><span class="s1">&#39;lats&#39;</span><span class="p">],</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span><span class="p">[</span><span class="s1">&#39;lons&#39;</span><span class="p">]),</span>
+            <span class="n">rupture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">point_source</span><span class="p">)</span><span class="o">.</span><span class="n">getDistanceContext</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">lons_out_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lons</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lats_out_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lats</span><span class="p">)</span>
@@ -638,6 +703,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">for</span> <span class="n">dfid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="p">((</span><span class="s1">&#39;df1&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;df2&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">dfid</span> <span class="o">==</span> <span class="s1">&#39;df1&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_seismic</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">dfid</span> <span class="o">==</span> <span class="s1">&#39;df2&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_macroseismic</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="n">sdf</span><span class="p">,</span> <span class="n">imts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">getStationDictionary</span><span class="p">(</span><span class="n">instrumented</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
@@ -690,6 +759,10 @@
                 <span class="s1">&#39;lats&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
             <span class="p">}</span>
             <span class="n">dfn</span><span class="o">.</span><span class="n">sx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getSitesContext</span><span class="p">(</span><span class="n">lldict</span><span class="p">)</span>
+            <span class="n">dfn</span><span class="o">.</span><span class="n">sx_rock</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dfn</span><span class="o">.</span><span class="n">sx</span><span class="p">)</span>
+            <span class="n">dfn</span><span class="o">.</span><span class="n">sx_rock</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">dfn</span><span class="o">.</span><span class="n">sx</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rock_vs30</span><span class="p">)</span>
+            <span class="n">dfn</span><span class="o">.</span><span class="n">sx_soil</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dfn</span><span class="o">.</span><span class="n">sx</span><span class="p">)</span>
+            <span class="n">dfn</span><span class="o">.</span><span class="n">sx_soil</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">dfn</span><span class="o">.</span><span class="n">sx</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">soil_vs30</span><span class="p">)</span>
             <span class="n">dist_obj</span> <span class="o">=</span> <span class="n">Distance</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">default_gmpe</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">],</span>
                 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span>
@@ -736,15 +809,32 @@
                         <span class="n">not_supported</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">if</span> <span class="n">not_supported</span><span class="p">:</span>
                     <span class="n">pmean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                    <span class="n">pmean_rock</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                    <span class="n">pmean_soil</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
                     <span class="n">pstddev</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
                     <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
                     <span class="n">pstddev</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
                     <span class="n">pstddev</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                    <span class="n">pstddev_rock</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>
+                    <span class="n">pstddev_soil</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>
+                    <span class="n">pstddev_rock</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                    <span class="n">pstddev_soil</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">dfn</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span> <span class="n">dfn</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
                                                 <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+                    <span class="n">pmean_rock</span><span class="p">,</span> <span class="n">pstddev_rock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">dfn</span><span class="o">.</span><span class="n">sx_rock</span><span class="p">,</span>
+                                                          <span class="n">dfn</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+                    <span class="n">pmean_soil</span><span class="p">,</span> <span class="n">pstddev_soil</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">dfn</span><span class="o">.</span><span class="n">sx_soil</span><span class="p">,</span>
+                                                          <span class="n">dfn</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_rock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean_rock</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma_rock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev_rock</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_soil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean_soil</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma_soil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev_soil</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
                 <span class="k">if</span> <span class="n">imtstr</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                     <span class="n">total_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gmpe_total_sd_only</span>
                     <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
@@ -879,8 +969,20 @@
                     <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span>
                                                 <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
                                                 <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+                    <span class="n">pmean_rock</span><span class="p">,</span> <span class="n">pstddev_rock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">sx_rock</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+                    <span class="n">pmean_soil</span><span class="p">,</span> <span class="n">pstddev_soil</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">sx_soil</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
                 <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                 <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_rock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean_rock</span>
+                <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma_rock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev_rock</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_soil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean_soil</span>
+                <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma_soil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev_soil</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">imtstr</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                     <span class="n">total_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gmpe_total_sd_only</span>
                     <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
@@ -952,8 +1054,18 @@
         <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
             <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+        <span class="n">pmean_rock</span><span class="p">,</span> <span class="n">pstddev_rock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
+            <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">sx_rock</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+        <span class="n">pmean_soil</span><span class="p">,</span> <span class="n">pstddev_soil</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
+            <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">sx_soil</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_rock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean_rock</span>
+        <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma_rock&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev_rock</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_soil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean_soil</span>
+        <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma_soil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev_soil</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipe_total_sd_only</span><span class="p">:</span>
             <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter_mmi&#39;</span><span class="p">]</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
@@ -1142,6 +1254,18 @@
                 <span class="n">mtype</span><span class="o">=</span><span class="mi">1</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dir_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">dir_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">))</span>
+            <span class="c1"># Precompute directivity for the attenuation curves</span>
+            <span class="n">dir_out</span> <span class="o">=</span> <span class="n">Rowshandel2013</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span><span class="p">[</span><span class="s1">&#39;lats&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span><span class="p">[</span><span class="s1">&#39;lons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atten_coords</span><span class="p">[</span><span class="s1">&#39;lats&#39;</span><span class="p">]),</span> <span class="mi">1</span><span class="p">)),</span>
+                <span class="n">dx</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                <span class="n">T</span><span class="o">=</span><span class="n">Rowshandel2013</span><span class="o">.</span><span class="n">getPeriods</span><span class="p">(),</span>
+                <span class="n">a_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                <span class="n">mtype</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dir_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">dir_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atten_dx</span><span class="p">))</span>
             <span class="n">directivity_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s1">&#39;Directivity prediction evaluation time: </span><span class="si">%f</span><span class="s1"> sec&#39;</span>
@@ -1164,24 +1288,30 @@
         <span class="c1"># Get the predictions at the output points</span>
         <span class="c1">#</span>
         <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">imtstr</span><span class="p">)</span>
-        <span class="n">gmpe</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">imtstr</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
             <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">oqimt</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gmpe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipe</span>
+
         <span class="n">pout_mean</span><span class="p">,</span> <span class="n">pout_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
             <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grid</span><span class="p">:</span>
-            <span class="c1">#</span>
-            <span class="c1"># Fill the grids for the regression plots</span>
-            <span class="c1">#</span>
-            <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
-                <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_rock</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rockgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_mean</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
-                <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_soil</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">soilgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_mean</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="c1"># While we have the gmpe for this IMT, we should make</span>
+        <span class="c1"># the attenuation curves</span>
+        <span class="c1">#</span>
+        <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atten_sx_rock</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atten_dx</span><span class="p">,</span>
+                                  <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_rock_mean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_mean</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_rock_sd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atten_sx_soil</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">atten_dx</span><span class="p">,</span>
+                                  <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_soil_mean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_mean</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atten_soil_sd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1">#</span>
         <span class="c1"># If there are no data, just use the unbiased prediction</span>
@@ -1475,17 +1605,24 @@
             <span class="k">elif</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
                 <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;cms&#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;ln(g)&#39;</span>
+                <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;g&#39;</span>
             <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
             <span class="k">if</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nominal_bias</span><span class="p">:</span>
                 <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;bias&#39;</span><span class="p">]</span> <span class="o">=</span> \
                     <span class="n">_string_round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nominal_bias</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;bias&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="n">_string_round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="n">_string_round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">moutgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">or</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">_string_round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">_string_round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">moutgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">_string_round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">])),</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">_string_round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">moutgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">])),</span> <span class="mi">3</span><span class="p">)</span>
+
         <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">mi</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">mi</span><span class="p">][</span><span class="s1">&#39;grid_points&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">mi</span><span class="p">][</span><span class="s1">&#39;grid_points&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smnx</span><span class="p">)</span>
@@ -1590,7 +1727,8 @@
 <span class="sd">        Get the station JSON dictionary and then add a bunch of stuff to it.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;stations&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">stations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;eventid&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span>
+                    <span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="p">[]}</span>
         <span class="n">sjdict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Compute a bias for all the IMTs in the data frames</span>
@@ -1645,7 +1783,8 @@
         <span class="c1"># Now go through the GeoJSON and add various properties and</span>
         <span class="c1"># amps from the df_dict dictionaries</span>
         <span class="c1">#</span>
-        <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">sjdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
+        <span class="n">sjdict_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">sjdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">sjdict_copy</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">sta_ix</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">]:</span>
                 <span class="n">ndf</span> <span class="o">=</span> <span class="s1">&#39;df1&#39;</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;station_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;seismic&#39;</span>
@@ -1653,8 +1792,13 @@
                 <span class="n">ndf</span> <span class="o">=</span> <span class="s1">&#39;df2&#39;</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;station_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;macroseismic&#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown station </span><span class="si">%s</span><span class="s1"> in stationlist&#39;</span> <span class="o">%</span>
-                                 <span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
+                <span class="c1"># We&#39;re probably using --no_seismic or --no_macroseismic</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_seismic</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_macroseismic</span><span class="p">:</span>
+                    <span class="n">sjdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown station </span><span class="si">%s</span><span class="s1"> in stationlist&#39;</span> <span class="o">%</span>
+                                     <span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
             <span class="n">dfx</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span>
             <span class="n">sdf</span> <span class="o">=</span> <span class="n">dfx</span><span class="o">.</span><span class="n">df</span>
             <span class="n">six</span> <span class="o">=</span> <span class="n">sta_ix</span><span class="p">[</span><span class="n">ndf</span><span class="p">][</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
@@ -1698,22 +1842,34 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_pred&#39;</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="n">myamp</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
+                <span class="n">myamp_rock</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_rock&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
+                <span class="n">myamp_soil</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_soil&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                 <span class="n">tau_str</span> <span class="o">=</span> <span class="s1">&#39;ln_tau&#39;</span>
                 <span class="n">phi_str</span> <span class="o">=</span> <span class="s1">&#39;ln_phi&#39;</span>
                 <span class="n">sigma_str</span> <span class="o">=</span> <span class="s1">&#39;ln_sigma&#39;</span>
+                <span class="n">sigma_str_rock</span> <span class="o">=</span> <span class="s1">&#39;ln_sigma_rock&#39;</span>
+                <span class="n">sigma_str_soil</span> <span class="o">=</span> <span class="s1">&#39;ln_sigma_soil&#39;</span>
                 <span class="n">bias_str</span> <span class="o">=</span> <span class="s1">&#39;ln_bias&#39;</span>
                 <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PGV&#39;</span><span class="p">):</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp</span><span class="p">)</span>
+                    <span class="n">value_rock</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp_rock</span><span class="p">)</span>
+                    <span class="n">value_soil</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp_soil</span><span class="p">)</span>
                     <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;cm/s&#39;</span>
                 <span class="k">elif</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">):</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">myamp</span>
+                    <span class="n">value_rock</span> <span class="o">=</span> <span class="n">myamp_rock</span>
+                    <span class="n">value_soil</span> <span class="o">=</span> <span class="n">myamp_soil</span>
                     <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;intensity&#39;</span>
                     <span class="n">tau_str</span> <span class="o">=</span> <span class="s1">&#39;tau&#39;</span>
                     <span class="n">phi_str</span> <span class="o">=</span> <span class="s1">&#39;phi&#39;</span>
                     <span class="n">sigma_str</span> <span class="o">=</span> <span class="s1">&#39;sigma&#39;</span>
+                    <span class="n">sigma_str_rock</span> <span class="o">=</span> <span class="s1">&#39;sigma_rock&#39;</span>
+                    <span class="n">sigma_str_soil</span> <span class="o">=</span> <span class="s1">&#39;sigma_soil&#39;</span>
                     <span class="n">bias_str</span> <span class="o">=</span> <span class="s1">&#39;bias&#39;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+                    <span class="n">value_rock</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp_rock</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+                    <span class="n">value_soil</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp_soil</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
                     <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gmpe_total_sd_only</span><span class="p">:</span>
                     <span class="n">mytau</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1721,15 +1877,21 @@
                     <span class="n">mytau</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_tau&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                 <span class="n">myphi</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_phi&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                 <span class="n">mysigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mytau</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">myphi</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">mysigma_rock</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_sigma_rock&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
+                <span class="n">mysigma_soil</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_sigma_soil&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                 <span class="n">imt_name</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_pred&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
                 <span class="n">mybias</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">imt_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;_bias&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
                     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">imt_name</span><span class="p">,</span>
                     <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                    <span class="s1">&#39;value_rock&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">value_rock</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                    <span class="s1">&#39;value_soil&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">value_soil</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
                     <span class="n">tau_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mytau</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="n">phi_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">myphi</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="n">sigma_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysigma</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                    <span class="n">sigma_str_rock</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysigma_rock</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                    <span class="n">sigma_str_soil</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysigma_soil</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="n">bias_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mybias</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                 <span class="p">})</span>
             <span class="c1">#</span>
@@ -1800,19 +1962,20 @@
             <span class="c1">#</span>
             <span class="n">mflag</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
             <span class="k">if</span> <span class="n">ndf</span> <span class="o">==</span> <span class="s1">&#39;df1&#39;</span> <span class="ow">and</span> <span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;flagged&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]:</span>
-                <span class="n">mflag</span> <span class="o">=</span> <span class="s1">&#39;M&#39;</span>
+                <span class="n">mflag</span> <span class="o">=</span> <span class="s1">&#39;ManuallyFlagged&#39;</span>
             <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
                 <span class="k">for</span> <span class="n">amp</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
-                        <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">mflag</span>
+                        <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="n">mflag</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mflag</span>
                     <span class="n">Name</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">sdf</span><span class="p">[</span><span class="n">Name</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]:</span>
                         <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
-                            <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;T&#39;</span>
+                            <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Outlier&#39;</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;,T&#39;</span>
+                            <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;,Outlier&#39;</span>
+        <span class="n">sjdict</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;eventid&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">sjdict</span>
 
     <span class="k">def</span> <span class="nf">_storeGriddedData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oc</span><span class="p">):</span>
@@ -1940,54 +2103,26 @@
                             <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">std_metadata</span><span class="p">,</span>
                             <span class="n">component</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_storeRegressionData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oc</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_storeAttenuationData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oc</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Average the regression grids in distance bins and output the arrays</span>
+<span class="sd">        Output arrays of rock and soil attenuation curves</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rrup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="o">.</span><span class="n">rrup</span>
-        <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span> <span class="o">*</span> <span class="mf">111.0</span>
-        <span class="n">dmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">rrup</span><span class="p">)</span>
-        <span class="n">dists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dmax</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
-        <span class="n">ndists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dists</span><span class="p">)</span>
-        <span class="n">rockmean</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">soilmean</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">rocksd</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">soilsd</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">mean_dists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ndists</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rockgrid</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">rockmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ndists</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ndists</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ndists</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ndists</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">bad_ix</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndists</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">ixx</span> <span class="o">=</span> <span class="p">(</span><span class="n">rrup</span> <span class="o">&gt;=</span> <span class="n">dists</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">rrup</span> <span class="o">&lt;</span> <span class="n">dists</span><span class="p">[</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">mean_dists</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dists</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">+</span> <span class="n">dists</span><span class="p">[</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">ixx</span><span class="p">):</span>
-                <span class="n">bad_ix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
-                <span class="k">continue</span>
-            <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rockgrid</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">rockmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rockgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ixx</span><span class="p">])</span>
-                <span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">soilgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ixx</span><span class="p">])</span>
-                <span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ixx</span><span class="p">])</span>
-                <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">ixx</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">dist_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">]:</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;distances&#39;</span><span class="p">],</span> <span class="n">dist_type</span><span class="p">,</span>
+                        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atten_dx</span><span class="p">,</span> <span class="n">dist_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
-        <span class="n">mean_dists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">mean_dists</span><span class="p">,</span> <span class="n">bad_ix</span><span class="p">)</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">],</span> <span class="s1">&#39;distances&#39;</span><span class="p">,</span> <span class="n">mean_dists</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rockgrid</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">rockmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">rockmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">bad_ix</span><span class="p">)</span>
-            <span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">bad_ix</span><span class="p">)</span>
-            <span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">bad_ix</span><span class="p">)</span>
-            <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">bad_ix</span><span class="p">)</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span>
-                        <span class="n">rockmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span>
-                        <span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span>
-                        <span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span>
-                        <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
+        <span class="n">imtstrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atten_rock_mean</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">imtstrs</span><span class="p">:</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atten_rock_mean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atten_soil_mean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atten_rock_sd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">imtstr</span><span class="p">],</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atten_soil_sd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
+        <span class="k">return</span>
 
     <span class="c1">#</span>
     <span class="c1"># Helper function to call get_mean_and_stddevs for the</span>

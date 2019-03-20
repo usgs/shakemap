@@ -47,7 +47,7 @@
 <span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 <span class="kn">import</span> <span class="nn">shakemap</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
@@ -113,19 +113,9 @@
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/grid\.xml&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/uncertainty\.xml&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
-    <span class="n">contents</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;xmlGrids&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;XML Grid&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;XML grid of ground motions&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;grid.xml&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">}</span>
-                                         <span class="p">]</span>
-                             <span class="p">},</span>
-                <span class="s1">&#39;uncertaintyGrid&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Uncertainty Grid&#39;</span><span class="p">,</span>
-                                    <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;XML grid of uncertainties&#39;</span><span class="p">,</span>
-                                    <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;uncertainty.xml&#39;</span><span class="p">,</span>
-                                                 <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">}</span>
-                                                <span class="p">]</span>
-                                    <span class="p">}</span>
-                <span class="p">}</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GridXMLModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s1">&#39;XML Grids&#39;</span><span class="p">,</span> <span class="s1">&#39;gridxml&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GridXMLModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.gridxml.html#shakemap.coremods.gridxml.GridXMLModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create grid.xml and uncertainty.xml files.</span>
@@ -188,7 +178,7 @@
 
             <span class="k">if</span> <span class="n">xml_type</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
                 <span class="n">grid_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getArray</span><span class="p">([],</span> <span class="s1">&#39;vs30&#39;</span><span class="p">)</span>
-                <span class="n">units</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+                <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;m/s&#39;</span>
                 <span class="n">digits</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span>
                 <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;SVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid_data</span>
                 <span class="n">field_keys</span><span class="p">[</span><span class="s1">&#39;SVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">digits</span><span class="p">)</span>
@@ -215,6 +205,14 @@
             <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span>
             <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;event_network&#39;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span>
+            <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;intensity_observations&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_observations&#39;</span><span class="p">]</span>
+            <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;seismic_stations&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;seismic_stations&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;fault_ref&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Origin&#39;</span><span class="p">:</span>
+                <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;point_source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;point_source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;False&#39;</span>
 
             <span class="c1"># shake dictionary</span>
             <span class="n">shake_dict</span> <span class="o">=</span> <span class="p">{}</span>
@@ -244,6 +242,13 @@
             <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.xml&#39;</span> <span class="o">%</span> <span class="n">xml_type</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Saving IMT grids to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
             <span class="n">shake_grid</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>  <span class="c1"># TODO - set grid version number</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;xmlGrids&#39;</span><span class="p">,</span> <span class="s1">&#39;XML Grid&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;XML grid of ground motions&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;grid.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;uncertaintyGrid&#39;</span><span class="p">,</span> <span class="s1">&#39;Uncertainty Grid&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;XML grid of uncertainties&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;uncertainty.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">)</span>
 
         <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>

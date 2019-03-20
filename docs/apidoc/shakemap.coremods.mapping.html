@@ -41,7 +41,6 @@
 <em class="property">class </em><code class="descclassname">shakemap.coremods.mapping.</code><code class="descname">MappingModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/mapping.html#MappingModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <p>mapping – Generate maps of the IMTs found in shake_result.hdf.</p>
-<p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="attribute">
 <dt id="shakemap.coremods.mapping.MappingModule.command_name">
 <code class="descname">command_name</code><em class="property"> = 'mapping'</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.command_name" title="Permalink to this definition">¶</a></dt>
@@ -62,21 +61,6 @@
 <code class="descname">configs</code><em class="property"> = ['products.conf']</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.configs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="shakemap.coremods.mapping.MappingModule.mapping_page">
-<code class="descname">mapping_page</code><em class="property"> = {'slug': 'maps', 'title': 'Ground Motion Maps'}</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.mapping_page" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.mapping.MappingModule.contents">
-<code class="descname">contents</code><em class="property"> = {'intensityMap': {'caption': 'Map of macroseismic intensity.', 'formats': [{'filename': 'intensity.jpg', 'type': 'image/jpeg'}, {'filename': 'intensity.pdf', 'type': 'application/pdf'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'Intensity Map'}, 'intensityThumbnail': {'caption': 'Thumbnail of intensity map.', 'formats': [{'filename': 'pin-thumbnail.png', 'type': 'image/png'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'Intensity Thumbnail'}, 'pgaMap': {'caption': 'Map of peak ground acceleration (%g).', 'formats': [{'filename': 'pga.jpg', 'type': 'image/jpeg'}, {'filename': 'pga.pdf', 'type': 'image/jpeg'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'PGA Map'}, 'pgvMap': {'caption': 'Map of peak ground velocity (cm/s).', 'formats': [{'filename': 'pgv.jpg', 'type': 'image/jpeg'}, {'filename': 'pgv.pdf', 'type': 'application/pdf'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'PGV Map'}, 'psa[PERIOD]Map': {'caption': 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'formats': [{'filename': 'psa[0-9]p[0-9].jpg', 'type': 'image/jpeg'}, {'filename': 'psa[0-9]p[0-9].pdf', 'type': 'application/pdf'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'PSA[PERIOD] Map'}}</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.contents" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.mapping.MappingModule.psacap">
-<code class="descname">psacap</code><em class="property"> = 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.psacap" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="method">
 <dt id="shakemap.coremods.mapping.MappingModule.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/mapping.html#MappingModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.execute" title="Permalink to this definition">¶</a></dt>
@@ -95,12 +79,17 @@ exist.</li>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="shakemap.coremods.mapping.MappingModule.make_pin_thumbnail">
-<code class="descname">make_pin_thumbnail</code><span class="sig-paren">(</span><em>container</em>, <em>component</em>, <em>datadir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/mapping.html#MappingModule.make_pin_thumbnail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.make_pin_thumbnail" title="Permalink to this definition">¶</a></dt>
-<dd><p>Make the artsy-thumbnail for the pin on the USGS webpages.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="shakemap.coremods.mapping.make_map">
+<code class="descclassname">shakemap.coremods.mapping.</code><code class="descname">make_map</code><span class="sig-paren">(</span><em>adict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/mapping.html#make_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.mapping.make_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="shakemap.coremods.mapping.make_pin_thumbnail">
+<code class="descclassname">shakemap.coremods.mapping.</code><code class="descname">make_pin_thumbnail</code><span class="sig-paren">(</span><em>adict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/mapping.html#make_pin_thumbnail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.mapping.make_pin_thumbnail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the artsy-thumbnail for the pin on the USGS webpages.</p>
 </dd></dl>
 
 </div>

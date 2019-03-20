@@ -38,7 +38,7 @@
 <span id="shakelib-plotting-contour"></span><h1>shakelib.plotting.contour<a class="headerlink" href="#module-shakelib.plotting.contour" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="shakelib.plotting.contour.contour">
-<code class="descclassname">shakelib.plotting.contour.</code><code class="descname">contour</code><span class="sig-paren">(</span><em>container</em>, <em>imtype</em>, <em>component</em>, <em>filter_size</em>, <em>gmice</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/plotting/contour.html#contour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.plotting.contour.contour" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakelib.plotting.contour.</code><code class="descname">contour</code><span class="sig-paren">(</span><em>imtdict</em>, <em>imtype</em>, <em>filter_size</em>, <em>gmice</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/plotting/contour.html#contour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.plotting.contour.contour" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate contours of a specific IMT and return as a Shapely
 MultiLineString object.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -50,7 +50,6 @@ MultiLineString object.</p>
 with ShakeMap output data.</li>
 <li><strong>imtype</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – String containing the name of an Intensity
 Measure Type found in container.</li>
-<li><strong>component</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Intensity Measure component found in container.</li>
 <li><strong>filter_size</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Integer filter (see
 <a class="reference external" href="https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html">https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html</a>)</li>
 </ul>
