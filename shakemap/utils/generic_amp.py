@@ -62,11 +62,11 @@ def get_generic_amp_factors(sx, myimt):
     indir, _ = get_config_paths()
     gaf_dir = os.path.join(indir, "data", "GenericAmpFactors")
     if not os.path.isdir(gaf_dir):
-        logging.warn("No GenericAmpFactors directory found.")
+        logging.warning("No GenericAmpFactors directory found.")
         return None
     gaf_files = glob.glob(os.path.join(gaf_dir, '*.hdf'))
     if len(gaf_files) == 0:
-        logging.warn("No generic amplification files found.")
+        logging.warning("No generic amplification files found.")
         return None
 
     gaf = np.zeros_like(sx.lats)
@@ -77,20 +77,20 @@ def get_generic_amp_factors(sx, myimt):
         gc = GridHDFContainer.load(gfile)
         contents = gc.getGrids()
         if thisimt == 'PGV' and 'PGV' not in contents:
-            logging.warn("Generic Amp Factors: PGV not found in file %s, "
-                         "attempting to use SA(1.0)" % (gfile))
+            logging.warning("Generic Amp Factors: PGV not found in file %s, "
+                            "attempting to use SA(1.0)" % (gfile))
             thisimt = 'SA(1.0)'
         if thisimt == 'PGA' and 'PGA' not in contents:
-            logging.warn("Generic Amp Factors: PGA not found in file %s, "
-                         "attempting to use SA(0.01)" % (gfile))
+            logging.warning("Generic Amp Factors: PGA not found in file %s, "
+                            "attempting to use SA(0.01)" % (gfile))
             thisimt = 'SA(0.01)'
 
         if thisimt in contents:
             # If imt in IMT list, get the grid
             mygrid, _ = gc.getGrid(thisimt)
         elif not thisimt.startswith('SA('):
-            logging.warn("Generic Amp Factors: IMT %s not found in file %s"
-                         % (myimt, gfile))
+            logging.warning("Generic Amp Factors: IMT %s not found in file %s"
+                            % (myimt, gfile))
             mygrid = None
         else:
             # Get the weighted average grid based on the
@@ -131,19 +131,20 @@ def _get_average_grid(gc, contents, myimt):
     #
     imt_list = [thisimt for thisimt in contents if thisimt.startswith('SA(')]
     if len(imt_list) == 0:
-        logging.warn('Generic Amp Factors: No SA grids in file')
+        logging.warning('Generic Amp Factors: No SA grids in file')
         return None, None
     imt_list.append(myimt)
     imt_list_sorted = sorted(imt_list, key=get_period_from_imt)
     nimt = len(imt_list_sorted)
     ix = imt_list_sorted.index(myimt)
     if ix == 0:
-        logging.warn("Generic Amp Factors:IMT %s less than min available "
-                     "imt, using %s" % (myimt, imt_list_sorted[1]))
+        logging.warning("Generic Amp Factors:IMT %s less than min available "
+                        "imt, using %s" % (myimt, imt_list_sorted[1]))
         return gc.getGrid(imt_list_sorted[1])
     elif ix == (nimt - 1):
-        logging.warn("Generic Amp Factors:IMT %s greater than max available "
-                     "imt, using %s" % (myimt, imt_list_sorted[-2]))
+        logging.warning("Generic Amp Factors:IMT %s greater than max "
+                        "available imt, using %s" %
+                        (myimt, imt_list_sorted[-2]))
         return gc.getGrid(imt_list_sorted[-2])
     else:
         # Interpolate using (log) period: p1 is the shorter period,
