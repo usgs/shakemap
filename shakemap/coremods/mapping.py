@@ -7,6 +7,7 @@ import copy
 # third party
 from configobj import ConfigObj
 from mapio.geodict import GeoDict
+from mapio.grid2d import Grid2D
 import numpy as np
 from scipy.interpolate import griddata
 import matplotlib
@@ -89,7 +90,10 @@ class MappingModule(CoreModule):
         # get all of the pieces needed for the mapping functions
         layers = config['products']['mapping']['layers']
         oceanfile = layers['oceans']
-        topofile = layers['topography']
+        if 'topography' in layers and layers['topography'] != '':
+            topofile = layers['topography']
+        else:
+            topofile = None
 
         # Get the number of parallel workers
         max_workers = config['products']['mapping']['max_workers']
@@ -118,9 +122,13 @@ class MappingModule(CoreModule):
         sampledict = GeoDict.createDictFromBox(sxmin, sxmax,
                                                symin, symax,
                                                dx, dy)
-        topogrid = read(topofile,
-                        samplegeodict=sampledict,
-                        resample=False)
+        if topofile:
+            topogrid = read(topofile,
+                            samplegeodict=sampledict,
+                            resample=False)
+        else:
+            tdata = np.full([sampledict.ny, sampledict.nx], 0.0)
+            topogrid = Grid2D(data=tdata, geodict=sampledict)
 
         model_config = container.getConfig()
 
@@ -184,11 +192,25 @@ def make_map(adict):
 
     imtype = adict['imtype']
     if imtype == 'MMI':
-        intensity_pdf, intensity_png, legend_file = draw_intensity(adict)
+        fig1, fig2 = draw_intensity(adict)
+        # save to pdf/jpeg
+        pdf_file = os.path.join(adict['datadir'], 'intensity.pdf')
+        jpg_file = os.path.join(adict['datadir'], 'intensity.jpg')
+        fig1.savefig(pdf_file, bbox_inches='tight')
+        fig1.savefig(jpg_file, bbox_inches='tight')
+
+        # save the legend file
+        legend_file = os.path.join(adict['datadir'], 'mmi_legend.png')
+        fig2.savefig(legend_file, bbox_inches='tight')
     elif imtype == 'thumbnail':
         make_pin_thumbnail(adict)
     else:
-        contour_pdf, contour_png = draw_contour(adict)
+        fig1 = draw_contour(adict)
+        fileimt = oq_to_file(imtype)
+        pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
+        jpg_file = os.path.join(adict['datadir'], '%s.jpg' % (fileimt))
+        fig1.savefig(pdf_file, bbox_inches='tight')
+        fig1.savefig(jpg_file, bbox_inches='tight')
 
 
 def make_pin_thumbnail(adict):
