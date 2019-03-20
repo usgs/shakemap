@@ -63,8 +63,7 @@ def test_mapmaker_intensity():
          }
 
     try:
-        pdf, png, legend = draw_intensity(d)
-        print(pdf)
+        fig1, fig2 = draw_intensity(d)
     except Exception:
         assert 1 == 2
     finally:
@@ -121,8 +120,7 @@ def test_mapmaker_contour():
          'config': model_config
          }
     try:
-        pdf, png = draw_contour(d)
-        print(pdf)
+        fig = draw_contour(d)
     except Exception:
         assert 1 == 2
     finally:

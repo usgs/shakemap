@@ -42,7 +42,6 @@ from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture import constants
 from shakelib.rupture.factory import rupture_from_dict
 from shakelib.plotting.contour import contour, getContourLevels
-from shakelib.utils.imt_string import oq_to_file
 from shakelib.gmice.wgrw12 import WGRW12
 from shakemap.utils.utils import get_object_from_config
 from shakemap.utils.config import get_config_paths
@@ -843,10 +842,14 @@ def _get_shaded(ptopo, contour_colormap):
     """
     maxvalue = contour_colormap.vmax
     ls1 = LightSource(azdeg=300, altdeg=45)
-    ls2 = LightSource(azdeg=45, altdeg=45)
-    intensity1 = ls1.hillshade(ptopo, fraction=0.25, vert_exag=VERT_EXAG)
-    intensity2 = ls2.hillshade(ptopo, fraction=0.25, vert_exag=VERT_EXAG)
-    intensity = intensity1 * 0.5 + intensity2 * 0.5
+    if np.allclose(ptopo, 0):
+        intensity = np.full_like(ptopo, 1.0)
+    else:
+        maxvalue = contour_colormap.vmax
+        ls2 = LightSource(azdeg=45, altdeg=45)
+        intensity1 = ls1.hillshade(ptopo, fraction=0.25, vert_exag=VERT_EXAG)
+        intensity2 = ls2.hillshade(ptopo, fraction=0.25, vert_exag=VERT_EXAG)
+        intensity = intensity1 * 0.5 + intensity2 * 0.5
 
     ptoposc = ptopo / maxvalue
     rgba = contour_colormap.cmap(ptoposc)
@@ -1023,21 +1026,21 @@ def _get_draped(data, topodata, colormap):
     maxvalue = colormap.vmax
     mmisc = data / maxvalue
     rgba_img = colormap.cmap(mmisc)
-
     rgb = np.squeeze(rgba_img[:, :, 0:3])
-    # use lightsource class to make our shaded topography
+
+    if np.allclose(topodata, 0):
+        intensity = np.full_like(topodata, 0.5)
+    else:
+        # use lightsource class to make our shaded topography
+        ls1 = LightSource(azdeg=300, altdeg=45)
+        ls2 = LightSource(azdeg=45, altdeg=45)
+        intensity1 = ls1.hillshade(
+            topodata, fraction=0.25, vert_exag=VERT_EXAG)
+        intensity2 = ls2.hillshade(
+            topodata, fraction=0.25, vert_exag=VERT_EXAG)
+        intensity = intensity1 * 0.5 + intensity2 * 0.5
+
     ls = LightSource(azdeg=315, altdeg=45)
-
-    ls1 = LightSource(azdeg=300, altdeg=45)
-    ls2 = LightSource(azdeg=45, altdeg=45)
-    intensity1 = ls1.hillshade(
-        topodata, fraction=0.25, vert_exag=VERT_EXAG)
-
-    intensity2 = ls2.hillshade(
-        topodata, fraction=0.25, vert_exag=VERT_EXAG)
-
-    intensity = intensity1 * 0.5 + intensity2 * 0.5
-
     draped_hsv = ls.blend_hsv(rgb, np.expand_dims(intensity, 2))
 
     return draped_hsv
@@ -1294,22 +1297,12 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
     # ***** End temp stuff for drawing circles ***** #
     # ---------------------------------------------- #
 
-    # create pdf and png output file names
-    pdf_file = os.path.join(adict['datadir'], 'intensity.pdf')
-    jpg_file = os.path.join(adict['datadir'], 'intensity.jpg')
-
-    # save to pdf/jpeg
-    plt.savefig(pdf_file, bbox_inches='tight')
-    plt.savefig(jpg_file, bbox_inches='tight')
-
     # make a separate MMI legend
     fig2 = plt.figure(figsize=figsize)
     _draw_mmi_legend(fig2, mmimap, gmice, process_time,
                      map_version, point_source)
-    legend_file = os.path.join(adict['datadir'], 'mmi_legend.png')
-    plt.savefig(legend_file, bbox_inches='tight')
 
-    return (pdf_file, jpg_file, legend_file)
+    return (fig, fig2)
 
 
 def draw_contour(adict, borderfile=None, override_scenario=False):
@@ -1613,13 +1606,6 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
     # ---------------------------------------------- #
     # ***** End temp stuff for drawing circles ***** #
     # ---------------------------------------------- #
-
-    # save plot to file
-    fileimt = oq_to_file(imtype)
     plt.draw()
-    pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
-    jpg_file = os.path.join(adict['datadir'], '%s.jpg' % (fileimt))
-    plt.savefig(pdf_file, bbox_inches='tight')
-    plt.savefig(jpg_file, bbox_inches='tight')
 
-    return (pdf_file, jpg_file)
+    return fig
