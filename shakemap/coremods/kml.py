@@ -758,7 +758,7 @@ def imt_to_string(imt):
                      'pgv': 'PGV'}
     if imt in non_spectrals:
         return non_spectrals[imt]
-    period = re.search("\d+\.\d+", imt).group()  # noqa
+    period = re.search(r"\d+\.\d+", imt).group()  # noqa
     imt_string = 'PSA %s sec' % period
     return imt_string
 

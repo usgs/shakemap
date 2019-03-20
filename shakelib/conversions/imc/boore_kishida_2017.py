@@ -100,7 +100,7 @@ class BooreKishida2017(ComponentConverter):
         self.checkUnknown()
         # Get shortest conversion "path" between imc_in and imc_out
         self.path = self.getShortestPath(self.conversion_graph,
-                self.imc_in, self.imc_out)
+                                         self.imc_in, self.imc_out)
 
     def convertAmpsOnce(self, imt, amps, rrups=None, mag=None):
         """
@@ -292,7 +292,7 @@ class BooreKishida2017(ComponentConverter):
             # For less common IMCs, Beyer & Bommer (2006) found most
             # of them to be more or less equivalent to geometric mean
             #
-            logging.warn("Can't handle IMC %s, using GMAR" % oq_imc)
+            logging.warning("Can't handle IMC %s, using GMAR" % oq_imc)
             return 'GMAR'
 
     def _verifyConversion(self, imc_in, imc_out=None):

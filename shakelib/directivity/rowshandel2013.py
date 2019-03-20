@@ -516,7 +516,7 @@ class Rowshandel2013(object):
             R1 = 35
             R2 = 70
             DT = np.ones(nsite)
-            ix = [(Rrup > R1) & (Rrup < R2)]
+            ix = tuple([(Rrup > R1) & (Rrup < R2)])
             DT[ix] = 2 - Rrup[ix] / R1
             DT[Rrup >= R2] = 0
         else:                  # eqn 3.9
