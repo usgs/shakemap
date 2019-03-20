@@ -61,14 +61,25 @@ class Wald99(GMICE):
                 return None
         oqimt = imt.from_string('PGA')
         mmi_pga = self.getMIfromGM(df['PGA'], oqimt, dists, mag)[0]
+        ix_nan_pga = np.isnan(mmi_pga)
         oqimt = imt.from_string('PGV')
         mmi_pgv = self.getMIfromGM(df['PGV'], oqimt, dists, mag)[0]
-        vscale = (mmi_pga - 5) / 2
+        ix_nan_pgv = np.isnan(mmi_pgv)
+        ix_nan = ix_nan_pga | ix_nan_pgv
+        vscale = np.zeros_like(mmi_pga)
+        vscale[~ix_nan] = (mmi_pga[~ix_nan] - 5) / 2
         vscale[vscale < 0] = 0
         vscale[vscale > 1] = 1
         ascale = 1 - vscale
-        mmi = np.clip(mmi_pga * ascale + mmi_pgv * vscale, 1, 10)
-        mmi[mmi > 9.5] = 10.0
+        mmi = np.full_like(mmi_pga, np.nan)
+        mmi[~ix_nan] = np.clip(mmi_pga[~ix_nan] * ascale[~ix_nan] +
+                               mmi_pgv[~ix_nan] * vscale[~ix_nan], 1, 10)
+        mmi[ix_nan_pgv] = mmi_pga[ix_nan_pgv]
+        mmi[ix_nan_pga] = mmi_pgv[ix_nan_pga]
+        ix_nan = np.isnan(mmi)
+        mmi95 = np.full_like(mmi, False, dtype=bool)
+        mmi95[~ix_nan] = mmi[~ix_nan] > 9.5
+        mmi[mmi95] = 10.0
         return mmi
 
     def getMIfromGM(self, amps, imt, dists=None, mag=None):
@@ -97,6 +108,7 @@ class Wald99(GMICE):
         """  # noqa
         lfact = np.log10(np.e)
         c = self._getConsts(imt)
+        ix_nan = np.isnan(amps)
 
         #
         # Convert (for accelerations) from ln(g) to cm/s^2
@@ -112,8 +124,9 @@ class Wald99(GMICE):
         # For PGV, just convert ln(amp) to log10(amp) by multiplying
         # by log10(e)
         #
-        lamps = np.log10(units) + amps * lfact
-        mmi = np.zeros_like(amps)
+        lamps = np.zeros_like(amps)
+        lamps[~ix_nan] = np.log10(units) + amps[~ix_nan] * lfact
+        mmi = np.full_like(amps, np.nan)
         dmmi_damp = np.zeros_like(amps)
         #
         # This is the upper segment of the bi-linear fit
@@ -129,6 +142,7 @@ class Wald99(GMICE):
         dmmi_damp[idx] = c['C3'] * lfact
 
         mmi = np.clip(mmi, 1.0, 10.0)
+        mmi[ix_nan] = np.nan
         return mmi, dmmi_damp
 
     def getGMfromMI(self, mmi, imt, dists=None, mag=None):
