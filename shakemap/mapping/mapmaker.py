@@ -1503,8 +1503,6 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
     # draw 10m res coastlines
     if not os.environ['CALLED_FROM_PYTEST']:
         ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
-    else:
-        print('*****Testing*********')
 
     states_provinces = cfeature.NaturalEarthFeature(
         category='cultural',
