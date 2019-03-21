@@ -112,8 +112,8 @@ class MappingModule(CoreModule):
                    ['grid_spacing']['latitude'])
         dx = float(info['output']['map_information']
                    ['grid_spacing']['longitude'])
-        padx = 5*dx
-        pady = 5*dy
+        padx = 5 * dx
+        pady = 5 * dy
         sxmin = float(xmin) - padx
         sxmax = float(xmax) + padx
         symin = float(ymin) - pady
