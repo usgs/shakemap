@@ -227,7 +227,7 @@ class AmplitudeHandler(object):
         del event['eventid']
         event['mag'] = event['magnitude']
         del event['magnitude']
-        event['time'] = datetime.fromtimestamp(event['time']).\
+        event['time'] = datetime.fromtimestamp(event['time'], timezone.utc).\
             strftime(constants.TIMEFMT)
         if event['repeats']:
             event['repeats'] = json.loads(event['repeats'])
@@ -838,8 +838,10 @@ class AmplitudeHandler(object):
             results['event_min'] = None
             results['event_max'] = None
         else:
-            results['event_min'] = datetime.utcfromtimestamp(row[1])
-            results['event_max'] = datetime.utcfromtimestamp(row[2])
+            results['event_min'] = datetime.fromtimestamp(row[1],
+                                                          timezone.utc)
+            results['event_max'] = datetime.fromtimestamp(row[2],
+                                                          timezone.utc)
 
         # station stuff
         squery = 'SELECT count(*), min(timestamp), max(timestamp) FROM station'
@@ -850,8 +852,10 @@ class AmplitudeHandler(object):
             results['station_min'] = None
             results['station_max'] = None
         else:
-            results['station_min'] = datetime.utcfromtimestamp(row[1])
-            results['station_max'] = datetime.utcfromtimestamp(row[2])
+            results['station_min'] = datetime.fromtimestamp(row[1],
+                                                            timezone.utc)
+            results['station_max'] = datetime.fromtimestamp(row[2],
+                                                            timezone.utc)
 
         # channels
         cquery = 'SELECT count(*) FROM channel'

@@ -34,8 +34,14 @@ def get_weights(origin, config):
             probs[key] = value
     all_keylist = list(probs.keys())
 
+    # let's have the code default to use the slab data
+    if config['tectonic_regions']['subduction']:
+        use_slab = config['tectonic_regions']['subduction']['use_slab']
+    else:
+        use_slab = True
+
     for region, rdict in config['tectonic_regions'].items():
-        if region == 'subduction':
+        if (region == 'subduction') and use_slab:
             if 'crustal' in probs or 'subduction_0' in probs:
                 if 'crustal' in probs:
                     topkey = 'crustal'
@@ -166,36 +172,42 @@ def get_probs(origin, config):
     in_subduction = strec_results['TectonicRegion'] == 'Subduction'
     above_slab = not np.isnan(strec_results['SlabModelDepth'])
 
-    if in_subduction:
-        subduction_probs = get_subduction_probs(
-            strec_results, depth, mag, config, above_slab
-        )
-        for key, value in subduction_probs.items():
-            subduction_probs[key] = value * region_probs['subduction']
+    use_slab = config['tectonic_regions']['subduction']['use_slab']
 
-        # If we are in a subduction zone then we don't want the
-        # keys for subduction_0, 1, 2 (which are the generic vertical
-        # subduction subtypes that are not informed by the slab model because
-        # it isn't available)
-        if 'subduction_0' in region_probs:
-            del region_probs['subduction_0']
-        if 'subduction_1' in region_probs:
-            del region_probs['subduction_1']
-        if 'subduction_2' in region_probs:
-            del region_probs['subduction_2']
+    if use_slab:
+        if in_subduction:
+            subduction_probs = get_subduction_probs(
+                strec_results, depth, mag, config, above_slab
+            )
+            for key, value in subduction_probs.items():
+                subduction_probs[key] = value * region_probs['subduction']
 
+            # If we are in a subduction zone then we don't want the
+            # keys for subduction_0, 1, 2 (which are the generic vertical
+            # subduction subtypes that are not informed by the slab model because
+            # it isn't available)
+            if 'subduction_0' in region_probs:
+                del region_probs['subduction_0']
+            if 'subduction_1' in region_probs:
+                del region_probs['subduction_1']
+            if 'subduction_2' in region_probs:
+                del region_probs['subduction_2']
+
+        else:
+            # If we are NOT in a subduction zone we may or may not need subduction
+            # probabilities (depending on distance and the configured taper). But
+            # either way, we will not have access to the slab model and so we have
+            # to use the generic vertical subtypes
+            subduction_probs = {
+                'crustal': region_probs['subduction_0'],
+                'interface': region_probs['subduction_1'],
+                'intraslab': region_probs['subduction_2']
+            }
+        region_probs.update(subduction_probs)
     else:
-        # If we are NOT in a subduction zone we may or may not need subcution
-        # probabilities (depending on distance and the configured taper). But
-        # either way, we will not have access to the slab model and so we have
-        # to use the generic vertical subtypes
-        subduction_probs = {
-            'crustal': region_probs['subduction_0'],
-            'interface': region_probs['subduction_1'],
-            'intraslab': region_probs['subduction_2']
-        }
+        logging.info('"use_slab" is False so no slab used in finding GMPE '
+                     'weights.')
 
-    region_probs.update(subduction_probs)
     return (region_probs, strec_results)
 
 

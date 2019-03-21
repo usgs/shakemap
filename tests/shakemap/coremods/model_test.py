@@ -31,14 +31,17 @@ def test_model_2():
                            'boat_fault.txt': 'boat_fault.txt'})
     assemble = AssembleModule('nc72282711', comment='Test comment.')
     assemble.execute()
+    del assemble
     model = ModelModule('nc72282711')
     model.execute()
+    del model
     #
     # Since we've done this, we might as well run plotregr, too
     #
     plotregr = PlotRegr('nc72282711')
     plotregr.execute()
     plotregr.writeContents()
+    del plotregr
     clear_files(event_path)
 
 
@@ -103,6 +106,7 @@ def test_directivity():
         'SA(3.0)', 'GREATER_OF_TWO_HORIZONTAL')['mean'])
     np.testing.assert_allclose(np.max(sa3), 1.15864273)
     np.testing.assert_allclose(np.min(sa3), 0.9278920)
+    oc.close()
 
 
 if __name__ == '__main__':

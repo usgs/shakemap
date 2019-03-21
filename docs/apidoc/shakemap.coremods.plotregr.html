@@ -9,11 +9,12 @@
     <title>shakemap.coremods.plotregr &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -40,7 +41,6 @@
 <em class="property">class </em><code class="descclassname">shakemap.coremods.plotregr.</code><code class="descname">PlotRegr</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/plotregr.html#PlotRegr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <p>plotregr – Plot the regression curves from a data file</p>
-<p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="attribute">
 <dt id="shakemap.coremods.plotregr.PlotRegr.command_name">
 <code class="descname">command_name</code><em class="property"> = 'plotregr'</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.command_name" title="Permalink to this definition">¶</a></dt>
@@ -54,21 +54,6 @@
 <dl class="attribute">
 <dt id="shakemap.coremods.plotregr.PlotRegr.dependencies">
 <code class="descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.dependencies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.plotregr.PlotRegr.regr_page">
-<code class="descname">regr_page</code><em class="property"> = {'slug': 'regression', 'title': 'Regression Plots'}</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.regr_page" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.plotregr.PlotRegr.contents">
-<code class="descname">contents</code><em class="property"> = {'miRegr': {'caption': 'Regression plot of macroseismic intensity.', 'title': 'Intensity Regression', 'formats': [{'filename': 'MMI_regr.png', 'type': 'image/png'}], 'page': {'title': 'Regression Plots', 'slug': 'regression'}}, 'pgaRegr': {'caption': 'Regression plot of [COMPONENT] peak ground acceleration (%g).', 'title': 'PGA Regression', 'formats': [{'filename': 'pga_regr.png', 'type': 'image/png'}], 'page': {'title': 'Regression Plots', 'slug': 'regression'}}, 'pgvRegr': {'caption': 'Regression plot of [COMPONENT] peak ground velocity (cm/s).', 'title': 'PGV Regression', 'formats': [{'filename': 'pgv_regr.png', 'type': 'image/png'}], 'page': {'title': 'Regression Plots', 'slug': 'regression'}}, 'psa[PERIOD]Regr': {'caption': 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'title': 'PSA[PERIOD] Regression', 'formats': [{'filename': 'psa[0-9]p[0-9]_regr.png', 'type': 'image/png'}], 'page': {'title': 'Regression Plots', 'slug': 'regression'}}}</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.contents" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.plotregr.PlotRegr.psacap">
-<code class="descname">psacap</code><em class="property"> = 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.psacap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -90,6 +75,11 @@ exist.</li>
 </dd></dl>
 
 </dd></dl>
+
+<dl class="function">
+<dt id="shakemap.coremods.plotregr.make_plots">
+<code class="descclassname">shakemap.coremods.plotregr.</code><code class="descname">make_plots</code><span class="sig-paren">(</span><em>adict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/plotregr.html#make_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.plotregr.make_plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 
@@ -127,11 +117,11 @@ exist.</li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.augment.html">shakemap.coremods.augment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.base.html">shakemap.coremods.base</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.cancel.html">shakemap.coremods.cancel</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.contour.html">shakemap.coremods.contour</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.exception.html">shakemap.coremods.exception</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.kml.html">shakemap.coremods.kml</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
@@ -139,10 +129,15 @@ exist.</li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">shakemap.coremods.plotregr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.save.html">shakemap.coremods.save</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.select.html">shakemap.coremods.select</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.shape.html">shakemap.coremods.shape</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.sleep.html">shakemap.coremods.sleep</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.stations.html">shakemap.coremods.stations</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer.html">shakemap.coremods.transfer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_base.html">shakemap.coremods.transfer_base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_email.html">shakemap.coremods.transfer_email</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_pdl.html">shakemap.coremods.transfer_pdl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_scp.html">shakemap.coremods.transfer_scp</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestimage.html">shakemap.coremods.xtestimage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestplot.html">shakemap.coremods.xtestplot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestplot_multi.html">shakemap.coremods.xtestplot_multi</a></li>

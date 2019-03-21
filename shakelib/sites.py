@@ -44,11 +44,17 @@ class Sites(object):
         self._defaultVs30 = defaultVs30
         self._vs30measured_grid = vs30measured_grid
         self._GeoDict = vs30grid.getGeoDict().copy()
-        self._lons = np.linspace(self._GeoDict.xmin,
-                                 self._GeoDict.xmax,
+        if self._GeoDict.xmin > self._GeoDict.xmax:
+            xmin = self._GeoDict.xmin - 360
+            xmax = self._GeoDict.xmax
+        else:
+            xmin = self._GeoDict.xmin
+            xmax = self._GeoDict.xmax
+        self._lons = np.linspace(xmin,
+                                 xmax,
                                  self._GeoDict.nx)
-        self._lats = np.linspace(self._GeoDict.ymin,
-                                 self._GeoDict.ymax,
+        self._lats = np.linspace(self._GeoDict.ymax,
+                                 self._GeoDict.ymin,
                                  self._GeoDict.ny)
 
     @classmethod

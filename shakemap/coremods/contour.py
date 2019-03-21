@@ -2,9 +2,7 @@
 import os.path
 import glob
 import json
-from collections import OrderedDict
 import shutil
-import logging
 
 # third party imports
 import fiona
@@ -12,8 +10,7 @@ from openquake.hazardlib import imt
 from configobj import ConfigObj
 
 # local imports
-from .base import CoreModule
-from shakemap.utils.logging import get_logging_config
+from .base import CoreModule, Contents
 from shakelib.plotting.contour import contour
 from shakemap.utils.utils import get_object_from_config
 from impactutils.io.smcontainers import ShakeMapOutputContainer
@@ -40,57 +37,15 @@ class ContourModule(CoreModule):
     targets = [r'products/cont_.*\.json']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    contour_page = {'title': 'Ground Motion Contours', 'slug': 'contours'}
-    contents = OrderedDict.fromkeys(['miContour', 'pgaContour', 'pgvContour',
-                                     'psa[PERIOD]Contour'])
-    contents['miContour'] = {'title': 'Intensity Contours',
-                             'caption': 'Contours of macroseismic intensity.',
-                             'page': contour_page,
-                             'formats': [{'filename': 'cont_*mmi.json',
-                                          'type': 'application/json'}
-                                         ]
-                             }
-    contents['pgaContour'] = {'title': 'PGA Contours',
-                              'caption': 'Contours of [COMPONENT] peak '
-                                         'ground acceleration (%g).',
-                              'page': contour_page,
-                              'formats': [{'filename': 'cont_*pga.json',
-                                           'type': 'application/json'}
-                                          ]
-                              }
-    contents['pgvContour'] = {'title': 'PGV Contours',
-                              'caption': 'Contours of [COMPONENT] peak '
-                                         'ground velocity (cm/s).',
-                              'page': contour_page,
-                              'formats': [{'filename': 'cont_*pgv.json',
-                                           'type': 'application/json'}
-                                          ]
-                              }
-    psacap = 'Contours of [COMPONENT] [FPERIOD] sec 5% damped '\
-             'pseudo-spectral acceleration(%g).'
-    contents['psa[PERIOD]Contour'] = {
-        'title': 'PSA[PERIOD] Contour',
-        'page': contour_page,
-        'caption': psacap,
-        'formats': [{'filename': 'cont_*psa[0-9]p[0-9].json',
-                     'type': 'application/json'}
-                    ]
-    }
-
     def __init__(self, eventid, filter=None):
-        """
-        Instantiate a ContourModule class with an event ID.
-        """
-        self._eventid = eventid
-        log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
-        self.logger = logging.getLogger(log_name)
+        super(ContourModule, self).__init__(eventid)
+
         if filter is not None:
             self.filter_size = filter
         else:
             self.filter_size = DEFAULT_FILTER_SIZE
+
+        self.contents = Contents("Ground Motion Contours", "contours", eventid)
 
     def execute(self):
         """
@@ -130,11 +85,12 @@ class ContourModule(CoreModule):
 
         # create contour files
         self.logger.debug('Contouring to files...')
-        contour_to_files(container, datadir, self.logger, filter_size)
+        contour_to_files(container, datadir, self.logger, self.contents,
+                         filter_size)
         container.close()
 
 
-def contour_to_files(container, output_dir, logger,
+def contour_to_files(container, output_dir, logger, contents,
                      filter_size=DEFAULT_FILTER_SIZE):
     """
     Generate contours of all IMT values.
@@ -193,6 +149,31 @@ def contour_to_files(container, output_dir, logger,
             fname = 'cont_%s.%s' % (fileimt, extension)
         else:
             fname = 'cont_%s_%s.%s' % (fileimt, component, extension)
+        if imtype == 'MMI':
+            contents.addFile('mmiContour', 'Intensity Contours',
+                             'Contours of macroseismic intensity.',
+                             fname, 'application/json')
+            contents.addFile('miContour', 'Intensity Contours',
+                             'Contours of macroseismic intensity.',
+                             'cont_mi.json', 'application/json')
+        elif imtype == 'PGA':
+            contents.addFile('pgaContour', 'PGA Contours',
+                             'Contours of ' + component + ' peak '
+                             'ground acceleration (%g).',
+                             fname, 'application/json')
+        elif imtype == 'PGV':
+            contents.addFile('pgvContour', 'PGV Contours',
+                             'Contours of ' + component + ' peak '
+                             'ground velocity (cm/s).',
+                             fname, 'application/json')
+        else:
+            contents.addFile(imtype + 'Contour',
+                             imtype.upper() + ' Contours',
+                             'Contours of ' + component + ' 5% damped ' +
+                             str(oqimt.period) +
+                             ' sec spectral acceleration (%g).',
+                             fname, 'application/json')
+
         filename = os.path.join(output_dir, fname)
         if os.path.isfile(filename):
             fpath, fext = os.path.splitext(filename)
@@ -215,7 +196,7 @@ def contour_to_files(container, output_dir, logger,
         # even redirecting stderr/stdout to IO streams
         # not sure where the warning is coming from,
         # but there appears to be no way to stop it...
-        with fiona.drivers():
+        with fiona.Env():
             if imtype == 'MMI':
                 selected_schema = mmi_schema
             else:
@@ -227,8 +208,8 @@ def contour_to_files(container, output_dir, logger,
                 crs=crs
             )
 
-            line_strings = contour(container, imtype, component, filter_size,
-                                   my_gmice)
+            line_strings = contour(container.getIMTGrids(imtype, component),
+                                   imtype, filter_size, my_gmice)
 
             for feature in line_strings:
                 vector_file.write(feature)

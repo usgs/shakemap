@@ -9,16 +9,17 @@
     <title>shakemap.coremods.contour &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap.coremods.dyfi" href="shakemap.coremods.dyfi.html" />
-    <link rel="prev" title="shakemap.coremods.cancel" href="shakemap.coremods.cancel.html" />
+    <link rel="prev" title="shakemap.coremods.base" href="shakemap.coremods.base.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -43,7 +44,6 @@
 <dt>contour – Generate contours of all IMT values from the</dt>
 <dd>shake_result.hdf output file.</dd>
 </dl>
-<p>Instantiate a ContourModule class with an event ID.</p>
 <dl class="attribute">
 <dt id="shakemap.coremods.contour.ContourModule.command_name">
 <code class="descname">command_name</code><em class="property"> = 'contour'</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.command_name" title="Permalink to this definition">¶</a></dt>
@@ -57,21 +57,6 @@
 <dl class="attribute">
 <dt id="shakemap.coremods.contour.ContourModule.dependencies">
 <code class="descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.dependencies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.contour.ContourModule.contour_page">
-<code class="descname">contour_page</code><em class="property"> = {'slug': 'contours', 'title': 'Ground Motion Contours'}</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.contour_page" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.contour.ContourModule.contents">
-<code class="descname">contents</code><em class="property"> = {'miContour': {'caption': 'Contours of macroseismic intensity.', 'title': 'Intensity Contours', 'formats': [{'filename': 'cont_*mmi.json', 'type': 'application/json'}], 'page': {'title': 'Ground Motion Contours', 'slug': 'contours'}}, 'pgaContour': {'caption': 'Contours of [COMPONENT] peak ground acceleration (%g).', 'title': 'PGA Contours', 'formats': [{'filename': 'cont_*pga.json', 'type': 'application/json'}], 'page': {'title': 'Ground Motion Contours', 'slug': 'contours'}}, 'pgvContour': {'caption': 'Contours of [COMPONENT] peak ground velocity (cm/s).', 'title': 'PGV Contours', 'formats': [{'filename': 'cont_*pgv.json', 'type': 'application/json'}], 'page': {'title': 'Ground Motion Contours', 'slug': 'contours'}}, 'psa[PERIOD]Contour': {'caption': 'Contours of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'title': 'PSA[PERIOD] Contour', 'formats': [{'filename': 'cont_*psa[0-9]p[0-9].json', 'type': 'application/json'}], 'page': {'title': 'Ground Motion Contours', 'slug': 'contours'}}}</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.contents" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="shakemap.coremods.contour.ContourModule.psacap">
-<code class="descname">psacap</code><em class="property"> = 'Contours of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'</em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.psacap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -93,24 +78,18 @@ exist.</li>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="shakemap.coremods.contour.ContourModule.parseArgs">
-<code class="descname">parseArgs</code><span class="sig-paren">(</span><em>arglist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#ContourModule.parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.parseArgs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set up the object to accept the –filter flag.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="function">
 <dt id="shakemap.coremods.contour.contour_to_files">
-<code class="descclassname">shakemap.coremods.contour.</code><code class="descname">contour_to_files</code><span class="sig-paren">(</span><em>container</em>, <em>output_dir</em>, <em>logger</em>, <em>filter_size=10</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#contour_to_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.contour.contour_to_files" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakemap.coremods.contour.</code><code class="descname">contour_to_files</code><span class="sig-paren">(</span><em>container</em>, <em>output_dir</em>, <em>logger</em>, <em>contents</em>, <em>filter_size=10</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#contour_to_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.contour.contour_to_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate contours of all IMT values.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>container</strong> (<a class="reference internal" href="../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer" title="shakelib.utils.containers.ShakeMapOutputContainer"><em>ShakeMapOutputContainer</em></a>) – ShakeMapOutputContainer with
+<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – ShakeMapOutputContainer with
 ShakeMap output data.</li>
 <li><strong>output_dir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to directory where output files will be written.</li>
 <li><strong>logger</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/logging.html#logging.Logger" title="(in Python v3.6)"><em>logging.Logger</em></a>) – Python logging Logger instance.</li>
@@ -160,11 +139,11 @@ ShakeMap output data.</li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.augment.html">shakemap.coremods.augment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.base.html">shakemap.coremods.base</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.cancel.html">shakemap.coremods.cancel</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">shakemap.coremods.contour</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.exception.html">shakemap.coremods.exception</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.kml.html">shakemap.coremods.kml</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
@@ -172,10 +151,15 @@ ShakeMap output data.</li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.save.html">shakemap.coremods.save</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.select.html">shakemap.coremods.select</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.shape.html">shakemap.coremods.shape</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.sleep.html">shakemap.coremods.sleep</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.stations.html">shakemap.coremods.stations</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer.html">shakemap.coremods.transfer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_base.html">shakemap.coremods.transfer_base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_email.html">shakemap.coremods.transfer_email</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_pdl.html">shakemap.coremods.transfer_pdl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_scp.html">shakemap.coremods.transfer_scp</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestimage.html">shakemap.coremods.xtestimage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestplot.html">shakemap.coremods.xtestplot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestplot_multi.html">shakemap.coremods.xtestplot_multi</a></li>

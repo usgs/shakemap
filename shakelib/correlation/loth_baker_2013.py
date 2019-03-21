@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
-# import numexpr as ne
 import itertools as it
 
 from shakelib.correlation.ccf_base import CrossCorrelationBase
@@ -104,7 +103,7 @@ class LothBaker2013(CrossCorrelationBase):
         The indices (ix1 and ix2) and h must have the same dimensions. The
         indices may be equal, and there is no restriction on which one is
         larger. The indices refer to periods in the 'period' argument to the
-        class constructor.
+        class constructor. The result is stored in h.
 
         Args:
             ix1 (2D, C-contiguous numpy array)):
@@ -113,9 +112,11 @@ class LothBaker2013(CrossCorrelationBase):
                 The indices of the second period of interest.
             h (2D, C-contiguous numpy array)):
                 The separation distance between two sites (units of km).
+                h will be returned with the result, so it must be
+                copied if the values in h are to be preserved.
 
         Returns:
-            numpy array::
+            h (numpy array):
                 The predicted correlation coefficient. The output array
                 will have the same shape as the inputs.
 
@@ -142,7 +143,6 @@ class LothBaker2013(CrossCorrelationBase):
         #
         # rho = ne.evaluate(
         #     "b1 * exp(h * afact) + b2 * exp(h * bfact) + (h == 0) * b3")
-        rho = eval_lb_correlation(self.b1, self.b2, self.b3,
-                                  ix1, ix2, h)
+        rho = eval_lb_correlation(self.b1, self.b2, self.b3, ix1, ix2, h)
 
         return rho

@@ -9,11 +9,12 @@
     <title>shakelib.gmice.gmice &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -35,26 +36,52 @@
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
+<span class="c1"># third party imports</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span><span class="p">,</span> <span class="n">SA</span><span class="p">,</span> <span class="n">from_string</span>
+
 <span class="c1"># local imports</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span><span class="p">,</span> <span class="n">SA</span>
 
 
 <div class="viewcode-block" id="GMICE"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE">[docs]</a><span class="k">class</span> <span class="nc">GMICE</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base class called to implement ground motion intensity conversion equations (GMICE).</span>
+<span class="sd">    Base class called to implement ground motion intensity conversion</span>
+<span class="sd">    equations (GMICE).</span>
 
 <span class="sd">    Inherited by AK07, Wald99, WGRW12.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pga</span> <span class="o">=</span> <span class="n">PGA</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span> <span class="o">=</span> <span class="n">PGV</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sa03</span> <span class="o">=</span> <span class="n">SA</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sa10</span> <span class="o">=</span> <span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sa30</span> <span class="o">=</span> <span class="n">SA</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
 <div class="viewcode-block" id="GMICE.getDistanceType"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getDistanceType">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">getDistanceType</span><span class="p">():</span>
         <span class="k">return</span> <span class="s1">&#39;rrup&#39;</span></div>
+
+<div class="viewcode-block" id="GMICE.supports"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.supports">[docs]</a>    <span class="k">def</span> <span class="nf">supports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine whether input IMT is supported by GMICE instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt (str): Valid IMT string - &#39;MMI&#39;, &#39;PGV&#39;, &#39;PGA&#39;, &#39;SA(0.3)&#39;, etc.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if gmice is defined for input IMT (and period), False if not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">imtcomp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
+            <span class="n">thisimt</span> <span class="o">=</span> <span class="n">from_string</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thisimt</span><span class="p">,</span> <span class="n">imtcomp</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thisimt</span><span class="p">,</span> <span class="n">SA</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">period</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_SA_PERIODS</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">period</span> <span class="o">==</span> <span class="n">thisimt</span><span class="o">.</span><span class="n">period</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">True</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="GMICE.getMinMax"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getMinMax">[docs]</a>    <span class="k">def</span> <span class="nf">getMinMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -84,8 +111,49 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span></div>
 
+<div class="viewcode-block" id="GMICE.getPreferredMI"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getPreferredMI">[docs]</a>    <span class="k">def</span> <span class="nf">getPreferredMI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function to compute macroseismic intensity from the preferred</span>
+<span class="sd">        ground-motion intensity. The function uses PGV by default, but</span>
+<span class="sd">        this may be overridden by individual classes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            df (dict):</span>
+<span class="sd">                Dictionaary containing all of the available ground</span>
+<span class="sd">                motions.</span>
+<span class="sd">            dists (ndarray):</span>
+<span class="sd">                Numpy array of distances from rupture (km).</span>
+<span class="sd">            mag (float):</span>
+<span class="sd">                Earthquake magnitude.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ndarray of Modified Mercalli Intensity and ndarray of</span>
+<span class="sd">            dMMI / dln(amp) (i.e., the slope of the relationship at the</span>
+<span class="sd">            point in question).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;PGV&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;PGV&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PGV&#39;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GMICE.getPreferredSD"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getPreferredSD">[docs]</a>    <span class="k">def</span> <span class="nf">getPreferredSD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an array of standard deviations for the preferred</span>
+<span class="sd">        ground-motion to MMI conversion. Return None is the preferred</span>
+<span class="sd">        IMT is not in the list of available IMTs for the GMICE.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (numpy array):  Array of GM to MI sigmas (in MMI units).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;PGV&quot;</span><span class="p">)</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getGM2MIsd</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">oqimt</span> <span class="ow">in</span> <span class="n">sd</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sd</span><span class="p">[</span><span class="n">oqimt</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
 <div class="viewcode-block" id="GMICE.getMIfromGM"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getMIfromGM">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">getMIfromGM</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getMIfromGM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to compute macroseismic intensity from ground-motion</span>
 <span class="sd">        intensity. Supported ground-motion IMTs are PGA, PGV and PSA</span>
@@ -108,11 +176,11 @@
 <span class="sd">            ndarray of Modified Mercalli Intensity and ndarray of</span>
 <span class="sd">            dMMI / dln(amp) (i.e., the slope of the relationship at the</span>
 <span class="sd">            point in question).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="GMICE.getGMfromMI"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getGMfromMI">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">getGMfromMI</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mmi</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getGMfromMI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mmi</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function to tcompute ground-motion intensity from macroseismic</span>
 <span class="sd">        intensity. Supported IMTs are PGA, PGV and PSA for 0.3, 1.0, and</span>
@@ -134,11 +202,11 @@
 <span class="sd">            Ndarray of ground motion intensity in natural log of g for PGA</span>
 <span class="sd">            and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI</span>
 <span class="sd">            (i.e., the slope of the relationship at the point in question).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="GMICE.getGM2MIsd"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getGM2MIsd">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">getGM2MIsd</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getGM2MIsd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a dictionary of standard deviations for the ground-motion</span>
 <span class="sd">        to MMI conversion. The keys are the ground motion types.</span>
@@ -149,7 +217,7 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="GMICE.getMI2GMsd"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getMI2GMsd">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">getMI2GMsd</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getMI2GMsd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a dictionary of standard deviations for the MMI</span>
 <span class="sd">        to ground-motion conversion. The keys are the ground motion</span>
@@ -161,7 +229,7 @@
         <span class="k">pass</span></div>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_getConsts</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_getConsts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to get the constants.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

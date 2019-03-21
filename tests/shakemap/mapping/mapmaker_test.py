@@ -3,6 +3,7 @@
 import os.path
 from tempfile import mkdtemp
 import shutil
+import copy
 
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakemap.mapping.mapmaker import draw_intensity, draw_contour
@@ -44,10 +45,25 @@ def test_mapmaker_intensity():
                              'mapping', 'northridge_ocean.json')
     outpath = mkdtemp()
 
+    model_config = container.getConfig()
+    comp = container.getComponents('MMI')[0]
+
+    d = {'imtype': 'MMI',
+         'topogrid': topogrid,
+         'oceanfile': oceanfile,
+         'datadir': outpath,
+         'operator': 'NEIC',
+         'filter_size': 10,
+         'info': info,
+         'component': comp,
+         'imtdict': container.getIMTGrids('MMI', comp),
+         'ruptdict': copy.deepcopy(container.getRuptureDict()),
+         'stationdict': container.getStationDict(),
+         'config': model_config
+         }
+
     try:
-        pdf, png = draw_intensity(container, topogrid, oceanfile,
-                                  outpath, 'NEIC')
-        print(pdf)
+        fig1, fig2 = draw_intensity(d)
     except Exception:
         assert 1 == 2
     finally:
@@ -87,10 +103,24 @@ def test_mapmaker_contour():
                              'mapping', 'northridge_ocean.json')
     outpath = mkdtemp()
     filter_size = 10
+    model_config = container.getConfig()
+    comp = container.getComponents('PGA')[0]
+
+    d = {'imtype': 'PGA',
+         'topogrid': topogrid,
+         'oceanfile': oceanfile,
+         'datadir': outpath,
+         'operator': 'NEIC',
+         'filter_size': filter_size,
+         'info': info,
+         'component': comp,
+         'imtdict': container.getIMTGrids('PGA', comp),
+         'ruptdict': copy.deepcopy(container.getRuptureDict()),
+         'stationdict': container.getStationDict(),
+         'config': model_config
+         }
     try:
-        pdf, png = draw_contour(container, 'PGA', topogrid, oceanfile,
-                                outpath, 'NEIC', filter_size)
-        print(pdf)
+        fig = draw_contour(d)
     except Exception:
         assert 1 == 2
     finally:

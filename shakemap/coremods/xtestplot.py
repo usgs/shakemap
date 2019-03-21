@@ -76,7 +76,7 @@ class XTestPlot(CoreModule):
             axa[0].set_title(self._eventid)
             axa[0].grid()
             axa[1].grid()
-            axa[1].set_ylim(ymin=0)
+            axa[1].set_ylim(bottom=0)
             fileimt = oq_to_file(myimt)
             pfile = os.path.join(datadir,
                                  self._eventid + '_' + fileimt + '.pdf')

@@ -7,6 +7,7 @@ import json
 import logging
 from collections import OrderedDict
 from shakemap.utils.config import get_config_paths
+import time
 
 # third party imports
 from configobj import ConfigObj
@@ -77,18 +78,28 @@ def get_network_name(netid):
     """
     url = NETWORK_TEMPLATE.replace('[NETID]', netid)
     network = 'unknown'
-    try:
-        fh = request.urlopen(url)
-        data = fh.read().decode('utf-8')
-        jdict = json.loads(data)
-        fh.close()
-        network = jdict['title']
-    except HTTPError:
-        error_str = '''No network description found for %s. You may
-want to make sure that the pages of the form %s still exist,
-and contact the ShakeMap developers if they do not.
-''' % (netid, NETWORK_TEMPLATE)
-        logging.info(error_str)
+    fails = 0
+    while fails < 3:
+        try:
+            fh = request.urlopen(url)
+            data = fh.read().decode('utf-8')
+            jdict = json.loads(data)
+            fh.close()
+            network = jdict['title']
+        except HTTPError:
+            error_str = ('No network description found for %s. You may '
+                         'want to make sure that the pages of the form %s '
+                         'still exist and contact the ShakeMap developers '
+                         'if they do not.' % (netid, NETWORK_TEMPLATE))
+            logging.warning(error_str)
+            fails += 1
+        except Exception as e:
+            logging.warning("Error in get_network_name: %s" % str(e))
+            logging.warning("Will try %d more times" % (3 - fails))
+            fails += 1
+            time.sleep(20)
+        else:
+            break
 
     return network
 

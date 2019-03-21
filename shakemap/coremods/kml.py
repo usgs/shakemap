@@ -1,7 +1,5 @@
 # stdlib imports
 import os.path
-from collections import OrderedDict
-import logging
 import zipfile
 import shutil
 import re
@@ -19,12 +17,11 @@ from scipy.ndimage.filters import median_filter
 import simplekml as skml
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
-from shakemap.utils.logging import get_logging_config
 from shakelib.plotting.contour import contour
 from impactutils.colors.cpalette import ColorPalette
 from mapio.grid2d import Grid2D
@@ -201,27 +198,12 @@ class KMLModule(CoreModule):
     targets = [r'products/shakemap\.kmz']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    kml_page = {'title': 'Ground Motion KMZ File', 'slug': 'kml'}
-    contents = OrderedDict.fromkeys(['shakemap_kmz'])
-    ftype = 'application/vnd.google-earth.kml+xml'
-    contents['shakemap_kmz'] = {'title': 'ShakeMap Overview KMZ',
-                                'caption': 'ShakeMap Overview.',
-                                'page': kml_page,
-                                'formats': [{'filename': 'shakemap.kmz',
-                                             'type': ftype}
-                                            ]
-                                }
-
     def __init__(self, eventid):
         """
         Instantiate a KMLModule class with an event ID.
         """
-        self._eventid = eventid
-        log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
-        self.logger = logging.getLogger(log_name)
+        super(KMLModule, self).__init__(eventid)
+        self.contents = Contents('Ground MOtion KMZ File', 'kml', eventid)
 
     def execute(self):
         """
@@ -260,12 +242,12 @@ class KMLModule(CoreModule):
         oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
 
         # call create_kmz function
-        create_kmz(container, datadir, oceanfile, self.logger)
+        create_kmz(container, datadir, oceanfile, self.logger, self.contents)
 
         container.close()
 
 
-def create_kmz(container, datadir, oceanfile, logger):
+def create_kmz(container, datadir, oceanfile, logger, contents):
     # we're going to combine all these layers into one KMZ file.
     kmz_contents = []
 
@@ -331,6 +313,11 @@ def create_kmz(container, datadir, oceanfile, logger):
         os.remove(kfile)
     kmzip.close()
 
+    ftype = 'application/vnd.google-earth.kml+xml'
+    contents.addFile('shakemap_kmz', 'ShakeMap Overview KMZ',
+                     'ShakeMap Overview KMZ.',
+                     'shakemap.kmz', ftype)
+
     logger.debug('Wrote KMZ container file %s' % kmzfile)
     return kmzfile
 
@@ -392,7 +379,11 @@ def create_polygons(container, document):
     gdict = container.getIMTGrids("MMI", component)
     fgrid = median_filter(gdict['mean'], size=10)
     cont_min = np.floor(np.min(fgrid)) - 0.5
+    if cont_min < 0:
+        cont_min = 0.5
     cont_max = np.ceil(np.max(fgrid)) + 0.5
+    if cont_max > 10.5:
+        cont_max = 10.5
     contour_levels = np.arange(cont_min, cont_max, 1, dtype=np.double)
     gjson = pcontour(fgrid,
                      gdict['mean_metadata']['dx'],
@@ -475,8 +466,8 @@ def create_contours(container, document):
     component = list(container.getComponents())[0]
     imts = container.getIMTs(component)
     for imt in imts:
-        line_strings = contour(container, imt, component, DEFAULT_FILTER_SIZE,
-                               None)
+        line_strings = contour(container.getIMTGrids(imt, component), imt,
+                               DEFAULT_FILTER_SIZE, None)
         # make a folder for the contours
         imt_folder = folder.newfolder(name='%s Contours' % imt,
                                       visibility=0)
@@ -767,7 +758,7 @@ def imt_to_string(imt):
                      'pgv': 'PGV'}
     if imt in non_spectrals:
         return non_spectrals[imt]
-    period = re.search("\d+\.\d+", imt).group()  # noqa
+    period = re.search(r"\d+\.\d+", imt).group()  # noqa
     imt_string = 'PSA %s sec' % period
     return imt_string
 

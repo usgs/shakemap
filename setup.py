@@ -7,7 +7,9 @@ from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 import numpy
 
-os.environ['CC'] = 'gcc'
+# This should be handled by conda when we install a platform-specific
+# compiler
+# os.environ['CC'] = 'gcc'
 
 sourcefiles = ["shakemap/c/pcontour.pyx", "shakemap/c/contour.c"]
 
@@ -66,12 +68,15 @@ setup(name='shakemap',
           'bin/receive_origins',
           'bin/run_verification',
           'bin/shake',
+          'bin/sm_check',
+          'bin/sm_compare',
           'bin/sm_create',
           'bin/sm_migrate',
           'bin/sm_profile',
-          'bin/sm_compare',
           'bin/sm_queue',
-          'bin/sm_rupture'],
+          'bin/sm_rupture',
+          'bin/sm_batch',
+          'bin/sm_sync'],
       cmdclass=cmdclass,
       ext_modules=cythonize(ext_modules)
       )

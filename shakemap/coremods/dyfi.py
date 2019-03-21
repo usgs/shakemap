@@ -6,7 +6,7 @@ import json
 # third party imports
 from libcomcat.search import get_event_by_id
 from libcomcat.classes import DetailEvent
-from amptools.table import dataframe_to_xml
+from impactutils.io.table import dataframe_to_xml
 import pandas as pd
 import numpy as np
 
@@ -79,7 +79,7 @@ class DYFIModule(CoreModule):
             detail = get_event_by_id(self._eventid)
         except Exception as e:
             fmt = 'Could not retrieve DYFI data for %s - error "%s"'
-            self.logger.warn(fmt % (self._eventid, str(e)))
+            self.logger.warning(fmt % (self._eventid, str(e)))
             return
 
         dataframe, msg = _get_dyfi_dataframe(detail)

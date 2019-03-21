@@ -2,24 +2,27 @@
 Process a ShakeMap, based on the configuration and data found in
 shake_data.hdf, and produce output in shake_result.hdf.
 """
-import warnings
+import argparse
+import inspect
 import os.path
 import time as time
 import copy
 from time import gmtime, strftime
 import shutil
-from collections import OrderedDict
+from datetime import date
+import json
 
 import numpy as np
 import numpy.ma as ma
-from mpl_toolkits.basemap import maskoceans
 from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
+from mapio.geodict import GeoDict
+import mapio.reader
 
 import concurrent.futures as cf
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.sites import Sites
 from shakelib.distance import (Distance,
@@ -33,13 +36,15 @@ from shakelib.utils.containers import ShakeMapInputContainer
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.rupture import constants
 
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_data_path)
 from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions
 from shakemap.utils.generic_amp import get_generic_amp_factors
 from shakemap.c.clib import (make_sigma_matrix,
-                             geodetic_distance_fast_c,
+                             geodetic_distance_fast,
                              make_sd_array)
+# from shakemap.utils.exception import TerminateShakeMap
 
 from shakelib.directivity.rowshandel2013 import Rowshandel2013
 
@@ -61,7 +66,8 @@ from shakelib.directivity.rowshandel2013 import Rowshandel2013
 SM_CONSTS = {
     'default_mmi_stddev': 0.3,
     'min_mmi_convert': 4.0,
-    'default_stddev_inter': 0.35
+    'default_stddev_inter': 0.35,
+    'default_stddev_inter_mmi': 0.4
 }
 
 
@@ -82,17 +88,55 @@ class ModelModule(CoreModule):
     targets = [r'products/shake_result\.hdf']
     dependencies = [('shake_data.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    contents = OrderedDict.fromkeys(['shakemapHDF'])
-    contents['shakemapHDF'] = {
-        'title': 'Comprehensive ShakeMap HDF Data File',
-        'caption': 'HDF file containing all ShakeMap results.',
-        'formats': [{
-            'filename': 'shake_result.hdf',
-            'type': 'application/x-bag'
-        }]
-    }
+    no_seismic = False
+    no_macroseismic = False
+    no_rupture = False
+
+    rock_vs30 = 760.0
+    soil_vs30 = 180.0
+
+    def __init__(self, eventid):
+        super(ModelModule, self).__init__(eventid)
+        self.contents = Contents(None, None, eventid)
+
+    def parseArgs(self, arglist):
+        """
+        Set up the object to accept the --no_seismic, --no_macroseismic,
+        and --no_rupture flags.
+        """
+        parser = argparse.ArgumentParser(
+            prog=self.__class__.command_name,
+            description=inspect.getdoc(self.__class__))
+        parser.add_argument('-s', '--no_seismic', action='store_true',
+                            help='Exclude instrumental seismic data from '
+                            'the processing, ignoring any that may exist in '
+                            'the input directory.')
+        parser.add_argument('-m', '--no_macroseismic', action='store_true',
+                            help='Exclude macroseismic data from the '
+                            'processing, ignoring any that may exist in the '
+                            'input directory.')
+        parser.add_argument('-r', '--no_rupture', action='store_true',
+                            help='Exclude a rupture model from the '
+                            'processing, ignoring any that may exist in the '
+                            'input directory.')
+        #
+        # This line should be in any modules that overrides this
+        # one. It will collect up everything after the current
+        # modules options in args.rem, which should be returned
+        # by this function. Note: doing parser.parse_known_args()
+        # will not work as it will suck up any later modules'
+        # options that are the same as this one's.
+        #
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
+                            help=argparse.SUPPRESS)
+        args = parser.parse_args(arglist)
+        if args.no_seismic:
+            self.no_seismic = True
+        if args.no_macroseismic:
+            self.no_macroseismic = True
+        if args.no_rupture:
+            self.no_rupture = True
+        return args.rem
 
     def execute(self):
         """
@@ -135,12 +179,30 @@ class ModelModule(CoreModule):
             ipe_gmpe = MultiGMPE.from_config(self.config, filter_imt=pgv_imt)
             self.ipe = VirtualIPE.fromFuncs(ipe_gmpe, self.gmice)
         else:
-            self.ipe = get_object_from_config('ipe', 'modeling', self.config)
+            ipe = get_object_from_config('ipe', 'modeling', self.config)
+            if 'vs30' not in ipe.REQUIRES_SITES_PARAMETERS:
+                ipe.REQUIRES_SITES_PARAMETERS.add('vs30')
+            ipe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
+                oqconst.IMC.GREATER_OF_TWO_HORIZONTAL
+            self.ipe = MultiGMPE.from_list([ipe], [1.0])
+
+        ipe_sd_types = self.ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        if len(ipe_sd_types) == 1:
+            self.ipe_total_sd_only = True
+            self.ipe_stddev_types = [oqconst.StdDev.TOTAL]
+        else:
+            self.ipe_total_sd_only = False
+            self.ipe_stddev_types = [oqconst.StdDev.TOTAL,
+                                     oqconst.StdDev.INTER_EVENT,
+                                     oqconst.StdDev.INTRA_EVENT]
 
         # ---------------------------------------------------------------------
         # Get the rupture object and rupture context
         # ---------------------------------------------------------------------
         self.rupture_obj = self.ic.getRuptureObject()
+        # If the --no_rupture flag is used, switch to a PointRupture
+        if self.no_rupture:
+            self.rupture_obj = PointRupture(self.rupture_obj._origin)
         if 'mechanism' in self.config['modeling']:
             self.rupture_obj._origin.setMechanism(
                 mech=self.config['modeling']['mechanism'])
@@ -149,11 +211,28 @@ class ModelModule(CoreModule):
         if self.rx.rake is None:
             self.rx.rake = 0
 
+        #
+        # Set up the coordinates for the attenuation curves
+        #
+        repi = np.logspace(-1, 3, 200)
+        pt = self.rupture_obj._origin.getHypo()
+        self.atten_coords = {
+            'lons': np.full_like(repi, pt.x),
+            'lats': np.array([pt.y + x / 111.0 for x in repi])
+        }
+        self.point_source = PointRupture(self.rupture_obj._origin)
+
         # ---------------------------------------------------------------------
         # The output locations: either a grid or a list of points
         # ---------------------------------------------------------------------
         self.logger.debug('Setting output params...')
         self._setOutputParams()
+
+        landmask = self._getLandMask()
+        # We used to do this, but we've decided not to. Leaving the code
+        # in place in case we change our minds.
+        # if landmask is not None and np.all(landmask):
+        #     raise TerminateShakeMap("Mapped area is entirely water")
 
         # ---------------------------------------------------------------------
         # If the gmpe doesn't break down its stardard deviation into
@@ -162,13 +241,13 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         gmpe_sd_types = self.default_gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
         if len(gmpe_sd_types) == 1:
-            self.total_sd_only = True
-            self.stddev_types = [oqconst.StdDev.TOTAL]
+            self.gmpe_total_sd_only = True
+            self.gmpe_stddev_types = [oqconst.StdDev.TOTAL]
         else:
-            self.total_sd_only = False
-            self.stddev_types = [oqconst.StdDev.TOTAL,
-                                 oqconst.StdDev.INTER_EVENT,
-                                 oqconst.StdDev.INTRA_EVENT]
+            self.gmpe_total_sd_only = False
+            self.gmpe_stddev_types = [oqconst.StdDev.TOTAL,
+                                      oqconst.StdDev.INTER_EVENT,
+                                      oqconst.StdDev.INTRA_EVENT]
 
         # ---------------------------------------------------------------------
         # Are we going to include directivity?
@@ -281,12 +360,12 @@ class ModelModule(CoreModule):
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
 
         #
-        # Places to put the results for the regression plots
+        # Places to put the results for the attenuation plots
         #
-        self.rockgrid = {}
-        self.soilgrid = {}
-        self.rocksd = {}
-        self.soilsd = {}
+        self.atten_rock_mean = {}
+        self.atten_soil_mean = {}
+        self.atten_rock_sd = {}
+        self.atten_soil_sd = {}
 
         self.logger.debug('Doing MVN...')
         if self.max_workers > 0:
@@ -315,7 +394,7 @@ class ModelModule(CoreModule):
         # We're going to need masked arrays of the output grids later, so
         # make them now.
         #
-        moutgrid = self._getMaskedGrids()
+        moutgrid = self._getMaskedGrids(landmask)
 
         #
         # Get the info dictionary that will become info.json, and
@@ -345,11 +424,15 @@ class ModelModule(CoreModule):
         else:
             self._storePointData(oc)
 
-        if self.do_grid:
-            self._storeRegressionData(oc)
+        self._storeAttenuationData(oc)
 
         oc.close()
         self.ic.close()
+
+        self.contents.addFile('shakemapHDF',
+                              'Comprehensive ShakeMap HDF Data File',
+                              'HDF file containing all ShakeMap results.',
+                              'shake_result.hdf', 'application/x-bag')
     # -------------------------------------------------------------------------
     # End execute()
     # -------------------------------------------------------------------------
@@ -403,10 +486,12 @@ class ModelModule(CoreModule):
         # Processing parameters
         # ---------------------------------------------------------------------
         self.max_workers = self.config['system']['max_workers']
+
         # ---------------------------------------------------------------------
         # Do we apply the generic amplification factors?
         # ---------------------------------------------------------------------
         self.apply_gafs = self.config['modeling']['apply_generic_amp_factors']
+
         # ---------------------------------------------------------------------
         # Bias parameters
         # ---------------------------------------------------------------------
@@ -415,6 +500,7 @@ class ModelModule(CoreModule):
         self.bias_max_mag = self.config['modeling']['bias']['max_mag']
         self.bias_max_dsigma = \
             self.config['modeling']['bias']['max_delta_sigma']
+
         # ---------------------------------------------------------------------
         # Outlier parameters
         # ---------------------------------------------------------------------
@@ -422,15 +508,21 @@ class ModelModule(CoreModule):
         self.outlier_deviation_level = \
             self.config['data']['outlier']['max_deviation']
         self.outlier_max_mag = self.config['data']['outlier']['max_mag']
+        self.outlier_valid_stations = \
+            self.config['data']['outlier']['valid_stations']
+
         # ---------------------------------------------------------------------
         # These are the IMTs we want to make
         # ---------------------------------------------------------------------
         self.imt_out_set = set(self.config['interp']['imt_list'])
+
         # ---------------------------------------------------------------------
         # The x and y resolution of the output grid
         # ---------------------------------------------------------------------
         self.smdx = self.config['interp']['prediction_location']['xres']
         self.smdy = self.config['interp']['prediction_location']['yres']
+        self.nmax = self.config['interp']['prediction_location']['nmax']
+
         # ---------------------------------------------------------------------
         # Get the Vs30 file name
         # ---------------------------------------------------------------------
@@ -487,10 +579,10 @@ class ModelModule(CoreModule):
                 padding=True, resample=True
             )
 
-            self.sx_out = self.sites_obj_out.getSitesContext({
-                'lats': self.lats,
-                'lons': self.lons
-            })
+            self.sx_out = self.sites_obj_out.getSitesContext(
+                {'lats': self.lats,
+                 'lons': self.lons}
+            )
             # Replace the Vs30 from the grid (or default) with the Vs30
             # provided with the site list.
             if np.any(self.vs30 > 0):
@@ -510,6 +602,9 @@ class ModelModule(CoreModule):
                     config=self.config
                 )
 
+            # Adjust resolution to be under nmax
+            self._adjustResolution()
+
             self.sites_obj_out = Sites.fromBounds(
                 self.W, self.E, self.S,
                 self.N, self.smdx, self.smdy,
@@ -519,17 +614,12 @@ class ModelModule(CoreModule):
             )
             self.smnx, self.smny = self.sites_obj_out.getNxNy()
             self.sx_out = self.sites_obj_out.getSitesContext()
-            #
-            # Grids on rock and soil for the regression plots
-            #
-            self.sx_rock = self.sites_obj_out.getSitesContext(rock_vs30=760)
-            self.sx_soil = self.sites_obj_out.getSitesContext(rock_vs30=180)
             lons, lats = np.meshgrid(self.sx_out.lons,
                                      self.sx_out.lats)
-            self.sx_out.lons = np.flipud(lons.copy())
-            self.sx_out.lats = np.flipud(lats.copy())
-            self.lons = np.flipud(lons).ravel()
-            self.lats = np.flipud(lats).ravel()
+            self.sx_out.lons = lons.copy()
+            self.sx_out.lats = lats.copy()
+            self.lons = lons.ravel()
+            self.lats = lats.ravel()
             self.depths = np.zeros_like(lats)
             dist_obj_out = Distance.fromSites(self.default_gmpe,
                                               self.sites_obj_out,
@@ -541,9 +631,26 @@ class ModelModule(CoreModule):
         # requirements of both
         #
         self.dx_out = dist_obj_out.getDistanceContext()
+        #
+        # Set up the sites and distance contexts for the attenuation curves
+        #
+        self.atten_sx_rock = self.sites_obj_out.getSitesContext(
+            self.atten_coords, rock_vs30=self.rock_vs30)
+        self.atten_sx_soil = self.sites_obj_out.getSitesContext(
+            self.atten_coords, rock_vs30=self.soil_vs30)
+        self.atten_dx = Distance(
+            self.default_gmpe,
+            self.atten_coords['lons'],
+            self.atten_coords['lats'],
+            np.zeros_like(self.atten_coords['lons']),
+            rupture=self.point_source).getDistanceContext()
 
         self.lons_out_rad = np.radians(self.lons)
         self.lats_out_rad = np.radians(self.lats)
+        self.flip_lons = False
+        if self.W > 0 and self.E < 0:
+            self.flip_lons = True
+            self.lons_out_rad[self.lons_out_rad < 0] += 2 * np.pi
 
     def _setDataFrames(self):
         """
@@ -561,6 +668,10 @@ class ModelModule(CoreModule):
         if self.stations is None:
             return
         for dfid, val in (('df1', True), ('df2', False)):
+            if dfid == 'df1' and self.no_seismic:
+                continue
+            if dfid == 'df2' and self.no_macroseismic:
+                continue
             sdf, imts = self.stations.getStationDictionary(instrumented=val)
             if sdf is not None:
                 df = DataFrame()
@@ -568,6 +679,33 @@ class ModelModule(CoreModule):
                 df.imts = imts
                 setattr(self, dfid, df)
                 self.dataframes.append(dfid)
+
+        # Flag the stations in the bad stations list from the config
+        if not hasattr(self, 'df1'):
+            return
+        evdt = date(self.rupture_obj._origin.time.year,
+                    self.rupture_obj._origin.time.month,
+                    self.rupture_obj._origin.time.day)
+        nostart = date(1970, 1, 1)
+        self.df1.df['flagged'] = np.full_like(self.df1.df['lon'], 0,
+                                              dtype=np.bool)
+        if 'bad_stations' not in self.config['data']:
+            return
+        for sid, dates in self.config['data']['bad_stations'].items():
+            ondate, offdate = dates.split(':')
+            year, month, day = map(int, ondate.split('-'))
+            ondt = date(year, month, day)
+            if offdate:
+                year, month, day = map(int, offdate.split('-'))
+                offdt = date(year, month, day)
+            else:
+                offdt = None
+            bad = False
+            if (ondt == nostart or ondt <= evdt) and \
+                    (offdt is None or offdt >= evdt):
+                bad = True
+            if bad:
+                self.df1.df['flagged'] |= (self.df1.df['id'] == sid)
 
     def _populateDataFrames(self):
         """
@@ -586,6 +724,10 @@ class ModelModule(CoreModule):
                 'lats': df['lat']
             }
             dfn.sx = self.sites_obj_out.getSitesContext(lldict)
+            dfn.sx_rock = copy.deepcopy(dfn.sx)
+            dfn.sx_rock.vs30 = np.full_like(dfn.sx.vs30, self.rock_vs30)
+            dfn.sx_soil = copy.deepcopy(dfn.sx)
+            dfn.sx_soil.vs30 = np.full_like(dfn.sx.vs30, self.soil_vs30)
             dist_obj = Distance(
                 self.default_gmpe, df['lon'], df['lat'],
                 df['depth'], self.rupture_obj
@@ -620,14 +762,51 @@ class ModelModule(CoreModule):
             for imtstr in dfn.imts:
                 oqimt = imt.from_string(imtstr)
                 gmpe = None
+                not_supported = False
                 if imtstr != 'MMI':
-                    gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-                pmean, pstddev = self._gmas(
-                    gmpe, dfn.sx, dfn.dx, oqimt, self.apply_gafs)
+                    try:
+                        gmpe = MultiGMPE.from_config(self.config,
+                                                     filter_imt=oqimt)
+                    except KeyError:
+                        self.logger.warn(
+                            "Input IMT %s not supported by GMPE: ignoring" %
+                            imtstr)
+                        not_supported = True
+                if not_supported:
+                    pmean = np.full_like(df[imtstr], np.nan)
+                    pmean_rock = np.full_like(df[imtstr], np.nan)
+                    pmean_soil = np.full_like(df[imtstr], np.nan)
+                    pstddev = [None] * 3
+                    pstddev[0] = np.full_like(df[imtstr], np.nan)
+                    pstddev[1] = np.full_like(df[imtstr], np.nan)
+                    pstddev[2] = np.full_like(df[imtstr], np.nan)
+                    pstddev_rock = [None] * 1
+                    pstddev_soil = [None] * 1
+                    pstddev_rock[0] = np.full_like(df[imtstr], np.nan)
+                    pstddev_soil[0] = np.full_like(df[imtstr], np.nan)
+                else:
+                    pmean, pstddev = self._gmas(gmpe, dfn.sx, dfn.dx, oqimt,
+                                                self.apply_gafs)
+                    pmean_rock, pstddev_rock = self._gmas(gmpe, dfn.sx_rock,
+                                                          dfn.dx, oqimt,
+                                                          self.apply_gafs)
+                    pmean_soil, pstddev_soil = self._gmas(gmpe, dfn.sx_soil,
+                                                          dfn.dx, oqimt,
+                                                          self.apply_gafs)
                 df[imtstr + '_pred'] = pmean
                 df[imtstr + '_pred_sigma'] = pstddev[0]
-                if self.total_sd_only:
+                df[imtstr + '_pred_rock'] = pmean_rock
+                df[imtstr + '_pred_sigma_rock'] = pstddev_rock[0]
+                df[imtstr + '_pred_soil'] = pmean_soil
+                df[imtstr + '_pred_sigma_soil'] = pstddev_soil[0]
+
+                if imtstr != 'MMI':
+                    total_only = self.gmpe_total_sd_only
                     tau_guess = SM_CONSTS['default_stddev_inter']
+                else:
+                    total_only = self.ipe_total_sd_only
+                    tau_guess = SM_CONSTS['default_stddev_inter_mmi']
+                if total_only:
                     df[imtstr + '_pred_tau'] = np.full_like(
                         df[imtstr + '_pred'], tau_guess)
                     df[imtstr + '_pred_phi'] = np.sqrt(
@@ -648,21 +827,34 @@ class ModelModule(CoreModule):
                         (not isinstance(self.rupture_obj, PointRupture) or
                          self.rx.mag <= self.outlier_max_mag):
                     #
+                    # Make a boolean array of stations that have been
+                    # manually rehabilitated by the operator
+                    #
+                    is_valid = np.full(np.shape(df['id']), False, dtype=bool)
+                    for valid in self.outlier_valid_stations:
+                        is_valid |= valid == df['id']
+                    #
                     # turn off nan warnings for this statement
                     #
                     np.seterr(invalid='ignore')
-                    flagged = \
-                        np.abs(df[imtstr + '_residual']) > \
-                        self.outlier_deviation_level * \
-                        df[imtstr + '_pred_sigma']
+                    flagged = (np.abs(df[imtstr + '_residual']) >
+                               self.outlier_deviation_level *
+                               df[imtstr + '_pred_sigma']) & (~is_valid)
                     np.seterr(invalid='warn')
+                    #
+                    # Add NaN values to the list of outliers
+                    #
+                    flagged |= np.isnan(df[imtstr + '_residual'])
 
                     self.logger.debug('IMT: %s, flagged: %d' %
                                       (imtstr, np.sum(flagged)))
                     df[imtstr + '_outliers'] = flagged
                 else:
-                    df[imtstr + '_outliers'] = np.full(
-                        df[imtstr].shape, False, dtype=np.bool)
+                    #
+                    # Not doing outliers, but should still flag NaNs
+                    #
+                    flagged = np.isnan(df[imtstr + '_residual'])
+                    df[imtstr + '_outliers'] = flagged
                 #
                 # If uncertainty hasn't been set for MMI, give it
                 # the default value
@@ -674,6 +866,8 @@ class ModelModule(CoreModule):
             #
             df['lon_rad'] = np.radians(df['lon'])
             df['lat_rad'] = np.radians(df['lat'])
+            if self.flip_lons:
+                df['lon_rad'][df['lon_rad'] < 0] += 2 * np.pi
             #
             # It will be handy later on to have the rupture distance
             # in the dataframes
@@ -703,7 +897,10 @@ class ModelModule(CoreModule):
             else:
                 iterlist = [None]
             for period in iterlist:
-                oqimt = gmice_imt(period)
+                if period:
+                    oqimt = gmice_imt(period)
+                else:
+                    oqimt = gmice_imt()
                 imtstr = str(oqimt)
 
                 np.seterr(invalid='ignore')
@@ -719,13 +916,45 @@ class ModelModule(CoreModule):
                 #
                 # Get the predictions and stddevs
                 #
-                gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-                pmean, pstddev = self._gmas(
-                    gmpe, self.df2.sx, self.df2.dx, oqimt, self.apply_gafs)
+                not_supported = False
+                try:
+                    gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
+                except KeyError:
+                    self.logger.warn(
+                        "Input IMT %s not supported by GMPE: ignoring" %
+                        imtstr)
+                    not_supported = True
+                if not_supported:
+                    pmean = np.full_like(df2['MMI'], np.nan)
+                    pstddev = [None] * 3
+                    pstddev[0] = np.full_like(df2['MMI'], np.nan)
+                    pstddev[1] = np.full_like(df2['MMI'], np.nan)
+                    pstddev[2] = np.full_like(df2['MMI'], np.nan)
+                else:
+                    pmean, pstddev = self._gmas(gmpe, self.df2.sx,
+                                                self.df2.dx, oqimt,
+                                                self.apply_gafs)
+                    pmean_rock, pstddev_rock = self._gmas(gmpe,
+                                                          self.df2.sx_rock,
+                                                          self.df2.dx, oqimt,
+                                                          self.apply_gafs)
+                    pmean_soil, pstddev_soil = self._gmas(gmpe,
+                                                          self.df2.sx_soil,
+                                                          self.df2.dx, oqimt,
+                                                          self.apply_gafs)
                 df2[imtstr + '_pred'] = pmean
                 df2[imtstr + '_pred_sigma'] = pstddev[0]
-                if self.total_sd_only:
+                df2[imtstr + '_pred_rock'] = pmean_rock
+                df2[imtstr + '_pred_sigma_rock'] = pstddev_rock[0]
+                df2[imtstr + '_pred_soil'] = pmean_soil
+                df2[imtstr + '_pred_sigma_soil'] = pstddev_soil[0]
+                if imtstr != 'MMI':
+                    total_only = self.gmpe_total_sd_only
                     tau_guess = SM_CONSTS['default_stddev_inter']
+                else:
+                    total_only = self.ipe_total_sd_only
+                    tau_guess = SM_CONSTS['default_stddev_inter_mmi']
+                if total_only:
                     df2[imtstr + '_pred_tau'] = np.full_like(
                         df2[imtstr + '_pred'], tau_guess)
                     df2[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
@@ -734,8 +963,7 @@ class ModelModule(CoreModule):
                     df2[imtstr + '_pred_tau'] = pstddev[1]
                     df2[imtstr + '_pred_phi'] = pstddev[2]
                 df2[imtstr + '_residual'] = df2[imtstr] - pmean
-                df2[imtstr + '_outliers'] = np.full(
-                    pmean.shape, False, dtype=np.bool)
+                df2[imtstr + '_outliers'] = np.isnan(df2[imtstr + '_residual'])
 
     def _deriveMMIFromIMTs(self):
         """
@@ -749,6 +977,13 @@ class ModelModule(CoreModule):
         df1 = self.df1.df
         gmice_imts = self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
         gmice_pers = self.gmice.DEFINED_FOR_SA_PERIODS
+        np.seterr(invalid='ignore')
+        df1['MMI'] = self.gmice.getPreferredMI(df1, dists=df1['rrup'],
+                                               mag=self.rx.mag)
+        np.seterr(invalid='warn')
+        df1['MMI_sd'] = self.gmice.getPreferredSD()
+        if df1['MMI_sd'] is not None:
+            df1['MMI_sd'] = np.full_like(df1['lon'], df1['MMI_sd'])
         for imtstr in self.df1.imts:
             oqimt = imt.from_string(imtstr)
             if not isinstance(oqimt, tuple(gmice_imts)):
@@ -767,8 +1002,9 @@ class ModelModule(CoreModule):
                 np.full_like(df1[imtstr], self.gmice.getGM2MIsd()[oqimt])
 
         preferred_imts = ['PGV', 'PGA', 'SA(1.0)', 'SA(0.3)', 'SA(3.0']
-        df1['MMI'] = np.full_like(df1['lon'], np.nan)
-        df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
+        if(df1['MMI'] is None):
+            df1['MMI'] = np.full_like(df1['lon'], np.nan)
+            df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
         for imtstr in preferred_imts:
             if 'derived_MMI_from_' + imtstr in df1:
                 ixx = np.isnan(df1['MMI'])
@@ -783,10 +1019,20 @@ class ModelModule(CoreModule):
         pmean, pstddev = self._gmas(
             gmpe, self.df1.sx, self.df1.dx, imt.from_string('MMI'),
             self.apply_gafs)
+        pmean_rock, pstddev_rock = self._gmas(
+            gmpe, self.df1.sx_rock, self.df1.dx, imt.from_string('MMI'),
+            self.apply_gafs)
+        pmean_soil, pstddev_soil = self._gmas(
+            gmpe, self.df1.sx_soil, self.df1.dx, imt.from_string('MMI'),
+            self.apply_gafs)
         df1['MMI' + '_pred'] = pmean
         df1['MMI' + '_pred_sigma'] = pstddev[0]
-        if self.total_sd_only:
-            tau_guess = SM_CONSTS['default_stddev_inter']
+        df1['MMI' + '_pred_rock'] = pmean_rock
+        df1['MMI' + '_pred_sigma_rock'] = pstddev_rock[0]
+        df1['MMI' + '_pred_soil'] = pmean_soil
+        df1['MMI' + '_pred_sigma_soil'] = pstddev_soil[0]
+        if self.ipe_total_sd_only:
+            tau_guess = SM_CONSTS['default_stddev_inter_mmi']
             df1['MMI' + '_pred_tau'] = np.full_like(
                 df1['MMI' + '_pred'], tau_guess)
             df1['MMI' + '_pred_phi'] = np.sqrt(
@@ -795,8 +1041,7 @@ class ModelModule(CoreModule):
             df1['MMI' + '_pred_tau'] = pstddev[1]
             df1['MMI' + '_pred_phi'] = pstddev[2]
         df1['MMI' + '_residual'] = df1['MMI'] - pmean
-        df1['MMI' + '_outliers'] = np.full(pmean.shape, False,
-                                           dtype=np.bool)
+        df1['MMI' + '_outliers'] = np.isnan(df1['MMI' + '_residual'])
 
     def _fillDataArrays(self):
         """
@@ -850,6 +1095,9 @@ class ModelModule(CoreModule):
             self.sta_period_ix[imtstr] = np.array(period_ix).reshape((-1, 1))
             self.sta_lons_rad[imtstr] = np.array(lons_rad).reshape((-1, 1))
             self.sta_lats_rad[imtstr] = np.array(lats_rad).reshape((-1, 1))
+            if self.flip_lons:
+                self.sta_lons_rad[imtstr][self.sta_lons_rad[imtstr] < 0] += \
+                    2 * np.pi
             self.sta_resids[imtstr] = np.array(resids).reshape((-1, 1))
             self.sta_tau[imtstr] = np.array(tau).reshape((-1, 1))
             self.sta_phi[imtstr] = np.array(phi).reshape((-1, 1))
@@ -880,8 +1128,8 @@ class ModelModule(CoreModule):
             sta_phi_dl = self.sta_phi[imtstr][dix].reshape((-1, 1))
             sta_tau_dl = self.sta_tau[imtstr][dix].reshape((-1, 1))
             sta_sig_total_dl = self.sta_sig_total[imtstr][dix].reshape((-1, 1))
-            sta_lons_rad_dl = self.sta_lons_rad[imtstr][dix].reshape((-1, 1))
-            sta_lats_rad_dl = self.sta_lats_rad[imtstr][dix].reshape((-1, 1))
+            sta_lons_rad_dl = self.sta_lons_rad[imtstr][dix].ravel()
+            sta_lats_rad_dl = self.sta_lats_rad[imtstr][dix].ravel()
             sta_period_ix_dl = self.sta_period_ix[imtstr][dix].reshape((-1, 1))
             sta_resids_dl = self.sta_resids[imtstr][dix].reshape((-1, 1))
             if np.size(sta_lons_rad_dl) == 0:
@@ -897,18 +1145,21 @@ class ModelModule(CoreModule):
             #
             # Build the covariance matrix of the residuals
             #
-            dist22 = geodetic_distance_fast_c(sta_lons_rad_dl.ravel(),
-                                              sta_lats_rad_dl.ravel(),
-                                              sta_lons_rad_dl.ravel(),
-                                              sta_lats_rad_dl.ravel())
-            d22_rows, d22_cols = np.shape(dist22)  # should be square
-            t1_22 = sta_period_ix_dl * np.ones((1, d22_cols), dtype=np.long)
-            t2_22 = sta_period_ix_dl.T * np.ones((d22_rows, 1), dtype=np.long)
-            corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
-            sigma22 = make_sigma_matrix(corr22, corr_adj22,
-                                        sta_phi_dl.ravel(),
-                                        sta_phi_dl.ravel())
-            sigma22inv = np.linalg.pinv(sigma22)
+            nsta = np.size(sta_lons_rad_dl)
+            matrix22 = np.empty((nsta, nsta), dtype=np.double)
+            geodetic_distance_fast(sta_lons_rad_dl,
+                                   sta_lats_rad_dl,
+                                   sta_lons_rad_dl,
+                                   sta_lats_rad_dl, matrix22)
+            ones = np.ones((1, nsta), dtype=np.long)
+            t1_22 = sta_period_ix_dl * ones
+            t2_22 = sta_period_ix_dl.T * ones.T
+            self.ccf.getCorrelation(t1_22, t2_22, matrix22)
+            sta_phi_dl_flat = sta_phi_dl.ravel()
+            make_sigma_matrix(matrix22, corr_adj22,
+                              sta_phi_dl_flat,
+                              sta_phi_dl_flat)
+            sigma22inv = np.linalg.pinv(matrix22)
             #
             # Compute the bias numerator and denominator pieces
             #
@@ -918,9 +1169,8 @@ class ModelModule(CoreModule):
                 # Get the correlation between the inputs and outputs
                 #
                 out_ix_arr = np.full_like(sta_period_ix_dl, outperiod_ix)
-                dist_arr = np.zeros_like(out_ix_arr, dtype=float)
-                Z = self.ccf.getCorrelation(sta_period_ix_dl, out_ix_arr,
-                                            dist_arr)
+                Z = np.zeros_like(out_ix_arr, dtype=float)
+                self.ccf.getCorrelation(sta_period_ix_dl, out_ix_arr, Z)
                 #
                 # Scale the correlation factor (Z) by the correlation
                 # adjustment due to observational uncertainty
@@ -969,6 +1219,18 @@ class ModelModule(CoreModule):
                 mtype=1
             )
             self.dir_results.append((dir_out, self.dx_out))
+            # Precompute directivity for the attenuation curves
+            dir_out = Rowshandel2013(
+                self.rupture_obj._origin, self.rupture_obj,
+                self.atten_coords['lats'].reshape((1, -1)),
+                self.atten_coords['lons'].reshape((1, -1)),
+                np.zeros_like((len(self.atten_coords['lats']), 1)),
+                dx=1.0,
+                T=Rowshandel2013.getPeriods(),
+                a_weight=0.5,
+                mtype=1
+            )
+            self.dir_results.append((dir_out, self.atten_dx))
             directivity_time = time.time() - time1
             self.logger.debug(
                 'Directivity prediction evaluation time: %f sec'
@@ -980,6 +1242,7 @@ class ModelModule(CoreModule):
         """
         Do the MVN computations
         """
+        self.logger.debug('computeMVN: doing IMT %s' % imtstr)
         time1 = time.time()
         #
         # Get the index of the (pesudo-) period of the output IMT
@@ -990,24 +1253,30 @@ class ModelModule(CoreModule):
         # Get the predictions at the output points
         #
         oqimt = imt.from_string(imtstr)
-        gmpe = None
         if imtstr != 'MMI':
             gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
+        else:
+            gmpe = self.ipe
+
         pout_mean, pout_sd = self._gmas(
             gmpe, self.sx_out, self.dx_out, oqimt, self.apply_gafs)
 
-        if self.do_grid:
-            #
-            # Fill the grids for the regression plots
-            #
-            x_mean, x_sd = self._gmas(
-                gmpe, self.sx_rock, self.dx_out, oqimt, False)
-            self.rockgrid[imtstr] = x_mean
-            self.rocksd[imtstr] = x_sd[0]
-            x_mean, x_sd = self._gmas(
-                gmpe, self.sx_soil, self.dx_out, oqimt, False)
-            self.soilgrid[imtstr] = x_mean
-            self.soilsd[imtstr] = x_sd[0]
+        #
+        # While we have the gmpe for this IMT, we should make
+        # the attenuation curves
+        #
+        x_mean, x_sd = self._gmas(gmpe,
+                                  self.atten_sx_rock,
+                                  self.atten_dx,
+                                  oqimt, self.apply_gafs)
+        self.atten_rock_mean[imtstr] = x_mean
+        self.atten_rock_sd[imtstr] = x_sd[0]
+        x_mean, x_sd = self._gmas(gmpe,
+                                  self.atten_sx_soil,
+                                  self.atten_dx,
+                                  oqimt, self.apply_gafs)
+        self.atten_soil_mean[imtstr] = x_mean
+        self.atten_soil_sd[imtstr] = x_sd[0]
 
         #
         # If there are no data, just use the unbiased prediction
@@ -1022,13 +1291,16 @@ class ModelModule(CoreModule):
         # Get an array of the within-event standard deviations for the
         # output IMT at the output points
         #
-        if self.total_sd_only:
-            self.psd[imtstr] = np.sqrt(
-                pout_sd[0]**2 - SM_CONSTS['default_stddev_inter']**2)
-            self.psd_raw[imtstr] = np.sqrt(
-                pout_sd[1]**2 - SM_CONSTS['default_stddev_inter']**2)
-            self.tsd[imtstr] = np.full_like(
-                self.psd[imtstr], SM_CONSTS['default_stddev_inter'])
+        if imtstr != 'MMI':
+            total_only = self.gmpe_total_sd_only
+            tau_guess = SM_CONSTS['default_stddev_inter']
+        else:
+            total_only = self.ipe_total_sd_only
+            tau_guess = SM_CONSTS['default_stddev_inter_mmi']
+        if total_only:
+            self.psd[imtstr] = np.sqrt(pout_sd[0]**2 - tau_guess**2)
+            self.psd_raw[imtstr] = np.sqrt(pout_sd[1]**2 - tau_guess**2)
+            self.tsd[imtstr] = np.full_like(self.psd[imtstr], tau_guess)
         else:
             self.psd[imtstr] = pout_sd[2]
             self.psd_raw[imtstr] = pout_sd[5]
@@ -1070,30 +1342,31 @@ class ModelModule(CoreModule):
         corr_adj22 = corr_adj * corr_adj.T
         np.fill_diagonal(corr_adj22, 1.0)
 
+        sta_lons_rad_flat = self.sta_lons_rad[imtstr].ravel()
+        sta_lats_rad_flat = self.sta_lats_rad[imtstr].ravel()
         #
         # Re-build the covariance matrix of the residuals with
         # the full set of data
         #
-        dist22 = geodetic_distance_fast_c(self.sta_lons_rad[imtstr].ravel(),
-                                          self.sta_lats_rad[imtstr].ravel(),
-                                          self.sta_lons_rad[imtstr].ravel(),
-                                          self.sta_lats_rad[imtstr].ravel())
-        d22_rows, d22_cols = np.shape(dist22)  # should be square
-        t1_22 = self.sta_period_ix[imtstr] * np.ones((1, d22_cols),
-                                                     dtype=np.long)
-        t2_22 = self.sta_period_ix[imtstr].T * np.ones((d22_rows, 1),
-                                                       dtype=np.long)
-        corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
+        nsta = np.size(sta_lons_rad_flat)
+        matrix22 = np.empty((nsta, nsta), dtype=np.double)
+        geodetic_distance_fast(sta_lons_rad_flat,
+                               sta_lats_rad_flat,
+                               sta_lons_rad_flat,
+                               sta_lats_rad_flat,
+                               matrix22)
+        ones = np.ones((1, nsta), dtype=np.long)
+        t1_22 = self.sta_period_ix[imtstr] * ones
+        t2_22 = self.sta_period_ix[imtstr].T * ones.T
+        self.ccf.getCorrelation(t1_22, t2_22, matrix22)
 
         #
         # Rebuild sigma22_inv now that we have updated phi and
         # the correlation adjustment factors
         #
-        sigma22 = make_sigma_matrix(corr22, corr_adj22,
-                                    self.sta_phi[imtstr].ravel(),
-                                    self.sta_phi[imtstr].ravel())
-
-        sigma22inv = np.linalg.pinv(sigma22)
+        sta_phi_flat = self.sta_phi[imtstr].ravel()
+        make_sigma_matrix(matrix22, corr_adj22, sta_phi_flat, sta_phi_flat)
+        sigma22inv = np.linalg.pinv(matrix22)
 
         #
         # Now do the MVN itself...
@@ -1102,45 +1375,46 @@ class ModelModule(CoreModule):
 
         ampgrid = np.zeros_like(pout_mean)
         sdgrid = np.zeros_like(pout_mean)
-        corr_adj12 = corr_adj * np.ones((1, self.smnx))
+        corr_adj12 = corr_adj.T * np.ones((self.smnx, 1))
         # Stuff that doesn't change within the loop:
-        sta_lons_rad_flat = self.sta_lons_rad[imtstr].ravel()
-        sta_lats_rad_flat = self.sta_lats_rad[imtstr].ravel()
         lons_out_rad_flat = self.lons_out_rad.ravel()
         lats_out_rad_flat = self.lats_out_rad.ravel()
-        ny = np.size(sta_lats_rad_flat)
         d12_cols = self.smnx
-        t2_12 = np.full((ny, d12_cols), outperiod_ix, dtype=np.int)
-        t1_12 = self.sta_period_ix[imtstr] * np.ones((1, d12_cols),
-                                                     dtype=np.long)
+        t2_12 = np.full((d12_cols, nsta), outperiod_ix, dtype=np.long)
+        t1_12 = self.sta_period_ix[imtstr].T * np.ones((d12_cols, 1),
+                                                       dtype=np.long)
         # sdsta is the standard deviation of the stations
         sdsta = self.sta_phi[imtstr].ravel()
+        matrix12 = np.empty(t2_12.shape, dtype=np.double)
+        rcmatrix = np.empty(t2_12.shape, dtype=np.double)
         for iy in range(self.smny):
             ss = iy * self.smnx
             se = (iy + 1) * self.smnx
             time4 = time.time()
-            dist12 = geodetic_distance_fast_c(
+            geodetic_distance_fast(
+                sta_lons_rad_flat,
+                sta_lats_rad_flat,
                 lons_out_rad_flat[ss:se],
                 lats_out_rad_flat[ss:se],
-                sta_lons_rad_flat,
-                sta_lats_rad_flat)
+                matrix12)
             ddtime += time.time() - time4
             time4 = time.time()
-            corr12 = self.ccf.getCorrelation(t1_12, t2_12, dist12)
+            self.ccf.getCorrelation(t1_12, t2_12, matrix12)
             ctime += time.time() - time4
             time4 = time.time()
             # sdarr is the standard deviation of the output sites
             sdarr = self.psd[imtstr][iy, :].ravel()
-            sigma12 = make_sigma_matrix(corr12, corr_adj12, sdsta, sdarr)
+            make_sigma_matrix(matrix12, corr_adj12, sdsta, sdarr)
             stime += time.time() - time4
             time4 = time.time()
             #
             # Sigma12 * Sigma22^-1 is known as the 'regression
             # coefficient' matrix (rcmatrix)
             #
-            rcmatrix = sigma12.dot(sigma22inv)
+            np.dot(matrix12, sigma22inv, out=rcmatrix)
             dtime += time.time() - time4
             time4 = time.time()
+
             #
             # This is the MVN solution for the conditional mean
             #
@@ -1156,7 +1430,7 @@ class ModelModule(CoreModule):
             # sdgrid[ss:se] = pout_sd2[ss:se] -
             #       np.diag(rcmatrix.dot(sigma21))
             #
-            make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, sigma12)
+            make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, matrix12)
             mtime += time.time() - time4
 
         self.outgrid[imtstr] = ampgrid
@@ -1171,32 +1445,35 @@ class ModelModule(CoreModule):
         self.logger.debug('total time for %s=%f' %
                           (imtstr, time.time() - time1))
 
-    def _getMaskedGrids(self):
+    def _getLandMask(self):
+        """
+        Get the landmask for this map. Land will be False, water will
+        be True (because of the way masked arrays work).
+        """
+        if not self.do_grid:
+            return None
+        gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
+                                       self.smdx, self.smdy)
+        maskfile = os.path.join(get_data_path(), 'landmask', 'landmask_nb.grd')
+        mask = mapio.reader.read(maskfile, samplegeodict=gd, resample=True,
+                                 method='nearest', doPadding=True,
+                                 padValue=0)
+        bmask = ~(mask._data.astype(np.bool))
+        return bmask
+
+    def _getMaskedGrids(self, bmask):
         """
         For each grid in the output, generate a grid with the water areas
         masked out.
         """
         moutgrid = {}
-        # We only need to make the mask for one IMT, then we can
-        # apply it to all of the other grids.
-        refimt = list(self.imt_out_set)[0]
-
-        #
-        # Don't know what to do about this warning; hopefully someone
-        # will fix maskoceans()
-        #
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore",
-                                    category=np.VisibleDeprecationWarning)
-            moutgrid[refimt] = \
-                maskoceans(self.sx_out.lons, self.sx_out.lats,
-                           self.outgrid[refimt], inlands=False, grid=1.25)
+        if not self.do_grid:
+            for imtout in self.imt_out_set:
+                moutgrid[imtout] = self.outgrid[imtout]
+            return moutgrid
         for imtout in self.imt_out_set:
-            if imtout == refimt:
-                continue
             moutgrid[imtout] = \
-                ma.masked_array(self.outgrid[imtout],
-                                mask=copy.copy(moutgrid[refimt].mask))
+                ma.masked_array(self.outgrid[imtout], mask=bmask)
         return moutgrid
 
     def _getInfo(self, moutgrid):
@@ -1211,6 +1488,7 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         # This is the metadata for creating info.json
         # ---------------------------------------------------------------------
+        st = 'strec'
         ip = 'input'
         ei = 'event_information'
         op = 'output'
@@ -1227,6 +1505,14 @@ class ModelModule(CoreModule):
         info[ip][ei] = {}
         info[ip][ei]['depth'] = str(self.rx.hypo_depth)
         info[ip][ei]['event_id'] = self._eventid
+
+        # look for the presence of a strec_results file and read it in
+        _, data_path = get_config_paths()
+        datadir = os.path.join(data_path, self._eventid, 'current')
+        strecfile = os.path.join(datadir, 'strec_results.json')
+        if os.path.isfile(strecfile):
+            strec_results = json.load(open(strecfile, 'rt'))
+            info[st] = strec_results
 
         # the following items are primarily useful for PDL
         origin = self.rupture_obj._origin
@@ -1284,38 +1570,54 @@ class ModelModule(CoreModule):
             elif myimt == 'PGV':
                 units = 'cms'
             else:
-                units = 'ln(g)'
+                units = 'g'
             info[op][gm][myimt]['units'] = units
             if myimt in self.nominal_bias:
-                info[op][gm][myimt]['bias'] = str(self.nominal_bias[myimt])
+                info[op][gm][myimt]['bias'] = \
+                    _string_round(self.nominal_bias[myimt], 3)
             else:
-                info[op][gm][myimt]['bias'] = '-'
-            info[op][gm][myimt]['max_grid'] = str(np.max(self.outgrid[myimt]))
-            info[op][gm][myimt]['max'] = str(np.max(moutgrid[myimt]))
+                info[op][gm][myimt]['bias'] = None
+            if myimt == 'MMI' or myimt == 'PGV':
+                info[op][gm][myimt]['max_grid'] = \
+                    _string_round(np.max(self.outgrid[myimt]), 3)
+                info[op][gm][myimt]['max'] = \
+                    _string_round(np.max(moutgrid[myimt]), 3)
+            else:
+                info[op][gm][myimt]['max_grid'] = \
+                    _string_round(np.exp(np.max(self.outgrid[myimt])), 3)
+                info[op][gm][myimt]['max'] = \
+                    _string_round(np.exp(np.max(moutgrid[myimt])), 3)
+
         info[op][mi] = {}
         info[op][mi]['grid_points'] = {}
         info[op][mi]['grid_points']['longitude'] = str(self.smnx)
         info[op][mi]['grid_points']['latitude'] = str(self.smny)
         info[op][mi]['grid_points']['units'] = ''
         info[op][mi]['grid_spacing'] = {}
-        info[op][mi]['grid_spacing']['longitude'] = str(self.smdx)
-        info[op][mi]['grid_spacing']['latitude'] = str(self.smdy)
+        info[op][mi]['grid_spacing']['longitude'] = _string_round(self.smdx, 7)
+        info[op][mi]['grid_spacing']['latitude'] = _string_round(self.smdy, 7)
         info[op][mi]['grid_spacing']['units'] = 'degrees'
         info[op][mi]['grid_span'] = {}
-        info[op][mi]['grid_span']['longitude'] = str(self.E - self.W)
-        info[op][mi]['grid_span']['latitude'] = str(self.N - self.S)
+        if self.E <= 0 and self.W >= 0:
+            info[op][mi]['grid_span']['longitude'] = \
+                _string_round(self.E + 360.0 - self.W, 3)
+        else:
+            info[op][mi]['grid_span']['longitude'] = \
+                _string_round(self.E - self.W, 3)
+        info[op][mi]['grid_span']['latitude'] = \
+            _string_round(self.N - self.S, 3)
         info[op][mi]['grid_span']['units'] = 'degrees'
         info[op][mi]['min'] = {}
-        info[op][mi]['min']['longitude'] = str(self.W)
-        info[op][mi]['min']['latitude'] = str(self.S)
+        info[op][mi]['min']['longitude'] = _string_round(self.W, 3)
+        info[op][mi]['min']['latitude'] = _string_round(self.S, 3)
         info[op][mi]['min']['units'] = 'degrees'
         info[op][mi]['max'] = {}
-        info[op][mi]['max']['longitude'] = str(self.E)
-        info[op][mi]['max']['latitude'] = str(self.N)
+        info[op][mi]['max']['longitude'] = _string_round(self.E, 3)
+        info[op][mi]['max']['latitude'] = _string_round(self.N, 3)
         info[op][mi]['max']['units'] = 'degrees'
         info[op][un] = {}
         info[op][un]['grade'] = mygrade
-        info[op][un]['mean_uncertainty_ratio'] = mean_rat
+        info[op][un]['mean_uncertainty_ratio'] = _string_round(mean_rat, 3)
         if 'df2' in self.dataframes:
             info[op][un]['total_flagged_mi'] = \
                 str(np.sum(self.df2.df['MMI_outliers'] |
@@ -1331,6 +1633,7 @@ class ModelModule(CoreModule):
                 all_flagged |= \
                     self.df1.df[imtstr + '_outliers'] | \
                     np.isnan(self.df1.df[imtstr])
+            all_flagged |= self.df1.df['flagged']
             info[op][un]['total_flagged_pgm'] = str(np.sum(all_flagged))
         else:
             info[op][un]['total_flagged_pgm'] = '0'
@@ -1389,7 +1692,8 @@ class ModelModule(CoreModule):
         Get the station JSON dictionary and then add a bunch of stuff to it.
         """
         if not hasattr(self, 'stations') or self.stations is None:
-            return {'features': []}
+            return {'eventid': self._eventid,
+                    'features': []}
         sjdict = {}
         # ---------------------------------------------------------------------
         # Compute a bias for all the IMTs in the data frames
@@ -1444,7 +1748,8 @@ class ModelModule(CoreModule):
         # Now go through the GeoJSON and add various properties and
         # amps from the df_dict dictionaries
         #
-        for station in sjdict['features']:
+        sjdict_copy = copy.copy(sjdict['features'])
+        for station in sjdict_copy:
             if station['id'] in sta_ix['df1']:
                 ndf = 'df1'
                 station['properties']['station_type'] = 'seismic'
@@ -1452,8 +1757,13 @@ class ModelModule(CoreModule):
                 ndf = 'df2'
                 station['properties']['station_type'] = 'macroseismic'
             else:
-                raise ValueError('Unknown station %s in stationlist' %
-                                 (station['id']))
+                # We're probably using --no_seismic or --no_macroseismic
+                if self.no_seismic or self.no_macroseismic:
+                    sjdict['features'].remove(station)
+                    continue
+                else:
+                    raise ValueError('Unknown station %s in stationlist' %
+                                     (station['id']))
             dfx = getattr(self, ndf)
             sdf = dfx.df
             six = sta_ix[ndf][station['id']]
@@ -1471,14 +1781,16 @@ class ModelModule(CoreModule):
                 station['properties']['intensity_stddev'] = 'null'
 
             if 'PGA' in sdf and not sdf['PGA_outliers'][six] \
-                    and not np.isnan(sdf['PGA'][six]):
+                    and not np.isnan(sdf['PGA'][six]) \
+                    and (ndf != 'df1' or not sdf['flagged'][six]):
                 station['properties']['pga'] = \
                     _round_float(np.exp(sdf['PGA'][six]) * 100, 4)
             else:
                 station['properties']['pga'] = 'null'
 
             if 'PGV' in sdf and not sdf['PGV_outliers'][six] \
-                    and not np.isnan(sdf['PGV'][six]):
+                    and not np.isnan(sdf['PGV'][six]) \
+                    and (ndf != 'df1' or not sdf['flagged'][six]):
                 station['properties']['pgv'] = \
                     _round_float(np.exp(sdf['PGV'][six]), 4)
             else:
@@ -1495,38 +1807,56 @@ class ModelModule(CoreModule):
                 if not key.endswith('_pred'):
                     continue
                 myamp = sdf[key][six]
+                myamp_rock = sdf[key + '_rock'][six]
+                myamp_soil = sdf[key + '_soil'][six]
                 tau_str = 'ln_tau'
                 phi_str = 'ln_phi'
                 sigma_str = 'ln_sigma'
+                sigma_str_rock = 'ln_sigma_rock'
+                sigma_str_soil = 'ln_sigma_soil'
                 bias_str = 'ln_bias'
                 if key.startswith('PGV'):
                     value = np.exp(myamp)
+                    value_rock = np.exp(myamp_rock)
+                    value_soil = np.exp(myamp_soil)
                     units = 'cm/s'
                 elif key.startswith('MMI'):
                     value = myamp
+                    value_rock = myamp_rock
+                    value_soil = myamp_soil
                     units = 'intensity'
                     tau_str = 'tau'
                     phi_str = 'phi'
                     sigma_str = 'sigma'
+                    sigma_str_rock = 'sigma_rock'
+                    sigma_str_soil = 'sigma_soil'
                     bias_str = 'bias'
                 else:
                     value = np.exp(myamp) * 100
+                    value_rock = np.exp(myamp_rock) * 100
+                    value_soil = np.exp(myamp_soil) * 100
                     units = '%g'
-                if self.total_sd_only:
+                if self.gmpe_total_sd_only:
                     mytau = 0
                 else:
                     mytau = sdf[key + '_tau'][six]
                 myphi = sdf[key + '_phi'][six]
                 mysigma = np.sqrt(mytau**2 + myphi**2)
+                mysigma_rock = sdf[key + '_sigma_rock'][six]
+                mysigma_soil = sdf[key + '_sigma_soil'][six]
                 imt_name = key.lower().replace('_pred', '')
                 mybias = sdf[imt_name.upper() + '_bias'][six]
                 station['properties']['predictions'].append({
                     'name': imt_name,
                     'value': _round_float(value, 4),
+                    'value_rock': _round_float(value_rock, 4),
+                    'value_soil': _round_float(value_soil, 4),
                     'units': units,
                     tau_str: _round_float(mytau, 4),
                     phi_str: _round_float(myphi, 4),
                     sigma_str: _round_float(mysigma, 4),
+                    sigma_str_rock: _round_float(mysigma_rock, 4),
+                    sigma_str_soil: _round_float(mysigma_soil, 4),
                     bias_str: _round_float(mybias, 4),
                 })
             #
@@ -1595,16 +1925,22 @@ class ModelModule(CoreModule):
             #
             # Set the outlier flags
             #
+            mflag = '0'
+            if ndf == 'df1' and sdf['flagged'][six]:
+                mflag = 'ManuallyFlagged'
             for channel in station['properties']['channels']:
                 for amp in channel['amplitudes']:
+                    if amp['flag'] != '0':
+                        amp['flag'] += ',' + mflag
+                    else:
+                        amp['flag'] = mflag
                     Name = amp['name'].upper()
                     if sdf[Name + '_outliers'][six]:
                         if amp['flag'] == '0':
-                            amp['flag'] = 'T'
+                            amp['flag'] = 'Outlier'
                         else:
-                            amp['flag'] += 'T'
-                    if not amp['flag']:
-                        amp['flag'] = '0'
+                            amp['flag'] += ',Outlier'
+        sjdict['metadata'] = {'eventid': self._eventid}
         return sjdict
 
     def _storeGriddedData(self, oc):
@@ -1732,54 +2068,26 @@ class ModelModule(CoreModule):
                             self.outsd[key].ravel(), std_metadata,
                             component)
 
-    def _storeRegressionData(self, oc):
+    def _storeAttenuationData(self, oc):
         """
-        Average the regression grids in distance bins and output the arrays
+        Output arrays of rock and soil attenuation curves
         """
-        rrup = self.dx_out.rrup
-        dx = self.smdx * 111.0
-        dmax = np.max(rrup)
-        dists = np.arange(0, dmax + dx, dx)
-        ndists = np.size(dists)
-        rockmean = {}
-        soilmean = {}
-        rocksd = {}
-        soilsd = {}
-        mean_dists = np.zeros(ndists - 1)
-        for imtstr in self.rockgrid.keys():
-            rockmean[imtstr] = np.zeros(ndists - 1)
-            soilmean[imtstr] = np.zeros(ndists - 1)
-            rocksd[imtstr] = np.zeros(ndists - 1)
-            soilsd[imtstr] = np.zeros(ndists - 1)
 
-        bad_ix = []
-        for ix in range(ndists - 1):
-            ixx = (rrup >= dists[ix]) & (rrup < dists[ix+1])
-            mean_dists[ix] = (dists[ix] + dists[ix+1]) / 2.0
-            if not np.any(ixx):
-                bad_ix.append(ix)
-                continue
-            for imtstr in self.rockgrid.keys():
-                rockmean[imtstr][ix] = np.mean(self.rockgrid[imtstr][ixx])
-                soilmean[imtstr][ix] = np.mean(self.soilgrid[imtstr][ixx])
-                rocksd[imtstr][ix] = np.mean(self.rocksd[imtstr][ixx])
-                soilsd[imtstr][ix] = np.mean(self.soilsd[imtstr][ixx])
+        for dist_type in ['repi', 'rhypo', 'rrup', 'rjb']:
+            oc.setArray(['attenuation', 'distances'], dist_type,
+                        getattr(self.atten_dx, dist_type, None))
 
-        mean_dists = np.delete(mean_dists, bad_ix)
-        oc.setArray(['regression'], 'distances', mean_dists)
-        for imtstr in self.rockgrid.keys():
-            rockmean[imtstr] = np.delete(rockmean[imtstr], bad_ix)
-            soilmean[imtstr] = np.delete(soilmean[imtstr], bad_ix)
-            rocksd[imtstr] = np.delete(rocksd[imtstr], bad_ix)
-            soilsd[imtstr] = np.delete(soilsd[imtstr], bad_ix)
-            oc.setArray(['regression', 'rock', imtstr], 'mean',
-                        rockmean[imtstr])
-            oc.setArray(['regression', 'soil', imtstr], 'mean',
-                        soilmean[imtstr])
-            oc.setArray(['regression', 'rock', imtstr], 'std',
-                        rocksd[imtstr])
-            oc.setArray(['regression', 'soil', imtstr], 'std',
-                        soilsd[imtstr])
+        imtstrs = self.atten_rock_mean.keys()
+        for imtstr in imtstrs:
+            oc.setArray(['attenuation', 'rock', imtstr], 'mean',
+                        self.atten_rock_mean[imtstr])
+            oc.setArray(['attenuation', 'soil', imtstr], 'mean',
+                        self.atten_soil_mean[imtstr])
+            oc.setArray(['attenuation', 'rock', imtstr], 'std',
+                        self.atten_rock_sd[imtstr])
+            oc.setArray(['attenuation', 'soil', imtstr], 'std',
+                        self.atten_soil_sd[imtstr])
+        return
 
     #
     # Helper function to call get_mean_and_stddevs for the
@@ -1814,8 +2122,10 @@ class ModelModule(CoreModule):
         """
         if 'MMI' in oqimt:
             pe = self.ipe
+            sd_types = self.ipe_stddev_types
         else:
             pe = gmpe
+            sd_types = self.gmpe_stddev_types
 
             # --------------------------------------------------------------------
             # Describe the MultiGMPE
@@ -1829,7 +2139,7 @@ class ModelModule(CoreModule):
         mean, stddevs = pe.get_mean_and_stddevs(
             copy.deepcopy(sx), self.rx,
             copy.deepcopy(dx), oqimt,
-            self.stddev_types)
+            sd_types)
 
         # Include generic amp factors?
         if apply_gafs:
@@ -1897,11 +2207,69 @@ class ModelModule(CoreModule):
 
         return mean, stddevs
 
+    def _adjustResolution(self):
+        """
+        This is a helper function to adjust the resolution to be under
+        the maximum value specified in the config.
+        """
+        # We want to only use resolutions that are multiples of 1 minute or
+        # an integer division of 1 minute.
+        one_minute = 1/60
+        multiples = np.arange(1, 11)
+        divisions = 1/multiples
+        factors = np.sort(np.unique(np.concatenate((divisions, multiples))))
+        ok_res = one_minute * factors
+        latspan = self.N - self.S
+
+        # Deal with possible 180 longitude disontinuity
+        if self.E > self.W:
+            lonspan = self.E - self.W
+        else:
+            xmax = self.E + 360
+            lonspan = xmax - self.W
+        nx = np.floor(lonspan / self.smdx) + 1
+        ny = np.floor(latspan / self.smdy) + 1
+        ngrid = nx * ny
+        nmax = self.nmax
+        if ngrid > nmax:
+            self.logger.info('Extent and resolution of shakemap results in '
+                             'too many grid points. Adjusting resolution...')
+            self.logger.info('Longitude span: %f' % lonspan)
+            self.logger.info('Latitude span: %f' % latspan)
+            self.logger.info('Current dx: %f' % self.smdx)
+            self.logger.info('Current dy: %f' % self.smdy)
+            self.logger.info('Current number of grid points: %i' % ngrid)
+            self.logger.info('Max grid points allowed: %i' % nmax)
+            target_res = \
+                (-(latspan + lonspan) -
+                 np.sqrt(latspan**2 + lonspan**2 +
+                         2 * latspan * lonspan *
+                         (2 * nmax - 1))) / (2 * (1 - nmax))
+
+            if np.any(ok_res > target_res):
+                sel_res = np.min(ok_res[ok_res > target_res])
+            else:
+                sel_res = np.max(ok_res)
+            self.smdx = sel_res
+            self.smdy = sel_res
+            self.logger.info('Updated dx: %f' % self.smdx)
+            self.logger.info('Updatd dy: %f' % self.smdy)
+            nx = np.floor(lonspan / self.smdx) + 1
+            ny = np.floor(latspan / self.smdy) + 1
+            self.logger.info('Updated number of grid points: %i'
+                             % (nx * ny))
+
 
 def _round_float(val, digits):
-    if val == 'null':
-        return val
+    if ma.is_masked(val) or val == '--' or val == 'null' or np.isnan(val):
+        return None
     return float(('%.' + str(digits) + 'f') % val)
+
+
+def _string_round(val, digits):
+    if ma.is_masked(val) or val == '--' or val == 'null' or np.isnan(val):
+        return None
+    return str(_round_float(val, digits))
 
 
 def _get_period_arrays(*args):
@@ -2078,12 +2446,13 @@ def _get_imt_lists(df):
     for ix in range(nlist):
         valid_imts = []
         sa_imts = []
-        for this_imt in df.imts:
-            if not np.isnan(df.df[this_imt][ix]) and \
-               not df.df[this_imt + '_outliers'][ix]:
-                valid_imts.append(this_imt)
-                if this_imt.startswith('SA('):
-                    sa_imts.append(this_imt)
+        if 'flagged' not in df.df or not df.df['flagged'][ix]:
+            for this_imt in df.imts:
+                if not np.isnan(df.df[this_imt + '_residual'][ix]) and \
+                        not df.df[this_imt + '_outliers'][ix]:
+                    valid_imts.append(this_imt)
+                    if this_imt.startswith('SA('):
+                        sa_imts.append(this_imt)
         imtlist.append(valid_imts)
         salist.append(sa_imts)
     return imtlist, salist
@@ -2094,7 +2463,7 @@ def _get_map_grade(do_grid, outsd, psd, moutgrid):
     Computes a 'grade' for the map. Essentially looks at the ratio of
     the computed PGA uncertainty to the predicted PGA uncertainty for
     the area inside the MMI 6 contour. If the maximum MMI is less than
-    6, or the map is not a grid, the grade and mean ratio are set to '-'.
+    6, or the map is not a grid, the grade and mean ratio are set to '--'.
 
     Args:
         do_grid (bool): Is the map a grid (True) or a list of points
@@ -2110,8 +2479,8 @@ def _get_map_grade(do_grid, outsd, psd, moutgrid):
     Returns:
         tuple: The mean uncertainty ratio and the letter grade.
     """
-    mean_rat = '-'
-    mygrade = '-'
+    mean_rat = '--'
+    mygrade = '--'
     if not do_grid or 'PGA' not in outsd or 'PGA' not in psd \
             or 'MMI' not in moutgrid:
         return mean_rat, mygrade
@@ -2126,7 +2495,7 @@ def _get_map_grade(do_grid, outsd, psd, moutgrid):
             if mean_rat <= val:
                 mygrade = grades[ix]
                 break
-        if mygrade == '-':
+        if mygrade == '--':
             mygrade = 'F'
     return mean_rat, mygrade
 

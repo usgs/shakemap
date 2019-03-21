@@ -6,6 +6,7 @@ import os.path
 import shutil
 from collections import OrderedDict
 import textwrap
+import json
 
 # third party imports
 from configobj import ConfigObj
@@ -95,6 +96,13 @@ class SelectModule(CoreModule):
         # Get the default weighting for this event
         # ---------------------------------------------------------------------
         gmmdict, strec_results = get_weights(org, config)
+
+        # ---------------------------------------------------------------------
+        # Write the strec results out to a JSON file.
+        # ---------------------------------------------------------------------
+        jsonfile = os.path.join(datadir, 'strec_results.json')
+        with open(jsonfile, 'wt') as f:
+            json.dump(strec_results.to_dict(), f)
 
         # ---------------------------------------------------------------------
         # Create ConfigObj object for output to model_select.conf

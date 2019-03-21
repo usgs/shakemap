@@ -40,10 +40,7 @@ class AugmentModule(CoreModule):
         """
         Instantiate a CoreModule class with an event ID.
         """
-        self._eventid = eventid
-        log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
-        self.logger = logging.getLogger(log_name)
+        super(AugmentModule, self).__init__(eventid)
         if comment is not None:
             self.comment = comment
 
@@ -76,7 +73,7 @@ class AugmentModule(CoreModule):
 
         # Prompt for a comment string if none is provided on the command line
         if self.comment is None:
-            if sys.stdout.isatty():
+            if sys.stdout is not None and sys.stdout.isatty():
                 self.comment = input(
                         'Please enter a comment for this version.\n'
                         '(Start with "+" if you wish to append to the\n'

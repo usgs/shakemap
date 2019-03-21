@@ -9,11 +9,12 @@
     <title>shakemap.utils.layers &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -73,6 +74,8 @@
             <span class="k">continue</span>
         <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;horizontal_buffer&#39;</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;vertical_buffer&#39;</span><span class="p">:</span>
             <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cfg_float</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;use_slab&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cfg_bool</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;gmpe&#39;</span><span class="p">:</span>
             <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">gmpe_list</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;min_depth&#39;</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span>
@@ -113,7 +116,7 @@
                                      <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ix</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]),</span>
                                      <span class="n">elon_arr</span><span class="p">,</span> <span class="n">elat_arr</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">nearest</span><span class="p">:</span>
-            <span class="n">nearest</span> <span class="o">=</span> <span class="n">dd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">nearest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">nearest</span></div>
 
 

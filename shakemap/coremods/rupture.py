@@ -1,13 +1,12 @@
 # stdlib imports
 import os.path
 import json
-from collections import OrderedDict
 
 # third party imports
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 
 ALLOWED_FORMATS = ['json']
@@ -22,15 +21,9 @@ class RuptureModule(CoreModule):
     targets = [r'products/rupture\.json']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    contents = OrderedDict.fromkeys(['ruptureJSON'])
-    contents['ruptureJSON'] = {
-        'title': 'Fault Rupture',
-        'caption': 'JSON Representation of Fault Rupture.',
-        'formats': [{'filename': 'rupture.json',
-                     'type': 'application/json'}]
-    }
+    def __init__(self, eventid):
+        super(RuptureModule, self).__init__(eventid)
+        self.contents = Contents(None, None, eventid)
 
     def execute(self):
         """
@@ -63,3 +56,7 @@ class RuptureModule(CoreModule):
                 f.close()
 
         container.close()
+
+        self.contents.addFile('ruptureJSON', 'Fault Rupture',
+                              'JSON Representation of Fault Rupture.',
+                              'rupture.json', 'application/json')

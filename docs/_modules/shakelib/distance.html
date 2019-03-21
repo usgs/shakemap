@@ -9,11 +9,12 @@
     <title>shakelib.distance &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -100,16 +101,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Distance object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
-        <span class="n">sm_dict</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">_GeoDict</span>
-        <span class="n">west</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">xmin</span>
-        <span class="n">east</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">xmax</span>
-        <span class="n">south</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">ymin</span>
-        <span class="n">north</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">ymax</span>
-        <span class="n">nx</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">nx</span>
-        <span class="n">ny</span> <span class="o">=</span> <span class="n">sm_dict</span><span class="o">.</span><span class="n">ny</span>
-        <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
-        <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
-        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
+        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">_lons</span><span class="p">,</span> <span class="n">sites</span><span class="o">.</span><span class="n">_lats</span><span class="p">)</span>
         <span class="n">dep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rup</span><span class="p">)</span></div>
 
@@ -144,7 +136,7 @@
             <span class="n">gmpe</span> <span class="o">=</span> <span class="p">[</span><span class="n">gmpe</span><span class="p">]</span>
 
         <span class="c1"># require rhypo always</span>
-        <span class="n">requires</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">])</span>
+        <span class="n">requires</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">ig</span> <span class="ow">in</span> <span class="n">gmpe</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">GMPE</span><span class="p">):</span>
@@ -178,7 +170,8 @@
 <span class="sd">        A list of strings.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rx&#39;</span><span class="p">,</span> <span class="s1">&#39;ry&#39;</span><span class="p">,</span> <span class="s1">&#39;ry0&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rx&#39;</span><span class="p">,</span> <span class="s1">&#39;ry&#39;</span><span class="p">,</span> <span class="s1">&#39;ry0&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;rvolc&#39;</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="get_distance"><a class="viewcode-back" href="../../shakelib/shakelib.distance.html#shakelib.distance.get_distance">[docs]</a><span class="k">def</span> <span class="nf">get_distance</span><span class="p">(</span><span class="n">methods</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
@@ -212,6 +205,9 @@
 <span class="sd">    | U      | GC2 coordinate U.                                        |</span>
 <span class="sd">    +--------+----------------------------------------------------------+</span>
 <span class="sd">    | T      | GC2 coordinate T.                                        |</span>
+<span class="sd">    +--------+----------------------------------------------------------+</span>
+<span class="sd">    | rvolc  | Part of the rupture distance spent in volcanic region.   |</span>
+<span class="sd">    |        | Currently set to 0 for all points.                       |</span>
 <span class="sd">    +--------+----------------------------------------------------------+</span>
 
 <span class="sd">    Args:</span>
@@ -271,6 +267,9 @@
     <span class="c1"># If any of the GC2-related distances are requested, may as well do all</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">methods</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">gc2_distances</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">distdict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">computeGC2</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="s1">&#39;rvolc&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;rvolc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">distdict</span></div>
 </pre></div>

@@ -14,7 +14,7 @@ from shakemap.utils.logging import get_logging_config
 
 class ExceptionModule(CoreModule):
     """
-    sleep -- Sleep for a number of seconds.
+    Module to raise an exception for testing purposes.
     """
 
     command_name = 'exception'

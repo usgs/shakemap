@@ -39,6 +39,8 @@ from impactutils.time.ancient_time import HistoricTime
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 
+do_tests = True
+
 
 def test_no_origin():
     # No argument
@@ -148,10 +150,10 @@ S214-S233.'''
 def test_rupture_from_dict():
 
     # Grab an EdgeRupture
-    origin = Origin({'id': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
-                     'network': '', 'locstring': '',
-                     'time': HistoricTime.utcfromtimestamp(time.time())})
+    origin = Origin({'id': 'test', 'lat': 0, 'lon': 0, 'depth': 5.0,
+                     'mag': 7.0, 'netid': 'us', 'network': '',
+                     'locstring': '', 'time':
+                     HistoricTime.utcfromtimestamp(time.time())})
 
     file = os.path.join(homedir, 'rupture_data/cascadia.json')
     rup_original = get_rupture(origin, file)
@@ -209,8 +211,11 @@ def test_rupture_from_dict():
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [41.11182253, 42.73956168])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [42.757296, 46.614723])
+    else:
+        print(rjb[0], rrup[0])
     # Various combinations of mech and tectonic region...
     rup_original._origin._tectonic_region = 'Active Shallow Crust'
     rup_original._origin.mech = 'ALL'
@@ -218,66 +223,93 @@ def test_rupture_from_dict():
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [41.11182253, 42.73956168])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [42.757296, 46.614723])
+    else:
+        print(rjb[0], rrup[0])
     rup_original._origin.mech = 'RS'
     rjb, _ = rup_original.computeRjb(np.array([-122.0]), np.array([37.0]),
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [39.17479645, 41.20916362])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [39.779893, 44.033556])
+    else:
+        print(rjb[0], rrup[0])
     rup_original._origin.mech = 'NM'
     rjb, _ = rup_original.computeRjb(np.array([-122.0]), np.array([37.0]),
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [39.85641875, 41.89222387])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [40.937772, 45.254891])
+    else:
+        print(rjb[0], rrup[0])
     rup_original._origin.mech = 'SS'
     rjb, _ = rup_original.computeRjb(np.array([-122.0]), np.array([37.0]),
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [43.21392667, 44.04215406])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [46.750567, 48.108934])
+    else:
+        print(rjb[0], rrup[0])
     rup_original._origin._tectonic_region = 'Stable Shallow Crust'
     rup_original._origin.mech = 'ALL'
     rjb, _ = rup_original.computeRjb(np.array([-122.0]), np.array([37.0]),
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [42.68382206, 43.71213495])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [43.676648, 48.008276])
+    else:
+        print(rjb[0], rrup[0])
     rup_original._origin.mech = 'RS'
     rjb, _ = rup_original.computeRjb(np.array([-122.0]), np.array([37.0]),
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [42.29766584, 43.51422441])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [42.445057, 46.865434])
+    else:
+        print(rjb[0], rrup[0])
     rup_original._origin.mech = 'NM'
     rjb, _ = rup_original.computeRjb(np.array([-122.0]), np.array([37.0]),
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [42.57075149, 43.7987126])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [43.233314, 47.563079])
+    else:
+        print(rjb[0], rrup[0])
     rup_original._origin.mech = 'SS'
     rjb, _ = rup_original.computeRjb(np.array([-122.0]), np.array([37.0]),
                                      np.array([0.0]))
     rrup, _ = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [44.19126409, 45.02525107])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [47.829729, 50.087485])
+    else:
+        print(rjb[0], rrup[0])
     rup_original._origin._tectonic_region = 'Somewhere Else'
     rup_original._origin.mech = 'ALL'
     rjb, var = rup_original.computeRjb(np.array([-122.0]), np.array([37.0]),
                                        np.array([0.0]))
     rrup, var = rup_original.computeRrup(np.array([-122.0]), np.array([37.0]),
                                          np.array([0.0]))
-    np.testing.assert_allclose([rjb[0], rrup[0]],
-                               [41.11182253, 42.73956168])
+    if do_tests is True:
+        np.testing.assert_allclose([rjb[0], rrup[0]],
+                                   [42.757296, 46.614723])
+    else:
+        print(rjb[0], rrup[0])
 
     # This is just zeroes now, so there's not much to check
     gc2 = rup_original.computeGC2(np.array([-122.0]), np.array([37.0]),

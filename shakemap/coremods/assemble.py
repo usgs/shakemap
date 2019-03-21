@@ -29,6 +29,8 @@ from shakemap.utils.logging import get_logging_config
 from shakemap.utils.amps import AmplitudeHandler
 from shakelib.rupture import constants
 
+SAVE_FILE = '.saved'
+
 
 class AssembleModule(CoreModule):
     """
@@ -48,10 +50,7 @@ class AssembleModule(CoreModule):
         """
         Instantiate a CoreModule class with an event ID.
         """
-        self._eventid = eventid
-        log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
-        self.logger = logging.getLogger(log_name)
+        super(AssembleModule, self).__init__(eventid)
         if comment is not None:
             self.comment = comment
 
@@ -82,7 +81,7 @@ class AssembleModule(CoreModule):
 
         # Prompt for a comment string if none is provided on the command line
         if self.comment is None:
-            if sys.stdout.isatty():
+            if sys.stdout is not None and sys.stdout.isatty():
                 self.comment = input(
                     'Please enter a comment for this version.\n'
                     'comment: ')
@@ -106,6 +105,11 @@ class AssembleModule(CoreModule):
         pdl_path = os.path.join(datadir, 'pdl')
         if os.path.isdir(pdl_path):
             shutil.rmtree(pdl_path, ignore_errors=True)
+
+        # Look for any .transferred file and delete it
+        save_file = os.path.join(datadir, SAVE_FILE)
+        if os.path.isfile(save_file):
+            os.remove(save_file)
 
         #
         # Look for global configs in install_path/config

@@ -9,11 +9,12 @@
     <title>shakemap.coremods.xtestplot_multi &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -41,7 +42,7 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="c1"># neic imports</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
@@ -126,7 +127,7 @@
             <span class="n">axa</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
             <span class="n">axa</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
             <span class="n">axa</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-            <span class="n">axa</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">axa</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
             <span class="n">pfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
                                  <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">)</span>

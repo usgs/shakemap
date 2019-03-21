@@ -1,15 +1,19 @@
 # stdlib imports
 import os.path
-from collections import OrderedDict
+# from multiprocessing import Pool
+import concurrent.futures as cf
+import copy
 
 # third party
 from configobj import ConfigObj
 from mapio.geodict import GeoDict
+from mapio.grid2d import Grid2D
 import numpy as np
 from scipy.interpolate import griddata
 import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+from impactutils.colors.cpalette import ColorPalette
+import rasterio.features
 
 # local imports
 # from mapio.gmt import GMTGrid
@@ -20,8 +24,9 @@ from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.mapping.mapmaker import (draw_intensity, draw_contour)
+from shakelib.utils.imt_string import oq_to_file
 
 
 class MappingModule(CoreModule):
@@ -30,68 +35,18 @@ class MappingModule(CoreModule):
     """
 
     command_name = 'mapping'
-    targets = [r'products/intensity\.jpg', r'products/intensity\.pdf',
-               r'products/pga\.jpg', r'products/pga\.pdf',
-               r'products/pgv\.jpg', r'products/pgv\.pdf',
-               r'products/psa.*p.*\.jpg', r'products/psa.*p.*\.pdf']
+    targets = [
+        r'products/intensity\.jpg', r'products/intensity\.pdf',
+        r'products/mmi_legend\.pdf',
+        r'products/pga\.jpg', r'products/pga\.pdf',
+        r'products/pgv\.jpg', r'products/pgv\.pdf',
+        r'products/psa.*p.*\.jpg', r'products/psa.*p.*\.pdf']
     dependencies = [('products/shake_result.hdf', True)]
     configs = ['products.conf']
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    mapping_page = {'title': 'Ground Motion Maps', 'slug': 'maps'}
-    contents = OrderedDict.fromkeys(
-        ['intensityMap', 'intensityThumbnail', 'pgaMap', 'pgvMap',
-         'psa[PERIOD]Map'])
-    contents['intensityMap'] = {'title': 'Intensity Map',
-                                'caption': 'Map of macroseismic intensity.',
-                                'page': mapping_page,
-                                'formats': [{'filename': 'intensity.jpg',
-                                             'type': 'image/jpeg'},
-                                            {'filename': 'intensity.pdf',
-                                             'type': 'application/pdf'}
-                                            ]
-                                }
-
-    contents['intensityThumbnail'] = {'title': 'Intensity Thumbnail',
-                                      'caption': 'Thumbnail of intensity map.',
-                                      'page': mapping_page,
-                                      'formats': [{'filename':
-                                                   'pin-thumbnail.png',
-                                                   'type': 'image/png'}
-                                                  ]
-                                      }
-
-    contents['pgaMap'] = {'title': 'PGA Map',
-                          'caption': 'Map of peak ground acceleration (%g).',
-                          'page': mapping_page,
-                          'formats': [{'filename': 'pga.jpg',
-                                       'type': 'image/jpeg'},
-                                      {'filename': 'pga.pdf',
-                                       'type': 'image/jpeg'}
-                                      ]
-                          }
-    contents['pgvMap'] = {'title': 'PGV Map',
-                          'caption': 'Map of peak ground velocity (cm/s).',
-                          'page': mapping_page,
-                          'formats': [{'filename': 'pgv.jpg',
-                                       'type': 'image/jpeg'},
-                                      {'filename': 'pgv.pdf',
-                                       'type': 'application/pdf'},
-                                      ]
-                          }
-    psacap = 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'
-    contents['psa[PERIOD]Map'] = {'title': 'PSA[PERIOD] Map',
-                                  'page': mapping_page,
-                                  'caption': psacap,
-                                  'formats': [{'filename':
-                                               'psa[0-9]p[0-9].jpg',
-                                               'type': 'image/jpeg'},
-                                              {'filename':
-                                               'psa[0-9]p[0-9].pdf',
-                                               'type': 'application/pdf'},
-                                              ]
-                                  }
+    def __init__(self, eventid):
+        super(MappingModule, self).__init__(eventid)
+        self.contents = Contents('Ground Motion Maps', 'maps', eventid)
 
     def execute(self):
         """
@@ -126,16 +81,6 @@ class MappingModule(CoreModule):
         # create contour files
         self.logger.debug('Mapping...')
 
-        # get the contour filter_size setting from config
-        # get the path to the products.conf file, load the config
-        config_file = os.path.join(install_path, 'config', 'products.conf')
-        spec_file = get_configspec('products')
-        validator = get_custom_validator()
-        config = ConfigObj(config_file, configspec=spec_file)
-        results = config.validate(validator)
-        if not isinstance(results, bool) or not results:
-            config_error(config, results)
-
         # get the filter size from the products.conf
         filter_size = config['products']['contour']['filter_size']
 
@@ -145,7 +90,13 @@ class MappingModule(CoreModule):
         # get all of the pieces needed for the mapping functions
         layers = config['products']['mapping']['layers']
         oceanfile = layers['oceans']
-        topofile = layers['topography']
+        if 'topography' in layers and layers['topography'] != '':
+            topofile = layers['topography']
+        else:
+            topofile = None
+
+        # Get the number of parallel workers
+        max_workers = config['products']['mapping']['max_workers']
 
         # Reading HDF5 files currently takes a long time, due to poor
         # programming in MapIO.  To save us some time until that issue is
@@ -171,56 +122,137 @@ class MappingModule(CoreModule):
         sampledict = GeoDict.createDictFromBox(sxmin, sxmax,
                                                symin, symax,
                                                dx, dy)
-        topogrid = read(topofile,
-                        samplegeodict=sampledict,
-                        resample=False)
+        if topofile:
+            topogrid = read(topofile,
+                            samplegeodict=sampledict,
+                            resample=False)
+        else:
+            tdata = np.full([sampledict.ny, sampledict.nx], 0.0)
+            topogrid = Grid2D(data=tdata, geodict=sampledict)
+
+        model_config = container.getConfig()
 
         imtlist = container.getIMTs()
+
+        alist = []
         for imtype in imtlist:
             component, imtype = imtype.split('/')
+            comp = container.getComponents(imtype)[0]
+            d = {'imtype': imtype,
+                 'topogrid': topogrid,
+                 'oceanfile': oceanfile,
+                 'datadir': datadir,
+                 'operator': operator,
+                 'filter_size': filter_size,
+                 'info': info,
+                 'component': comp,
+                 'imtdict': container.getIMTGrids(imtype, comp),
+                 'ruptdict': copy.deepcopy(container.getRuptureDict()),
+                 'stationdict': container.getStationDict(),
+                 'config': model_config
+                 }
+            alist.append(d)
             if imtype == 'MMI':
-                self.logger.debug('Drawing intensity map...')
-                intensity_pdf, _ = draw_intensity(container,
-                                                  topogrid,
-                                                  oceanfile,
-                                                  datadir,
-                                                  operator)
-                self.logger.debug('Created intensity map %s' % intensity_pdf)
-                self.make_pin_thumbnail(container, component, datadir)
+                g = copy.deepcopy(d)
+                g['imtype'] = 'thumbnail'
+                alist.append(g)
+                self.contents.addFile('intensityMap', 'Intensity Map',
+                                      'Map of macroseismic intensity.',
+                                      'intensity.jpg', 'image/jpeg')
+                self.contents.addFile('intensityMap', 'Intensity Map',
+                                      'Map of macroseismic intensity.',
+                                      'intensity.pdf', 'application/pdf')
+                self.contents.addFile('intensityThumbnail',
+                                      'Intensity Thumbnail',
+                                      'Thumbnail of intensity map.',
+                                      'pin-thumbnail.png', 'image/png')
             else:
-                self.logger.debug('Drawing %s contour map...' % imtype)
+                fileimt = oq_to_file(imtype)
+                self.contents.addFile(fileimt + 'Map',
+                                      fileimt.upper() + ' Map',
+                                      'Map of ' + imtype + '.',
+                                      fileimt + '.jpg', 'image/jpeg')
+                self.contents.addFile(fileimt + 'Map',
+                                      fileimt.upper() + ' Map',
+                                      'Map of ' + imtype + '.',
+                                      fileimt + '.pdf', 'application/pdf')
 
-                contour_pdf, contour_png = draw_contour(container,
-                                                        imtype, topogrid,
-                                                        oceanfile,
-                                                        datadir,
-                                                        operator, filter_size)
-                self.logger.debug('Created contour map %s' % contour_pdf)
+        if max_workers > 0:
+            with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
+                results = ex.map(make_map, alist)
+                list(results)
+        else:
+            for adict in alist:
+                make_map(adict)
 
         container.close()
 
-    def make_pin_thumbnail(self, container, component, datadir):
-        """Make the artsy-thumbnail for the pin on the USGS webpages.
-        """
-        imtdict = container.getIMTGrids("MMI", component)
-        grid = imtdict['mean']
-        metadata = imtdict['mean_metadata']
-        rx = (np.random.rand(500) * metadata['nx']).astype(np.int)
-        ry = (np.random.rand(500) * metadata['ny']).astype(np.int)
 
-        x_grid = np.linspace(0, metadata['nx'] - 1, 800)
-        y_grid = np.linspace(0, metadata['ny'] - 1, 800)
+def make_map(adict):
 
-        mx_grid, my_grid = np.meshgrid(x_grid, y_grid)
+    imtype = adict['imtype']
+    if imtype == 'MMI':
+        fig1, fig2 = draw_intensity(adict)
+        # save to pdf/jpeg
+        pdf_file = os.path.join(adict['datadir'], 'intensity.pdf')
+        jpg_file = os.path.join(adict['datadir'], 'intensity.jpg')
+        fig1.savefig(pdf_file, bbox_inches='tight')
+        fig1.savefig(jpg_file, bbox_inches='tight')
 
-        grid = griddata(np.hstack([rx.reshape((-1, 1)), ry.reshape((-1, 1))]),
-                        grid[ry, rx], (mx_grid, my_grid), method='nearest')
+        # save the legend file
+        legend_file = os.path.join(adict['datadir'], 'mmi_legend.png')
+        fig2.savefig(legend_file, bbox_inches='tight')
+    elif imtype == 'thumbnail':
+        make_pin_thumbnail(adict)
+    else:
+        fig1 = draw_contour(adict)
+        fileimt = oq_to_file(imtype)
+        pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
+        jpg_file = os.path.join(adict['datadir'], '%s.jpg' % (fileimt))
+        fig1.savefig(pdf_file, bbox_inches='tight')
+        fig1.savefig(jpg_file, bbox_inches='tight')
 
-        plt.figure(figsize=(2.75, 2.75), dpi=96, frameon=False)
-        plt.axis('off')
-        plt.tight_layout()
-        plt.imshow(grid, cmap=cm.jet)
-        plt.savefig(os.path.join(datadir, "pin-thumbnail.png"), dpi=96,
-                    bbox_inches=matplotlib.transforms.Bbox([[0.47, 0.39],
-                                                            [2.50, 2.50]]),
-                    pad_inches=0)
+
+def make_pin_thumbnail(adict):
+    """Make the artsy-thumbnail for the pin on the USGS webpages.
+    """
+    imtdict = adict['imtdict']
+    grid = imtdict['mean']
+    metadata = imtdict['mean_metadata']
+    num_pixels = 300
+    randx = np.random.rand(num_pixels)
+    randy = np.random.rand(num_pixels)
+    rx = (randx * metadata['nx']).astype(np.int)
+    ry = (randy * metadata['ny']).astype(np.int)
+    rvals = np.arange(num_pixels)
+
+    x_grid = np.arange(400)
+    y_grid = np.arange(400)
+
+    mx_grid, my_grid = np.meshgrid(x_grid, y_grid)
+
+    grid = griddata(np.hstack([randx.reshape((-1, 1)) * 400,
+                               randy.reshape((-1, 1)) * 400]),
+                    grid[ry, rx], (mx_grid, my_grid), method='nearest')
+    grid = (grid * 10 + 0.5).astype(np.int).astype(np.float) / 10.0
+
+    rgrid = griddata(np.hstack([randx.reshape((-1, 1)) * 400,
+                                randy.reshape((-1, 1)) * 400]),
+                     rvals, (mx_grid, my_grid), method='nearest')
+    irgrid = rgrid.astype(np.int32)
+    mypols = [p[0]['coordinates'] for p in rasterio.features.shapes(irgrid)]
+
+    mmimap = ColorPalette.fromPreset('mmi')
+    plt.figure(figsize=(2.75, 2.75), dpi=96, frameon=False)
+    plt.axis('off')
+    plt.tight_layout()
+    plt.imshow(grid, cmap=mmimap.cmap, vmin=1.5, vmax=9.5)
+    for pol in mypols:
+        mycoords = list(zip(*pol[0]))
+        plt.plot(mycoords[0], mycoords[1], color='#cccccc', linewidth=0.2)
+    plt.savefig(
+        os.path.join(adict['datadir'], "pin-thumbnail.png"),
+        dpi=96,
+        bbox_inches=matplotlib.transforms.Bbox(
+            [[0.47, 0.39], [2.50, 2.50]]),
+        pad_inches=0)

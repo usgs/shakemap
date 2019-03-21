@@ -6,10 +6,10 @@ import logging
 
 import numpy as np
 
-from openquake.hazardlib.gsim.base import GMPE
+from openquake.hazardlib.gsim.base import GMPE, IPE
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
-                                                CampbellBozorgnia2014)
+    CampbellBozorgnia2014)
 from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
 
@@ -147,7 +147,7 @@ class MultiGMPE(GMPE):
             sites = MultiGMPE.set_sites_depth_parameters(sites, gmpe)
 
             # -----------------------------------------------------------------
-            # Evaluate GMPEs
+            # Select the IMT
             # -----------------------------------------------------------------
 
             gmpe_imts = [imt.__name__ for imt in
@@ -158,6 +158,33 @@ class MultiGMPE(GMPE):
                 timt = SA(1.0)
             else:
                 timt = imt
+
+            # -----------------------------------------------------------------
+            # Grab GMPE_LIMITS in gmpe instance for later as the multigmpe
+            # nests downward.
+            # -----------------------------------------------------------------
+            if hasattr(self, 'GMPE_LIMITS'):
+                # Remember that GMPE_LIMITS is only present if it is getting
+                # loaded from a config... we could change this eventually.
+                gmpe.GMPE_LIMITS = self.GMPE_LIMITS
+
+            # -----------------------------------------------------------------
+            # Apply GMPE_LIMITS if applicable
+            # -----------------------------------------------------------------
+            if hasattr(gmpe, 'GMPE_LIMITS'):
+                gmpes_with_limits = list(gmpe.GMPE_LIMITS.keys())
+                gmpe_class_str = str(gmpe).replace('()', '')
+                if gmpe_class_str in gmpes_with_limits:
+                    limit_dict = gmpe.GMPE_LIMITS[gmpe_class_str]
+                    for k, v in limit_dict.items():
+                        if k == 'vs30':
+                            vs30min = float(v[0])
+                            vs30max = float(v[1])
+                            sites.vs30 = np.clip(sites.vs30, vs30min, vs30max)
+
+            # -----------------------------------------------------------------
+            # Evaluate
+            # -----------------------------------------------------------------
 
             lmean, lsd = gmpe.get_mean_and_stddevs(sites, rup, dists, timt,
                                                    stddev_types)
@@ -297,19 +324,35 @@ class MultiGMPE(GMPE):
                     selected_gmpe,
                     filter_imt=filter_imt)
             else:
-                raise KeyError("%s must consist exclusively of keys in "
-                               "conf['gmpe_modules'] or conf['gmpe_sets']"
-                               % selected_gmpe)
+                raise TypeError("%s must consist exclusively of keys in "
+                                "conf['gmpe_modules'] or conf['gmpe_sets']"
+                                % selected_gmpe)
         elif selected_gmpe in conf['gmpe_modules'].keys():
             modinfo = conf['gmpe_modules'][selected_gmpe]
             mod = import_module(modinfo[1])
             tmpclass = getattr(mod, modinfo[0])
             out = MultiGMPE.from_list([tmpclass()], [1.0], imc=IMC)
         else:
-            raise KeyError("conf['modeling']['gmpe'] must be a key in "
-                           "conf['gmpe_modules'] or conf['gmpe_sets']")
+            raise TypeError("conf['modeling']['gmpe'] must be a key in "
+                            "conf['gmpe_modules'] or conf['gmpe_sets']")
 
         out.DESCRIPTION = selected_gmpe
+
+        # ---------------------------------------------------------------------
+        # Deal with GMPE limits
+        # ---------------------------------------------------------------------
+        gmpe_lims = conf['gmpe_limits']
+
+        # We need to replace the short name in the dictionary key with module
+        # name here since the conf is not available within the MultiGMPE class.
+        mods = conf['gmpe_modules']
+        mod_keys = mods.keys()
+        for k, v in gmpe_lims.items():
+            if k in mod_keys:
+                gmpe_lims[mods[k][0]] = gmpe_lims.pop(k)
+
+        out.GMPE_LIMITS = gmpe_lims
+
         return out
 
     def __multigmpe_from_gmpe_set(conf, set_name, filter_imt=None):
@@ -512,8 +555,8 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
 
         for g in gmpes:
-            if not isinstance(g, GMPE):
-                raise Exception("\"%s\" is not a GMPE instance." % g)
+            if not isinstance(g, GMPE) and not isinstance(g, IPE):
+                raise Exception("\"%s\" is not a GMPE or IPE instance." % g)
 
         self = cls()
         self.GMPES = gmpes
@@ -734,7 +777,7 @@ class MultiGMPE(GMPE):
             else:
                 sites.z2pt5 = sites.z2pt5_cb14_cal
         if gmpe == 'ChiouYoungs2008()' or \
-           gmpe == 'Bradley20i3()' or \
+           gmpe == 'Bradley2013()' or \
            gmpe == 'Bradley2013Volc()':
             sites.z1pt0 = sites.z1pt0_cy08
         if gmpe == 'CampbellBozorgnia2008()':
@@ -889,7 +932,7 @@ def filter_gmpe_list(gmpes, wts, imt):
                 swts.append(wts[i])
 
     if len(sgmpe) == 0:
-        raise Exception('No applicable GMPEs from GMPE list for %s' % imt)
+        raise KeyError('No applicable GMPEs from GMPE list for %s' % str(imt))
 
     # Scale weights to sum to one
     swts = np.array(swts)

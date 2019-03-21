@@ -4,6 +4,7 @@ import os.path
 import sys
 import pkg_resources
 import logging
+import glob
 
 # third party libraries
 import numpy as np
@@ -138,6 +139,8 @@ def get_custom_validator():
         'file_type': file_type,
         'directory_type': directory_type,
         'annotatedfloat_type': annotatedfloat_type,
+        'nanfloat_type': nanfloat_type,
+        'nanfloat_list': nanfloat_list,
         'gmpe_list': gmpe_list,
         'weight_list': weight_list,
         'extent_list': extent_list,
@@ -211,6 +214,51 @@ def check_config(config, logger):
         logger.error('Configuration error: ccf %s not in ccf_modules' %
                      (config['modeling']['ccf']))
         raise ValidateError()
+
+
+def check_all_configs(configdir):
+    data_path = get_data_path()
+    specfiles = glob.glob(os.path.join(data_path, '*spec*.conf'))
+    missing_files = []
+    issues = {}
+    exceptions = []
+    val = get_custom_validator()
+    for tspecfile in specfiles:
+        _, specfile = os.path.split(tspecfile)
+        configfile = os.path.join(configdir, specfile.replace('spec', ''))
+        if not os.path.isfile(configfile):
+            missing_files.append(configfile)
+            continue
+        config = ConfigObj(configfile, configspec=tspecfile,
+                           interpolation=False)
+        try:
+            results = config.validate(val, preserve_errors=True)
+        except Exception as e:
+            exceptions.append(str(e))
+        if not isinstance(results, bool):
+            # results = flatten_errors(config, results)
+            issues[specfile] = results
+
+    return (missing_files, issues, exceptions)
+
+
+def nanfloat_type(value):
+    """
+    Checks to see if value is a float, or NaN, nan, Inf, -Inf, etc.
+    Raises a ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing a float NaN or Inf.
+
+    Returns:
+        float: The input value converted to its float equivalent.
+
+    """
+    try:
+        out = float(value)
+    except ValueError:
+        raise ValidateError(value)
+    return out
 
 
 def annotatedfloat_type(value):
@@ -297,6 +345,39 @@ def weight_list(value, min):
         logging.error("weights must sum to 1.0: %s" % value)
         raise ValidateError()
 
+    return out
+
+
+def nanfloat_list(value, min):
+    """
+    Checks to see if value is a list of floats, including NaN and Inf.
+    Raises a ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing a list of floats.
+
+    Returns:
+        list: The input string converted to a list of floats.
+
+    """
+    min = int(min)
+    if isinstance(value, str) and (value == 'None' or value == '[]'):
+        value = []
+    if isinstance(value, str):
+        value = [value]
+    if isinstance(value, list) and not value:
+        value = []
+    if not isinstance(value, list):
+        logging.error("'%s' is not a list" % value)
+        raise ValidateError()
+    if len(value) < min:
+        logging.error("extent list must contain %i entries" % min)
+        raise ValidateError()
+    try:
+        out = [float(a) for a in value]
+    except ValueError:
+        logging.error("%s is not a list of %i floats" % (value, min))
+        raise ValidateError()
     return out
 
 
@@ -497,6 +578,34 @@ def cfg_float(value):
         logging.error("'%s' is not a float" % (value))
         raise ValidateError()
     return fval
+
+
+def cfg_bool(value):
+    """
+    Converts (if possible) the input string to a bool. Raises
+    ValidateError if the input can't be converted to a bool.
+
+    Args:
+        value (str): A string to be converted to a bool.
+
+    Returns:
+        bool: The input converted to a bool.
+
+    Raises:
+        ValidateError
+    """
+    if not isinstance(value, (str, bool)) or not value or value == 'None':
+        logging.error("'%s' is not a bool" % (value))
+        raise ValidateError()
+    try:
+        if value.lower() in ['true', 't', 'yes', 'y', '1']:
+            bval = True
+        else:
+            bval = False
+    except ValueError:
+        logging.error("'%s' is not a bool" % (value))
+        raise ValidateError()
+    return bval
 
 
 def check_profile_config(config):

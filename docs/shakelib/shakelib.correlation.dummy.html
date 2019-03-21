@@ -9,11 +9,12 @@
     <title>shakelib.correlation.dummy &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -76,7 +77,8 @@ class constructor.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>ix1</strong> (<em>ndarray</em>) – The indices of the first period of interest.</li>
 <li><strong>ix2</strong> (<em>ndarrays</em>) – The indices of the second period of interest.</li>
-<li><strong>h</strong> (<em>ndarray</em>) – The separation distance between two sites (units of km).</li>
+<li><strong>h</strong> (<em>ndarray</em>) – The separation distance between two sites (units of km).
+The result is placed in h.</li>
 </ul>
 </td>
 </tr>
@@ -84,7 +86,7 @@ class constructor.</p>
 array will have the same shape as the inputs.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">h (ndarray)</p>
 </td>
 </tr>
 </tbody>

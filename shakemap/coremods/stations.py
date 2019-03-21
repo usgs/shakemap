@@ -1,13 +1,12 @@
 # stdlib imports
 import os.path
 import json
-from collections import OrderedDict
 
 # third party imports
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 
 ALLOWED_FORMATS = ['json']
@@ -22,15 +21,9 @@ class StationModule(CoreModule):
     targets = [r'products/stationlist\.json']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    contents = OrderedDict.fromkeys(['stationJSON'])
-    contents['stationJSON'] = {
-        'title': 'Station Lists',
-        'caption': 'Lists of ShakeMap input data.',
-        'formats': [{'filename': 'stationlist.json',
-                     'type': 'application/json'}]
-    }
+    def __init__(self, eventid):
+        super(StationModule, self).__init__(eventid)
+        self.contents = Contents(None, None, eventid)
 
     def execute(self):
         """Write stationlist.json file.
@@ -62,3 +55,7 @@ class StationModule(CoreModule):
                 f.close()
 
         container.close()
+
+        self.contents.addFile('stationJSON', 'Station List',
+                              'List of ShakeMap input data.',
+                              'stationlist.json', 'application/json')

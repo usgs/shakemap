@@ -10,7 +10,7 @@ import numpy as np
 from openquake.hazardlib import imt
 
 
-def contour(container, imtype, component, filter_size, gmice):
+def contour(imtdict, imtype, filter_size, gmice):
     """
     Generate contours of a specific IMT and return as a Shapely
     MultiLineString object.
@@ -20,7 +20,6 @@ def contour(container, imtype, component, filter_size, gmice):
             with ShakeMap output data.
         imtype (str): String containing the name of an Intensity
             Measure Type found in container.
-        component (str): Intensity Measure component found in container.
         filter_size (int): Integer filter (see
             https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)
     Returns:
@@ -38,7 +37,6 @@ def contour(container, imtype, component, filter_size, gmice):
     oqimt = imt.from_string(imtype)
 
     intensity_colormap = ColorPalette.fromPreset('mmi')
-    imtdict = container.getIMTGrids(imtype, component)
     grid = imtdict['mean']
     metadata = imtdict['mean_metadata']
     if imtype == 'MMI':
@@ -68,7 +66,12 @@ def contour(container, imtype, component, filter_size, gmice):
 
     lonstart = metadata['xmin']
     latstart = metadata['ymin']
-    lonspan = np.abs(metadata['xmax'] - lonstart)
+
+    lonend = metadata['xmax']
+    if lonend < lonstart:
+        lonstart -= 360
+
+    lonspan = np.abs(lonend - lonstart)
     latspan = np.abs(metadata['ymax'] - latstart)
     nlon = metadata['nx']
     nlat = metadata['ny']
@@ -90,8 +93,10 @@ def contour(container, imtype, component, filter_size, gmice):
             #
             coords = measure.approximate_polygon(coords, filter_size / 20)
 
-            mylons = coords[:, 1] * lonspan / nlon + lonstart
-            mylats = (nlat - coords[:, 0]) * latspan / nlat + latstart
+            mylons = np.around(coords[:, 1] * lonspan / nlon + lonstart,
+                               decimals=6)
+            mylats = np.around((nlat - coords[:, 0]) * latspan / nlat +
+                               latstart, decimals=6)
 
             contours[ic] = np.hstack((mylons[:].reshape((-1, 1)),
                                       mylats[:].reshape((-1, 1))))

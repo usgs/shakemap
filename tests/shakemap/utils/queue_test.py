@@ -135,7 +135,10 @@ def test_dispatch_event():
     logger, logstring = get_dummy_logger('test_dispatch')
     children = {}
     config = {}
-    queue.dispatch_event('Testing dispatch', logger, children, 'test', config)
+    shake_config = {'autorun_modules': 'associate dyfi select assemble '
+                                       '-c "Autorun" model mapping'}
+    queue.dispatch_event('Testing dispatch', logger, children, 'test', config,
+                         shake_config)
     returncode = children['Testing dispatch']['popen'].wait()
     assert returncode == 0
     assert 'Testing event Testing dispatch' in logstring.getvalue()
@@ -145,7 +148,7 @@ def test_dispatch_event():
     config = {'cancel_command': 'echo "Testing cancel"',
               'shake_path': '/dev/null'}
     queue.dispatch_event('Testing dispatch', logger, children, 'cancel',
-                         config)
+                         config, shake_config)
     returncode = children['Testing dispatch']['popen'].wait()
     assert returncode == 0
     assert 'Canceling event Testing dispatch' in logstring.getvalue()
@@ -154,11 +157,11 @@ def test_dispatch_event():
     children = {}
     config = {'shake_command': 'echo "Testing shake"',
               'shake_path': '/dev/null'}
-    queue.dispatch_event('Testing dispatch', logger, children, 'shake',
-                         config)
+    queue.dispatch_event('Testing dispatch', logger, children, 'Event added',
+                         config, shake_config)
     returncode = children['Testing dispatch']['popen'].wait()
     assert returncode == 0
-    assert 'Running event Testing dispatch due to action shake' in \
+    assert 'Running event Testing dispatch due to action "Event added"' in \
         logstring.getvalue()
     logstring.close()
     return

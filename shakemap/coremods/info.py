@@ -1,13 +1,13 @@
 # stdlib imports
 import os.path
-from collections import OrderedDict
 import json
 
 # third party imports
+import numpy as np
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 
 
@@ -20,16 +20,9 @@ class InfoModule(CoreModule):
     targets = [r'products/info\.json']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    contents = OrderedDict.fromkeys(['supplementalInformation'])
-    cap = 'ShakeMap processing parameters and map summary information.'
-    contents['supplementalInformation'] = {
-        'title': 'Supplemental Information',
-        'caption': cap,
-        'formats': [{'filename': 'info.json',
-                     'type': 'application/json'}]
-    }
+    def __init__(self, eventid):
+        super(InfoModule, self).__init__(eventid)
+        self.contents = Contents(None, None, eventid)
 
     def execute(self):
         """
@@ -51,12 +44,24 @@ class InfoModule(CoreModule):
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
-        # create ShakeMap metadata file
+        # Create ShakeMap metadata file
         self.logger.debug('Writing info.json file...')
         info = container.getMetadata()
-        infostring = json.dumps(info)
+
+        # Clean up strec results to be valid json
+        if 'strec' in info:
+            for k, v in info['strec'].items():
+                if isinstance(v, float):
+                    if not np.isfinite(v):
+                        info['strec'][k] = None
+
+        infostring = json.dumps(info, allow_nan=False)
         info_file = os.path.join(datadir, 'info.json')
         f = open(info_file, 'wt')
         f.write(infostring)
         f.close()
         container.close()
+        cap = 'ShakeMap processing parameters and map summary information.'
+        self.contents.addFile('supplementalInformation',
+                              'Supplemental Information', cap,
+                              'info.json', 'application/json')

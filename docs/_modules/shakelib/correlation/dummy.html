@@ -9,11 +9,12 @@
     <title>shakelib.correlation.dummy &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -86,9 +87,10 @@
 <span class="sd">                The indices of the second period of interest.</span>
 <span class="sd">            h (ndarray):</span>
 <span class="sd">                The separation distance between two sites (units of km).</span>
+<span class="sd">                The result is placed in h.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            ndarray: The predicted correlation coefficient. The output</span>
+<span class="sd">            h (ndarray): The predicted correlation coefficient. The output</span>
 <span class="sd">            array will have the same shape as the inputs.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -107,7 +109,8 @@
         <span class="n">rho</span><span class="p">[</span><span class="n">invix</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">rho</span><span class="p">[</span><span class="n">invix</span><span class="p">]</span>
         <span class="n">ad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ad</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">rho</span></div></div>
+        <span class="n">h</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">rho</span><span class="p">[:]</span>
+        <span class="k">return</span> <span class="n">h</span></div></div>
 </pre></div>
 
           </div>
