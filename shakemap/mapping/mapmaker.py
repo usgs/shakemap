@@ -1169,7 +1169,8 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
                zorder=IMG_ZORDER, interpolation='none')
 
     # draw 10m res coastlines
-    ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
+    if not os.environ['CALLED_FROM_PYTEST']:
+        ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
 
     proj._threshold /= 6
 
@@ -1179,7 +1180,8 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
         scale='10m',
         facecolor='none')
 
-    ax.add_feature(states_provinces, edgecolor='black', zorder=BORDER_ZORDER)
+    if not os.environ['CALLED_FROM_PYTEST']:
+        ax.add_feature(states_provinces, edgecolor='black', zorder=BORDER_ZORDER)
 
     # draw country borders using natural earth data set
     if borderfile is not None:
@@ -1499,7 +1501,8 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
     )
 
     # draw 10m res coastlines
-    ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
+    if not os.environ['CALLED_FROM_PYTEST']:
+        ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
 
     states_provinces = cfeature.NaturalEarthFeature(
         category='cultural',
@@ -1507,7 +1510,8 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
         scale='10m',
         facecolor='none')
 
-    ax.add_feature(states_provinces, edgecolor='black', zorder=COAST_ZORDER)
+    if not os.environ['CALLED_FROM_PYTEST']:
+        ax.add_feature(states_provinces, edgecolor='black', zorder=COAST_ZORDER)
 
     # draw graticules, ticks, tick labels
     _draw_graticules(ax, *bounds)
