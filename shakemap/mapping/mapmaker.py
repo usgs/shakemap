@@ -1184,6 +1184,14 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
         ax.add_feature(states_provinces, edgecolor='black',
                        zorder=BORDER_ZORDER)
 
+        countries = cfeature.NaturalEarthFeature(
+            category='cultural',
+            name='admin_0_countries',
+            scale='10m',
+            facecolor='none')
+
+        ax.add_feature(countries, edgecolor='black', zorder=BORDER_ZORDER)
+
     # draw country borders using natural earth data set
     if borderfile is not None:
         borders = ShapelyFeature(Reader(borderfile).geometries(),
