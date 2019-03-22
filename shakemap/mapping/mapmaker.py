@@ -1181,7 +1181,7 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
             scale='10m',
             facecolor='none')
 
-        ax.add_feature(states_provinces, edgecolor='black',
+        ax.add_feature(states_provinces, edgecolor='0.5',
                        zorder=BORDER_ZORDER)
 
         countries = cfeature.NaturalEarthFeature(
