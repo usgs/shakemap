@@ -1169,19 +1169,20 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
                zorder=IMG_ZORDER, interpolation='none')
 
     # draw 10m res coastlines
-    if not os.environ['CALLED_FROM_PYTEST']:
+    if 'CALLED_FROM_PYTEST' not in os.environ:
         ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
 
     proj._threshold /= 6
 
-    states_provinces = cfeature.NaturalEarthFeature(
-        category='cultural',
-        name='admin_1_states_provinces_lines',
-        scale='10m',
-        facecolor='none')
+    if 'CALLED_FROM_PYTEST' not in os.environ:
+        states_provinces = cfeature.NaturalEarthFeature(
+            category='cultural',
+            name='admin_1_states_provinces_lines',
+            scale='10m',
+            facecolor='none')
 
-    if not os.environ['CALLED_FROM_PYTEST']:
-        ax.add_feature(states_provinces, edgecolor='black', zorder=BORDER_ZORDER)
+        ax.add_feature(states_provinces, edgecolor='black',
+                       zorder=BORDER_ZORDER)
 
     # draw country borders using natural earth data set
     if borderfile is not None:
@@ -1501,17 +1502,18 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
     )
 
     # draw 10m res coastlines
-    if not os.environ['CALLED_FROM_PYTEST']:
+    if 'CALLED_FROM_PYTEST' not in os.environ:
         ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
 
-    states_provinces = cfeature.NaturalEarthFeature(
-        category='cultural',
-        name='admin_1_states_provinces_lines',
-        scale='10m',
-        facecolor='none')
+    if 'CALLED_FROM_PYTEST' not in os.environ:
+        states_provinces = cfeature.NaturalEarthFeature(
+            category='cultural',
+            name='admin_1_states_provinces_lines',
+            scale='10m',
+            facecolor='none')
 
-    if not os.environ['CALLED_FROM_PYTEST']:
-        ax.add_feature(states_provinces, edgecolor='black', zorder=COAST_ZORDER)
+        ax.add_feature(states_provinces, edgecolor='black',
+                       zorder=COAST_ZORDER)
 
     # draw graticules, ticks, tick labels
     _draw_graticules(ax, *bounds)
