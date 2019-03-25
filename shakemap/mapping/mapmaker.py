@@ -1146,11 +1146,6 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
     # get the proj4 string - used by Grid2D project() method
     projstr = proj.proj4_init
 
-    # this is a workaround to an occasional problem where some vector layers
-    # are not rendered. See
-    # https://github.com/SciTools/cartopy/issues/1155#issuecomment-432941088
-    proj._threshold /= 6
-
     # get the projected MMI and topo grids
     pmmigrid, ptopogrid = _get_projected_grids(mmigrid, adict['topogrid'],
                                                projstr)
@@ -1178,8 +1173,6 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
     # draw 10m res coastlines
     if 'CALLED_FROM_PYTEST' not in os.environ:
         ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
-
-    proj._threshold /= 6
 
     if 'CALLED_FROM_PYTEST' not in os.environ:
         states_provinces = cfeature.NaturalEarthFeature(
@@ -1390,11 +1383,6 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
     proj = mmap.proj
     # get the proj4 string - used by Grid2D project() method
     projstr = proj.proj4_init
-
-    # this is a workaround to an occasional problem where some vector layers
-    # are not rendered. See
-    # https://github.com/SciTools/cartopy/issues/1155#issuecomment-432941088
-    proj._threshold /= 6
 
     # get the projected MMI and topo grids
     pimtgrid, ptopogrid = _get_projected_grids(imtgrid, adict['topogrid'],
