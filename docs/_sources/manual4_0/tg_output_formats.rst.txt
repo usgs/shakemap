@@ -87,19 +87,19 @@ https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html
 
 *shake_result.hdf* contains the following metadata elements:
 
-+-----------------------+----------------------------+-------------+----------------------------------------------+
-| Name                  | Location                   | Python Type | Contents                                     |
-+=======================+============================+=============+==============================================+
-| config                | /dictionaries/config       | JSON string | ShakeMap configuration                       |
-+-----------------------+----------------------------+-------------+----------------------------------------------+
-| info.json             | /dictionaries/info.json    | JSON string | ShakeMap metadata                            |
-+-----------------------+----------------------------+-------------+----------------------------------------------+
-| stations_dict         | /dictionaries/stations_dict| JSON string | Dictionary representation of observed data   |
-+-----------------------+----------------------------+-------------+----------------------------------------------+
-| rupture               | /dictionaries/rupture      | JSON string | Dictionary representation of fault rupture   |
-+-----------------------+----------------------------+-------------+----------------------------------------------+
++---------------+----------------------------+-------------+----------------------------------------------+
+| Name          | Location                   | Python Type | Contents                                     |
++===============+============================+=============+==============================================+
+| config        | /dictionaries/config       | JSON string | ShakeMap configuration                       |
++---------------+----------------------------+-------------+----------------------------------------------+
+| info.json     | /dictionaries/info.json    | JSON string | ShakeMap metadata                            |
++---------------+----------------------------+-------------+----------------------------------------------+
+| stations_dict | /dictionaries/stations_dict| JSON string | Dictionary representation of observed data   |
++---------------+----------------------------+-------------+----------------------------------------------+
+| rupture       | /dictionaries/rupture      | JSON string | Dictionary representation of fault rupture   |
++---------------+----------------------------+-------------+----------------------------------------------+
 
-It also will contain a number of grids, which, when read with the HDFContainer getGrid() method, return
+It also will contain a number of arrays, which, when read with the HDFContainer getGrid() method, return
 a Grid2D object which is a Python representation of a North-up 2D array of data, whose upper-left corner
 coordinate and cell dimensions are known.  The definition of this object can be found here:
 https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py
@@ -107,21 +107,39 @@ https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py
 
 Sampling of grids contained in the HDF:
 
-+-----------------------+----------------------------+-------------+----------------------------------------------+
-| Name                  | Location                   | Python Type | Contents                                     |
-+=======================+============================+=============+==============================================+
-| vs30                  | /grids/vs30                | Grid2D      | Vs30 values at output grid/points            | 
-+-----------------------+----------------------------+-------------+----------------------------------------------+
-| distance_rhypo        | /grids/distance_rhypo      | Grid2D      | Hypocentral distance                         |
-+-----------------------+----------------------------+-------------+----------------------------------------------+
-| distance_rjb          | /grids/distance_rjb        | Grid2D      | RJB distance                                 |
-+-----------------------+----------------------------+-------------+----------------------------------------------+
++-------------------+----------------------------+-------------+----------------------------------------------+
+| Name              | Location                   | Python Type | Contents                                     |
++===================+============================+=============+==============================================+
+| vs30              | /arrays/vs30               | Grid2D      | Vs30 values at output grid/points            | 
++-------------------+----------------------------+-------------+----------------------------------------------+
+| distance_rhypo    | /arrays/distance_rhypo     | Grid2D      | Hypocentral distance                         |
++-------------------+----------------------------+-------------+----------------------------------------------+
+| distance_repi     | /arrays/distance_repi      | Grid2D      | Epicentral distance                          |
++-------------------+----------------------------+-------------+----------------------------------------------+
+| distance_rjb      | /arrays/distance_rjb       | Grid2D      | RJB distance                                 |
++-------------------+----------------------------+-------------+----------------------------------------------+
+| distance_rjb_std  | /arrays/distance_rjb_std   | Grid2D      | Standard deviation of the RJB distance if    |
+|                   |                            |             | the point-source approximations are used,    |
+|                   |                            |             | will be zeor if a finite fault is used.      |
++-------------------+----------------------------+-------------+----------------------------------------------+
+| distance_rrup     | /arrays/distance_rrup      | Grid2D      | Rrup distance                                |
++-------------------+----------------------------+-------------+----------------------------------------------+
+| distance_rrup_std | /arrays/distance_rrup_std  | Grid2D      | Standard deviation of the Rrup distance if   |
+|                   |                            |             | the point-source approximations are used,    |
+|                   |                            |             | will be zeor if a finite fault is used.      |
++-------------------+----------------------------+-------------+----------------------------------------------+
+| distance_rx       | /arrays/distance_rx        | Grid2D      | Rx distance (generalized coordinate used by  |
+|                   |                            |             | some GMPEs)                                  |
++-------------------+----------------------------+-------------+----------------------------------------------+
+| distance_ry0      | /arrays/distance_ry0       | Grid2D      | Ry0 distance (generalized coordinate used by |
+|                   |                            |             | some GMPEs)                                  |
++-------------------+----------------------------+-------------+----------------------------------------------+
 
 
 Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two 
-datasets, the mean values for each cell and the standard deviations.  
+datasets: the mean values for each cell and the standard deviations.  
 MMI data for the component 'Larger' will be stored under a group called 
-``imt_MMI_GREATER_OF_TWO_HORIZONTAL``. The mean array will be stored as
+``imts/MMI_GREATER_OF_TWO_HORIZONTAL``. The mean array will be stored as
 ``mean``, and the standard deviation array will be stored as
 ``std``.  All IMT grid datasets will be accompanied by a dictionary of
 attributes:
@@ -152,17 +170,17 @@ attributes:
 
 Sampling of IMTs in the HDF file:
 
-+-----------------------+----------------------------------------------+----------------------------------------------+
-| Name                  | Location                                     | Python Type | Contents                       |
-+=======================+==============================================+=============+================================+
-| MMI Mean              | /imts/MMI_GREATER_OF_TWO_HORIZONTAL/mean     | Grid2D      | MMI Mean Values                | 
-+-----------------------+----------------------------+-----------------+----------------------------------------------+
-| MMI Std               | /imts/MMI_GREATER_OF_TWO_HORIZONTAL/std      | Grid2D      | MMI Std                        | 
-+-----------------------+----------------------------+-----------------+----------------------------------------------+
-| Sa(0.3) Mean          | /imts/SA(0.3)_GREATER_OF_TWO_HORIZONTAL/mean | Grid2D      | SA(0.3) Mean Values            | 
-+-----------------------+----------------------------+-----------------+----------------------------------------------+
-| Sa(0.3) Std           | /imts/SA(0.3)_GREATER_OF_TWO_HORIZONTAL/std  | Grid2D      | SA(0.3) Std                    | 
-+-----------------------+----------------------------+-------------+--------------------------------------------------+
++--------------+-----------------------------------------------------+-------------+---------------------+
+| Name         | Location                                            | Python Type | Contents            |
++==============+=====================================================+=============+=============+=======+
+| MMI Mean     | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/mean     | Grid2D      | MMI Mean Values     | 
++--------------+-----------------------------------------------------+-------------+---------------------+
+| MMI Std      | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/std      | Grid2D      | MMI Std             | 
++--------------+-----------------------------------------------------+-------------+---------------------+
+| Sa(0.3) Mean | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/mean | Grid2D      | SA(0.3) Mean Values | 
++--------------+-----------------------------------------------------+-------------+---------------------+
+| Sa(0.3) Std  | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/std  | Grid2D      | SA(0.3) Std         | 
++--------------+-----------------------------------------------------+-------------+---------------------+
 
 For datasets that are lists of points, the storage of IMTS is the same
 as for grids, except that the data are stored as one-dimensional arrays.
@@ -179,32 +197,25 @@ attributes are:
 | digits       | Number of significant digits to use for the values   |
 +--------------+------------------------------------------------------+
 
-All *shake_result.hdf* files will have a group ``file_data_type`` 
+All *shake_result.hdf* files will have a group in the ``dictionaries``
+group called ``file_data_type`` 
 which will have a single attribute ``data_type`` that will be one of
 'points' or 'grid'. This way the user can distinguish between the two
 types of storage.
 
-For grid files, there will also be sets of regression curves stored
-as one-dimensional arrays. These
-will be labeled like ``array_regression_<IMT>_<site>_<type>`` Where
-``<IMT>`` will be one of the output IMTs (e.g., ``SA(3.0)``), 
+For grid files, there will also be sets of approximated attenuation
+curves stored as one-dimensional arrays. These
+will be labeled like ``/arrays/attenuation/<site>/<IMT>/<type>``
+Where ``<IMT>`` will be one of the output IMTs (e.g., ``SA(3.0)``), 
 ``<site>`` will be one of ``rock`` or ``soil`` (for which ``rock``
 means a Vs30 of 760 m/s, and ``soil`` means a Vs30 of 180 m/s), and
-``<type>`` is one of ``mean`` (for the mean values) or ``sd`` (for
+``<type>`` is one of ``mean`` (for the mean values) or ``std`` (for
 the standard deviations). All units are in natural log space (except
-for MMI). There will also be an array called 
-``array_regression_distances`` which will contain the distances
-(in km) corresponding to the points in the data arrays.
-
-Regardless of whether the file stores grids or arrays of points, it will
-also contain datasets of various distance parameters. These will be 
-named ``distance_*`` where the wildcard will be replaced with  one of 
-the typical 
-source distance metrics (e.g., 'rrup' for rupture distance, 'rjb' for
-Joyner-Boore distance, 'rhypo' for hypocentral distance, 'rx', 'ry0',
-etc.) 
-Similarly, the Vs30 data are found in a dataset named ``vs30``.
-The metadata for distances and Vs30 consists of 'units' and 'digits'.
+for MMI). There will also be a set of datasets named like 
+``/arrays/attenuation/distances/<type>`` which will contain the distances
+(in km) corresponding to the points in the data arrays. The ``type`` will
+be ``repi``, ``rhypo``, ``rjb``, ``rrup`` (for epicentral, hypocentral,
+Joyner-Boore, and rupture distance, respectively).
 
 Dictionary datasets are stored as JSON strings.
 
@@ -215,13 +226,11 @@ There will typically be multiple *IMT* (Intensity Measure Type) datasets
 'SA(1.0)']. 
 
 Python developers will likely want to access *shake_result.hdf* through
-the shakelib OutputContainer class:
-https://usgs.github.io/shakelib/shakelib.utils.container.html
+the ShakeMapOutputContainer class which may be found in the repository:
+https://github.com/usgs/earthquake-impact-utils and imported from
+``impactutils.utils.io.smcontainers``.
 Also see, for example, the *contour* module [:meth:`shakemap.coremods.contour`]
 for some basic access patterns.
-
-Matlab developers can use the function *read_shake_data.m*, which is included in
-the repository for ShakeMap here: https://github.com/usgs/shakemap/blob/master/contrib/read_shakemap_data.m
 
 
 .. _subsec-stationlist-geojson:

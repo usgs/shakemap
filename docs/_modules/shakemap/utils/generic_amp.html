@@ -97,11 +97,11 @@
     <span class="n">indir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
     <span class="n">gaf_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">indir</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;GenericAmpFactors&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">gaf_dir</span><span class="p">):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No GenericAmpFactors directory found.&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No GenericAmpFactors directory found.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="n">gaf_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gaf_dir</span><span class="p">,</span> <span class="s1">&#39;*.hdf&#39;</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gaf_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No generic amplification files found.&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No generic amplification files found.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">gaf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sx</span><span class="o">.</span><span class="n">lats</span><span class="p">)</span>
@@ -112,20 +112,20 @@
         <span class="n">gc</span> <span class="o">=</span> <span class="n">GridHDFContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">gfile</span><span class="p">)</span>
         <span class="n">contents</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">getGrids</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">thisimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">and</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors: PGV not found in file </span><span class="si">%s</span><span class="s2">, &quot;</span>
-                         <span class="s2">&quot;attempting to use SA(1.0)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gfile</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors: PGV not found in file </span><span class="si">%s</span><span class="s2">, &quot;</span>
+                            <span class="s2">&quot;attempting to use SA(1.0)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gfile</span><span class="p">))</span>
             <span class="n">thisimt</span> <span class="o">=</span> <span class="s1">&#39;SA(1.0)&#39;</span>
         <span class="k">if</span> <span class="n">thisimt</span> <span class="o">==</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">and</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors: PGA not found in file </span><span class="si">%s</span><span class="s2">, &quot;</span>
-                         <span class="s2">&quot;attempting to use SA(0.01)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gfile</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors: PGA not found in file </span><span class="si">%s</span><span class="s2">, &quot;</span>
+                            <span class="s2">&quot;attempting to use SA(0.01)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gfile</span><span class="p">))</span>
             <span class="n">thisimt</span> <span class="o">=</span> <span class="s1">&#39;SA(0.01)&#39;</span>
 
         <span class="k">if</span> <span class="n">thisimt</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
             <span class="c1"># If imt in IMT list, get the grid</span>
             <span class="n">mygrid</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">getGrid</span><span class="p">(</span><span class="n">thisimt</span><span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">thisimt</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">):</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors: IMT </span><span class="si">%s</span><span class="s2"> not found in file </span><span class="si">%s</span><span class="s2">&quot;</span>
-                         <span class="o">%</span> <span class="p">(</span><span class="n">myimt</span><span class="p">,</span> <span class="n">gfile</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors: IMT </span><span class="si">%s</span><span class="s2"> not found in file </span><span class="si">%s</span><span class="s2">&quot;</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">myimt</span><span class="p">,</span> <span class="n">gfile</span><span class="p">))</span>
             <span class="n">mygrid</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Get the weighted average grid based on the</span>
@@ -166,19 +166,20 @@
     <span class="c1">#</span>
     <span class="n">imt_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">thisimt</span> <span class="k">for</span> <span class="n">thisimt</span> <span class="ow">in</span> <span class="n">contents</span> <span class="k">if</span> <span class="n">thisimt</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">)]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">imt_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Generic Amp Factors: No SA grids in file&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Generic Amp Factors: No SA grids in file&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
     <span class="n">imt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
     <span class="n">imt_list_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">imt_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">get_period_from_imt</span><span class="p">)</span>
     <span class="n">nimt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">imt_list_sorted</span><span class="p">)</span>
     <span class="n">ix</span> <span class="o">=</span> <span class="n">imt_list_sorted</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">ix</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors:IMT </span><span class="si">%s</span><span class="s2"> less than min available &quot;</span>
-                     <span class="s2">&quot;imt, using </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myimt</span><span class="p">,</span> <span class="n">imt_list_sorted</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors:IMT </span><span class="si">%s</span><span class="s2"> less than min available &quot;</span>
+                        <span class="s2">&quot;imt, using </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myimt</span><span class="p">,</span> <span class="n">imt_list_sorted</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">return</span> <span class="n">gc</span><span class="o">.</span><span class="n">getGrid</span><span class="p">(</span><span class="n">imt_list_sorted</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">ix</span> <span class="o">==</span> <span class="p">(</span><span class="n">nimt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors:IMT </span><span class="si">%s</span><span class="s2"> greater than max available &quot;</span>
-                     <span class="s2">&quot;imt, using </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myimt</span><span class="p">,</span> <span class="n">imt_list_sorted</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors:IMT </span><span class="si">%s</span><span class="s2"> greater than max &quot;</span>
+                        <span class="s2">&quot;available imt, using </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">myimt</span><span class="p">,</span> <span class="n">imt_list_sorted</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
         <span class="k">return</span> <span class="n">gc</span><span class="o">.</span><span class="n">getGrid</span><span class="p">(</span><span class="n">imt_list_sorted</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Interpolate using (log) period: p1 is the shorter period,</span>

@@ -42,6 +42,7 @@
 <span class="c1"># third party</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 <span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
+<span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="k">import</span> <span class="n">griddata</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
@@ -124,7 +125,10 @@
         <span class="c1"># get all of the pieces needed for the mapping functions</span>
         <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">]</span>
         <span class="n">oceanfile</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">]</span>
-        <span class="n">topofile</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;topography&#39;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">topofile</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">topofile</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Get the number of parallel workers</span>
         <span class="n">max_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;max_workers&#39;</span><span class="p">]</span>
@@ -153,9 +157,13 @@
         <span class="n">sampledict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromBox</span><span class="p">(</span><span class="n">sxmin</span><span class="p">,</span> <span class="n">sxmax</span><span class="p">,</span>
                                                <span class="n">symin</span><span class="p">,</span> <span class="n">symax</span><span class="p">,</span>
                                                <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
-        <span class="n">topogrid</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">topofile</span><span class="p">,</span>
-                        <span class="n">samplegeodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">,</span>
-                        <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">topofile</span><span class="p">:</span>
+            <span class="n">topogrid</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">topofile</span><span class="p">,</span>
+                            <span class="n">samplegeodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">,</span>
+                            <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="n">sampledict</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">sampledict</span><span class="o">.</span><span class="n">nx</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">topogrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tdata</span><span class="p">,</span> <span class="n">geodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">)</span>
 
         <span class="n">model_config</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
 
@@ -219,11 +227,25 @@
 
     <span class="n">imtype</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;imtype&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-        <span class="n">intensity_pdf</span><span class="p">,</span> <span class="n">intensity_png</span><span class="p">,</span> <span class="n">legend_file</span> <span class="o">=</span> <span class="n">draw_intensity</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="p">,</span> <span class="n">fig2</span> <span class="o">=</span> <span class="n">draw_intensity</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
+        <span class="c1"># save to pdf/jpeg</span>
+        <span class="n">pdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="s1">&#39;intensity.pdf&#39;</span><span class="p">)</span>
+        <span class="n">jpg_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="s1">&#39;intensity.jpg&#39;</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">pdf_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">jpg_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+
+        <span class="c1"># save the legend file</span>
+        <span class="n">legend_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="s1">&#39;mmi_legend.png&#39;</span><span class="p">)</span>
+        <span class="n">fig2</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">legend_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;thumbnail&#39;</span><span class="p">:</span>
         <span class="n">make_pin_thumbnail</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">contour_pdf</span><span class="p">,</span> <span class="n">contour_png</span> <span class="o">=</span> <span class="n">draw_contour</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span></div>
+        <span class="n">fig1</span> <span class="o">=</span> <span class="n">draw_contour</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
+        <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
+        <span class="n">pdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.pdf&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">))</span>
+        <span class="n">jpg_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">))</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">pdf_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">jpg_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="make_pin_thumbnail"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.make_pin_thumbnail">[docs]</a><span class="k">def</span> <span class="nf">make_pin_thumbnail</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>

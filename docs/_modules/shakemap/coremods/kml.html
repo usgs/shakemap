@@ -793,7 +793,7 @@
                      <span class="s1">&#39;pgv&#39;</span><span class="p">:</span> <span class="s1">&#39;PGV&#39;</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">non_spectrals</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">non_spectrals</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
-    <span class="n">period</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;\d+\.\d+&quot;</span><span class="p">,</span> <span class="n">imt</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>  <span class="c1"># noqa</span>
+    <span class="n">period</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+\.\d+&quot;</span><span class="p">,</span> <span class="n">imt</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>  <span class="c1"># noqa</span>
     <span class="n">imt_string</span> <span class="o">=</span> <span class="s1">&#39;PSA </span><span class="si">%s</span><span class="s1"> sec&#39;</span> <span class="o">%</span> <span class="n">period</span>
     <span class="k">return</span> <span class="n">imt_string</span></div>
 
