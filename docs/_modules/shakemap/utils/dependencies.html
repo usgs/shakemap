@@ -382,8 +382,8 @@
                 <span class="n">found</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">required</span><span class="p">:</span>
                     <span class="c1"># Didn&#39;t find a required file -- this prevents a run</span>
-                    <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Did not find required dependency: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                 <span class="n">pattern</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Did not find required dependency: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                    <span class="n">pattern</span><span class="p">)</span>
                     <span class="n">clean</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="k">break</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>

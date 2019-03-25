@@ -135,7 +135,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">checkUnknown</span><span class="p">()</span>
         <span class="c1"># Get shortest conversion &quot;path&quot; between imc_in and imc_out</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getShortestPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conversion_graph</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span><span class="p">)</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BooreKishida2017.convertAmpsOnce"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce">[docs]</a>    <span class="k">def</span> <span class="nf">convertAmpsOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -327,7 +327,7 @@
             <span class="c1"># For less common IMCs, Beyer &amp; Bommer (2006) found most</span>
             <span class="c1"># of them to be more or less equivalent to geometric mean</span>
             <span class="c1">#</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Can&#39;t handle IMC </span><span class="si">%s</span><span class="s2">, using GMAR&quot;</span> <span class="o">%</span> <span class="n">oq_imc</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Can&#39;t handle IMC </span><span class="si">%s</span><span class="s2">, using GMAR&quot;</span> <span class="o">%</span> <span class="n">oq_imc</span><span class="p">)</span>
             <span class="k">return</span> <span class="s1">&#39;GMAR&#39;</span>
 
     <span class="k">def</span> <span class="nf">_verifyConversion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
