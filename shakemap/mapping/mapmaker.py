@@ -1170,6 +1170,14 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
 
         ax.add_feature(countries, edgecolor='black', zorder=BORDER_ZORDER)
 
+        lakes = cfeature.NaturalEarthFeature(
+           category='physical',
+           name='lakes',
+           scale='10m',
+           facecolor=WATERCOLOR)
+
+        ax.add_feature(lakes, edgecolor='black', zorder=OCEAN_ZORDER)
+
     # draw country borders using natural earth data set
     if borderfile is not None:
         borders = ShapelyFeature(Reader(borderfile).geometries(),
@@ -1499,6 +1507,22 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
 
         ax.add_feature(states_provinces, edgecolor='black',
                        zorder=COAST_ZORDER)
+
+        countries = cfeature.NaturalEarthFeature(
+            category='cultural',
+            name='admin_0_countries',
+            scale='10m',
+            facecolor='none')
+
+        ax.add_feature(countries, edgecolor='black', zorder=BORDER_ZORDER)
+
+        lakes = cfeature.NaturalEarthFeature(
+           category='physical',
+           name='lakes',
+           scale='10m',
+           facecolor=WATERCOLOR)
+
+        ax.add_feature(lakes, edgecolor='black', zorder=OCEAN_ZORDER)
 
     # draw graticules, ticks, tick labels
     _draw_graticules(ax, *bounds)
