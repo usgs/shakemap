@@ -105,15 +105,6 @@ IMT_RANGES = {
     'SA(3.0)': (1e-4, 400)
 }
 
-IMTYPES = {
-    'MMI': 'Macroseismic Intensity Map',
-    'PGV': 'Peak Ground Velocity Map',
-    'PGA': 'Peak Ground Acceleration Map',
-    'SA(0.3)': '0.3 Second Peak Spectral Acceleration Map',
-    'SA(1.0)': '1.0 Second Peak Spectral Acceleration Map',
-    'SA(3.0)': '3.0 Second Peak Spectral Acceleration Map'
-}
-
 DEG2KM = 111.191
 
 # what is the colormap we want to use for non-MMI intensity values?
@@ -279,7 +270,7 @@ def _get_map_info(gd):
 
 
 def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
-                     point_source):
+                     point_source, tdict):
     """Create a legend axis for non MMI plots.
 
     Args:
@@ -288,15 +279,14 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
         palette (ColorPalette): ColorPalette using range of input data and
             IMT_CMAP.
         imtype (str): One of 'PGV','PGA','SA(0.3)',etc.
+        gmice (GMICE object): The GMICE used for this map.
+        process_time (str): The processing time of this map.
+        map_version (str): The version of this map.
+        point_source (bool): Is the rupture a point source?
+        tdict (dict): Dictionary containing the text strings for printing
+            on the maps (in the language of the user's choice).
     """
-    units = {
-        'PGV': '(cm/s)',
-        'PGA': '(%g)',
-        'SA(0.3)': '(%g)',
-        'SA(1.0)': '(%g)',
-        'SA(3.0)': '(%g)'
-    }
-    imtlabel = imtype + ' ' + units[imtype]
+    imtlabel = imtype + ' ' + tdict['units'][imtype]
     # imtlabel = imtype
 
     cax = fig.add_axes([0.1, 0.13, 0.8, 0.02])
@@ -390,7 +380,7 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
              markeredgecolor='k', markersize=6, mew=0.5, clip_on=False)
     plt.text(triangle_text_x,
              yloc_seventh_row,
-             'Seismic Instrument',
+             tdict['legend']['instrument'],
              va='center',
              ha='left')
 
@@ -405,7 +395,7 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
              mew=0.5)
     plt.text(circle_text_x,
              yloc_seventh_row,
-             'Reported Intensity',
+             tdict['legend']['intensity'],
              va='center',
              ha='left')
 
@@ -418,7 +408,7 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
              mew=0.5)
     plt.text(star_text_x,
              yloc_seventh_row,
-             'Epicenter',
+             tdict['legend']['epicenter'],
              va='center',
              ha='left')
 
@@ -439,26 +429,27 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
         cax.add_patch(rup)
         plt.text(rup_text_x,
                  yloc_seventh_row,
-                 'Rupture',
+                 tdict['legend']['rupture'],
                  va='center',
                  ha='left')
 
     # Add conversion reference and shakemap version/process time
     version_x = 1.0
-    tpl = (map_version, process_time)
+    tpl = (tdict['legend']['version'], map_version,
+           tdict['legend']['processed'], process_time)
     plt.text(version_x, yloc_sixth_row,
-             'Version %i: Processed %s' % tpl,
+             '%s %i: %s %s' % tpl,
              ha='right', va='center')
 
     ref = gmice.name
     refx = 0
     plt.text(refx, yloc_sixth_row,
-             'Scale based on %s' % ref,
+             '%s %s' % (tdict['legend']['scale'], ref),
              va='center')
 
 
 def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
-                     point_source):
+                     point_source, tdict):
     """Create a legend axis for MMI plots.
 
     Args:
@@ -469,6 +460,8 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
         process_time (str): Process time.
         map_version (int): ShakeMap version.
         point_source (bool): Is the rupture a PointRupture?
+        tdict (dict): Dictionary containing the text strings for printing
+            on the maps (in the language of the user's choice).
 
     """
     cax = fig.add_axes([0.1, 0.00, 0.8, 0.15])
@@ -478,41 +471,10 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
     plt.xlim(cax_xmin, cax_xmax)
     plt.ylim(bottom, top)
 
-    shaking = [
-        'SHAKING',
-        'Not felt',
-        'Weak',
-        'Light',
-        'Moderate',
-        'Strong',
-        'Very strong',
-        'Severe',
-        'Violent',
-        'Extreme']
-    damage = [
-        'DAMAGE',
-        'None',
-        'None',
-        'None',
-        'Very light',
-        'Light',
-        'Moderate',
-        'Moderate/heavy',
-        'Heavy',
-        'Very heavy']
-
-    acceleration = ['PGA(%g)']
-    velocity = ['PGV(cm/s)']
+    acceleration = [tdict['mmi_scale']['acc_label']]
+    velocity = [tdict['mmi_scale']['vel_label']]
 
     imt_edges = np.array([0.5, 1.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5])
-    intensities = [
-        'INTENSITY', 'I', 'II-III',
-        'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X+'
-    ]
-
-    widths = np.array([11.5, 7.75, 6.75, 7.0, 10.25,
-                       8.5, 12.0, 16.25, 8.25, 11.75])/100
-
     mmi_centers = np.array([1.0, 2.5, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
     pga_values, _ = gmice.getGMfromMI(mmi_centers, imt.from_string('PGA'))
     pgv_values, _ = gmice.getGMfromMI(mmi_centers, imt.from_string('PGV'))
@@ -588,7 +550,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
              markeredgecolor='k', markersize=6, mew=0.5, clip_on=False)
     plt.text(triangle_text_x,
              yloc_seventh_row,
-             'Seismic Instrument',
+             tdict['legend']['instrument'],
              va='center',
              ha='left')
 
@@ -603,7 +565,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
              mew=0.5)
     plt.text(circle_text_x,
              yloc_seventh_row,
-             'Reported Intensity',
+             tdict['legend']['intensity'],
              va='center',
              ha='left')
 
@@ -616,7 +578,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
              mew=0.5)
     plt.text(star_text_x,
              yloc_seventh_row,
-             'Epicenter',
+             tdict['legend']['epicenter'],
              va='center',
              ha='left')
 
@@ -637,31 +599,34 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
         cax.add_patch(rup)
         plt.text(rup_text_x,
                  yloc_seventh_row,
-                 'Rupture',
+                 tdict['legend']['rupture'],
                  va='center',
                  ha='left')
 
     # Add conversion reference and shakemap version/process time
     version_x = 1.0
-    tpl = (map_version, process_time)
+    tpl = (tdict['legend']['version'], map_version,
+           tdict['legend']['processed'], process_time)
     plt.text(version_x, yloc_sixth_row,
-             'Version %i: Processed %s' % tpl,
+             '%s %i: %s %s' % tpl,
              ha='right', va='center')
 
     ref = gmice.name
     refx = 0
     plt.text(refx, yloc_sixth_row,
-             'Scale based on %s' % ref,
+             '%s %s' % (tdict['legend']['scale'], ref),
              va='center')
 
     nsteps = 10
-    for i in range(0, len(widths)):
-        width = widths[i]
+    for i, width in enumerate(tdict['mmi_scale']['box_widths']):
+        width /= 100
         textleft = sumwidth + width/2
         sumwidth += width
-        plt.text(textleft, yloc_first_row, shaking[i],
+        plt.text(textleft, yloc_first_row,
+                 tdict['mmi_scale']['shaking_labels'][i],
                  fontproperties=font1, **alignment)
-        plt.text(textleft, yloc_second_row, damage[i],
+        plt.text(textleft, yloc_second_row,
+                 tdict['mmi_scale']['damage_labels'][i],
                  fontproperties=font1, **alignment)
         plt.text(textleft, yloc_third_row, acceleration[i],
                  fontproperties=font1, **alignment)
@@ -672,14 +637,15 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
             font = font1
         else:
             font = font0
-        th = plt.text(textleft, yloc_fifth_row, intensities[i],
+        th = plt.text(textleft, yloc_fifth_row,
+                      tdict['mmi_scale']['intensity_labels'][i],
                       fontproperties=font, **alignment)
         th.set_path_effects([path_effects.Stroke(linewidth=2.0,
                                                  foreground='white'),
                              path_effects.Normal()])
 
         # draw right edge of cell
-        plt.plot([gridleft+widths[i], gridleft+widths[i]],
+        plt.plot([gridleft+width, gridleft+width],
                  [bottom, top], 'k', clip_on=False)  # right
 
         # draw little colored rectangles inside the MMI cells
@@ -697,15 +663,17 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
                 left = right
                 plt.fill(px, py, mmicolor, ec=mmicolor)
 
-        gridleft += widths[i]
+        gridleft += width
 
 
-def _draw_colorbar(fig, mmimap):
+def _draw_colorbar(fig, mmimap, tdict):
     """Draw an MMI colorbar in a separate axis from the map.
 
     Args:
         fig (Figure): Matplotlib Figure object.
         mmimap (ColorPalette): Impactutils MMI ColorPalette instance.
+        tdict (dict): Dictionary containing the text strings in the user's
+            choice of language.
     """
     # making up our own colorbar object here because the default
     # pyplot functionality doesn't seem to do the job.
@@ -729,9 +697,8 @@ def _draw_colorbar(fig, mmimap):
     start_loc = (1/nsteps) - (1/nsteps)/2
     end_loc = 1 - (1/nsteps)/2
     locs = np.linspace(start_loc, end_loc, 10)
-    labels = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
 
-    plt.xticks(locs, labels)
+    plt.xticks(locs, tdict['mmi_scale']['mmi_colorbar_labels'])
 
 
 def _label_close_to_edge(x, y, xmin, xmax, ymin, ymax):
@@ -865,10 +832,12 @@ def _draw_title(imt, adict):
     Args:
         imt (str): IMT that is being drawn on the map ('MMI', 'PGV',
             'PGA', 'SA(x.y)').
-        container (ShakeMapOutputContainer): HDF container of ShakeMap output.
-        operator (str): Configured ShakeMap operator (NEIC, CISN, etc.)
+        adict (dict): The dictionary containing the key geographic
+            and ShakeMap data. See draw_intensity() or draw_contour() for a
+            descritption.
     """
     # Add a title
+    tdict = adict['tdict']
     edict = adict['info']['input']['event_information']
     hlon = float(edict['longitude'])
     hlat = float(edict['latitude'])
@@ -882,24 +851,33 @@ def _draw_title(imt, adict):
     timestr = etime.strftime('%b %d, %Y %H:%M:%S')
     mag = float(edict['magnitude'])
     if hlon < 0:
-        lonstr = 'W%.2f' % np.abs(hlon)
+        lonstr = '%s%.2f' % (tdict['title_parts']['west'], np.abs(hlon))
     else:
-        lonstr = 'E%.2f' % hlon
+        lonstr = '%s%.2f' % (tdict['title_parts']['east'], hlon)
     if hlat < 0:
-        latstr = 'S%.2f' % np.abs(hlat)
+        latstr = '%s%.2f' % (tdict['title_parts']['south'], np.abs(hlat))
     else:
-        latstr = 'N%.2f' % hlat
+        latstr = '%s%.2f' % (tdict['title_parts']['north'], hlat)
     dep = float(edict['depth'])
     eid = edict['event_id']
-    imtstr = IMTYPES[imt]
+    imtstr = tdict['IMTYPES'][imt]
     if len(eid) <= 10:
-        fmt = ('%s\n%s ShakeMap: %s\n %s UTC M%.1f %s %s '
-               'Depth: %.1fkm ID:%s')
+        fmt = ('%s\n%s %s: %s\n %s %s %s%.1f %s %s '
+               '%s: %.1f%s %s:%s')
     else:
-        fmt = ('%s\n%s ShakeMap: %s\n %s UTC M%.1f %s %s '
-               'Depth: %.1fkm\nID:%s')
-    tstr = fmt % (imtstr, adict['operator'], eloc, timestr, mag, latstr,
-                  lonstr, dep, eid)
+        fmt = ('%s\n%s %s: %s\n %s %s %s%.1f %s %s '
+               '%s: %.1f%s\n%s:%s')
+    tstr = fmt % (imtstr, adict['operator'],
+                  tdict['title_parts']['shakemap'],
+                  eloc, timestr,
+                  tdict['title_parts']['timezone'],
+                  tdict['title_parts']['magnitude'],
+                  mag, latstr, lonstr,
+                  tdict['title_parts']['depth'],
+                  dep,
+                  tdict['title_parts']['depth_units'],
+                  tdict['title_parts']['event_id'],
+                  eid)
     plt.title(tstr, fontsize=10, verticalalignment='bottom')
 
 
@@ -1192,6 +1170,14 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
 
         ax.add_feature(countries, edgecolor='black', zorder=BORDER_ZORDER)
 
+        lakes = cfeature.NaturalEarthFeature(
+           category='physical',
+           name='lakes',
+           scale='10m',
+           facecolor=WATERCOLOR)
+
+        ax.add_feature(lakes, edgecolor='black', zorder=OCEAN_ZORDER)
+
     # draw country borders using natural earth data set
     if borderfile is not None:
         borders = ShapelyFeature(Reader(borderfile).geometries(),
@@ -1230,7 +1216,9 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
 
     if is_scenario and not override_scenario:
         plt.text(
-            center_lon, center_lat, 'SCENARIO', fontsize=72,
+            center_lon, center_lat,
+            adict['tdict']['title_parts']['scenario'],
+            fontsize=72,
             zorder=SCENARIO_ZORDER, transform=geoproj,
             alpha=WATERMARK_ALPHA, color=WATERMARK_COLOR,
             horizontalalignment='center',
@@ -1256,13 +1244,13 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
     _draw_graticules(ax, *bounds)
 
     # draw a separate intensity colorbar in a separate axes
-    # _draw_colorbar(fig, mmimap)
+    # _draw_colorbar(fig, mmimap, adict['tdict'])
     config = adict['config']
     gmice = get_object_from_config('gmice', 'modeling', config)
     process_time = info['processing']['shakemap_versions']['process_time']
     map_version = int(info['processing']['shakemap_versions']['map_version'])
     _draw_mmi_legend(fig, mmimap, gmice, process_time,
-                     map_version, point_source)
+                     map_version, point_source, adict['tdict'])
 
     # make the map border thicker
     plt.sca(ax)
@@ -1311,7 +1299,7 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
     # make a separate MMI legend
     fig2 = plt.figure(figsize=figsize)
     _draw_mmi_legend(fig2, mmimap, gmice, process_time,
-                     map_version, point_source)
+                     map_version, point_source, adict['tdict'])
 
     return (fig, fig2)
 
@@ -1333,6 +1321,8 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
             'rupdict' (dictionary): Dict containing the rupture data
             'stationdict' (dictionary): Dict of station data
             'config' (dictionary): The configuration data for this shakemap
+            'tdict' (dictionary): The text strings to be printed on the map
+                in the user's choice of language.
         borderfile (str): Shapefile containing country/state borders.
         override_scenario (bool): Turn off scenario watermark.
 
@@ -1518,6 +1508,22 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
         ax.add_feature(states_provinces, edgecolor='black',
                        zorder=COAST_ZORDER)
 
+        countries = cfeature.NaturalEarthFeature(
+            category='cultural',
+            name='admin_0_countries',
+            scale='10m',
+            facecolor='none')
+
+        ax.add_feature(countries, edgecolor='black', zorder=BORDER_ZORDER)
+
+        lakes = cfeature.NaturalEarthFeature(
+           category='physical',
+           name='lakes',
+           scale='10m',
+           facecolor=WATERCOLOR)
+
+        ax.add_feature(lakes, edgecolor='black', zorder=OCEAN_ZORDER)
+
     # draw graticules, ticks, tick labels
     _draw_graticules(ax, *bounds)
 
@@ -1532,7 +1538,9 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
 
     if is_scenario and not override_scenario:
         plt.text(
-            center_lon, center_lat, 'SCENARIO', fontsize=72,
+            center_lon, center_lat,
+            adict['tdict']['title_parts']['scenario'],
+            fontsize=72,
             zorder=SCENARIO_ZORDER, transform=geoproj,
             alpha=WATERMARK_ALPHA, color=WATERMARK_COLOR,
             horizontalalignment='center',
@@ -1578,7 +1586,7 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
     process_time = info['processing']['shakemap_versions']['process_time']
     map_version = int(info['processing']['shakemap_versions']['map_version'])
     _draw_imt_legend(fig, mmimap, imtype, gmice, process_time, map_version,
-                     point_source)
+                     point_source, adict['tdict'])
 
     # ------------------------------------------ #
     # ***** Temp stuff for drawing circles ***** #

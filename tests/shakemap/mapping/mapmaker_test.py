@@ -7,6 +7,8 @@ import copy
 
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakemap.mapping.mapmaker import draw_intensity, draw_contour
+from shakemap.coremods.mapping import get_text_strings
+from shakemap.utils.config import get_data_path
 
 from mapio.gmt import GMTGrid
 from mapio.geodict import GeoDict
@@ -47,6 +49,9 @@ def test_mapmaker_intensity():
 
     model_config = container.getConfig()
     comp = container.getComponents('MMI')[0]
+    textfile = os.path.join(get_data_path(), 'mapping',
+                            'map_strings.en')
+    text_dict = get_text_strings(textfile)
 
     d = {'imtype': 'MMI',
          'topogrid': topogrid,
@@ -59,7 +64,8 @@ def test_mapmaker_intensity():
          'imtdict': container.getIMTGrids('MMI', comp),
          'ruptdict': copy.deepcopy(container.getRuptureDict()),
          'stationdict': container.getStationDict(),
-         'config': model_config
+         'config': model_config,
+         'tdict': text_dict
          }
 
     try:
@@ -105,6 +111,9 @@ def test_mapmaker_contour():
     filter_size = 10
     model_config = container.getConfig()
     comp = container.getComponents('PGA')[0]
+    textfile = os.path.join(get_data_path(), 'mapping',
+                            'map_strings.en')
+    text_dict = get_text_strings(textfile)
 
     d = {'imtype': 'PGA',
          'topogrid': topogrid,
@@ -117,10 +126,11 @@ def test_mapmaker_contour():
          'imtdict': container.getIMTGrids('PGA', comp),
          'ruptdict': copy.deepcopy(container.getRuptureDict()),
          'stationdict': container.getStationDict(),
-         'config': model_config
+         'config': model_config,
+         'tdict': text_dict
          }
     try:
-        fig = draw_contour(d)
+        _ = draw_contour(d)
     except Exception:
         assert 1 == 2
     finally:
