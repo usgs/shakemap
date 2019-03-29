@@ -866,7 +866,7 @@ def _draw_title(imt, adict):
                '%s: %.1f%s %s:%s')
     else:
         fmt = ('%s\n%s %s: %s\n %s %s %s%.1f %s %s '
-               '%s: %.1%s\n%s:%s')
+               '%s: %.1f%s\n%s:%s')
     tstr = fmt % (imtstr, adict['operator'],
                   tdict['title_parts']['shakemap'],
                   eloc, timestr,
