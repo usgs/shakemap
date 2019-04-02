@@ -3,6 +3,7 @@ import os.path
 # from multiprocessing import Pool
 import concurrent.futures as cf
 import copy
+import json
 
 # third party
 from configobj import ConfigObj
@@ -23,7 +24,8 @@ from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
-                                   config_error)
+                                   config_error,
+                                   get_data_path)
 from .base import CoreModule, Contents
 from shakemap.mapping.mapmaker import (draw_intensity, draw_contour)
 from shakelib.utils.imt_string import oq_to_file
@@ -134,6 +136,15 @@ class MappingModule(CoreModule):
 
         imtlist = container.getIMTs()
 
+        textfile = os.path.join(get_data_path(), 'mapping',
+                                'map_strings.' +
+                                config['products']['mapping']['language'])
+        text_dict = get_text_strings(textfile)
+        if config['products']['mapping']['fontfamily'] != '':
+            matplotlib.rcParams['font.family'] = \
+                config['products']['mapping']['fontfamily']
+            matplotlib.rcParams['axes.unicode_minus'] = False
+
         alist = []
         for imtype in imtlist:
             component, imtype = imtype.split('/')
@@ -149,7 +160,8 @@ class MappingModule(CoreModule):
                  'imtdict': container.getIMTGrids(imtype, comp),
                  'ruptdict': copy.deepcopy(container.getRuptureDict()),
                  'stationdict': container.getStationDict(),
-                 'config': model_config
+                 'config': model_config,
+                 'tdict': text_dict
                  }
             alist.append(d)
             if imtype == 'MMI':
@@ -256,3 +268,26 @@ def make_pin_thumbnail(adict):
         bbox_inches=matplotlib.transforms.Bbox(
             [[0.47, 0.39], [2.50, 2.50]]),
         pad_inches=0)
+
+
+def get_text_strings(stringfile):
+    """Read the file containing the translated text strings, remove the
+    comments and parse as JSON.
+
+    Args:
+        stringfile (str): Path to the map_strings.xx file specified in the
+            config. The file is assumend to be UTF-8.
+
+    Returns:
+        dict: A dictionary of strings for use in writing text to the maps.
+    """
+    if not os.path.isfile(stringfile):
+        FileNotFoundError("File %s not found" % stringfile)
+    f = open(stringfile, 'rt', encoding='UTF-8')
+    jline = ''
+    for line in f:
+        if line.startswith('//'):
+            continue
+        jline += line
+    f.close()
+    return json.loads(jline)
