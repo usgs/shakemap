@@ -848,7 +848,7 @@ def _draw_title(imt, adict):
     except ValueError:
         etime = datetime.strptime(edict['origin_time'],
                                   constants.ALT_TIMEFMT)
-    timestr = etime.strftime('%b %d, %Y %H:%M:%S')
+    timestr = etime.strftime(tdict['title_parts']['date_format'])
     mag = float(edict['magnitude'])
     if hlon < 0:
         lonstr = '%s%.2f' % (tdict['title_parts']['west'], np.abs(hlon))

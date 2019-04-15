@@ -41,12 +41,12 @@
 // committing to production.
 {
     "IMTYPES": {
-        "MMI": "Macroseismic Intensity Map",
-        "PGV": "Peak Ground Velocity Map",
-        "PGA": "Peak Ground Acceleration Map",
-        "SA(0.3)": "0.3 Second Peak Spectral Acceleration Map",
-        "SA(1.0)": "1.0 Second Peak Spectral Acceleration Map",
-        "SA(3.0)": "3.0 Second Peak Spectral Acceleration Map"
+        "MMI": "Mapa de Intensidades Macrosísmicas",
+        "PGV": "Mapa de Velocidad Máxima (PGV)",
+        "PGA": "Mapa de Aceleración Máxima (PGA)",
+        "SA(0.3)": "0.3 Segundos Mapa de Aceleración Espectral",
+        "SA(1.0)": "1.0 Segundos Mapa de Aceleración Espectral",
+        "SA(3.0)": "3.0 Segundos Mapa de Aceleración Espectral"
     },
     "units": {
          "PGV": "(cm/s)",
@@ -56,47 +56,47 @@
          "SA(3.0)": "(%g)"
     },
     "legend": {
-        "instrument": "Seismic Instrument",
-        "intensity": "Reported Intensity",
-        "epicenter": "Epicenter",
-        "rupture": "Rupture",
-        "version": "Version",
-        "processed": "Processed",
-        "scale": "Scale based on"
+        "instrument": "Instrumento Sísmico",
+        "intensity": "Intensidad Reportada",
+        "epicenter": "Epicentro",
+        "rupture": "Ruptura",
+        "version": "Versión",
+        "processed": "Procesado",
+        "scale": "Escala por"
     },
     "mmi_scale": {
         "shaking_labels": [
-            "SHAKING",
-            "Not felt",
-            "Weak",
-            "Light",
-            "Moderate",
-            "Strong",
-            "Very strong",
-            "Severe",
-            "Violent",
-            "Extreme"
+            "MOVIMIENTO",
+            "No Sentido",
+            "Débil",
+            "Ligero",
+            "Moderado",
+            "Fuerte",
+            "Muy Fuerte",
+            "Severo",
+            "Violento",
+            "Extremo"
         ],
         "damage_labels": [
-            "DAMAGE",
-            "None",
-            "None",
-            "None",
-            "Very light",
-            "Light",
-            "Moderate",
-            "Moderate/heavy",
-            "Heavy",
-            "Very heavy"
+            "DAÑO",
+            "Ninguno",
+            "Ninguno",
+            "Ninguno",
+            "Muy Poco",
+            "Poco",
+            "Moderado",
+            "Moderado/Mucho",
+            "Mucho",
+            "Cuantioso"
         ],
         "acc_label": "PGA(%g)",
         "vel_label": "PGV(cm/s)",
         "intensity_labels": [
-            "INTENSITY", "I", "II-III",
+            "INTENSIDAD", "I", "II-III",
             "IV", "V", "VI", "VII", "VIII", "IX", "X+"
         ],
         "box_widths": [ 
-            11.5, 7.75, 6.75, 7.0, 10.25, 8.5, 12.0, 16.25, 8.25, 11.75
+            12.0, 10.50, 7.75, 7.75, 10.0, 7.0, 12.0, 16.0, 8.0, 9.0
         ],
         "mmi_colorbar_labels": [
             "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"
@@ -104,12 +104,12 @@
     },
     "title_parts": {
         "shakemap": "ShakeMap",
-        "depth": "Depth",
+        "depth": "Prof",
         "depth_units": "km",
         "timezone": "UTC",
         "magnitude": "M",
         "event_id": "ID",
-        "scenario": "SCENARIO",
+        "scenario": "ESCENARIO",
         "north": "N",
         "south": "S",
         "east": "E",
