@@ -8,8 +8,11 @@ import glob
 
 # third party libraries
 import numpy as np
-from configobj import ConfigObj, flatten_errors
-from validate import Validator, ValidateError
+from configobj import (ConfigObj,
+                       flatten_errors,
+                       get_extra_values)
+from validate import (Validator,
+                      ValidateError)
 
 
 def get_data_path():
@@ -182,6 +185,46 @@ def config_error(config, results):
         raise RuntimeError('There %s %d %s in configuration.'
                            % ('was' if errs == 1 else 'were', errs,
                               'error' if errs == 1 else 'errors'))
+
+
+def check_extra_values(config, logger):
+    """
+    Checks the config and warns the user if there are any extra entries
+    in their config file. This function is based on suggested usage in the
+    ConfigObj manual.
+
+    Args:
+        config (ConfigObj): A ConfigObj instance.
+        logger (logger): The logger to which to write complaints.
+
+    Returns:
+        Nothing: Nothing.
+    """
+    warnings = 0
+    for sections, name in get_extra_values(config):
+
+        # this code gets the extra values themselves
+        the_section = config
+        for section in sections:
+            the_section = the_section[section]
+
+        # the_value may be a section or a value
+        the_value = the_section[name]
+
+        section_or_value = 'value'
+        if isinstance(the_value, dict):
+            # Sections are subclasses of dict
+            section_or_value = 'section'
+
+        section_string = ', '.join(sections) or "top level"
+        logger.warning('Extra entry in section: %s: %s %r is not in spec.' %
+                       (section_string, section_or_value, name))
+        warnings += 1
+    if warnings:
+        logger.warning('The extra value(s) may be the result of deprecated '
+                       'entries or other changes to the config files; please '
+                       'check the conifg files in shakemap/data for the most '
+                       'up to date specs.')
 
 
 def check_config(config, logger):

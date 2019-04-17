@@ -14,8 +14,8 @@ from matplotlib import patches
 
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-from cartopy.feature import ShapelyFeature
 import cartopy.feature as cfeature
+from cartopy.feature import ShapelyFeature
 from cartopy.io.shapereader import Reader
 import pyproj
 
@@ -56,7 +56,7 @@ VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
 # all of the zorder values for different plotted parameters
 # elements with a higher zorder will plot on top of lower elements.
 IMG_ZORDER = 1
-ROAD_ZORDER = 5
+ROAD_ZORDER = 5000
 COAST_ZORDER = 11
 CONTOUR_ZORDER = 800
 DASHED_CONTOUR_ZORDER = 1002
@@ -1057,7 +1057,6 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
         adict (dictionary): A dictionary containing the following keys:
             'imtype' (str): The intensity measure type
             'topogrid' (Grid2d): A topography grid
-            'oceanfile' (str): A file containing the ocean boundaries
             'datadir' (str): The path into which to deposit products
             'operator' (str): The producer of this shakemap
             'filter_size' (int): The size of the filter used before contouring
@@ -1150,9 +1149,9 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
 
     # draw 10m res coastlines
     if 'CALLED_FROM_PYTEST' not in os.environ:
-        ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
+        # Coastlines get drawn when we draw the ocean edges.
+        # ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
 
-    if 'CALLED_FROM_PYTEST' not in os.environ:
         states_provinces = cfeature.NaturalEarthFeature(
             category='cultural',
             name='admin_1_states_provinces_lines',
@@ -1170,6 +1169,14 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
 
         ax.add_feature(countries, edgecolor='black', zorder=BORDER_ZORDER)
 
+        oceans = cfeature.NaturalEarthFeature(
+           category='physical',
+           name='ocean',
+           scale='10m',
+           facecolor=WATERCOLOR)
+
+        ax.add_feature(oceans, edgecolor='black', zorder=OCEAN_ZORDER)
+
         lakes = cfeature.NaturalEarthFeature(
            category='physical',
            name='lakes',
@@ -1178,19 +1185,15 @@ def draw_intensity(adict, borderfile=None, override_scenario=False):
 
         ax.add_feature(lakes, edgecolor='black', zorder=OCEAN_ZORDER)
 
-    # draw country borders using natural earth data set
-    if borderfile is not None:
-        borders = ShapelyFeature(Reader(borderfile).geometries(),
-                                 ccrs.PlateCarree())
-        ax.add_feature(borders, zorder=BORDER_ZORDER,
-                       edgecolor='black', linewidth=2, facecolor='none')
+    if adict['faultfile'] is not None:
+        faults = ShapelyFeature(Reader(adict['faultfile']).geometries(),
+                                ccrs.PlateCarree(), facecolor='none')
+        ax.add_feature(faults, edgecolor='firebrick', zorder=ROAD_ZORDER)
 
-    # clip the ocean data to the shakemap
-    bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-    oceanshapes = _clip_bounds(bbox, adict['oceanfile'])
-
-    ax.add_feature(ShapelyFeature(oceanshapes, crs=geoproj),
-                   facecolor=WATERCOLOR, zorder=OCEAN_ZORDER)
+    if adict['roadfile'] is not None:
+        roads = ShapelyFeature(Reader(adict['roadfile']).geometries(),
+                               ccrs.PlateCarree(), facecolor='none')
+        ax.add_feature(roads, edgecolor='dimgray', zorder=ROAD_ZORDER)
 
     # draw cities
     mmap.drawCities(shadow=True, zorder=CITIES_ZORDER,
@@ -1311,7 +1314,6 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
         adict (dictionary): A dictionary containing the following keys:
             'imtype' (str): The intensity measure type
             'topogrid' (Grid2d): A topography grid
-            'oceanfile' (str): A file containing the ocean boundaries
             'datadir' (str): The path into which to deposit products
             'operator' (str): The producer of this shakemap
             'filter_size' (int): The size of the filter used before contouring
@@ -1484,28 +1486,17 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
     ax.outline_patch.set_joinstyle('round')
     ax.outline_patch.set_capstyle('round')
 
-    # clip the ocean data to the shakemap
-    bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-    oceanshapes = _clip_bounds(bbox, adict['oceanfile'])
-
-    ax.add_feature(
-        ShapelyFeature(oceanshapes, crs=geoproj),
-        facecolor=WATERCOLOR,
-        zorder=OCEAN_ZORDER
-    )
-
     # draw 10m res coastlines
     if 'CALLED_FROM_PYTEST' not in os.environ:
-        ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
+        # ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
 
-    if 'CALLED_FROM_PYTEST' not in os.environ:
         states_provinces = cfeature.NaturalEarthFeature(
             category='cultural',
             name='admin_1_states_provinces_lines',
             scale='10m',
             facecolor='none')
 
-        ax.add_feature(states_provinces, edgecolor='black',
+        ax.add_feature(states_provinces, edgecolor='0.5',
                        zorder=COAST_ZORDER)
 
         countries = cfeature.NaturalEarthFeature(
@@ -1516,6 +1507,14 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
 
         ax.add_feature(countries, edgecolor='black', zorder=BORDER_ZORDER)
 
+        oceans = cfeature.NaturalEarthFeature(
+           category='physical',
+           name='ocean',
+           scale='10m',
+           facecolor=WATERCOLOR)
+
+        ax.add_feature(oceans, edgecolor='black', zorder=OCEAN_ZORDER)
+
         lakes = cfeature.NaturalEarthFeature(
            category='physical',
            name='lakes',
@@ -1523,6 +1522,16 @@ def draw_contour(adict, borderfile=None, override_scenario=False):
            facecolor=WATERCOLOR)
 
         ax.add_feature(lakes, edgecolor='black', zorder=OCEAN_ZORDER)
+
+    if adict['faultfile'] is not None:
+        faults = ShapelyFeature(Reader(adict['faultfile']).geometries(),
+                                ccrs.PlateCarree(), facecolor='none')
+        ax.add_feature(faults, edgecolor='firebrick', zorder=ROAD_ZORDER)
+
+    if adict['roadfile'] is not None:
+        roads = ShapelyFeature(Reader(adict['roadfile']).geometries(),
+                               ccrs.PlateCarree(), facecolor='none')
+        ax.add_feature(roads, edgecolor='dimgray', zorder=ROAD_ZORDER)
 
     # draw graticules, ticks, tick labels
     _draw_graticules(ax, *bounds)

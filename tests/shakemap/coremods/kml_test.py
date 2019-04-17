@@ -7,13 +7,8 @@ import zipfile
 import logging
 from xml.dom import minidom
 
-import configobj
-
 from shakemap.coremods.base import Contents
-from shakemap.utils.config import (get_config_paths,
-                                   get_configspec,
-                                   get_custom_validator,
-                                   config_error)
+from shakemap.utils.config import (get_config_paths)
 from shakemap.coremods.kml import (create_kmz)
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 
@@ -27,20 +22,9 @@ def test_create_kmz():
         container = ShakeMapOutputContainer.load(cfile)
         install_path, data_path = get_config_paths()
 
-        product_config_file = os.path.join(
-            install_path, 'config', 'products.conf')
-        spec_file = get_configspec('products')
-        validator = get_custom_validator()
-        pconfig = configobj.ConfigObj(product_config_file,
-                                      configspec=spec_file)
-        results = pconfig.validate(validator)
-        if not isinstance(results, bool) or not results:
-            config_error(pconfig, results)
-        oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
-
         logger = logging.getLogger(__name__)
         contents = Contents(None, None, 'northridge')
-        kmzfile = create_kmz(container, tempdir, oceanfile, logger, contents)
+        kmzfile = create_kmz(container, tempdir, logger, contents)
         myzip = zipfile.ZipFile(kmzfile, mode='r')
         kmlstr = myzip.read('shakemap.kml').decode('utf-8')
         root = minidom.parseString(kmlstr)

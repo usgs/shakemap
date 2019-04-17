@@ -25,6 +25,7 @@ from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error,
+                                   check_extra_values,
                                    get_data_path)
 from .base import CoreModule, Contents
 from shakemap.mapping.mapmaker import (draw_intensity, draw_contour)
@@ -77,6 +78,7 @@ class MappingModule(CoreModule):
         validator = get_custom_validator()
         config = ConfigObj(config_file, configspec=spec_file)
         results = config.validate(validator)
+        check_extra_values(config, self.logger)
         if not isinstance(results, bool) or not results:
             config_error(config, results)
 
@@ -91,11 +93,18 @@ class MappingModule(CoreModule):
 
         # get all of the pieces needed for the mapping functions
         layers = config['products']['mapping']['layers']
-        oceanfile = layers['oceans']
         if 'topography' in layers and layers['topography'] != '':
             topofile = layers['topography']
         else:
             topofile = None
+        if 'roads' in layers and layers['roads'] != '':
+            roadfile = layers['roads']
+        else:
+            roadfile = None
+        if 'faults' in layers and layers['faults'] != '':
+            faultfile = layers['faults']
+        else:
+            faultfile = None
 
         # Get the number of parallel workers
         max_workers = config['products']['mapping']['max_workers']
@@ -151,7 +160,8 @@ class MappingModule(CoreModule):
             comp = container.getComponents(imtype)[0]
             d = {'imtype': imtype,
                  'topogrid': topogrid,
-                 'oceanfile': oceanfile,
+                 'roadfile': roadfile,
+                 'faultfile': faultfile,
                  'datadir': datadir,
                  'operator': operator,
                  'filter_size': filter_size,
