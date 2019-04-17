@@ -28,7 +28,7 @@ from shakemap.utils.config import (get_config_paths,
                                    check_extra_values,
                                    get_data_path)
 from .base import CoreModule, Contents
-from shakemap.mapping.mapmaker import (draw_intensity, draw_contour)
+from shakemap.mapping.mapmaker import draw_map
 from shakelib.utils.imt_string import oq_to_file
 
 
@@ -213,26 +213,27 @@ class MappingModule(CoreModule):
 def make_map(adict):
 
     imtype = adict['imtype']
+
+    if imtype == 'thumbnail':
+        make_pin_thumbnail(adict)
+        return
+
+    fig1, fig2 = draw_map(adict)
+
     if imtype == 'MMI':
-        fig1, fig2 = draw_intensity(adict)
         # save to pdf/jpeg
         pdf_file = os.path.join(adict['datadir'], 'intensity.pdf')
         jpg_file = os.path.join(adict['datadir'], 'intensity.jpg')
-        fig1.savefig(pdf_file, bbox_inches='tight')
-        fig1.savefig(jpg_file, bbox_inches='tight')
-
         # save the legend file
         legend_file = os.path.join(adict['datadir'], 'mmi_legend.png')
         fig2.savefig(legend_file, bbox_inches='tight')
-    elif imtype == 'thumbnail':
-        make_pin_thumbnail(adict)
     else:
-        fig1 = draw_contour(adict)
         fileimt = oq_to_file(imtype)
         pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
         jpg_file = os.path.join(adict['datadir'], '%s.jpg' % (fileimt))
-        fig1.savefig(pdf_file, bbox_inches='tight')
-        fig1.savefig(jpg_file, bbox_inches='tight')
+
+    fig1.savefig(pdf_file, bbox_inches='tight')
+    fig1.savefig(jpg_file, bbox_inches='tight')
 
 
 def make_pin_thumbnail(adict):
