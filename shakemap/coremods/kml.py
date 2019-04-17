@@ -1,4 +1,5 @@
 # stdlib imports
+import os
 import os.path
 import zipfile
 import shutil
@@ -584,19 +585,21 @@ def create_overlay_image(container, filename):
     # set the alpha value to 255 wherever we have MMI 0
     rgba[imtdata <= 1.5] = 0
 
-    # mask off the areas covered by ocean
-    oceans = shpreader.natural_earth(category='physical',
-                                     name='ocean',
-                                     resolution='10m')
-    bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-    with fiona.open(oceans) as c:
-        tshapes = list(c.items(bbox=bbox))
-        shapes = []
-        for tshp in tshapes:
-            shapes.append(shape(tshp[1]['geometry']))
-        if len(shapes):
-            oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd, fillValue=0.0)
-            rgba[oceangrid.getData() == 1] = 0
+    if 'CALLED_FROM_PYTEST' not in os.environ:
+        # mask off the areas covered by ocean
+        oceans = shpreader.natural_earth(category='physical',
+                                         name='ocean',
+                                         resolution='10m')
+        bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
+        with fiona.open(oceans) as c:
+            tshapes = list(c.items(bbox=bbox))
+            shapes = []
+            for tshp in tshapes:
+                shapes.append(shape(tshp[1]['geometry']))
+            if len(shapes):
+                oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
+                                                         fillValue=0.0)
+                rgba[oceangrid.getData() == 1] = 0
 
     # save rgba image as png
     img = Image.fromarray(rgba)

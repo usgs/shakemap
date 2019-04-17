@@ -15,11 +15,17 @@ import matplotlib
 import matplotlib.pyplot as plt
 from impactutils.colors.cpalette import ColorPalette
 import rasterio.features
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+from cartopy.feature import ShapelyFeature
+from cartopy.io.shapereader import Reader
 
 # local imports
 # from mapio.gmt import GMTGrid
 from mapio.reader import read
 from impactutils.io.smcontainers import ShakeMapOutputContainer
+from impactutils.mapping.city import Cities
+
 
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
@@ -30,6 +36,8 @@ from shakemap.utils.config import (get_config_paths,
 from .base import CoreModule, Contents
 from shakemap.mapping.mapmaker import draw_map
 from shakelib.utils.imt_string import oq_to_file
+
+WATERCOLOR = '#7AA1DA'
 
 
 class MappingModule(CoreModule):
@@ -154,14 +162,61 @@ class MappingModule(CoreModule):
                 config['products']['mapping']['fontfamily']
             matplotlib.rcParams['axes.unicode_minus'] = False
 
+        allcities = Cities.fromDefault()
+        states_provinces = None
+        countries = None
+        oceans = None
+        lakes = None
+        if 'CALLED_FROM_PYTEST' not in os.environ:
+            states_provinces = cfeature.NaturalEarthFeature(
+                category='cultural',
+                name='admin_1_states_provinces_lines',
+                scale='10m',
+                facecolor='none')
+
+            countries = cfeature.NaturalEarthFeature(
+                category='cultural',
+                name='admin_0_countries',
+                scale='10m',
+                facecolor='none')
+
+            oceans = cfeature.NaturalEarthFeature(
+                category='physical',
+                name='ocean',
+                scale='10m',
+                facecolor=WATERCOLOR)
+
+            lakes = cfeature.NaturalEarthFeature(
+                category='physical',
+                name='lakes',
+                scale='10m',
+                facecolor=WATERCOLOR)
+
+        if faultfile is not None:
+            faults = ShapelyFeature(Reader(faultfile).geometries(),
+                                    ccrs.PlateCarree(), facecolor='none')
+        else:
+            faults = None
+
+        if roadfile is not None:
+            roads = ShapelyFeature(Reader(roadfile).geometries(),
+                                   ccrs.PlateCarree(), facecolor='none')
+        else:
+            roads = None
+
         alist = []
         for imtype in imtlist:
             component, imtype = imtype.split('/')
             comp = container.getComponents(imtype)[0]
             d = {'imtype': imtype,
                  'topogrid': topogrid,
-                 'roadfile': roadfile,
-                 'faultfile': faultfile,
+                 'allcities': allcities,
+                 'states_provinces': states_provinces,
+                 'countries': countries,
+                 'oceans': oceans,
+                 'lakes': lakes,
+                 'roads': roads,
+                 'faults': faults,
                  'datadir': datadir,
                  'operator': operator,
                  'filter_size': filter_size,

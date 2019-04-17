@@ -1,6 +1,5 @@
 # stdlib imports
 from datetime import datetime
-import os.path
 
 # third party imports
 import numpy as np
@@ -14,8 +13,6 @@ from matplotlib import patches
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import cartopy.feature as cfeature
-from cartopy.feature import ShapelyFeature
-from cartopy.io.shapereader import Reader
 import pyproj
 
 from shapely.geometry import shape as sShape
@@ -28,7 +25,6 @@ from openquake.hazardlib import imt
 
 # neic imports
 from impactutils.mapping.mercatormap import MercatorMap
-from impactutils.mapping.city import Cities
 from impactutils.colors.cpalette import ColorPalette
 from impactutils.mapping.scalebar import draw_scale
 from impactutils.textformat.text import set_num_precision
@@ -1055,6 +1051,13 @@ def draw_map(adict, override_scenario=False):
         adict (dictionary): A dictionary containing the following keys:
             'imtype' (str): The intensity measure type
             'topogrid' (Grid2d): A topography grid
+            'allcities' (Cities): A list of global cities,
+            'states_provinces' (Cartopy Feature): States/province boundaries.
+            'countries' (Cartopy Feature): Country boundaries.
+            'oceans' (Cartopy Feature): Oceans.
+            'lakes' (Cartopy Feature): Lakes.
+            'roads' (Shapely Feature): Roads.
+            'faults' (Shapely Feature): Fault traces
             'datadir' (str): The path into which to deposit products
             'operator' (str): The producer of this shakemap
             'filter_size' (int): The size of the filter used before contouring
@@ -1089,8 +1092,8 @@ def draw_map(adict, override_scenario=False):
     center_lon = origin.lon
 
     # load the cities data, limit to cities within shakemap bounds
-    allcities = Cities.fromDefault()
-    cities = allcities.limitByBounds((gd.xmin, gd.xmax, gd.ymin, gd.ymax))
+    cities = adict['allcities'].limitByBounds((gd.xmin, gd.xmax,
+                                               gd.ymin, gd.ymax))
 
     # get the map boundaries and figure size
     bounds, figsize, aspect = _get_map_info(gd)
@@ -1236,52 +1239,32 @@ def draw_map(adict, override_scenario=False):
     ax.outline_patch.set_joinstyle('round')
     ax.outline_patch.set_capstyle('round')
 
-    if 'CALLED_FROM_PYTEST' not in os.environ:
-        # Coastlines will get drawn when we draw the ocean edges
-        # ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
+    # Coastlines will get drawn when we draw the ocean edges
+    # ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
 
-        states_provinces = cfeature.NaturalEarthFeature(
-            category='cultural',
-            name='admin_1_states_provinces_lines',
-            scale='10m',
-            facecolor='none')
-
-        ax.add_feature(states_provinces, edgecolor='0.5',
+    if adict['states_provinces']:
+        ax.add_feature(adict['states_provinces'], edgecolor='0.5',
                        zorder=COAST_ZORDER)
 
-        countries = cfeature.NaturalEarthFeature(
-            category='cultural',
-            name='admin_0_countries',
-            scale='10m',
-            facecolor='none')
+    if adict['countries']:
+        ax.add_feature(adict['countries'], edgecolor='black',
+                       zorder=BORDER_ZORDER)
 
-        ax.add_feature(countries, edgecolor='black', zorder=BORDER_ZORDER)
+    if adict['oceans']:
+        ax.add_feature(adict['oceans'], edgecolor='black',
+                       zorder=OCEAN_ZORDER)
 
-        oceans = cfeature.NaturalEarthFeature(
-           category='physical',
-           name='ocean',
-           scale='10m',
-           facecolor=WATERCOLOR)
+    if adict['lakes']:
+        ax.add_feature(adict['lakes'], edgecolor='black',
+                       zorder=OCEAN_ZORDER)
 
-        ax.add_feature(oceans, edgecolor='black', zorder=OCEAN_ZORDER)
+    if adict['faults'] is not None:
+        ax.add_feature(adict['faults'], edgecolor='firebrick',
+                       zorder=ROAD_ZORDER)
 
-        lakes = cfeature.NaturalEarthFeature(
-           category='physical',
-           name='lakes',
-           scale='10m',
-           facecolor=WATERCOLOR)
-
-        ax.add_feature(lakes, edgecolor='black', zorder=OCEAN_ZORDER)
-
-    if adict['faultfile'] is not None:
-        faults = ShapelyFeature(Reader(adict['faultfile']).geometries(),
-                                ccrs.PlateCarree(), facecolor='none')
-        ax.add_feature(faults, edgecolor='firebrick', zorder=ROAD_ZORDER)
-
-    if adict['roadfile'] is not None:
-        roads = ShapelyFeature(Reader(adict['roadfile']).geometries(),
-                               ccrs.PlateCarree(), facecolor='none')
-        ax.add_feature(roads, edgecolor='dimgray', zorder=ROAD_ZORDER)
+    if adict['roads'] is not None:
+        ax.add_feature(adict['roads'], edgecolor='dimgray',
+                       zorder=ROAD_ZORDER)
 
     # draw graticules, ticks, tick labels
     _draw_graticules(ax, *bounds)

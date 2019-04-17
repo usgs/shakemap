@@ -2,6 +2,7 @@
 Process a ShakeMap, based on the configuration and data found in
 shake_data.hdf, and produce output in shake_result.hdf.
 """
+import os
 import argparse
 import inspect
 import os.path
@@ -1457,18 +1458,21 @@ class ModelModule(CoreModule):
         gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
                                        self.smdx, self.smdy)
         bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-        oceans = shpreader.natural_earth(category='physical',
-                                         name='ocean',
-                                         resolution='10m')
+        if 'CALLED_FROM_PYTEST' not in os.environ:
+            oceans = shpreader.natural_earth(category='physical',
+                                             name='ocean',
+                                             resolution='10m')
+            with fiona.open(oceans) as c:
+                tshapes = list(c.items(bbox=bbox))
+                shapes = []
+                for tshp in tshapes:
+                    shapes.append(shape(tshp[1]['geometry']))
+                if len(shapes):
+                    oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
+                                                             fillValue=0.0)
+        else:
+            return np.zeros((gd.ny, gd.nx), dtype=np.bool)
 
-        with fiona.open(oceans) as c:
-            tshapes = list(c.items(bbox=bbox))
-            shapes = []
-            for tshp in tshapes:
-                shapes.append(shape(tshp[1]['geometry']))
-            if len(shapes):
-                oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
-                                                         fillValue=0.0)
         return oceangrid.getData().astype(np.bool)
 
     def _getMaskedGrids(self, bmask):
