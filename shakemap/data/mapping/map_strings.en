@@ -35,6 +35,10 @@
 // can adjust these numbers, but the numbers must add up to 100.
 // All of the keys defined herein must remain even if the translation is
 // the English default.
+// The 'date_format' in 'title_parts' must be a valid Python datetime
+// strftime() format. It will behave according to the user's LOCALE setting,
+// so it should be tested in the ShakeMap execution environment before
+// committing to production.
 {
     "IMTYPES": {
         "MMI": "Macroseismic Intensity Map",
@@ -109,6 +113,7 @@
         "north": "N",
         "south": "S",
         "east": "E",
-        "west": "W"
+        "west": "W",
+        "date_format": "%b %d, %Y %H:%M:%S"
     }
 }

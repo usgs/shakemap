@@ -34,6 +34,8 @@ Note that ratios are grid1/grid2 and differences are grid1 - grid2.
                              'psa03, psa10.')
     parser.add_argument('-o', '--output', type=str, default='compare.png',
                         help='Output filename. Default: compare.png')
+    parser.add_argument('-n', '--nocoasts', action='store_true',
+                        help='Suppresses printing of coastlines on the maps.')
     return parser
 
 
@@ -49,7 +51,7 @@ def main(pparser, args):
     g2_geodict = g2.getGeoDict()
     try:
         cutdict = g1_geodict.getBoundsWithin(g2_geodict)
-    except:
+    except Exception:
         cutdict = g2_geodict.getBoundsWithin(g1_geodict)
     c1 = g1.interpolateToGrid(cutdict)
     c2 = g2.interpolateToGrid(cutdict)
@@ -76,7 +78,8 @@ def main(pparser, args):
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     cs1 = ax1.contourf(lons, lats, np.flipud(ratio), levels,
                        cmap=cmap, extend='both')
-    ax1.add_feature(cfeature.COASTLINE)
+    if not args.nocoasts:
+        ax1.add_feature(cfeature.COASTLINE)
 
     ax_cbar1 = plt.axes([x1, y1-0.1, wid, 0.05])
     cbar1 = fig.colorbar(cs1, cax=ax_cbar1,
@@ -93,7 +96,8 @@ def main(pparser, args):
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     cs2 = ax2.contourf(lons, lats, np.flipud(dif), levels,
                        cmap=cmap, extend='both')
-    ax2.add_feature(cfeature.COASTLINE)
+    if not args.nocoasts:
+        ax2.add_feature(cfeature.COASTLINE)
 
     ax_cbar2 = plt.axes([x1, y1-0.1, wid, 0.05])
     cbar2 = fig.colorbar(cs2, cax=ax_cbar2,

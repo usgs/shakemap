@@ -1,27 +1,25 @@
 # stdlib imports
+import os
 import os.path
 import zipfile
 import shutil
 import re
 
 # third party imports
-from shapely.geometry import shape
-import fiona
-from impactutils.io.smcontainers import ShakeMapOutputContainer
 from PIL import Image
-import configobj
 from lxml import etree
 import numpy as np
-from mapio.geodict import GeoDict
 from scipy.ndimage.filters import median_filter
 import simplekml as skml
+import fiona
+import cartopy.io.shapereader as shpreader
+from shapely.geometry import shape
 
 # local imports
+from mapio.geodict import GeoDict
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from .base import CoreModule, Contents
-from shakemap.utils.config import (get_config_paths,
-                                   get_configspec,
-                                   get_custom_validator,
-                                   config_error)
+from shakemap.utils.config import (get_config_paths)
 from shakelib.plotting.contour import contour
 from impactutils.colors.cpalette import ColorPalette
 from mapio.grid2d import Grid2D
@@ -229,25 +227,13 @@ class KMLModule(CoreModule):
             raise NotImplementedError('kml module can only contour '
                                       'gridded data, not sets of points')
 
-        # find the low res ocean vector dataset
-        product_config_file = os.path.join(
-            install_path, 'config', 'products.conf')
-        spec_file = get_configspec('products')
-        validator = get_custom_validator()
-        pconfig = configobj.ConfigObj(product_config_file,
-                                      configspec=spec_file)
-        results = pconfig.validate(validator)
-        if not isinstance(results, bool) or not results:
-            config_error(pconfig, results)
-        oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
-
         # call create_kmz function
-        create_kmz(container, datadir, oceanfile, self.logger, self.contents)
+        create_kmz(container, datadir, self.logger, self.contents)
 
         container.close()
 
 
-def create_kmz(container, datadir, oceanfile, logger, contents):
+def create_kmz(container, datadir, logger, contents):
     # we're going to combine all these layers into one KMZ file.
     kmz_contents = []
 
@@ -266,7 +252,7 @@ def create_kmz(container, datadir, oceanfile, logger, contents):
 
     # create intensity overlay
     logger.debug('Creating intensity overlay...')
-    overlay_image = create_overlay(container, oceanfile, datadir, document)
+    overlay_image = create_overlay(container, datadir, document)
     kmz_contents += [overlay_image]
     logger.debug('Created intensity overlay image %s' % overlay_image)
 
@@ -545,12 +531,11 @@ def create_line_styles():
     return line_styles
 
 
-def create_overlay(container, oceanfile, datadir, document):
+def create_overlay(container, datadir, document):
     """Create a KML file and intensity map.
 
     Args:
         container (ShakeMapOutputContainer): Results of model.conf.
-        oceanfile (str): Path to shapefile containing ocean polygons.
         datadir (str): Path to data directory where output KMZ will be written.
         document (SubElement): KML document where the overlay tags should go.
     Returns:
@@ -558,7 +543,7 @@ def create_overlay(container, oceanfile, datadir, document):
     """
     # create the overlay image file
     overlay_img_file = os.path.join(datadir, OVERLAY_IMG)
-    geodict = create_overlay_image(container, oceanfile, overlay_img_file)
+    geodict = create_overlay_image(container, overlay_img_file)
     box = skml.LatLonBox(north=geodict.ymax, south=geodict.ymin,
                          east=geodict.xmax, west=geodict.xmin)
     icon = skml.Icon(refreshinterval=300,
@@ -573,12 +558,11 @@ def create_overlay(container, oceanfile, datadir, document):
     return overlay_img_file
 
 
-def create_overlay_image(container, oceanfile, filename):
+def create_overlay_image(container, filename):
     """Create a semi-transparent PNG image of intensity.
 
     Args:
         container (ShakeMapOutputContainer): Results of model.conf.
-        oceanfile (str): Path to shapefile containing ocean polygons.
         filename (str): Path to desired output PNG file.
     Returns:
         GeoDict: GeoDict object for the intensity grid.
@@ -601,16 +585,21 @@ def create_overlay_image(container, oceanfile, filename):
     # set the alpha value to 255 wherever we have MMI 0
     rgba[imtdata <= 1.5] = 0
 
-    # mask off the areas covered by ocean
-    bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-    with fiona.open(oceanfile) as c:
-        tshapes = list(c.items(bbox=bbox))
-        shapes = []
-        for tshp in tshapes:
-            shapes.append(shape(tshp[1]['geometry']))
-        if len(shapes):
-            oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd, fillValue=0.0)
-            rgba[oceangrid.getData() == 1] = 0
+    if 'CALLED_FROM_PYTEST' not in os.environ:
+        # mask off the areas covered by ocean
+        oceans = shpreader.natural_earth(category='physical',
+                                         name='ocean',
+                                         resolution='10m')
+        bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
+        with fiona.open(oceans) as c:
+            tshapes = list(c.items(bbox=bbox))
+            shapes = []
+            for tshp in tshapes:
+                shapes.append(shape(tshp[1]['geometry']))
+            if len(shapes):
+                oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
+                                                         fillValue=0.0)
+                rgba[oceangrid.getData() == 1] = 0
 
     # save rgba image as png
     img = Image.fromarray(rgba)

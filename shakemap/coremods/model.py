@@ -2,6 +2,7 @@
 Process a ShakeMap, based on the configuration and data found in
 shake_data.hdf, and produce output in shake_result.hdf.
 """
+import os
 import argparse
 import inspect
 import os.path
@@ -16,12 +17,15 @@ import numpy as np
 import numpy.ma as ma
 from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
-from mapio.geodict import GeoDict
-import mapio.reader
+import fiona
+import cartopy.io.shapereader as shpreader
+from shapely.geometry import shape
 
 import concurrent.futures as cf
 
 # local imports
+from mapio.geodict import GeoDict
+from mapio.grid2d import Grid2D
 from .base import CoreModule, Contents
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.sites import Sites
@@ -36,8 +40,7 @@ from shakelib.utils.containers import ShakeMapInputContainer
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.rupture import constants
 
-from shakemap.utils.config import (get_config_paths,
-                                   get_data_path)
+from shakemap.utils.config import get_config_paths
 from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions
 from shakemap.utils.generic_amp import get_generic_amp_factors
@@ -1454,12 +1457,23 @@ class ModelModule(CoreModule):
             return None
         gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
                                        self.smdx, self.smdy)
-        maskfile = os.path.join(get_data_path(), 'landmask', 'landmask_nb.grd')
-        mask = mapio.reader.read(maskfile, samplegeodict=gd, resample=True,
-                                 method='nearest', doPadding=True,
-                                 padValue=0)
-        bmask = ~(mask._data.astype(np.bool))
-        return bmask
+        bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
+        if 'CALLED_FROM_PYTEST' not in os.environ:
+            oceans = shpreader.natural_earth(category='physical',
+                                             name='ocean',
+                                             resolution='10m')
+            with fiona.open(oceans) as c:
+                tshapes = list(c.items(bbox=bbox))
+                shapes = []
+                for tshp in tshapes:
+                    shapes.append(shape(tshp[1]['geometry']))
+                if len(shapes):
+                    oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
+                                                             fillValue=0.0)
+        else:
+            return np.zeros((gd.ny, gd.nx), dtype=np.bool)
+
+        return oceangrid.getData().astype(np.bool)
 
     def _getMaskedGrids(self, bmask):
         """

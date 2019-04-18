@@ -22,7 +22,7 @@ def test_sm_compare():
                             'comparison_test')
     grid1 = os.path.join(data_dir, 'shakemap3.xml')
     grid2 = os.path.join(data_dir, 'shakemap4.xml')
-    cp = subprocess.run([program, grid1, grid2], shell=False)
+    cp = subprocess.run([program, grid1, grid2, '--nocoasts'], shell=False)
     if os.path.isfile('compare.png'):
         os.remove('compare.png')
     assert not cp.returncode

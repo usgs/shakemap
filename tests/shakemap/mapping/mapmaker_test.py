@@ -6,7 +6,8 @@ import shutil
 import copy
 
 from impactutils.io.smcontainers import ShakeMapOutputContainer
-from shakemap.mapping.mapmaker import draw_intensity, draw_contour
+from impactutils.mapping.city import Cities
+from shakemap.mapping.mapmaker import draw_map
 from shakemap.coremods.mapping import get_text_strings
 from shakemap.utils.config import get_data_path
 
@@ -43,8 +44,6 @@ def test_mapmaker_intensity():
                             samplegeodict=sampledict,
                             resample=False)
 
-    oceanfile = os.path.join(homedir, '..', '..', 'data', 'install', 'data',
-                             'mapping', 'northridge_ocean.json')
     outpath = mkdtemp()
 
     model_config = container.getConfig()
@@ -53,9 +52,16 @@ def test_mapmaker_intensity():
                             'map_strings.en')
     text_dict = get_text_strings(textfile)
 
+    cities = Cities.fromDefault()
     d = {'imtype': 'MMI',
          'topogrid': topogrid,
-         'oceanfile': oceanfile,
+         'allcities': cities,
+         'states_provinces': None,
+         'countries': None,
+         'oceans': None,
+         'lakes': None,
+         'roads': None,
+         'faults': None,
          'datadir': outpath,
          'operator': 'NEIC',
          'filter_size': 10,
@@ -69,7 +75,7 @@ def test_mapmaker_intensity():
          }
 
     try:
-        fig1, fig2 = draw_intensity(d)
+        fig1, fig2 = draw_map(d)
     except Exception:
         assert 1 == 2
     finally:
@@ -105,8 +111,6 @@ def test_mapmaker_contour():
                             samplegeodict=sampledict,
                             resample=False)
 
-    oceanfile = os.path.join(homedir, '..', '..', 'data', 'install', 'data',
-                             'mapping', 'northridge_ocean.json')
     outpath = mkdtemp()
     filter_size = 10
     model_config = container.getConfig()
@@ -115,9 +119,16 @@ def test_mapmaker_contour():
                             'map_strings.en')
     text_dict = get_text_strings(textfile)
 
+    cities = Cities.fromDefault()
     d = {'imtype': 'PGA',
          'topogrid': topogrid,
-         'oceanfile': oceanfile,
+         'allcities': cities,
+         'states_provinces': None,
+         'countries': None,
+         'oceans': None,
+         'lakes': None,
+         'roads': None,
+         'faults': None,
          'datadir': outpath,
          'operator': 'NEIC',
          'filter_size': filter_size,
@@ -130,7 +141,7 @@ def test_mapmaker_contour():
          'tdict': text_dict
          }
     try:
-        _ = draw_contour(d)
+        _ = draw_map(d)
     except Exception:
         assert 1 == 2
     finally:

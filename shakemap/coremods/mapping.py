@@ -15,20 +15,29 @@ import matplotlib
 import matplotlib.pyplot as plt
 from impactutils.colors.cpalette import ColorPalette
 import rasterio.features
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+from cartopy.feature import ShapelyFeature
+from cartopy.io.shapereader import Reader
 
 # local imports
 # from mapio.gmt import GMTGrid
 from mapio.reader import read
 from impactutils.io.smcontainers import ShakeMapOutputContainer
+from impactutils.mapping.city import Cities
+
 
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error,
+                                   check_extra_values,
                                    get_data_path)
 from .base import CoreModule, Contents
-from shakemap.mapping.mapmaker import (draw_intensity, draw_contour)
+from shakemap.mapping.mapmaker import draw_map
 from shakelib.utils.imt_string import oq_to_file
+
+WATERCOLOR = '#7AA1DA'
 
 
 class MappingModule(CoreModule):
@@ -77,6 +86,7 @@ class MappingModule(CoreModule):
         validator = get_custom_validator()
         config = ConfigObj(config_file, configspec=spec_file)
         results = config.validate(validator)
+        check_extra_values(config, self.logger)
         if not isinstance(results, bool) or not results:
             config_error(config, results)
 
@@ -91,11 +101,18 @@ class MappingModule(CoreModule):
 
         # get all of the pieces needed for the mapping functions
         layers = config['products']['mapping']['layers']
-        oceanfile = layers['oceans']
         if 'topography' in layers and layers['topography'] != '':
             topofile = layers['topography']
         else:
             topofile = None
+        if 'roads' in layers and layers['roads'] != '':
+            roadfile = layers['roads']
+        else:
+            roadfile = None
+        if 'faults' in layers and layers['faults'] != '':
+            faultfile = layers['faults']
+        else:
+            faultfile = None
 
         # Get the number of parallel workers
         max_workers = config['products']['mapping']['max_workers']
@@ -145,13 +162,61 @@ class MappingModule(CoreModule):
                 config['products']['mapping']['fontfamily']
             matplotlib.rcParams['axes.unicode_minus'] = False
 
+        allcities = Cities.fromDefault()
+        states_provinces = None
+        countries = None
+        oceans = None
+        lakes = None
+        if 'CALLED_FROM_PYTEST' not in os.environ:
+            states_provinces = cfeature.NaturalEarthFeature(
+                category='cultural',
+                name='admin_1_states_provinces_lines',
+                scale='10m',
+                facecolor='none')
+
+            countries = cfeature.NaturalEarthFeature(
+                category='cultural',
+                name='admin_0_countries',
+                scale='10m',
+                facecolor='none')
+
+            oceans = cfeature.NaturalEarthFeature(
+                category='physical',
+                name='ocean',
+                scale='10m',
+                facecolor=WATERCOLOR)
+
+            lakes = cfeature.NaturalEarthFeature(
+                category='physical',
+                name='lakes',
+                scale='10m',
+                facecolor=WATERCOLOR)
+
+        if faultfile is not None:
+            faults = ShapelyFeature(Reader(faultfile).geometries(),
+                                    ccrs.PlateCarree(), facecolor='none')
+        else:
+            faults = None
+
+        if roadfile is not None:
+            roads = ShapelyFeature(Reader(roadfile).geometries(),
+                                   ccrs.PlateCarree(), facecolor='none')
+        else:
+            roads = None
+
         alist = []
         for imtype in imtlist:
             component, imtype = imtype.split('/')
             comp = container.getComponents(imtype)[0]
             d = {'imtype': imtype,
                  'topogrid': topogrid,
-                 'oceanfile': oceanfile,
+                 'allcities': allcities,
+                 'states_provinces': states_provinces,
+                 'countries': countries,
+                 'oceans': oceans,
+                 'lakes': lakes,
+                 'roads': roads,
+                 'faults': faults,
                  'datadir': datadir,
                  'operator': operator,
                  'filter_size': filter_size,
@@ -203,26 +268,27 @@ class MappingModule(CoreModule):
 def make_map(adict):
 
     imtype = adict['imtype']
+
+    if imtype == 'thumbnail':
+        make_pin_thumbnail(adict)
+        return
+
+    fig1, fig2 = draw_map(adict)
+
     if imtype == 'MMI':
-        fig1, fig2 = draw_intensity(adict)
         # save to pdf/jpeg
         pdf_file = os.path.join(adict['datadir'], 'intensity.pdf')
         jpg_file = os.path.join(adict['datadir'], 'intensity.jpg')
-        fig1.savefig(pdf_file, bbox_inches='tight')
-        fig1.savefig(jpg_file, bbox_inches='tight')
-
         # save the legend file
         legend_file = os.path.join(adict['datadir'], 'mmi_legend.png')
         fig2.savefig(legend_file, bbox_inches='tight')
-    elif imtype == 'thumbnail':
-        make_pin_thumbnail(adict)
     else:
-        fig1 = draw_contour(adict)
         fileimt = oq_to_file(imtype)
         pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
         jpg_file = os.path.join(adict['datadir'], '%s.jpg' % (fileimt))
-        fig1.savefig(pdf_file, bbox_inches='tight')
-        fig1.savefig(jpg_file, bbox_inches='tight')
+
+    fig1.savefig(pdf_file, bbox_inches='tight')
+    fig1.savefig(jpg_file, bbox_inches='tight')
 
 
 def make_pin_thumbnail(adict):
