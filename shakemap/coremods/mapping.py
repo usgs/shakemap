@@ -349,7 +349,7 @@ def get_text_strings(stringfile):
     """
     if not os.path.isfile(stringfile):
         FileNotFoundError("File %s not found" % stringfile)
-    f = open(stringfile, 'rt', encoding='UTF-8')
+    f = open(stringfile, 'rt', encoding='utf-8-sig')
     jline = ''
     for line in f:
         if line.startswith('//'):
