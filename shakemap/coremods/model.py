@@ -1458,22 +1458,23 @@ class ModelModule(CoreModule):
         gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
                                        self.smdx, self.smdy)
         bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-        if 'CALLED_FROM_PYTEST' not in os.environ:
-            oceans = shpreader.natural_earth(category='physical',
-                                             name='ocean',
-                                             resolution='10m')
-            with fiona.open(oceans) as c:
-                tshapes = list(c.items(bbox=bbox))
-                shapes = []
-                for tshp in tshapes:
-                    shapes.append(shape(tshp[1]['geometry']))
-                if len(shapes):
-                    oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
-                                                             fillValue=0.0)
-        else:
+        if 'CALLED_FROM_PYTEST' in os.environ:
             return np.zeros((gd.ny, gd.nx), dtype=np.bool)
 
-        return oceangrid.getData().astype(np.bool)
+        oceans = shpreader.natural_earth(category='physical',
+                                         name='ocean',
+                                         resolution='10m')
+        with fiona.open(oceans) as c:
+            tshapes = list(c.items(bbox=bbox))
+            shapes = []
+            for tshp in tshapes:
+                shapes.append(shape(tshp[1]['geometry']))
+            if len(shapes):
+                oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
+                                                         fillValue=0.0)
+                return oceangrid.getData().astype(np.bool)
+            else:
+                return np.zeros((gd.ny, gd.nx), dtype=np.bool)
 
     def _getMaskedGrids(self, bmask):
         """
