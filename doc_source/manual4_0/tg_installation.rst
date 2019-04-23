@@ -16,8 +16,8 @@ The Wiki does a pretty good job of explaining the installation process,
 which is fairly automated. Here we will just reiterate that things will
 go most smoothly if you use the bash shell and conda virtual environment.
 Taking a more manual approach will likely lead to conflicts with system
-software (ShakeMap runs on Python 3.6, while many systems still use 2.7
-as a default) and dependency headaches.
+software (ShakeMap runs on Python 3.6 or 3.7, while many systems still
+use 2.7 as a default) and dependency headaches.
 
 Configuration
 =============
@@ -28,7 +28,13 @@ These files should be reviewed by the operator prior to running
 ShakeMap. Additionally, the config files sometimes change when the
 code is updated and so it is fairly common for errors encountered after
 an update to be related to changes in the configs. We hope that the
-configs will become more stable as the code matures.
+configs will become more stable as the code matures, however it is
+useful to check your configuration files against those in the
+directory *shakemap/data* to make sure that you make any necessary 
+changes to parameters.
+
+Some internationalization support is included in the making of maps with
+the ``mapping`` module. See the *products.conf* section below.
 
 The configuration files are discussed in the sections below.
 
@@ -90,6 +96,28 @@ products.conf
 Options for the various ShakeMap products, such as
 contours, rasters, and maps. Additional explanation is
 available as comments in the ``products.conf`` file.
+
+Of particular 
+interest to some users will be the options for *language* and 
+possibly *fontfamily*. These options allow for the maps to be
+generated in a language other than English. If your language
+of interest already exists in ``shakemap/data/mapping`` then you
+can specify its extension for the *language* parameter. You may or
+may not have to set the *fontfamily* parameter to support your
+language of choice -- that will depend on your system configuration.
+
+If your language does not appear as one of the options in 
+``shakemap/data/mapping``, you may make the translations as
+described in one of the language files (e.g., ``map_strings.en``)
+and add your new file (with the proper extension -- see
+https://www.iana.org/assignments/language-subtag-registry
+for a list of options) to ``shakemap/data/mapping`` directory, and then 
+use that extension for your *language* parameter. Please also send us
+your file so that we can include it in the repository. That way it will
+be there the next time you update or install the ShakeMap software.
+
+Note that the translations only apply to the products of the ``mapping``
+module.
 
 
 gmpe_sets.conf
