@@ -43,8 +43,11 @@
 
 <span class="c1"># third party libraries</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span><span class="p">,</span> <span class="n">flatten_errors</span>
-<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">ValidateError</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="p">(</span><span class="n">ConfigObj</span><span class="p">,</span>
+                       <span class="n">flatten_errors</span><span class="p">,</span>
+                       <span class="n">get_extra_values</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="p">(</span><span class="n">Validator</span><span class="p">,</span>
+                      <span class="n">ValidateError</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_data_path"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_data_path">[docs]</a><span class="k">def</span> <span class="nf">get_data_path</span><span class="p">():</span>
@@ -217,6 +220,46 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;There </span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> in configuration.&#39;</span>
                            <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;was&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;were&#39;</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span>
                               <span class="s1">&#39;error&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;errors&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="check_extra_values"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_extra_values">[docs]</a><span class="k">def</span> <span class="nf">check_extra_values</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks the config and warns the user if there are any extra entries</span>
+<span class="sd">    in their config file. This function is based on suggested usage in the</span>
+<span class="sd">    ConfigObj manual.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigObj): A ConfigObj instance.</span>
+<span class="sd">        logger (logger): The logger to which to write complaints.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Nothing: Nothing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">sections</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">get_extra_values</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+
+        <span class="c1"># this code gets the extra values themselves</span>
+        <span class="n">the_section</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="n">the_section</span> <span class="o">=</span> <span class="n">the_section</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
+
+        <span class="c1"># the_value may be a section or a value</span>
+        <span class="n">the_value</span> <span class="o">=</span> <span class="n">the_section</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="n">section_or_value</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">the_value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c1"># Sections are subclasses of dict</span>
+            <span class="n">section_or_value</span> <span class="o">=</span> <span class="s1">&#39;section&#39;</span>
+
+        <span class="n">section_string</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sections</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;top level&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Extra entry in section: </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1"> </span><span class="si">%r</span><span class="s1"> is not in spec.&#39;</span> <span class="o">%</span>
+                       <span class="p">(</span><span class="n">section_string</span><span class="p">,</span> <span class="n">section_or_value</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="n">warnings</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">warnings</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The extra value(s) may be the result of deprecated &#39;</span>
+                       <span class="s1">&#39;entries or other changes to the config files; please &#39;</span>
+                       <span class="s1">&#39;check the conifg files in shakemap/data for the most &#39;</span>
+                       <span class="s1">&#39;up to date specs.&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="check_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_config">[docs]</a><span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>

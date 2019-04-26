@@ -80,7 +80,7 @@ exist.</li>
 
 <dl class="function">
 <dt id="shakemap.coremods.kml.create_kmz">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_kmz</code><span class="sig-paren">(</span><em>container</em>, <em>datadir</em>, <em>oceanfile</em>, <em>logger</em>, <em>contents</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_kmz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_kmz" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_kmz</code><span class="sig-paren">(</span><em>container</em>, <em>datadir</em>, <em>logger</em>, <em>contents</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_kmz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_kmz" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -177,7 +177,7 @@ the viewer’s map.</p>
 
 <dl class="function">
 <dt id="shakemap.coremods.kml.create_overlay">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_overlay</code><span class="sig-paren">(</span><em>container</em>, <em>oceanfile</em>, <em>datadir</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_overlay</code><span class="sig-paren">(</span><em>container</em>, <em>datadir</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a KML file and intensity map.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -185,7 +185,6 @@ the viewer’s map.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</li>
-<li><strong>oceanfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to shapefile containing ocean polygons.</li>
 <li><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</li>
 <li><strong>document</strong> (<em>SubElement</em>) – KML document where the overlay tags should go.</li>
 </ul>
@@ -203,7 +202,7 @@ the viewer’s map.</p>
 
 <dl class="function">
 <dt id="shakemap.coremods.kml.create_overlay_image">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_overlay_image</code><span class="sig-paren">(</span><em>container</em>, <em>oceanfile</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay_image" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_overlay_image</code><span class="sig-paren">(</span><em>container</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a semi-transparent PNG image of intensity.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -211,7 +210,6 @@ the viewer’s map.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</li>
-<li><strong>oceanfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to shapefile containing ocean polygons.</li>
 <li><strong>filename</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to desired output PNG file.</li>
 </ul>
 </td>

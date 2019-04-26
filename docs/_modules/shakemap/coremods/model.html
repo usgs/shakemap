@@ -37,6 +37,7 @@
 <span class="sd">Process a ShakeMap, based on the configuration and data found in</span>
 <span class="sd">shake_data.hdf, and produce output in shake_result.hdf.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
@@ -51,12 +52,15 @@
 <span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
 <span class="kn">import</span> <span class="nn">openquake.hazardlib.const</span> <span class="k">as</span> <span class="nn">oqconst</span>
-<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
-<span class="kn">import</span> <span class="nn">mapio.reader</span>
+<span class="kn">import</span> <span class="nn">fiona</span>
+<span class="kn">import</span> <span class="nn">cartopy.io.shapereader</span> <span class="k">as</span> <span class="nn">shpreader</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">shape</span>
 
 <span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">cf</span>
 
 <span class="c1"># local imports</span>
+<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
+<span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.point_rupture</span> <span class="k">import</span> <span class="n">PointRupture</span>
 <span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="k">import</span> <span class="n">Sites</span>
@@ -71,8 +75,7 @@
 <span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
-                                   <span class="n">get_data_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
 <span class="kn">from</span> <span class="nn">shakemap._version</span> <span class="k">import</span> <span class="n">get_versions</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.generic_amp</span> <span class="k">import</span> <span class="n">get_generic_amp_factors</span>
@@ -1489,12 +1492,24 @@
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">gd</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromBox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span>
                                        <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">)</span>
-        <span class="n">maskfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;landmask&#39;</span><span class="p">,</span> <span class="s1">&#39;landmask_nb.grd&#39;</span><span class="p">)</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">mapio</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">maskfile</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">gd</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                 <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">doPadding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                 <span class="n">padValue</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">bmask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">bmask</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">gd</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">nx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+
+        <span class="n">oceans</span> <span class="o">=</span> <span class="n">shpreader</span><span class="o">.</span><span class="n">natural_earth</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;physical&#39;</span><span class="p">,</span>
+                                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ocean&#39;</span><span class="p">,</span>
+                                         <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">oceans</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+            <span class="n">tshapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">))</span>
+            <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">tshp</span> <span class="ow">in</span> <span class="n">tshapes</span><span class="p">:</span>
+                <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">tshp</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">):</span>
+                <span class="n">oceangrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">rasterizeFromGeometry</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span>
+                                                         <span class="n">fillValue</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">oceangrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">gd</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">nx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_getMaskedGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bmask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

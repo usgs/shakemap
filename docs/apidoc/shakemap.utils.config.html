@@ -187,6 +187,32 @@ the ‘config’ arguments.</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="shakemap.utils.config.check_extra_values">
+<code class="descclassname">shakemap.utils.config.</code><code class="descname">check_extra_values</code><span class="sig-paren">(</span><em>config</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_extra_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_extra_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the config and warns the user if there are any extra entries
+in their config file. This function is based on suggested usage in the
+ConfigObj manual.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<em>ConfigObj</em>) – A ConfigObj instance.</li>
+<li><strong>logger</strong> (<em>logger</em>) – The logger to which to write complaints.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Nothing.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Nothing</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="shakemap.utils.config.check_config">
 <code class="descclassname">shakemap.utils.config.</code><code class="descname">check_config</code><span class="sig-paren">(</span><em>config</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that the gmpe, gmice, ipe, and ccf parameters
