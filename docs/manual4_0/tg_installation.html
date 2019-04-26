@@ -46,8 +46,8 @@ additional detail for installing, configuring, and running v4.</p>
 which is fairly automated. Here we will just reiterate that things will
 go most smoothly if you use the bash shell and conda virtual environment.
 Taking a more manual approach will likely lead to conflicts with system
-software (ShakeMap runs on Python 3.6, while many systems still use 2.7
-as a default) and dependency headaches.</p>
+software (ShakeMap runs on Python 3.6 or 3.7, while many systems still
+use 2.7 as a default) and dependency headaches.</p>
 </div>
 <div class="section" id="configuration">
 <h2>2.1.2. Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
@@ -57,7 +57,12 @@ These files should be reviewed by the operator prior to running
 ShakeMap. Additionally, the config files sometimes change when the
 code is updated and so it is fairly common for errors encountered after
 an update to be related to changes in the configs. We hope that the
-configs will become more stable as the code matures.</p>
+configs will become more stable as the code matures, however it is
+useful to check your configuration files against those in the
+directory <em>shakemap/data</em> to make sure that you make any necessary
+changes to parameters.</p>
+<p>Some internationalization support is included in the making of maps with
+the <code class="docutils literal notranslate"><span class="pre">mapping</span></code> module. See the <em>products.conf</em> section below.</p>
 <p>The configuration files are discussed in the sections below.</p>
 <div class="section" id="model-conf">
 <h3>2.1.2.1. model.conf<a class="headerlink" href="#model-conf" title="Permalink to this headline">¶</a></h3>
@@ -111,6 +116,25 @@ additional details on how this configuration works.</p>
 <p>Options for the various ShakeMap products, such as
 contours, rasters, and maps. Additional explanation is
 available as comments in the <code class="docutils literal notranslate"><span class="pre">products.conf</span></code> file.</p>
+<p>Of particular
+interest to some users will be the options for <em>language</em> and
+possibly <em>fontfamily</em>. These options allow for the maps to be
+generated in a language other than English. If your language
+of interest already exists in <code class="docutils literal notranslate"><span class="pre">shakemap/data/mapping</span></code> then you
+can specify its extension for the <em>language</em> parameter. You may or
+may not have to set the <em>fontfamily</em> parameter to support your
+language of choice – that will depend on your system configuration.</p>
+<p>If your language does not appear as one of the options in
+<code class="docutils literal notranslate"><span class="pre">shakemap/data/mapping</span></code>, you may make the translations as
+described in one of the language files (e.g., <code class="docutils literal notranslate"><span class="pre">map_strings.en</span></code>)
+and add your new file (with the proper extension – see
+<a class="reference external" href="https://www.iana.org/assignments/language-subtag-registry">https://www.iana.org/assignments/language-subtag-registry</a>
+for a list of options) to <code class="docutils literal notranslate"><span class="pre">shakemap/data/mapping</span></code> directory, and then
+use that extension for your <em>language</em> parameter. Please also send us
+your file so that we can include it in the repository. That way it will
+be there the next time you update or install the ShakeMap software.</p>
+<p>Note that the translations only apply to the products of the <code class="docutils literal notranslate"><span class="pre">mapping</span></code>
+module.</p>
 </div>
 <div class="section" id="gmpe-sets-conf">
 <h3>2.1.2.4. gmpe_sets.conf<a class="headerlink" href="#gmpe-sets-conf" title="Permalink to this headline">¶</a></h3>

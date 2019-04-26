@@ -34,29 +34,27 @@
             
   <h1>Source code for shakemap.coremods.kml</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
 <span class="c1"># third party imports</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">shape</span>
-<span class="kn">import</span> <span class="nn">fiona</span>
-<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
-<span class="kn">import</span> <span class="nn">configobj</span>
 <span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage.filters</span> <span class="k">import</span> <span class="n">median_filter</span>
 <span class="kn">import</span> <span class="nn">simplekml</span> <span class="k">as</span> <span class="nn">skml</span>
+<span class="kn">import</span> <span class="nn">fiona</span>
+<span class="kn">import</span> <span class="nn">cartopy.io.shapereader</span> <span class="k">as</span> <span class="nn">shpreader</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">shape</span>
 
 <span class="c1"># local imports</span>
+<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
-                                   <span class="n">get_configspec</span><span class="p">,</span>
-                                   <span class="n">get_custom_validator</span><span class="p">,</span>
-                                   <span class="n">config_error</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="k">import</span> <span class="n">contour</span>
 <span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="k">import</span> <span class="n">ColorPalette</span>
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
@@ -264,25 +262,13 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;kml module can only contour &#39;</span>
                                       <span class="s1">&#39;gridded data, not sets of points&#39;</span><span class="p">)</span>
 
-        <span class="c1"># find the low res ocean vector dataset</span>
-        <span class="n">product_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
-        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s1">&#39;products&#39;</span><span class="p">)</span>
-        <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
-        <span class="n">pconfig</span> <span class="o">=</span> <span class="n">configobj</span><span class="o">.</span><span class="n">ConfigObj</span><span class="p">(</span><span class="n">product_config_file</span><span class="p">,</span>
-                                      <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">pconfig</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
-            <span class="n">config_error</span><span class="p">(</span><span class="n">pconfig</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
-        <span class="n">oceanfile</span> <span class="o">=</span> <span class="n">pconfig</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="s1">&#39;lowres_oceans&#39;</span><span class="p">]</span>
-
         <span class="c1"># call create_kmz function</span>
-        <span class="n">create_kmz</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span>
+        <span class="n">create_kmz</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span>
 
         <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="create_kmz"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_kmz">[docs]</a><span class="k">def</span> <span class="nf">create_kmz</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">contents</span><span class="p">):</span>
+<div class="viewcode-block" id="create_kmz"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_kmz">[docs]</a><span class="k">def</span> <span class="nf">create_kmz</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">contents</span><span class="p">):</span>
     <span class="c1"># we&#39;re going to combine all these layers into one KMZ file.</span>
     <span class="n">kmz_contents</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -301,7 +287,7 @@
 
     <span class="c1"># create intensity overlay</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating intensity overlay...&#39;</span><span class="p">)</span>
-    <span class="n">overlay_image</span> <span class="o">=</span> <span class="n">create_overlay</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
+    <span class="n">overlay_image</span> <span class="o">=</span> <span class="n">create_overlay</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
     <span class="n">kmz_contents</span> <span class="o">+=</span> <span class="p">[</span><span class="n">overlay_image</span><span class="p">]</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created intensity overlay image </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">overlay_image</span><span class="p">)</span>
 
@@ -580,12 +566,11 @@
     <span class="k">return</span> <span class="n">line_styles</span></div>
 
 
-<div class="viewcode-block" id="create_overlay"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay">[docs]</a><span class="k">def</span> <span class="nf">create_overlay</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
+<div class="viewcode-block" id="create_overlay"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay">[docs]</a><span class="k">def</span> <span class="nf">create_overlay</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a KML file and intensity map.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        container (ShakeMapOutputContainer): Results of model.conf.</span>
-<span class="sd">        oceanfile (str): Path to shapefile containing ocean polygons.</span>
 <span class="sd">        datadir (str): Path to data directory where output KMZ will be written.</span>
 <span class="sd">        document (SubElement): KML document where the overlay tags should go.</span>
 <span class="sd">    Returns:</span>
@@ -593,7 +578,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># create the overlay image file</span>
     <span class="n">overlay_img_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">OVERLAY_IMG</span><span class="p">)</span>
-    <span class="n">geodict</span> <span class="o">=</span> <span class="n">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">overlay_img_file</span><span class="p">)</span>
+    <span class="n">geodict</span> <span class="o">=</span> <span class="n">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">overlay_img_file</span><span class="p">)</span>
     <span class="n">box</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LatLonBox</span><span class="p">(</span><span class="n">north</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">ymax</span><span class="p">,</span> <span class="n">south</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span>
                          <span class="n">east</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">west</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">xmin</span><span class="p">)</span>
     <span class="n">icon</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Icon</span><span class="p">(</span><span class="n">refreshinterval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
@@ -608,12 +593,11 @@
     <span class="k">return</span> <span class="n">overlay_img_file</span></div>
 
 
-<div class="viewcode-block" id="create_overlay_image"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay_image">[docs]</a><span class="k">def</span> <span class="nf">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="create_overlay_image"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay_image">[docs]</a><span class="k">def</span> <span class="nf">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a semi-transparent PNG image of intensity.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        container (ShakeMapOutputContainer): Results of model.conf.</span>
-<span class="sd">        oceanfile (str): Path to shapefile containing ocean polygons.</span>
 <span class="sd">        filename (str): Path to desired output PNG file.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        GeoDict: GeoDict object for the intensity grid.</span>
@@ -636,16 +620,21 @@
     <span class="c1"># set the alpha value to 255 wherever we have MMI 0</span>
     <span class="n">rgba</span><span class="p">[</span><span class="n">imtdata</span> <span class="o">&lt;=</span> <span class="mf">1.5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="c1"># mask off the areas covered by ocean</span>
-    <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">oceanfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
-        <span class="n">tshapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">))</span>
-        <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">tshp</span> <span class="ow">in</span> <span class="n">tshapes</span><span class="p">:</span>
-            <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">tshp</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]))</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">):</span>
-            <span class="n">oceangrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">rasterizeFromGeometry</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span> <span class="n">fillValue</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-            <span class="n">rgba</span><span class="p">[</span><span class="n">oceangrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="c1"># mask off the areas covered by ocean</span>
+        <span class="n">oceans</span> <span class="o">=</span> <span class="n">shpreader</span><span class="o">.</span><span class="n">natural_earth</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;physical&#39;</span><span class="p">,</span>
+                                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ocean&#39;</span><span class="p">,</span>
+                                         <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">)</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">oceans</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+            <span class="n">tshapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">))</span>
+            <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">tshp</span> <span class="ow">in</span> <span class="n">tshapes</span><span class="p">:</span>
+                <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">tshp</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">):</span>
+                <span class="n">oceangrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">rasterizeFromGeometry</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span>
+                                                         <span class="n">fillValue</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+                <span class="n">rgba</span><span class="p">[</span><span class="n">oceangrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># save rgba image as png</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">rgba</span><span class="p">)</span>
