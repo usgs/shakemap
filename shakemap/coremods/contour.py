@@ -153,7 +153,7 @@ def contour_to_files(container, output_dir, logger, contents,
             contents.addFile('mmiContour', 'Intensity Contours',
                              'Contours of macroseismic intensity.',
                              fname, 'application/json')
-            contents.addFile('miContour', 'Intensity Contours',
+            contents.addFile('miContour', 'Intensity Contours (Legacy Naming)',
                              'Contours of macroseismic intensity.',
                              'cont_mi.json', 'application/json')
         elif imtype == 'PGA':
