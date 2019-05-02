@@ -13,12 +13,14 @@ import numpy as np
 from scipy.interpolate import griddata
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.ticker import NullLocator
 from impactutils.colors.cpalette import ColorPalette
 import rasterio.features
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.feature import ShapelyFeature
 from cartopy.io.shapereader import Reader
+from PIL import Image
 
 # local imports
 # from mapio.gmt import GMTGrid
@@ -233,6 +235,9 @@ class MappingModule(CoreModule):
                 g = copy.deepcopy(d)
                 g['imtype'] = 'thumbnail'
                 alist.append(g)
+                h = copy.deepcopy(d)
+                h['imtype'] = 'overlay'
+                alist.append(h)
                 self.contents.addFile('intensityMap', 'Intensity Map',
                                       'Map of macroseismic intensity.',
                                       'intensity.jpg', 'image/jpeg')
@@ -243,6 +248,16 @@ class MappingModule(CoreModule):
                                       'Intensity Thumbnail',
                                       'Thumbnail of intensity map.',
                                       'pin-thumbnail.png', 'image/png')
+                self.contents.addFile('intensityOverlay',
+                                      'Intensity Overlay and World File',
+                                      'Macroseismic intensity rendered as a '
+                                      'PNG overlay and associated world file',
+                                      'intensity_overlay.png', 'image/png')
+                self.contents.addFile('intensityOverlay',
+                                      'Intensity Overlay and World File',
+                                      'Macroseismic intensity rendered as a '
+                                      'PNG overlay and associated world file',
+                                      'intensity_overlay.pngw', 'text/plain')
             else:
                 fileimt = oq_to_file(imtype)
                 self.contents.addFile(fileimt + 'Map',
@@ -272,6 +287,9 @@ def make_map(adict):
     if imtype == 'thumbnail':
         make_pin_thumbnail(adict)
         return
+    elif imtype == 'overlay':
+        make_overlay(adict)
+        return
 
     fig1, fig2 = draw_map(adict)
 
@@ -281,7 +299,9 @@ def make_map(adict):
         jpg_file = os.path.join(adict['datadir'], 'intensity.jpg')
         # save the legend file
         legend_file = os.path.join(adict['datadir'], 'mmi_legend.png')
-        fig2.savefig(legend_file, bbox_inches='tight')
+        fig2.gca().xaxis.set_major_locator(NullLocator())
+        fig2.gca().yaxis.set_major_locator(NullLocator())
+        fig2.savefig(legend_file, bbox_inches='tight', pad_inches=0)
     else:
         fileimt = oq_to_file(imtype)
         pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
@@ -357,3 +377,35 @@ def get_text_strings(stringfile):
         jline += line
     f.close()
     return json.loads(jline)
+
+
+def make_overlay(adict):
+    """
+    Make a transparent PNG of intensity and a world file
+
+    Args:
+        adict (dict): The usual dictionary for the mapping functions.
+
+    Returns:
+        nothing: Nothing.
+    """
+    mmidict = adict['imtdict']
+    mmi_array = mmidict['mean']
+    geodict = GeoDict(mmidict['mean_metadata'])
+    palette = ColorPalette.fromPreset('mmi')
+    mmi_rgb = palette.getDataColor(mmi_array, color_format='array')
+    img = Image.fromarray(mmi_rgb)
+    pngfile = os.path.join(adict['datadir'], 'intensity_overlay.png')
+    img.save(pngfile, "PNG")
+
+    # write out a world file
+    # https://en.wikipedia.org/wiki/World_file
+    worldfile = os.path.join(adict['datadir'], 'intensity_overlay.pngw')
+    with open(worldfile, 'wt') as f:
+        f.write('%.4f\n' % geodict.dx)
+        f.write('0.0\n')
+        f.write('0.0\n')
+        f.write('-%.4f\n' % geodict.dy)
+        f.write('%.4f\n' % geodict.xmin)
+        f.write('%.4f\n' % geodict.ymax)
+    return
