@@ -66,9 +66,9 @@ the <code class="docutils literal notranslate"><span class="pre">mapping</span><
 <p>The configuration files are discussed in the sections below.</p>
 <div class="section" id="model-conf">
 <h3>2.1.2.1. model.conf<a class="headerlink" href="#model-conf" title="Permalink to this headline">¶</a></h3>
-<p>Config options for how modeling works, such as what
-GMPE or GMPEs to use, what Vs30 file to use, what IMTs to compute, and
-options on where the predictions should be computed (i.e., grid
+<p><em>model.conf</em> contains configuration options for the way modeling works, such
+as the GMPE or GMPEs to use, the location of the Vs30, the IMTs to compute,
+and options on where the predictions should be computed (i.e., grid
 resolution or a list of site locations). One can make a copy of this
 file in an event directory to have event-specific config options.
 In the event-specific <em>model.conf</em> it is only necessary to list parameters
@@ -98,14 +98,14 @@ and set the system to use it. For instance:</p>
 </div>
 <div class="section" id="select-conf">
 <h3>2.1.2.2. select.conf<a class="headerlink" href="#select-conf" title="Permalink to this headline">¶</a></h3>
-<p>Config options for GMPE selection, which are used by
+<p><em>select.conf</em> has options for GMPE selection, which are used by
 the <code class="docutils literal notranslate"><span class="pre">select</span></code> module. Note that if/when the <code class="docutils literal notranslate"><span class="pre">select</span></code> module runs, it
-creates the file <code class="docutils literal notranslate"><span class="pre">model_select.conf</span></code> in the event’s _current_ directory,
-which overrides the GMPE set in the <code class="docutils literal notranslate"><span class="pre">model.conf</span></code> file located in the
+creates the file <em>model_select.conf</em> in the event’s <em>current</em> directory,
+which overrides the GMPE set in the <em>model.conf</em> file located in the
 global config directory, but the config settings in an event-specific
-<code class="docutils literal notranslate"><span class="pre">model.conf</span></code> take precedence over the settings in <code class="docutils literal notranslate"><span class="pre">model_select.conf</span></code>.
-Thus, if there are any event-specific changes to the <code class="docutils literal notranslate"><span class="pre">model.conf</span></code>,
-a sensible approach is to rename <code class="docutils literal notranslate"><span class="pre">model_select.conf</span></code> to <code class="docutils literal notranslate"><span class="pre">model.conf</span></code>
+<em>model.conf</em> take precedence over the settings in <em>model_select.conf</em>.
+Thus, if there are any event-specific changes to the <em>model.conf</em>,
+a sensible approach is to rename <em>model_select.conf</em> to <em>model.conf</em>
 and then add any other config options to it.</p>
 <p>Please see the
 <a class="reference internal" href="tg_select.html#sec-select-4"><span class="std std-ref">Ground Motion Selection section</span></a> for
@@ -113,24 +113,24 @@ additional details on how this configuration works.</p>
 </div>
 <div class="section" id="products-conf">
 <h3>2.1.2.3. products.conf<a class="headerlink" href="#products-conf" title="Permalink to this headline">¶</a></h3>
-<p>Options for the various ShakeMap products, such as
+<p><em>products.conf</em> holds options for the various ShakeMap products, such as
 contours, rasters, and maps. Additional explanation is
-available as comments in the <code class="docutils literal notranslate"><span class="pre">products.conf</span></code> file.</p>
+available as comments in the <em>products.conf</em> file.</p>
 <p>Of particular
-interest to some users will be the options for <em>language</em> and
-possibly <em>fontfamily</em>. These options allow for the maps to be
+interest to some users will be the options for <strong>language</strong> and
+possibly <strong>fontfamily</strong>. These options allow for the maps to be
 generated in a language other than English. If your language
-of interest already exists in <code class="docutils literal notranslate"><span class="pre">shakemap/data/mapping</span></code> then you
-can specify its extension for the <em>language</em> parameter. You may or
-may not have to set the <em>fontfamily</em> parameter to support your
+of interest already exists in <em>shakemap/data/mapping</em> then you
+can specify its extension for the <strong>language</strong> parameter. You may or
+may not have to set the <strong>fontfamily</strong> parameter to support your
 language of choice – that will depend on your system configuration.</p>
 <p>If your language does not appear as one of the options in
-<code class="docutils literal notranslate"><span class="pre">shakemap/data/mapping</span></code>, you may make the translations as
-described in one of the language files (e.g., <code class="docutils literal notranslate"><span class="pre">map_strings.en</span></code>)
+<em>shakemap/data/mapping</em>, you may make the translations as
+described in one of the language files (e.g., <em>map_strings.en</em>)
 and add your new file (with the proper extension – see
 <a class="reference external" href="https://www.iana.org/assignments/language-subtag-registry">https://www.iana.org/assignments/language-subtag-registry</a>
-for a list of options) to <code class="docutils literal notranslate"><span class="pre">shakemap/data/mapping</span></code> directory, and then
-use that extension for your <em>language</em> parameter. Please also send us
+for a list of options) to <em>shakemap/data/mapping</em> directory, and then
+use that extension for your <strong>language</strong> parameter. Please also send us
 your file so that we can include it in the repository. That way it will
 be there the next time you update or install the ShakeMap software.</p>
 <p>Note that the translations only apply to the products of the <code class="docutils literal notranslate"><span class="pre">mapping</span></code>
@@ -139,15 +139,15 @@ module.</p>
 <div class="section" id="gmpe-sets-conf">
 <h3>2.1.2.4. gmpe_sets.conf<a class="headerlink" href="#gmpe-sets-conf" title="Permalink to this headline">¶</a></h3>
 <p>This file defines the GMPE sets that are available to be set in
-<code class="docutils literal notranslate"><span class="pre">model.conf</span></code>. These sets can be as simple as a single GMPE with a
-weight of 1.0. The GMPE sets can be selected directly from <code class="docutils literal notranslate"><span class="pre">model.conf</span></code>,
+<em>model.conf</em>. These sets can be as simple as a single GMPE with a
+weight of 1.0. The GMPE sets can be selected directly from <em>model.conf</em>,
 or a the custom GMPE set created by the <code class="docutils literal notranslate"><span class="pre">select</span></code> module can be
 selected.</p>
 </div>
 <div class="section" id="modules-conf">
 <h3>2.1.2.5. modules.conf<a class="headerlink" href="#modules-conf" title="Permalink to this headline">¶</a></h3>
-<p>Controls what GMPEs are available for constructing GMPE sets. Generally,
-this only needs to be edited if you wish to use a GMPE that is not
+<p><em>modules.conf</em> ontrols what GMPEs are available for constructing GMPE sets.
+Generally, this only needs to be edited if you wish to use a GMPE that is not
 currently imported. The GMPEs are imported
 from the <a class="reference external" href="https://github.com/gem/oq-engine">OpenQuake Engine</a>
 <a class="reference external" href="https://github.com/gem/oq-engine/tree/master/openquake/hazardlib">hazardlib</a>
@@ -155,38 +155,41 @@ library.</p>
 </div>
 <div class="section" id="shake-conf">
 <h3>2.1.2.6. shake.conf<a class="headerlink" href="#shake-conf" title="Permalink to this headline">¶</a></h3>
-<p>This config file is only for very general configuration options relating
+<p>This configuration file is only for very general configuration options
+relating
 to the operation of <code class="docutils literal notranslate"><span class="pre">shake</span></code>. It allows the operator to configure additional
 repositories of ShakeMap modules (“plugins,” if you will). It also allows
-the user to set the modules for “automatic”, called <code class="docutils literal notranslate"><span class="pre">autorun_modules</span></code>. The
+the user to set the modules for automatic runs, using the parameter
+<strong>autorun_modules</strong>. The
 general idea is that shake can be run specifying specific modules like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shake</span> <span class="o">&lt;</span><span class="n">event</span> <span class="nb">id</span><span class="o">&gt;</span> <span class="n">module1</span> <span class="n">module2</span>
 </pre></div>
 </div>
 <p>But since there are many modules and <code class="docutils literal notranslate"><span class="pre">shake</span></code> is often invoked via
 automated processes, it is convenient to configure a list of
-<code class="docutils literal notranslate"><span class="pre">autorun_modules</span></code> which will be used when no module is specified
-on the command line like this:</p>
+<strong>*utorun_modules</strong> that will be used when no module is specified
+on the command line, i.e., like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shake</span> <span class="o">&lt;</span><span class="n">event</span> <span class="nb">id</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="logging-conf">
 <h3>2.1.2.7. logging.conf<a class="headerlink" href="#logging-conf" title="Permalink to this headline">¶</a></h3>
-<p>Contains options for logging. Most users will likely not need to modify
-this file unless they wish to change the format of the messages,
-date/time stamps, or other logging behavior.</p>
+<p><em>logging.conf</em> contains options for logging. Most users will likely not
+need to modify this file unless they wish to change the format of the
+messages, date/time stamps, or other logging behavior.</p>
 </div>
 <div class="section" id="transfer-conf">
 <h3>2.1.2.8. transfer.conf<a class="headerlink" href="#transfer-conf" title="Permalink to this headline">¶</a></h3>
-<p>Controls the transfer of ShakeMap products to remote systems via the
+<p><em>transfer.conf</em> controls the transfer of ShakeMap products to remote
+systems via the
 <code class="docutils literal notranslate"><span class="pre">transfer</span></code> module. See the documentation within the file itself for
 explanation of the available options.</p>
 </div>
 <div class="section" id="migrate-conf">
 <h3>2.1.2.9. migrate.conf<a class="headerlink" href="#migrate-conf" title="Permalink to this headline">¶</a></h3>
-<p>Parameters that determine how ShakeMap 3.5 data directories are
-migrated to ShakeMap 4.0-compatible directories via the program
+<p>This file holds parameters that determine how ShakeMap 3.5 data directories
+are migrated to ShakeMap 4.0-compatible directories via the program
 <code class="docutils literal notranslate"><span class="pre">sm_migrate</span></code>. This file allows the user to choose which OpenQuake
 GMPE should be used in place of the ShakeMap GMPE previously used
 for each event.</p>
@@ -197,18 +200,18 @@ for each event.</p>
 <p>We provide three files available by FTP at
 <a class="reference external" href="ftp://hazards.cr.usgs.gov/shakemap">ftp://hazards.cr.usgs.gov/shakemap</a>:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">global_vs30.grd</span></code> – The 30 arcsecond resolution Vs30 data set for the entire globe.</li>
-<li><code class="docutils literal notranslate"><span class="pre">topo_30sec.grd</span></code> – The 30 arcsecond resolution topography data for the entire globe.</li>
-<li><code class="docutils literal notranslate"><span class="pre">topo_15sec.grd</span></code> – The 15 arcsecond resolution topography data for the entire globe.</li>
+<li><em>global_vs30.grd</em> – The 30 arcsecond resolution Vs30 data set for the entire globe.</li>
+<li><em>topo_30sec.grd</em> – The 30 arcsecond resolution topography data for the entire globe.</li>
+<li><em>topo_15sec.grd</em> – The 15 arcsecond resolution topography data for the entire globe.</li>
 </ul>
 <p>By ‘entire globe’ we mean from 56 degrees south to 84 degrees north latitude.</p>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> allows the user to download the 30-arcsecond topo
 and Vs30 files as part of the creation of a profile. If <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> is
 called with the <code class="docutils literal notranslate"><span class="pre">-a</span></code> option, these files will be downloaded automatically
 and the profile will be configured to use them.</p>
-<p>If you have not had <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> download the grids, you have a choice
+<p>If you did not have <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> download the grids, you have a choice
 of 15 or 30 second resolution topography. 15 second data shows
-more detail at small scales, but causes ShakeMap to take <em>significantly</em>
+more detail at small scales, but causes ShakeMap to take significantly
 longer to make the various output maps. The ShakeMap system at the National
 Earthquake Information Center uses the 30 second data. If you plan to use
 the 15 second data, modify the topo file name below to topo_15sec.grd.</p>
@@ -230,11 +233,11 @@ names:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">cd</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_profiles</span><span class="o">/</span><span class="p">[</span><span class="n">profile</span><span class="p">]</span><span class="o">/</span><span class="n">install</span><span class="o">/</span><span class="n">config</span>
 </pre></div>
 </div>
-<p>Modify <code class="docutils literal notranslate"><span class="pre">model.conf</span></code> to change the line:</p>
+<p>Modify <em>model.conf</em> to change the line:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vs30file</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">DATA_DIR</span><span class="o">&gt;/</span><span class="n">vs30</span><span class="o">/</span><span class="n">global_vs30</span><span class="o">.</span><span class="n">grd</span>
 </pre></div>
 </div>
-<p>to the location of your Vs30 data. Similarly, modify products.conf to
+<p>to the location of your Vs30 data. Similarly, edit <em>products.conf</em> and
 change the line:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">topography</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">DATA_DIR</span><span class="o">&gt;/</span><span class="n">topo</span><span class="o">/</span><span class="n">topo_30sec</span><span class="o">.</span><span class="n">grd</span>
 </pre></div>

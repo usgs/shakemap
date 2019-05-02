@@ -64,14 +64,16 @@ informmation. Here is an example of an origin-type dictionary:</p>
           <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="s1">&#39;123.6&#39;</span><span class="p">,</span>
           <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="s1">&#39;6.2&#39;</span><span class="p">,</span>
           <span class="s1">&#39;mag&#39;</span><span class="p">:</span> <span class="s1">&#39;5.6&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;locstring&#39;</span><span class="p">:</span> <span class="s1">&#39;231 km SE of Guam&#39;</span><span class="p">}}</span>
+          <span class="s1">&#39;locstring&#39;</span><span class="p">:</span> <span class="s1">&#39;231 km SE of Guam&#39;</span>
+          <span class="s1">&#39;alt_eventids&#39;</span><span class="p">:</span> <span class="s1">&#39;id1,id2,id3&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;Event added&#39;</span><span class="p">}}</span>
 </pre></div>
 </div>
 <p>The fields are:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="20%" />
-<col width="80%" />
+<col width="19%" />
+<col width="81%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>id</td>
@@ -101,6 +103,12 @@ informmation. Here is an example of an origin-type dictionary:</p>
 <tr class="row-odd"><td>locstring</td>
 <td>A text description of the origin location</td>
 </tr>
+<tr class="row-even"><td>alt_eventids</td>
+<td>A comma-separated list of alternate event IDs for the event</td>
+</tr>
+<tr class="row-odd"><td>action</td>
+<td>A text description action that resulted in this trigger</td>
+</tr>
 </tbody>
 </table>
 <p>For all “type” values other than “origin”, the “data” dictionary
@@ -114,6 +122,16 @@ action. All other values of “type” will be treated as if something
 has changed for that event, and <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> should consider rerunning
 the event subject to the same rules as an updated origin. The “type”
 of the trigger will be printed in the log.</p>
+<p>If provided, the <code class="docutils literal notranslate"><span class="pre">alt_eventids</span></code> field allows for the possibility that
+the event
+was originally processed under a different ID, but the authoritative ID
+has changed since then. If the original ID is listed in the
+<code class="docutils literal notranslate"><span class="pre">alt_eventids</span></code> string, then the system will copy the data associated
+with the old ID into the directory for the new ID, and the event database
+will be updated to reflect the new ID.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">action</span></code> is provided, it will be given as the argument to
+the <code class="docutils literal notranslate"><span class="pre">assemble</span></code> or <code class="docutils literal notranslate"><span class="pre">augment</span></code> module when the event is processed by
+<code class="docutils literal notranslate"><span class="pre">shake</span></code>.</p>
 <p>The library module <code class="docutils literal notranslate"><span class="pre">shakemap.utils.queue</span></code> provides a helper function
 <code class="docutils literal notranslate"><span class="pre">send_queue</span></code> that will send a message to the local instance of
 <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. For code written in other languages, the message must
@@ -121,7 +139,7 @@ be serialized JSON encoded in UTF-8.</p>
 <p><a class="pageref" href="#basic-queue">Figure  1</a> is a simplified example of a generic
 implementation of <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. The figure shows two example messages
 that might be sent by a triggering process (“User Process”) to
-<code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. <a href="#id1"><span class="problematic" id="id2">``</span></a>sm_queue`
+<code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>
 listens on a socket for incoming messages and, when they arrive,
 decides their disposition. It then goes back to listening for new
 messages. If no input is received for 30 seconds, the process checks
@@ -129,7 +147,7 @@ for any scheduled repeats that it may need to initiate, tends to any
 other unfinished business (reaping dead child processes, removing old
 events from the database, etc.) and then goes back to listening on
 the socket.</p>
-<div class="figure align-left" id="id5">
+<div class="figure align-left" id="id1">
 <span id="basic-queue"></span><a class="reference internal image-reference" href="../_images/queue_basic.png"><img alt="../_images/queue_basic.png" src="../_images/queue_basic.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 1: A simplified flowchart for <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> and a triggering process.</span></p>
 </div>
@@ -142,7 +160,7 @@ to run, and 2) to prevent too many re-runs of events when
 trigger messages come very frequently. See <em>queue.conf</em> for
 details on the parameters and their effects on the processing
 logic.</p>
-<div class="figure align-left" id="id6">
+<div class="figure align-left" id="id2">
 <span id="process-origin"></span><a class="reference internal image-reference" href="../_images/process_origin.png"><img alt="../_images/process_origin.png" src="../_images/process_origin.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 2: A flowchart illustrating the decision-making process of
 <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>.</span></p>
@@ -153,7 +171,7 @@ logic.</p>
 we have provided a simple drop-in replacement that emulates the existing
 functionality through the GitHub repository
 <a class="reference external" href="https://github.com/cbworden/shakemap-aqms">https://github.com/cbworden/shakemap-aqms</a>.
-In this setup, illustrated in <a href="#id3"><span class="problematic" id="id4">:nun:`Figure #queue-aqms`</span></a>, <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> is
+In this setup, illustrated in <a class="pageref" href="#queue-aqms">Figure  3</a>, <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> is
 configured as discussed above, but another process, <code class="docutils literal notranslate"><span class="pre">aqms_queue</span></code> is also
 runs alongside it. <code class="docutils literal notranslate"><span class="pre">aqms_queue</span></code> is designed to receive the same messages
 as the old ShakeMap v3.5 <code class="docutils literal notranslate"><span class="pre">queue</span></code> (that is, the messages from
@@ -163,7 +181,7 @@ database, and sends them to <code class="docutils literal notranslate"><span cla
 the existing triggering mechanisms of ShakeMap v3.5 will continue to work
 unmodified (though Python versions of <code class="docutils literal notranslate"><span class="pre">shake_alarm</span></code> and <code class="docutils literal notranslate"><span class="pre">shake_cancel</span></code>
 are provided for operators who wish to update from the older Perl versions).</p>
-<div class="figure align-left" id="id7">
+<div class="figure align-left" id="id3">
 <span id="queue-aqms"></span><a class="reference internal image-reference" href="../_images/queue_aqms.png"><img alt="../_images/queue_aqms.png" src="../_images/queue_aqms.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 3: A flowchart illustrating the use of the AQMS extensions
 to ShakeMap v4.</span></p>

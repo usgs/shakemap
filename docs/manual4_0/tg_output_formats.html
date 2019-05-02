@@ -149,74 +149,6 @@ a Grid2D object which is a Python representation of a North-up 2D array of data,
 coordinate and cell dimensions are known.  The definition of this object can be found here:
 <a class="reference external" href="https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py">https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py</a></p>
 <p>Sampling of grids contained in the HDF:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="18%" />
-<col width="26%" />
-<col width="12%" />
-<col width="43%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Name</th>
-<th class="head">Location</th>
-<th class="head">Python Type</th>
-<th class="head">Contents</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>vs30</td>
-<td>/arrays/vs30</td>
-<td>Grid2D</td>
-<td>Vs30 values at output grid/points</td>
-</tr>
-<tr class="row-odd"><td>distance_rhypo</td>
-<td>/arrays/distance_rhypo</td>
-<td>Grid2D</td>
-<td>Hypocentral distance</td>
-</tr>
-<tr class="row-even"><td>distance_repi</td>
-<td>/arrays/distance_repi</td>
-<td>Grid2D</td>
-<td>Epicentral distance</td>
-</tr>
-<tr class="row-odd"><td>distance_rjb</td>
-<td>/arrays/distance_rjb</td>
-<td>Grid2D</td>
-<td>RJB distance</td>
-</tr>
-<tr class="row-even"><td>distance_rjb_std</td>
-<td>/arrays/distance_rjb_std</td>
-<td>Grid2D</td>
-<td>Standard deviation of the RJB distance if
-the point-source approximations are used,
-will be zeor if a finite fault is used.</td>
-</tr>
-<tr class="row-odd"><td>distance_rrup</td>
-<td>/arrays/distance_rrup</td>
-<td>Grid2D</td>
-<td>Rrup distance</td>
-</tr>
-<tr class="row-even"><td>distance_rrup_std</td>
-<td>/arrays/distance_rrup_std</td>
-<td>Grid2D</td>
-<td>Standard deviation of the Rrup distance if
-the point-source approximations are used,
-will be zeor if a finite fault is used.</td>
-</tr>
-<tr class="row-odd"><td>distance_rx</td>
-<td>/arrays/distance_rx</td>
-<td>Grid2D</td>
-<td>Rx distance (generalized coordinate used by
-some GMPEs)</td>
-</tr>
-<tr class="row-even"><td>distance_ry0</td>
-<td>/arrays/distance_ry0</td>
-<td>Grid2D</td>
-<td>Ry0 distance (generalized coordinate used by
-some GMPEs)</td>
-</tr>
-</tbody>
-</table>
 <p>Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two
 datasets: the mean values for each cell and the standard deviations.
 MMI data for the component ‘Larger’ will be stored under a group called
@@ -348,7 +280,9 @@ for MMI). There will also be a set of datasets named like
 <code class="docutils literal notranslate"><span class="pre">/arrays/attenuation/distances/&lt;type&gt;</span></code> which will contain the distances
 (in km) corresponding to the points in the data arrays. The <code class="docutils literal notranslate"><span class="pre">type</span></code> will
 be <code class="docutils literal notranslate"><span class="pre">repi</span></code>, <code class="docutils literal notranslate"><span class="pre">rhypo</span></code>, <code class="docutils literal notranslate"><span class="pre">rjb</span></code>, <code class="docutils literal notranslate"><span class="pre">rrup</span></code> (for epicentral, hypocentral,
-Joyner-Boore, and rupture distance, respectively).</p>
+Joyner-Boore, and rupture distance, respectively). As with the other
+distance arrays, <code class="docutils literal notranslate"><span class="pre">rjb</span></code> and <code class="docutils literal notranslate"><span class="pre">rrup</span></code> will be approximated if a finite
+rupture model is not supplied in the input.</p>
 <p>Dictionary datasets are stored as JSON strings.</p>
 <p>There will typically be multiple <em>IMT</em> (Intensity Measure Type) datasets
 (each containing the mean and standard deviation of the IMT). For instance

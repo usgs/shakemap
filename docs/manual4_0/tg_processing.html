@@ -249,7 +249,7 @@ treatment of these IMTs.</p>
 PGA is typically the product of the high-frequency part of a
 seismogram’s spectrum, and PGV tends to derive from a longer-period
 portion of the signal, and is often associated with 1.0 second SA.
-MMI, while it’s correlation structure is unknown, is closely
+MMI, while its correlation structure is unknown, is closely
 correlated with PGV.</p>
 <p>As suitable cross-correlation functions become available
 for additional IMTs, we will incorporate them into ShakeMap.</p>
@@ -282,7 +282,7 @@ is available. The thinking here is that for larger earthquakes,
 the large size of the rupture makes it difficult to know
 the rupture distance, and the prediction becomes much less
 reliable. While ShakeMap attempts to compensate for the
-absence of a rupture model (see <a class="reference internal" href="#sec-point-source"><span class="std std-ref">Finite-rupture Approximations</span></a>,
+absence of a rupture model (see <a class="reference internal" href="#sec-point-source"><span class="std std-ref">Finite-rupture Approximations</span></a>),
 it is still desirable to turn
 off the outlier flagging at larger magnitudes. If a
 rupture model is available, the <code class="docutils literal notranslate"><span class="pre">max_mag</span></code> parameter has no
@@ -300,7 +300,8 @@ discuss some specific details of its implementation within ShakeMap.</p>
 <div class="section" id="computation">
 <span id="subsubsec-mvn-computation"></span><h3>2.5.6.1. Computation<a class="headerlink" href="#computation" title="Permalink to this headline">¶</a></h3>
 <p>The conditional MVN can be summarized as a situation in which we have a
-variable of interest <img class="math" src="../_images/math/eb033c9481b1f0b7e66d45bbff46b87c96420dc3.png" alt="\bm{Y}"/> where we wish to compute predictions
+random variable of interest <img class="math" src="../_images/math/eb033c9481b1f0b7e66d45bbff46b87c96420dc3.png" alt="\bm{Y}"/> where we wish to compute
+predictions
 at a set of <em>M</em> ordinates (<img class="math" src="../_images/math/4cc152eabd200b686a2e35e505de0469cbfaba87.png" alt="\bm{Y}_1"/>) conditioned upon a set of
 <em>N</em> observations (<img class="math" src="../_images/math/85ef4be063b4549fd27394cd481120a0fab3d05d.png" alt="\bm{Y}_2"/>). We can treat these as a vector with
 two components:</p>
@@ -346,7 +347,8 @@ position <em>(i, j)</em>,
 <img class="math" src="../_images/math/c370bafe6175b964dcdae989c714c8e55a88cbce.png" alt="Y_i"/> and <img class="math" src="../_images/math/bb6e327d6694e8c3d46c0051b93a6ef0debf780e.png" alt="Y_j"/> of the vector <img class="math" src="../_images/math/eb033c9481b1f0b7e66d45bbff46b87c96420dc3.png" alt="\bm{Y}"/>, and
 <img class="math" src="../_images/math/8651a17f7c9c3626f8209a0a7ea719226e11dda4.png" alt="\phi_{Y_i}"/> and <img class="math" src="../_images/math/398db89eecf1119740f6419cc6ee6eb32a904a9d.png" alt="\phi_{Y_j}"/> are the within-event standard
 deviations of the elements <img class="math" src="../_images/math/c370bafe6175b964dcdae989c714c8e55a88cbce.png" alt="Y_i"/> and <img class="math" src="../_images/math/bb6e327d6694e8c3d46c0051b93a6ef0debf780e.png" alt="Y_j"/>.</p>
-<p>Given a set of observations <img class="math" src="../_images/math/345ea8dc937749e65d049602eddf10cd621cfb66.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, we define
+<p>Given a set of observations <img class="math" src="../_images/math/345ea8dc937749e65d049602eddf10cd621cfb66.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, and
+their (usually predicted) means <img class="math" src="../_images/math/ec3503752708b4dc7a036c980553456736e4aef5.png" alt="\bm{\mu}_{\mathbf{Y_2}}"/>, we define
 a vector of residuals</p>
 <div class="math">
 <p><img src="../_images/math/7163ea1c31c38256cbbf4e89a8296aaf1a771317.png" alt="\bm{\zeta} =
@@ -453,7 +455,7 @@ the conditional spectra. This point is reinforced by
 the two sets of conditional spectra. While the 7-point spectra is
 better constrained overall, in the area of overlap (again, between 0.3
 and 1.0 seconds, and between 1.0 and 3.0 seconds) there is virtually
-no difference between the spectra. These figures were generated using the
+no difference between the uncertainties. These figures were generated using the
 <a class="reference internal" href="references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPE and the
 <a class="reference internal" href="references.html#baker2008"><span class="std std-ref">Baker and Jayaram (2008)</span></a> spectral correlation function.
 The odd kink in the mean plots at around 0.2 seconds is a result of the
@@ -516,7 +518,28 @@ of the residuals [for a discussion, see
  \frac{1}
  {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
  \bm{Z}_i}."/></p>
-</div><p>In the ShakeMap implementation, the residuals used to compute the bias
+</div><p>Unlike the bias calculated by earlier versions of ShakeMap, this approach
+in non-iterative and does not seek to directly minimize the misfit of the
+residuals. The approach described here apportions to the event term the
+fraction of the residuals that can be mathematically justified based on the
+size and number of residuals. Thus, we
+can compute a bias term (albeit a small one) even in situations where there
+is only one residual. <a class="pageref" href="#event-term-number-obs">Figure  8</a>
+illustrates this effect using a uniform set
+of residuals. The event term only approaches the mean of the residuals as
+the number of observations becomes large.</p>
+<div class="figure align-center" id="id8">
+<span id="event-term-number-obs"></span><a class="reference internal image-reference" href="../_images/event_term_number_obs.png"><img alt="../_images/event_term_number_obs.png" src="../_images/event_term_number_obs.png" style="width: 450px;" /></a>
+<p class="caption"><span class="caption-text">Figure 8: The event term as a function of the number of residuals. Here all
+of the residuals have a uniform value of 1.0. The within-event
+and between-event standard deviations are 0.7 and 0.3, respectively.
+The blue dots indicate the event term computed given a particular
+number of residuals, and the black bars indicate the uncertainty
+of the event term (i.e., +/- one standard deviation). As the number
+of observations increases, the event term approaches the mean of
+the residuals, and the standard deviation decreases.</span></p>
+</div>
+<p>In the ShakeMap implementation, the residuals used to compute the bias
 are limited to a subset within a distance of <code class="docutils literal notranslate"><span class="pre">max_range</span></code> km from the
 source (<code class="docutils literal notranslate"><span class="pre">max_range</span></code> is found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code> sub-section of the
 <code class="docutils literal notranslate"><span class="pre">modeling</span></code> section of <em>model.conf</em>). As with the outlier flagging, the
