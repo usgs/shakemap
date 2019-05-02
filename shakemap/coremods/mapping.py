@@ -13,6 +13,7 @@ import numpy as np
 from scipy.interpolate import griddata
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.ticker import NullLocator
 from impactutils.colors.cpalette import ColorPalette
 import rasterio.features
 import cartopy.crs as ccrs
@@ -298,7 +299,9 @@ def make_map(adict):
         jpg_file = os.path.join(adict['datadir'], 'intensity.jpg')
         # save the legend file
         legend_file = os.path.join(adict['datadir'], 'mmi_legend.png')
-        fig2.savefig(legend_file, bbox_inches='tight')
+        fig2.gca().xaxis.set_major_locator(NullLocator())
+        fig2.gca().yaxis.set_major_locator(NullLocator())
+        fig2.savefig(legend_file, bbox_inches='tight', pad_inches=0)
     else:
         fileimt = oq_to_file(imtype)
         pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
