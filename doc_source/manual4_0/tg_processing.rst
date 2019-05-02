@@ -270,7 +270,7 @@ While not ideal, we feel that these approximations are reasonable.
 PGA is typically the product of the high-frequency part of a 
 seismogram's spectrum, and PGV tends to derive from a longer-period
 portion of the signal, and is often associated with 1.0 second SA.
-MMI, while it's correlation structure is unknown, is closely
+MMI, while its correlation structure is unknown, is closely
 correlated with PGV.
 
 As suitable cross-correlation functions become available
@@ -308,7 +308,7 @@ is available. The thinking here is that for larger earthquakes,
 the large size of the rupture makes it difficult to know 
 the rupture distance, and the prediction becomes much less
 reliable. While ShakeMap attempts to compensate for the
-absence of a rupture model (see :ref:`sec-point-source`, 
+absence of a rupture model (see :ref:`sec-point-source`), 
 it is still desirable to turn
 off the outlier flagging at larger magnitudes. If a 
 rupture model is available, the ``max_mag`` parameter has no
@@ -333,7 +333,8 @@ Computation
 -----------
 
 The conditional MVN can be summarized as a situation in which we have a
-variable of interest :math:`\bm{Y}` where we wish to compute predictions
+random variable of interest :math:`\bm{Y}` where we wish to compute
+predictions
 at a set of *M* ordinates (:math:`\bm{Y}_1`) conditioned upon a set of
 *N* observations (:math:`\bm{Y}_2`). We can treat these as a vector with
 two components:
@@ -392,7 +393,8 @@ position *(i, j)*,
 :math:`\phi_{Y_i}` and :math:`\phi_{Y_j}` are the within-event standard
 deviations of the elements :math:`Y_i` and :math:`Y_j`.
 
-Given a set of observations :math:`\mathbf{Y_2} = \mathbf{y_2}`, we define 
+Given a set of observations :math:`\mathbf{Y_2} = \mathbf{y_2}`, and
+their (usually predicted) means :math:`\bm{\mu}_{\mathbf{Y_2}}`, we define 
 a vector of residuals
 
 .. math::
@@ -530,7 +532,7 @@ the conditional spectra. This point is reinforced by
 the two sets of conditional spectra. While the 7-point spectra is
 better constrained overall, in the area of overlap (again, between 0.3
 and 1.0 seconds, and between 1.0 and 3.0 seconds) there is virtually
-no difference between the spectra. These figures were generated using the 
+no difference between the uncertainties. These figures were generated using the 
 :ref:`Chiou and Youngs (2014) <chiou2014>` GMPE and the 
 :ref:`Baker and Jayaram (2008) <baker2008>` spectral correlation function.
 The odd kink in the mean plots at around 0.2 seconds is a result of the
@@ -613,6 +615,32 @@ The variance of the bias terms is given by:
     \frac{1}
     {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
     \bm{Z}_i}.
+
+Unlike the bias calculated by earlier versions of ShakeMap, this approach
+in non-iterative and does not seek to directly minimize the misfit of the
+residuals. The approach described here apportions to the event term the 
+fraction of the residuals that can be mathematically justified based on the
+size and number of residuals. Thus, we
+can compute a bias term (albeit a small one) even in situations where there
+is only one residual. :num:`Figure #event-term-number-obs`
+illustrates this effect using a uniform set
+of residuals. The event term only approaches the mean of the residuals as
+the number of observations becomes large. 
+
+.. _event-term-number-obs:
+
+.. figure:: _static/event_term_number_obs.*
+   :width: 450
+   :align: center
+
+   The event term as a function of the number of residuals. Here all
+   of the residuals have a uniform value of 1.0. The within-event
+   and between-event standard deviations are 0.7 and 0.3, respectively.
+   The blue dots indicate the event term computed given a particular
+   number of residuals, and the black bars indicate the uncertainty
+   of the event term (i.e., +/- one standard deviation). As the number
+   of observations increases, the event term approaches the mean of 
+   the residuals, and the standard deviation decreases.
 
 In the ShakeMap implementation, the residuals used to compute the bias 
 are limited to a subset within a distance of ``max_range`` km from the 

@@ -230,7 +230,7 @@ def process_origin(event, action, handler, data_path, logger, config,
     # See if we already have this event, make a decision
     #
     existing = handler.getEvent(event['id'])
-    if existing is None:
+    if existing is None and 'alt_eventids' in event:
         for eid in event['alt_eventids'].split(','):
             if eid == event['id']:
                 continue
@@ -422,14 +422,15 @@ def process_cancel(data, handler, logger, config, children, shake_config):
                              shake_config)
         return
 
-    for eid in data['alt_eventids'].split(','):
-        if eid == eventid:
-            continue
-        existing = handler.getEvent(eid)
-        if existing:
-            queue.dispatch_event(eid, logger, children, 'cancel', config,
-                                 shake_config)
-            return
+    if 'alt_eventids' in data:
+        for eid in data['alt_eventids'].split(','):
+            if eid == eventid:
+                continue
+            existing = handler.getEvent(eid)
+            if existing:
+                queue.dispatch_event(eid, logger, children, 'cancel', config,
+                                     shake_config)
+                return
 
     logger.info('cancel is for unprocessed event %s: ignoring' % eventid)
     return

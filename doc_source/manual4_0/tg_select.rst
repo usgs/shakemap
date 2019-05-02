@@ -243,7 +243,7 @@ heuristic steps using the following parameters:
 - The angle of rotation between the plane tangent to the slab at the location
   of the earthquake and the focal mechanism; see the ``p_int_kagan`` section
   of ``select.conf`` (the angle is sometimes called the "Kagan angle").
-- The position of the hypocenter relative to teh maximum depth of the
+- The position of the hypocenter relative to the maximum depth of the
   seismogenic zone, as given by the slab mode; see the ``p_int_sz`` section
   of ``select.conf``.
 - The position of the hypocenter relative to interface in the slab model;
