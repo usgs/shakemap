@@ -52,9 +52,10 @@ Modifications/details/re-emphasis:
 **General**
 
 - Put spaces after commas
-- *Really*, put spaces after commas
-- Put spaces after commas. Seriously.
+- *Seriously*, put spaces after commas
 - Put spaces after the beginning '#' of comments
+- Put spaces around mathematical operators unless they are part of the
+  argument list of a function.
 - Comment heavily with useful comments
 - Document everything
 - Keep imports on separate lines to the extent that this is reasonable
@@ -63,7 +64,10 @@ Modifications/details/re-emphasis:
 - Some of us also use the `spyder
   <https://pythonhosted.org/spyder/>`_ IDE, which helps catch many errors
   and style issues. It also has an option for automatically removing
-  trailing whitespace.
+  trailing whitespace. But there are also Python style/syntax checking
+  modules for many editors, including vim and emacs.
+- Two blank lines between functions. One blank line between methods of a 
+  class.
 - Put spaces after commas
 
 **Names**

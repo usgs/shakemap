@@ -112,26 +112,26 @@ Sampling of grids contained in the HDF:
 +===================+============================+=============+==============================================+
 | vs30              | /arrays/vs30               | Grid2D      | Vs30 values at output grid/points            | 
 +-------------------+----------------------------+-------------+----------------------------------------------+
-| distance_rhypo    | /arrays/distance_rhypo     | Grid2D      | Hypocentral distance                         |
+| distance_rhypo    | /arrays/distances/rhypo    | Grid2D      | Hypocentral distance                         |
 +-------------------+----------------------------+-------------+----------------------------------------------+
-| distance_repi     | /arrays/distance_repi      | Grid2D      | Epicentral distance                          |
+| distance_repi     | /arrays/distances/repi     | Grid2D      | Epicentral distance                          |
 +-------------------+----------------------------+-------------+----------------------------------------------+
-| distance_rjb      | /arrays/distance_rjb       | Grid2D      | RJB distance                                 |
+| distance_rjb      | /arrays/distances/rjb      | Grid2D      | RJB distance                                 |
 +-------------------+----------------------------+-------------+----------------------------------------------+
-| distance_rjb_std  | /arrays/distance_rjb_std   | Grid2D      | Standard deviation of the RJB distance if    |
+| distance_rjb_std  | /arrays/distances/rjb_std  | Grid2D      | Standard deviation of the RJB distance if    |
 |                   |                            |             | the point-source approximations are used,    |
-|                   |                            |             | will be zeor if a finite fault is used.      |
+|                   |                            |             | or will be zero if a finite fault is used.      |
 +-------------------+----------------------------+-------------+----------------------------------------------+
-| distance_rrup     | /arrays/distance_rrup      | Grid2D      | Rrup distance                                |
+| distance_rrup     | /arrays/distances/rrup     | Grid2D      | Rrup distance                                |
 +-------------------+----------------------------+-------------+----------------------------------------------+
-| distance_rrup_std | /arrays/distance_rrup_std  | Grid2D      | Standard deviation of the Rrup distance if   |
+| distance_rrup_std | /arrays/distances/rrup_std | Grid2D      | Standard deviation of the Rrup distance if   |
 |                   |                            |             | the point-source approximations are used,    |
-|                   |                            |             | will be zeor if a finite fault is used.      |
+|                   |                            |             | or will be zero if a finite fault is used.      |
 +-------------------+----------------------------+-------------+----------------------------------------------+
-| distance_rx       | /arrays/distance_rx        | Grid2D      | Rx distance (generalized coordinate used by  |
+| distance_rx       | /arrays/distances/rx       | Grid2D      | Rx distance (generalized coordinate used by  |
 |                   |                            |             | some GMPEs)                                  |
 +-------------------+----------------------------+-------------+----------------------------------------------+
-| distance_ry0      | /arrays/distance_ry0       | Grid2D      | Ry0 distance (generalized coordinate used by |
+| distance_ry0      | /arrays/distances/ry0      | Grid2D      | Ry0 distance (generalized coordinate used by |
 |                   |                            |             | some GMPEs)                                  |
 +-------------------+----------------------------+-------------+----------------------------------------------+
 
@@ -215,7 +215,9 @@ for MMI). There will also be a set of datasets named like
 ``/arrays/attenuation/distances/<type>`` which will contain the distances
 (in km) corresponding to the points in the data arrays. The ``type`` will
 be ``repi``, ``rhypo``, ``rjb``, ``rrup`` (for epicentral, hypocentral,
-Joyner-Boore, and rupture distance, respectively).
+Joyner-Boore, and rupture distance, respectively). As with the other
+distance arrays, ``rjb`` and ``rrup`` will be approximated if a finite
+rupture model is not supplied in the input.
 
 Dictionary datasets are stored as JSON strings.
 

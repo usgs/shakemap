@@ -212,19 +212,37 @@ the ShakeMap system determine the GMPE set, IPE, GMICE, or
 cross-correlation functions to use based on the event's location and depth.
 Many operators will have a fixed configuration for their regions, and will
 therefore not use ``select``.
-The operator will then typically run ``assemble`` (or possibly ``augment``)
+The operator will then usually run ``assemble`` (or possibly ``augment``)
 to
 create (or update) the *shake_data.hdf* input file, followed by running
 ``model``. The order of modules after ``model`` is usually not as important
-as they typically depend upon the output of ``model`` (i.e.,
+as they most often depend upon the output of ``model`` (i.e.,
 *shake_result.hdf*) and not upon the results of other modules.
-``transfer``, however, will typically be run last.
+``transfer``, however, will typically be run last, after the other modules
+have produced their products.
 
 select
 ```````
 Please see the
 :ref:`Ground Motion Selection section <sec-select-4>` for
-details on how ``select`` works.
+details on the way ``select`` works. ``select`` will create a file
+called *model_select.conf* in the event's *current* directory. The
+configuration parameters in this file will override those set in the
+sysetm-level *model.conf* file.
+
+
+associate
+`````````
+
+The ``associate`` module checks a database of station data and searches
+for ground motions that may associate with the event. If any associated
+data are found, they are written to a file *\*_dat.xml* in the event's
+current directory. 
+
+This module is only useful if the ShakeMap system is receiving 
+unassociated amplitudes via some method (such as PDL) and storing
+that data via a program like ``receive_amps``. Most operators will
+probably not use the ``associate`` module.
 
 
 dyfi
@@ -264,6 +282,11 @@ Any parameter set in the event-specific *model.conf* will override
 parameters set in the other configuration files. Note: if both
 *model.conf* and *model_select.conf* exist in the event directory,
 *model.conf* will be processed and *model_select.conf* will be ignored.
+This behavior allows the operator to override the results of ``select``
+even if it is part of an automatic processing sequence. (That is, 
+``select`` may produce a new *model_select.conf* file every time the 
+event is updated, but the operator's *model.conf* will be in effect
+for as long as it remains in the event's *current* directory.
 
 ``assemble`` then reads any files with a *_dat.xml* extension
 and assembles them into a station list.
@@ -277,7 +300,7 @@ for details of these input data forats.
 
 Note: only one rupture file should be present in the event's input
 directory. If more than one file exists, only the first
-(lexicographically) will we processed.
+(in lexicographic order) will we processed.
 
 If no backups exist (i.e., event subdirectories named *.backup????*)
 then the ShakeMap history from an existing *shake_data.hdf* is
@@ -312,9 +335,9 @@ documentation.
 augment
 ```````
 
-The ``augment`` module behaves in a manner similar to ``assemble` except
+The ``augment`` module behaves in a manner similar to ``assemble`` except
 that it will first read *shake_data.hdf* from the event's *current*
-directory. If *exven.xml* exists in the event's *current* directory, its
+directory. If *event.xml* exists in the event's *current* directory, its
 data will replace the data in the existing *shake_data.hdf*.
 
 The configuration data in *shake_data.hdf* is used as a starting point,
@@ -326,8 +349,8 @@ parameters from the local system retain the highest priority.
 
 Data files (i.e., files in the event's *current* directory that have
 the *_dat.xml* extension) will be added to any data already found in
-*shake_data.hdf*. If a fault file is found in the local directory, it
-will replace the existing fault data in *shake_data.hdf*.
+*shake_data.hdf*. If a finite rupture file is found in the local directory,
+it will replace the existing rupture data in *shake_data.hdf*.
 
 The history information will be updated to reflect the update time and
 originator (if applicable).
@@ -356,7 +379,7 @@ will be read first, and then if *model.conf* or *model_select.conf* exists
 in the event's *current* directory, then the parameters set therein will
 override those in the profile's *model.conf*. If both *model.conf* and
 *model_select.conf* exist in the event's *current* directory, *model.conf*
-will be read and *model_select.conf* will be ignored. ``model`` also reads
+will be processed and *model_select.conf* will be ignored. ``model`` also reads
 the configuration files *gmpe_sets.conf* and *modules.conf*, which
 reside in the current profile's ``INSTALL_DIR/config`` directory. See
 the documentation within those files for more information.
@@ -365,7 +388,7 @@ A great deal of this manual is devoted to the way the interpolation is
 performed, and the effect of various configuration options. See the
 relevant sections for more. In particular, the section
 :ref:`sec-processing-4`
-goes into detail on the way the model program works.
+goes into detail on the way the ``model`` module works.
 
 ``model`` writes a file, *shake_result.hdf*, in the *products*
 subdirectory of the event's *current* directory.
@@ -416,14 +439,18 @@ kml
 
 ``kml`` reads *shake_result.hdf* and produces a file, *shakemap.kmz*
 which is a self-contained file of geographic layers suitable for 
-reading into Google Earth. The layers include an MMI overlay, MMI
-contours, station locations and data, and the event's epicenter.
+reading into Google Earth. The layers include an MMI overlay and MMI
+polygons, contours of MMI and the other IMTs found in ``shake_result.hdf``,
+station locations and data, and the event's epicenter.
 
 mapping
 ```````
 
 ``mapping`` reads an event's *shake_result.hdf* and produces a set of
-maps of the IMTs.
+maps of the IMTs in both JPEG and PDF format. Also produced is an abstract
+thumbnail image of MMI which may be used as a symbolic logo or pin for 
+the event's ShakeMap products. The module also produces a PNG intensity
+"overlay" and its associated world file..
 
 See :meth:`shakemap.coremods.mapping` for the module's API documentation.
 See the configuration file *products.conf* for information on configuring
@@ -432,20 +459,30 @@ the ``mapping`` module.
 plotregr
 ````````
 
-``plotregr`` makes plots of an approximation of the GMPE's predicted
-ground motion as a function of distance for each output IMT, along with
-the data for that IMT. The plotted value at each distance is the average
-value of the GMPE's gridded values in that particular distance bin. The
-values are predicted on soil (Vs30=180 m/s) and rock (Vs30=760 m/s), which
-are plotted as green and red lines, respectively. The +/- 1 standard
+When ``model`` runs, it produces a set of curves of the selected GMPE vs.
+distance, as well as a set of distance metrics [e.g., epi- and hypo-central
+distances, rupture distance, and Joyner-Boore distance (where the rupture
+is unknown, these last two distance metrics are replaced with estimated
+fault distances using the point-source to finite-rupture  methodology
+discussed in the section :ref:`sec-point-source`.)]
+
+``plotregr`` uses the ground-motion curves produced by ``model`` to 
+make plots of the GMPE's predicted
+ground motion [on "rock" (i.e., Vs30=760 m/s) and "soil" (i.e., Vs30=180 
+m/s), plotted as green and red lines, respectively]
+as a function of distance for each
+output IMT, along with
+the seismic and macroseismic data for that IMT. 
+The +/- 1 standard
 deviation lines are also plotted. The station and dyfi data are plotted at
 their computed distance from the source. If no finite fault is available for
 the map, then the approximated point-source to finite-fault  distance 
 is used.
 
-The ``plotregr`` module is fairly simplistic and of limited utility. 
-Our hope it that it will be rendered obsolete by
-more sophisticated interactive plots.
+The ``plotregr`` module and its plots are fairly simplistic and of limited
+utility. The interactive residual plots deployed on the USGS web site make 
+use of the much richer data found in the station file, and are a far better
+tool for studying the characteristics of the data, 
 
 raster
 ```````
@@ -481,7 +518,11 @@ stations
 ````````
 
 ``stations`` reads an event's *shake_result.hdf* and produces a
-JSON file, *stationlist.json*, of the input station data.
+JSON file, *stationlist.json*, of the input station data. The output
+JSON also contains predicted values (on "rock" and "soil"), inter- and
+intra-event uncertainties for each type of prediction, converted amplitudes
+(PGM to MMI or MMI to PGM), distance metrics, etc. 
+
 
 See :meth:`shakemap.coremods.stations` for the module's API
 documentation.
@@ -490,11 +531,33 @@ transfer
 `````````
 
 ``transfer`` allows the operator to transfer ShakeMap products to
-other system via PDL or ssh. See the documentation in *transfer.conf*
+other system via PDL or ssh. It can also send email with the event
+summary information. See the documentation in *transfer.conf*
 for details on configuring ``transfer``.
 
 See :meth:`shakemap.coremods.transfer` for the module's API
 documentation.
+
+history
+```````
+
+The ``hisotry`` module will attempt to read the ShakeMap history
+information stored in the event's *shake_data.hdf* or backup files
+and print it to the screen.
+
+save
+````
+
+The ``save`` module generates a new *backup????* directory with the 
+contents of the event's *current* directory. It is useful for preserving
+intermediate results.
+
+sleep
+`````
+
+The ``sleep`` module will cause the calling process to sleep for a 
+specified number of seconds. It may be useful under certain circumstances.
+
 
 
 Additional Programs
@@ -563,7 +626,7 @@ receive_amps, receive_origins, and associate_amps
 
 ``receive_amps`` and ``receive_origins`` are intended to be run 
 by a configured instance of the USGS's Product
-Distribution system to inform ``sm_queue`` of new origins and
+Distribution system (PDL) to inform ``sm_queue`` of new origins and
 unassociated amplitudes. They are, therefore, of limited utility
 to most users, however they may serve as guides as to writing
 similar programs for other systems.
@@ -584,4 +647,21 @@ documentation section :ref:`Verification <sec-verification-4>`.
 usage and notes.
 
 
+sm_batch
+--------
 
+Will run a list of events specified in a text file containing one event
+ID per line.
+
+
+sm_check
+--------
+
+Will check the user's configuration files for certain types of errors.
+
+
+sm_rupture
+----------
+
+Will create or convert a rupture file for ShakeMap v4. Run the program
+with the "--help" option for an explanation and a list of options.
