@@ -238,15 +238,14 @@ def create_kmz(container, datadir, logger, contents):
     kmz_contents = []
 
     # create the kml text
-    kml = skml.Kml()
-    nlc = skml.NetworkLinkControl(minrefreshperiod=300)
-    kml.networklinkcontrol = nlc
     info = container.getMetadata()
     eid = info['input']['event_information']['event_id']
     mag = info['input']['event_information']['magnitude']
     timestr = info['input']['event_information']['origin_time']
     namestr = 'ShakeMap %s M%s %s' % (eid, mag, timestr)
-    document = kml.newdocument(name=namestr)
+    document = skml.Kml(name=namestr)
+    nlc = skml.NetworkLinkControl(minrefreshperiod=300)
+    document.networklinkcontrol = nlc
 
     set_look(document, container)
 
@@ -285,7 +284,7 @@ def create_kmz(container, datadir, logger, contents):
 
     # Write the uber-kml file
     kmlfile = os.path.join(datadir, KML_FILE)
-    kml.save(kmlfile)
+    document.save(kmlfile)
     kmz_contents.append(kmlfile)
 
     # assemble all the pieces into a KMZ file, and delete source files
