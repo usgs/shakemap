@@ -133,7 +133,7 @@ Example station element::
    and TriNet" commtype="DIG" netid=”CI” loc="Adelanto, on Hwy 395">
 
 The station element can contain zero to many *comp* elements. Each
-comp element must contain one *acc* element, and one *vel* element,
+comp element can contain one *acc* element and one *vel* element,
 and may contain *psa03*, *psa10* and *psa30* elements (one of
 each). These refer to peak acceleration, velocity, and 5%-damped
 pseduo-spectral acceleration (at 0.3, 1.0, and 3.0 sec period) values

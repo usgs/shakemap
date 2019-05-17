@@ -12,7 +12,6 @@ from matplotlib import patches
 
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-import cartopy.feature as cfeature
 import pyproj
 
 from shapely.geometry import shape as sShape
@@ -1305,12 +1304,14 @@ def draw_map(adict, override_scenario=False):
     if not isinstance(rupture, PointRupture):
         point_source = False
         json_dict = rupture._geojson
-        # shapes = []
         for feature in json_dict['features']:
-            rup_shape = sShape(feature['geometry'])
-            sfeature = cfeature.ShapelyFeature(rup_shape, geoproj)
-            ax.add_feature(sfeature, zorder=FAULT_ZORDER,
-                           lw=1, edgecolor='k', facecolor=(0, 0, 0, 0))
+            multi_poly = sShape(feature['geometry'])
+            pmulti_poly = proj.project_geometry(multi_poly)
+            mpoly = mapping(pmulti_poly)['coordinates']
+            for poly in mpoly:
+                for spoly in poly:
+                    x, y = zip(*spoly)
+                    ax.plot(x, y, 'k', lw=1, zorder=FAULT_ZORDER)
 
     # draw the station data on the map
     stations = adict['stationdict']
