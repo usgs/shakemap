@@ -176,15 +176,6 @@ class MappingModule(CoreModule):
                 name='admin_1_states_provinces_lines',
                 scale='10m',
                 facecolor='none')
-            states_provs = list(states_provs.intersecting_geometries(extent))
-            if len(states_provs) > 300:
-                states_provs = None
-            else:
-                states_provs = cfeature.NaturalEarthFeature(
-                    category='cultural',
-                    name='admin_1_states_provinces_lines',
-                    scale='10m',
-                    facecolor='none')
 
             countries = cfeature.NaturalEarthFeature(
                 category='cultural',
@@ -213,11 +204,6 @@ class MappingModule(CoreModule):
         if roadfile is not None:
             roads = ShapelyFeature(Reader(roadfile).geometries(),
                                    ccrs.PlateCarree(), facecolor='none')
-            if len(list(roads.intersecting_geometries(extent))) > 200:
-                roads = None
-            else:
-                roads = ShapelyFeature(Reader(roadfile).geometries(),
-                                       ccrs.PlateCarree(), facecolor='none')
         else:
             roads = None
 
