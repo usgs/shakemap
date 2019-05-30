@@ -443,7 +443,7 @@ def main(args):
                     model['modeling']['gmice'] = gmm_dict['gmice']
                 if gmm_dict['ccf']:
                     model['modeling']['ccf'] = gmm_dict['ccf']
-                model_file = os.path.join(event_dir, 'model.conf')
+                model_file = os.path.join(event_dir, 'model_select.conf')
                 model.filename = model_file
                 model.write()
 
