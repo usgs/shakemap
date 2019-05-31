@@ -336,25 +336,27 @@ def main(args):
                 print(msg)
                 sys.exit(0)
 
+            got_data_file = False
             try:
                 data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
                 shakemap.getContent('stationlist.xml', filename=data_file)
+                got_data_file = True
+            except Exception as e:
+                try:
+                    data_file = os.path.join(
+                        event_dir, '%s_dat.json' % eventid)
+                    shakemap.getContent('stationlist.json', filename=data_file)
+                    got_data_file = True
+                except Exception as e:
+                    pass
+
+            if got_data_file:
                 instrument_file = write_instrumented(data_file, event_dir)
                 macro_file = write_macroseismic(data_file, event_dir)
-
-            except Exception as e:
-                station_url = shakemap.getContentURL('stationlist.xml')
-                fmt = 'Error while attempting to download ShakeMap ground motion data file at:\n%s.'
-                print(fmt % station_url)
-                print(
-                    'This data file likely does not match current standards. You may download')
-                print(
-                    'this file separately and edit it or perhaps find the source of the data')
-                print('and re-process it.')
-            finally:
-                # delete the data file now that we've split it apart
-                if os.path.isfile(data_file):
-                    os.remove(data_file)
+                os.remove(data_file)
+            else:
+                fmt = 'Error while attempting to download ShakeMap ground motion data file.'
+                print(fmt)
 
             # let's try to write out the input data in as many as three files:
             # 1) dyfi_dat.xml, the most up to date DYFI we have.
@@ -441,7 +443,7 @@ def main(args):
                     model['modeling']['gmice'] = gmm_dict['gmice']
                 if gmm_dict['ccf']:
                     model['modeling']['ccf'] = gmm_dict['ccf']
-                model_file = os.path.join(event_dir, 'model.conf')
+                model_file = os.path.join(event_dir, 'model_select.conf')
                 model.filename = model_file
                 model.write()
 

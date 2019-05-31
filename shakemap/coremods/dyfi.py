@@ -77,12 +77,12 @@ class DYFIModule(CoreModule):
         # try to find the event by our event id
         try:
             detail = get_event_by_id(self._eventid)
+            dataframe, msg = _get_dyfi_dataframe(detail)
         except Exception as e:
             fmt = 'Could not retrieve DYFI data for %s - error "%s"'
             self.logger.warning(fmt % (self._eventid, str(e)))
             return
 
-        dataframe, msg = _get_dyfi_dataframe(detail)
         if dataframe is None:
             self.logger.info(msg)
             return
