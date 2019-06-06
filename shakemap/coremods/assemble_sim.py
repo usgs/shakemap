@@ -27,11 +27,12 @@ IMT_MATCHES = ['PGA',
 
 class AssembleSimModule(CoreModule):
     """
-    assemble_sim -- Assemble simulation data, configuration information, and event.xml into ShakeMap results.
+    assemble_sim -- Assemble simulation data, configuration information,
+    and event.xml into ShakeMap results.
     """
 
     command_name = 'assemble_sim'
-    targets = [r'products/shake_result\.hdf']
+    targets = []
     dependencies = [('event.xml', True),
                     ('simulation.conf', True),
                     ('simulation_*.csv', True)]
@@ -46,7 +47,8 @@ class AssembleSimModule(CoreModule):
 
         Raises:
             NotADirectoryError if data directory does not exist.
-            FileNotFoundError if simulation.conf or simulation CSV could not be found.
+            FileNotFoundError if simulation.conf or simulation CSV
+                could not be found.
             FileExistsError more than one simulation CSV file is found.
         """
         install_path, data_path = get_config_paths()
@@ -83,23 +85,30 @@ def _get_grids(config, simfile):
         config (ConfigObj): Dictionary containing fields:
                             - simulation: (dict)
                               - order = (required) "rows" or "cols"
-                              - projection = (optional) Proj4 string defining input X/Y data projection.
+                              - projection = (optional) Proj4 string
+                                defining input X/Y data projection.
                               - nx Number of columns in input grid.
                               - ny Number of rows in input grid.
-                              - dx Resolution of columns (if XY, whatever those units are, otherwise decimal degrees).
-                              - dy Resolution of rows (if XY, whatever those units are, otherwise decimal degrees).
+                              - dx Resolution of columns (if XY, whatever
+                                those units are, otherwise decimal degrees).
+                              - dy Resolution of rows (if XY, whatever those
+                                units are, otherwise decimal degrees).
         simfile (str): Path to a CSV file with columns:
-                       - LAT Latitudes for each cell. If irregular, X/Y data will be used.
-                       - LON Longitudes for each cell. If irregular, X/Y data will be used.
+                       - LAT Latitudes for each cell. If irregular, X/Y data
+                         will be used.
+                       - LON Longitudes for each cell. If irregular, X/Y data
+                         will be used.
                        - X Regularized X coordinates for each cell.
                        - Y Regularized Y coordinates for each cell.
-                       - H1_<IMT> First horizontal channel for given IMT. Supported IMTs are: PGA, PGV, SA(period).
-                       - H2_<IMT> Second horizontal channel for given IMT. Supported IMTs are: PGA, PGV, SA(period).
+                       - H1_<IMT> First horizontal channel for given IMT.
+                         Supported IMTs are: PGA, PGV, SA(period).
+                       - H2_<IMT> Second horizontal channel for given IMT.
+                         Supported IMTs are: PGA, PGV, SA(period).
 
     Returns:
-        dict: Dictionary of IMTs (PGA, PGV, SA(1.0), etc.) and Grid2D objects. If XY data was used, these
-              grids are the result of a projection/resampling of that XY data back to a regular lat/lon grid.
-
+        dict: Dictionary of IMTs (PGA, PGV, SA(1.0), etc.) and Grid2D
+        objects. If XY data was used, these grids are the result of a
+        projection/resampling of that XY data back to a regular lat/lon grid.
     """
     row_order = 'C'
     if config['simulation']['order'] != 'rows':
@@ -196,7 +205,8 @@ def _get_geodict(dataframe, config):
             pass
         if not is_regular and not has_xy:
             raise IndexError(
-                'Input simulation files must have *regular* projected X/Y or lat/lon coordinates.')
+                'Input simulation files must have *regular* projected X/Y '
+                'or lat/lon coordinates.')
     if not is_regular:
         x = dataframe['X'].values
         y = dataframe['X'].values
