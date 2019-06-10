@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.interpolate import RectBivariateSpline
+from scipy.interpolate import RegularGridInterpolator
 import itertools as it
 
 from shakelib.correlation.ccf_base import CrossCorrelationBase
@@ -10,41 +10,41 @@ Tlist = np.array([0.01, 0.1, 0.2, 0.5, 1, 2, 5, 7.5, 10.0001])
 
 # Table II. Short range coregionalization matrix, B1
 B1 = np.array([
-    [0.30, 0.24, 0.23, 0.22, 0.16, 0.07, 0.03, 0, 0],
-    [0.24, 0.27, 0.19, 0.13, 0.08, 0, 0, 0, 0],
-    [0.23, 0.19, 0.26, 0.19, 0.12, 0.04, 0, 0, 0],
-    [0.22, 0.13, 0.19, 0.32, 0.23, 0.14, 0.09, 0.06, 0.04],
-    [0.16, 0.08, 0.12, 0.23, 0.32, 0.22, 0.13, 0.09, 0.07],
-    [0.07, 0, 0.04, 0.14, 0.22, 0.33, 0.23, 0.19, 0.16],
-    [0.03, 0, 0, 0.09, 0.13, 0.23, 0.34, 0.29, 0.24],
-    [0, 0, 0, 0.06, 0.09, 0.19, 0.29, 0.30, 0.25],
-    [0, 0, 0, 0.04, 0.07, 0.16, 0.24, 0.25, 0.24]
+    [0.305, 0.24, 0.23,  0.22, 0.16, 0.07,  0.03, 0,    0],
+    [0.24,  0.275, 0.19, 0.13, 0.08, 0,     0,    0,    0],
+    [0.23,  0.19, 0.26,  0.19, 0.12, 0.04,  0,    0,    0],
+    [0.22,  0.13, 0.19,  0.32, 0.23, 0.14,  0.09, 0.06, 0.04],
+    [0.16,  0.08, 0.12,  0.23, 0.32, 0.22,  0.13, 0.09, 0.07],
+    [0.07,  0,    0.04,  0.14, 0.22, 0.335, 0.23, 0.19, 0.16],
+    [0.03,  0,    0,     0.09, 0.13, 0.23,  0.34, 0.29, 0.24],
+    [0,     0,    0,     0.06, 0.09, 0.19,  0.29, 0.30, 0.25],
+    [0,     0,    0,     0.04, 0.07, 0.16,  0.24, 0.25, 0.24]
 ])
 
 # Table III. Long range coregionalization matrix, B2
 B2 = np.array([
-    [0.31, 0.26, 0.27, 0.24, 0.17, 0.11, 0.08, 0.06, 0.05],
-    [0.26, 0.29, 0.22, 0.15, 0.07, 0, 0, 0, -0.03],
-    [0.27, 0.22, 0.29, 0.24, 0.15, 0.09, 0.03, 0.02, 0],
-    [0.24, 0.15, 0.24, 0.33, 0.27, 0.23, 0.17, 0.14, 0.14],
-    [0.17, 0.07, 0.15, 0.27, 0.38, 0.34, 0.23, 0.19, 0.21],
-    [0.11, 0, 0.09, 0.23, 0.34, 0.44, 0.33, 0.29, 0.32],
-    [0.08, 0, 0.03, 0.17, 0.23, 0.33, 0.45, 0.42, 0.42],
-    [0.06, 0, 0.02, 0.14, 0.19, 0.29, 0.42, 0.47, 0.47],
-    [0.05, -0.03, 0, 0.14, 0.21, 0.32, 0.42, 0.47, 0.54]
+    [0.315, 0.26,  0.27, 0.24, 0.17, 0.11,  0.08, 0.06, 0.05],
+    [0.26,  0.295, 0.22, 0.15, 0.07, 0,     0,    0,   -0.03],
+    [0.27,  0.22,  0.29, 0.24, 0.15, 0.09,  0.03, 0.02, 0],
+    [0.24,  0.15,  0.24, 0.33, 0.27, 0.23,  0.17, 0.14, 0.14],
+    [0.17,  0.07,  0.15, 0.27, 0.38, 0.34,  0.23, 0.19, 0.21],
+    [0.11,  0,     0.09, 0.23, 0.34, 0.445, 0.33, 0.29, 0.32],
+    [0.08,  0,     0.03, 0.17, 0.23, 0.33,  0.45, 0.42, 0.42],
+    [0.06,  0,     0.02, 0.14, 0.19, 0.29,  0.42, 0.47, 0.47],
+    [0.05, -0.03,  0,    0.14, 0.21, 0.32,  0.42, 0.47, 0.54]
 ])
 
 # Table IV. Nugget effect coregionalization matrix, B3
 B3 = np.array([
-    [0.38, 0.36, 0.35, 0.17, 0.04, 0.04, 0, 0.03, 0.08],
-    [0.36, 0.43, 0.35, 0.13, 0, 0.02, 0, 0.02, 0.08],
-    [0.35, 0.35, 0.45, 0.11, -0.04, -0.02, -0.04, -0.02, 0.03],
-    [0.17, 0.13, 0.11, 0.35, 0.2, 0.06, 0.02, 0.04, 0.02],
-    [0.04, 0, -0.04, 0.20, 0.30, 0.14, 0.09, 0.12, 0.04],
-    [0.04, 0.02, -0.02, 0.06, 0.14, 0.22, 0.12, 0.13, 0.09],
-    [0, 0, -0.04, 0.02, 0.09, 0.12, 0.21, 0.17, 0.13],
-    [0.03, 0.02, -0.02, 0.04, 0.12, 0.13, 0.17, 0.23, 0.10],
-    [0.08, 0.08, 0.03, 0.02, 0.04, 0.09, 0.13, 0.10, 0.22]
+    [0.38, 0.36,  0.35, 0.17,  0.04,  0.04,  0,     0.03, 0.08],
+    [0.36, 0.43,  0.35, 0.13,  0,     0.02,  0,     0.02, 0.08],
+    [0.35, 0.35,  0.45, 0.11, -0.04, -0.02, -0.04, -0.02, 0.03],
+    [0.17, 0.13,  0.11, 0.35,  0.2,   0.06,  0.02,  0.04, 0.02],
+    [0.04, 0,    -0.04, 0.20,  0.30,  0.14,  0.09,  0.12, 0.04],
+    [0.04, 0.02, -0.02, 0.06,  0.14,  0.22,  0.12,  0.13, 0.09],
+    [0,    0,    -0.04, 0.02,  0.09,  0.12,  0.21,  0.17, 0.13],
+    [0.03, 0.02, -0.02, 0.04,  0.12,  0.13,  0.17,  0.23, 0.10],
+    [0.08, 0.08,  0.03, 0.02,  0.04,  0.09,  0.13,  0.10, 0.22]
 ])
 
 
@@ -82,18 +82,35 @@ class LothBaker2013(CrossCorrelationBase):
         if np.any(periods > 10):
             raise ValueError('The periods must be less or equal to 10s')
 
-        rbs1 = RectBivariateSpline(Tlist, Tlist, B1, kx=1, ky=1)
-        rbs2 = RectBivariateSpline(Tlist, Tlist, B2, kx=1, ky=1)
-        rbs3 = RectBivariateSpline(Tlist, Tlist, B3, kx=1, ky=1)
+        nper = np.size(periods)
+
+        rgi1 = RegularGridInterpolator((Tlist, Tlist), B1, method='linear')
+        rgi2 = RegularGridInterpolator((Tlist, Tlist), B2, method='linear')
+        rgi3 = RegularGridInterpolator((Tlist, Tlist), B3, method='linear')
 
         #
         # Build new tables with entries at the periods we will use
         #
-        tlist = list(zip(*it.product(periods, periods)))
-        nper = np.size(periods)
-        self.b1 = rbs1.ev(tlist[0], tlist[1]).reshape((nper, nper))
-        self.b2 = rbs2.ev(tlist[0], tlist[1]).reshape((nper, nper))
-        self.b3 = rbs3.ev(tlist[0], tlist[1]).reshape((nper, nper))
+        tlist = list(it.product(periods, periods))
+        self.b1 = rgi1(tlist).reshape((nper, nper))
+        self.b2 = rgi2(tlist).reshape((nper, nper))
+        self.b3 = rgi3(tlist).reshape((nper, nper))
+
+        db1 = np.diagonal(B1)
+        db2 = np.diagonal(B2)
+        db3 = np.diagonal(B3)
+
+        rgid1 = RegularGridInterpolator((Tlist,), db1, method='linear')
+        rgid2 = RegularGridInterpolator((Tlist,), db2, method='linear')
+        rgid3 = RegularGridInterpolator((Tlist,), db3, method='linear')
+
+        id1 = rgid1(periods)
+        id2 = rgid2(periods)
+        id3 = rgid3(periods)
+
+        np.fill_diagonal(self.b1, id1)
+        np.fill_diagonal(self.b2, id2)
+        np.fill_diagonal(self.b3, id3)
 
     def getCorrelation(self, ix1, ix2, h):
         """

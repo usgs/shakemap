@@ -20,7 +20,8 @@ XY_COLS = set(['X', 'Y'])
 
 GEO_PROJ_STR = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'
 
-IMT_MATCHES = ['PGA',
+IMT_MATCHES = ['MMI',
+               'PGA',
                'PGV',
                r'SA\([-+]?[0-9]*\.?[0-9]+\)']
 
