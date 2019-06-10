@@ -550,7 +550,7 @@ class ModelModule(CoreModule):
             in_sites = np.genfromtxt(
                 self.config['interp']['prediction_location']['file'],
                 autostrip=True, unpack=True,
-                dtype=[np.float, np.float, np.float, '<U80'])
+                dtype=[np.double, np.double, np.double, '<U80'])
             if np.size(in_sites) == 0:
                 self.logger.info('Points file is empty; nothing to do')
                 return
