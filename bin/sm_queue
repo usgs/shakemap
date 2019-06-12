@@ -3,6 +3,7 @@
 # System imports
 import os
 import os.path
+import sys
 import socket
 import json
 from datetime import datetime, timezone
@@ -481,6 +482,11 @@ def get_parser():
     parser.add_argument('-a', '--attached', action='store_true',
                         help='Inhibit daemonization and remain attached '
                              'to the terminal.')
+    parser.add_argument('-b', '--break_lock', action='store_true',
+                        help="If the pid lock file can't be acquired, break "
+                             "the existing lock and acquire a new lock. Do "
+                             "this only if you are certain tha no other "
+                             "sm_queue processes are running.")
     return parser
 
 
@@ -506,9 +512,18 @@ def main(pargs):
     if not os.path.isdir(logpath):
         os.makedirs(logpath)
     pidfile = os.path.join(logpath, 'queue.pid')
-    context = daemon.DaemonContext(
-            working_directory=data_path,
-            pidfile=lockfile.FileLock(pidfile))
+    filelock = lockfile.FileLock(pidfile)
+    if filelock.is_locked():
+        if pargs.break_lock:
+            filelock.break_lock()
+        else:
+            logger = queue.get_logger(logpath, pargs.attached)
+            logger.error("pid lock file '%s' exists, can't start sm_queue; "
+                         "exiting..." % (pidfile))
+            sys.exit(-1)
+
+    context = daemon.DaemonContext(working_directory=data_path,
+                                   pidfile=filelock)
 
     with get_context(context, pargs.attached):
         logger = queue.get_logger(logpath, pargs.attached)
