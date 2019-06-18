@@ -1,7 +1,12 @@
 # stdlib imports
 import os.path
+import sys
 import glob
 import re
+import shutil
+import datetime
+import argparse
+import inspect
 
 # third party imports
 import numpy as np
@@ -11,10 +16,14 @@ from mapio.grid2d import Grid2D
 import matplotlib.pyplot as plt
 from mapio.geodict import GeoDict
 
-
 # local imports
 from .base import CoreModule, Contents
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_model_config)
+from shakelib.utils.containers import ShakeMapInputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
+from shakemap.utils.amps import AmplitudeHandler
+from shakelib.rupture import constants
 
 LATLON_COLS = set(['LAT', 'LON'])
 XY_COLS = set(['X', 'Y'])
@@ -26,22 +35,56 @@ IMT_MATCHES = ['MMI',
                'PGV',
                r'SA\([-+]?[0-9]*\.?[0-9]+\)']
 
+SAVE_FILE = '.saved'
 
-class AssembleSimModule(CoreModule):
+
+class ModelSimModule(CoreModule):
     """
-    assemble_sim -- Assemble simulation data, configuration information,
+    model_sim -- Assemble simulation data, configuration information,
     and event.xml into ShakeMap results.
     """
 
-    command_name = 'assemble_sim'
+    command_name = 'model_sim'
     targets = []
     dependencies = [('event.xml', True),
                     ('simulation.conf', True),
                     ('simulation_*.csv', True)]
 
-    def __init__(self, eventid):
-        super(AssembleSimModule, self).__init__(eventid)
+    apply_site_amp = False
+
+    rock_vs30 = 760.0
+
+    def __init__(self, eventid, comment=None):
+        super(ModelSimModule, self).__init__(eventid)
         self.contents = Contents(None, None, eventid)
+        if comment is not None:
+            self.comment = comment
+
+    def parseArgs(self, arglist):
+        """
+        Allow for options:
+            -s, --apply_site_amp: Apply site amplification.
+        """
+        parser = argparse.ArgumentParser(
+            prog=self.__class__.command_name,
+            description=inspect.getdoc(self.__class__))
+        parser.add_argument('-s', '--apply_site_amp', action='store_true',
+                            help='Apply site amplification based upon '
+                                 'the configured GMPE set.')
+        #
+        # This line should be in any modules that overrides this
+        # one. It will collect up everything after the current
+        # modules options in args.rem, which should be returned
+        # by this function. Note: doing parser.parse_known_args()
+        # will not work as it will suck up any later modules'
+        # options that are the same as this one's.
+        #
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
+                            help=argparse.SUPPRESS)
+        args = parser.parse_args(arglist)
+        if args.apply_site_amp:
+            self.apply_site_amp = True
+        return args.rem
 
     def execute(self):
         """
@@ -58,6 +101,20 @@ class AssembleSimModule(CoreModule):
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
 
+        eventxml = os.path.join(datadir, 'event.xml')
+        self.logger.debug('Looking for event.xml file...')
+        if not os.path.isfile(eventxml):
+            raise FileNotFoundError('%s does not exist.' % eventxml)
+
+        # Prompt for a comment string if none is provided on the command line
+        if self.comment is None:
+            if sys.stdout is not None and sys.stdout.isatty():
+                self.comment = input(
+                    'Please enter a comment for this version.\n'
+                    'comment: ')
+            else:
+                self.comment = ''
+
         # load the simulation.conf file
         config_file = os.path.join(datadir, 'simulation.conf')
         if not os.path.isfile(config_file):
@@ -66,6 +123,126 @@ class AssembleSimModule(CoreModule):
 
         # find the spec file for simulation.conf
         config = ConfigObj(infile=config_file)
+
+        model_global_config = get_model_config(install_path, datadir,
+                                               self.logger)
+        model_config = model_global_config.dict()
+
+        self.logger.debug('Looking for rupture files...')
+        # look for geojson versions of rupture files
+        rupturefile = os.path.join(datadir, 'rupture.json')
+        if not os.path.isfile(rupturefile):
+            # failing any of those, look for text file versions
+            rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
+            rupturefile = None
+            if len(rupturefiles):
+                rupturefile = rupturefiles[0]
+
+        # find any source.txt or moment.xml files
+        momentfile = os.path.join(datadir, 'moment.xml')
+        sourcefile = os.path.join(datadir, 'source.txt')
+        if not os.path.isfile(sourcefile):
+            sourcefile = None
+        if not os.path.isfile(momentfile):
+            momentfile = None
+
+        #
+        # Clear away results from previous runs
+        #
+        products_path = os.path.join(datadir, 'products')
+        if os.path.isdir(products_path):
+            shutil.rmtree(products_path, ignore_errors=True)
+        pdl_path = os.path.join(datadir, 'pdl')
+        if os.path.isdir(pdl_path):
+            shutil.rmtree(pdl_path, ignore_errors=True)
+
+        # Look for any .transferred file and delete it
+        save_file = os.path.join(datadir, SAVE_FILE)
+        if os.path.isfile(save_file):
+            os.remove(save_file)
+
+        #
+        # Sort out the version history. Get the most recent backup file and
+        # extract the existing history. Then add a new line for this run.
+        #
+        timestamp = datetime.datetime.utcnow().strftime('%FT%TZ')
+        originator = config['system']['source_network']
+        backup_dirs = sorted(
+            glob.glob(os.path.join(datadir, '..', 'backup*')),
+            reverse=True)
+        if len(backup_dirs):
+            #
+            # Backup files exist so find the latest one and extract its
+            # history, then add a new line that increments the version
+            #
+            bu_file = os.path.join(backup_dirs[0], 'shake_data.hdf')
+            bu_ic = ShakeMapInputContainer.load(bu_file)
+            history = bu_ic.getVersionHistory()
+            bu_ic.close()
+            version = int(
+                backup_dirs[0].replace(
+                    os.path.join(datadir, '..', 'backup'), ''))
+            version += 1
+            new_line = [timestamp, originator, version, self.comment]
+            history['history'].append(new_line)
+        elif os.path.isfile(os.path.join(datadir, 'shake_data.hdf')):
+            #
+            # No backups are available, but there is an existing shake_data
+            # file. Extract its history and update the timestamp and
+            # source network (but leave the version alone).
+            # If there is no history, just start a new one with version 1
+            #
+            bu_file = os.path.join(datadir, 'shake_data.hdf')
+            bu_ic = ShakeMapInputContainer.load(bu_file)
+            history = bu_ic.getVersionHistory()
+            bu_ic.close()
+            if 'history' in history:
+                new_line = [timestamp, originator, history['history'][-1][2],
+                            self.comment]
+                history['history'][-1] = new_line
+            else:
+                history = {'history': []}
+                new_line = [timestamp, originator, 1, self.comment]
+                history['history'].append(new_line)
+        else:
+            #
+            # No backup and no existing file. Make this version 1
+            #
+            history = {'history': []}
+            new_line = [timestamp, originator, 1, self.comment]
+            history['history'].append(new_line)
+
+        hdf_file = os.path.join(datadir, 'shake_data.hdf')
+
+        self.logger.debug('Creating input container...')
+        shake_data = ShakeMapInputContainer.createFromInput(
+            hdf_file,
+            config,
+            eventxml,
+            history,
+            rupturefile=rupturefile,
+            sourcefile=sourcefile,
+            momentfile=momentfile,
+            datafiles=[])
+        self.logger.debug('Created HDF5 input container in %s' %
+                          shake_data.getFileName())
+        ah = AmplitudeHandler(install_path, data_path)
+        event = ah.getEvent(self._eventid)
+        if event is None:
+            origin = shake_data.getRuptureObject().getOrigin()
+            event = {'id': self._eventid,
+                     'netid': origin.netid,
+                     'network': origin.network,
+                     'time': origin.time.strftime(constants.TIMEFMT),
+                     'lat': origin.lat,
+                     'lon': origin.lon,
+                     'depth': origin.depth,
+                     'mag': origin.mag,
+                     'locstring': origin.locstring}
+            ah.insertEvent(event)
+        shake_data.close()
+
+        self.gmice = get_object_from_config('gmice', 'modeling', model_config)
 
         # look for the simulation data file
         simfiles = glob.glob(os.path.join(datadir, 'simulation_*.csv'))

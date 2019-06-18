@@ -4,7 +4,7 @@ import os.path
 
 from configobj import ConfigObj
 from validate import Validator
-from shakemap.coremods.assemble_sim import (_get_grids)
+from shakemap.coremods.assemble import (_get_grids)
 import numpy as np
 
 
