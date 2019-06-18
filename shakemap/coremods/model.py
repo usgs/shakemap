@@ -582,7 +582,6 @@ class ModelModule(CoreModule):
                 padding=True, resample=True
             )
             self.smnx, self.smny = self.sites_obj_out.getNxNy()
-            print(self.W, self.E, self.S, self.N, self.smnx, self.smny, self.smdx, self.smdy)
             self.sx_out = self.sites_obj_out.getSitesContext()
             lons, lats = np.meshgrid(self.sx_out.lons,
                                      self.sx_out.lats)
@@ -1247,7 +1246,7 @@ class ModelModule(CoreModule):
             self.nominal_bias[imtstr] = self.bias_num[imtstr] * nom_variance
             bias_time = time.time() - time1
             #
-            # Print the nominal values of the bias and its stddev
+            # Write the nominal values of the bias and its stddev to log
             #
             self.logger.debug(
                 '%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
@@ -1323,7 +1322,6 @@ class ModelModule(CoreModule):
                                                       dists=self.dx_out.rrup,
                                                       mag=self.rx.mag)
             else:
-                print('NaNs: ', np.where(np.isnan(self.sim_df[imtstr])))
                 pout_mean = self.sim_df[imtstr]
 
         #

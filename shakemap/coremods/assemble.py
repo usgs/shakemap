@@ -341,7 +341,7 @@ def _get_grids(config, simfile):
     dataframe = pd.read_csv(simfile)
 
     # construct a geodict
-    geodict = _get_geodict(dataframe, config)
+    geodict, top_down = _get_geodict(dataframe, config)
 
     # figure out which IMTs we have...
     column_list = []
@@ -371,21 +371,57 @@ def _get_grids(config, simfile):
                 'Incorrect number of channels for IMT %s.' % imt)
         channel1, channel2 = imtcols
         maximt = dataframe[[channel1, channel2]].max(axis=1).values
-        data = np.reshape(maximt, (nrows, ncols), order=row_order)
-        if imt == "PGV":
-            data = np.log(data)
+        data = np.log(np.reshape(maximt, (nrows, ncols), order=row_order))
+        if not top_down:
+            data = np.flipud(data)
         grid = Grid2D(data, geodict)
 
         # if we need to project data back to geographic, do that here
         if geodict.projection != GEO_PROJ_STR:
-            grid = grid.project(GEO_PROJ_STR)
+            grid2 = grid.project(GEO_PROJ_STR)
 
-        print(grid.getGeoDict().xmin, grid.getGeoDict().xmax, grid.getGeoDict().ymin, grid.getGeoDict().ymax)
+        # remove any nan's, maximizing the resulting area of good data
+        grid3 = _trim_grid(grid2)
 
-#        print('NaNs: ', list(zip(*np.where(np.isnan(grid.getData())))))
-        imtgrids[imt] = grid
+        imtgrids[imt] = grid3
 
     return imtgrids
+
+
+def _trim_grid(ingrid):
+    outgrid = Grid2D.copyFromGrid(ingrid)
+    while np.isnan(outgrid._data).any():
+        nrows, ncols = outgrid._data.shape
+        top = outgrid._data[0, :]
+        bottom = outgrid._data[-1, :]
+        left = outgrid._data[:, 0]
+        right = outgrid._data[:, -1]
+        ftop = np.isnan(top).sum() / ncols
+        fbottom = np.isnan(bottom).sum() / ncols
+        fleft = np.isnan(left).sum() / nrows
+        fright = np.isnan(right).sum() / nrows
+        side = np.argmax([ftop, fbottom, fleft, fright])
+        gdict = outgrid.getGeoDict().asDict()
+        if side == 0:  # removing top row
+            outgrid._data = outgrid._data[1:, :]
+            gdict['ymax'] -= gdict['dy']
+            gdict['ny'] -= 1
+        elif side == 1:  # removing bottom row
+            outgrid._data = outgrid._data[0:-1, :]
+            gdict['ymin'] += gdict['dy']
+            gdict['ny'] -= 1
+        elif side == 2:  # removing left column
+            outgrid._data = outgrid._data[:, 1:]
+            gdict['xmin'] += gdict['dx']
+            gdict['nx'] -= 1
+        elif side == 3:  # removing right column
+            outgrid._data = outgrid._data[:, 0:-1]
+            gdict['xmax'] -= gdict['dx']
+            gdict['nx'] -= 1
+        geodict = GeoDict(gdict)
+        outgrid = Grid2D(data=outgrid._data, geodict=geodict)
+
+    return outgrid
 
 
 def _get_geodict(dataframe, config):
@@ -414,6 +450,9 @@ def _get_geodict(dataframe, config):
 
     # check for lat/lon regularity
     is_regular = False
+
+    # this lets the user know whether the data starts at the top or the bottom
+    top_down = True
     if has_latlon:
         lat = dataframe['LAT'].values
         lon = dataframe['LON'].values
@@ -421,7 +460,6 @@ def _get_geodict(dataframe, config):
         ymax = lat.max()
         xmin = lon.min()
         xmax = lon.max()
-        print(xmin, xmax, ymin, ymax)
         projection = GEO_PROJ_STR
         if row_order:
             lat = np.reshape(lat, (ny, nx), order='C')
@@ -429,6 +467,8 @@ def _get_geodict(dataframe, config):
         else:
             lat = np.reshape(lat, (ny, nx), order='F')
             lon = np.reshape(lon, (ny, nx), order='F')
+        if lat[1][0] > lat[0][0]:
+            top_down = False
         try:
             np.testing.assert_almost_equal(lat[0][0], lat[0][1])
             is_regular = True
@@ -440,7 +480,10 @@ def _get_geodict(dataframe, config):
                 'or lat/lon coordinates.')
     if not is_regular:
         x = dataframe['X'].values
-        y = dataframe['X'].values
+        y = dataframe['Y'].values
+        y2 = np.reshape(y, (ny, nx), order='C')
+        if y2[1][0] > y2[0][0]:
+            top_down = False
         xmin = x.min()
         xmax = x.max()
         ymin = y.min()
@@ -458,4 +501,4 @@ def _get_geodict(dataframe, config):
           'projection': projection}
     geodict = GeoDict(gd)
 
-    return geodict
+    return (geodict, top_down)
