@@ -82,6 +82,20 @@ def test_model_4():
     clear_files(event_path)
 
 
+def test_model_sim():
+
+    #
+    # Run with no data and no fault, and use the default extent.
+    #
+    install_path, data_path = get_config_paths()
+    event_path = os.path.join(data_path, 'planet9', 'current')
+    assemble = AssembleModule('planet9',
+                              comment='Test comment.')
+    assemble.execute()
+    model = ModelModule('planet9')
+    model.execute()
+
+
 def test_directivity():
 
     #
@@ -114,4 +128,5 @@ if __name__ == '__main__':
     test_model_2()
     test_model_3()
     test_model_4()
+    test_model_sim()
     test_directivity()

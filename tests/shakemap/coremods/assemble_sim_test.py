@@ -4,7 +4,7 @@ import os.path
 
 from configobj import ConfigObj
 from validate import Validator
-from shakemap.coremods.assemble_sim import (_get_grids)
+from shakemap.coremods.assemble import (_get_grids)
 import numpy as np
 
 
@@ -25,7 +25,7 @@ def test_assemble_sim():
     assert results
     imtgrids = _get_grids(config, simfile)
     pgasum = np.nansum(imtgrids['PGA'].getData())
-    pgacomp = 496.35559358570333
+    pgacomp = -2195.342762128482
     np.testing.assert_almost_equal(pgasum, pgacomp)
     imtlist = list(imtgrids.keys())
     imtcmp = ['PGA', 'PGV', 'SA(0.3)', 'SA(1.0)', 'SA(3.0)']

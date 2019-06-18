@@ -94,6 +94,7 @@ class ModelModule(CoreModule):
     no_seismic = False
     no_macroseismic = False
     no_rupture = False
+    use_simulations = False
 
     rock_vs30 = 760.0
     soil_vs30 = 180.0
@@ -155,6 +156,11 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         self._setInputContainer()
         self.config = self.ic.getConfig()
+
+        self.sim_imt_paths = [x for x in self.ic.getArrays()
+                              if 'simulations' in x]
+        if len(self.sim_imt_paths):
+            self.use_simulations = True
 
         # ---------------------------------------------------------------------
         # Clear away results from previous runs
@@ -309,9 +315,22 @@ class ModelModule(CoreModule):
         # Get the combined set of input and output IMTs, their periods,
         # and an index dictionary, then make the cross-correlation function
         # ---------------------------------------------------------------------
-        self.combined_imt_set = self.imt_out_set.copy()
-        for ndf in self.dataframes:
-            self.combined_imt_set |= getattr(self, ndf).imts
+        if self.use_simulations:
+            #
+            # Ignore what is in the configuration and make maps only for the
+            # IMTs that are in the set of simulations (and MMI).
+            #
+            self.combined_imt_set = set(
+                [x.split('/')[-1] for x in self.sim_imt_paths])
+            self.sim_df = {}
+            for imtstr in self.combined_imt_set:
+                dset, _ = self.ic.getArray(['simulations'], imtstr)
+                self.sim_df[imtstr] = dset
+            self.combined_imt_set |= set(['MMI'])
+        else:
+            self.combined_imt_set = self.imt_out_set.copy()
+            for ndf in self.dataframes:
+                self.combined_imt_set |= getattr(self, ndf).imts
 
         self.imt_per, self.imt_per_ix = _get_period_arrays(
             self.combined_imt_set)
@@ -541,8 +560,41 @@ class ModelModule(CoreModule):
         Returns:
             nothing
         """
-        if self.config['interp']['prediction_location']['file'] and \
-           self.config['interp']['prediction_location']['file'] != 'None':
+        if self.use_simulations:
+            self.do_grid = True
+            imt_grp = self.sim_imt_paths[0]
+            groups = imt_grp.split('/')
+            myimt = groups[-1]
+            del groups[-1]
+            data, geodict = self.ic.getArray(groups, myimt)
+            self.W = geodict['xmin']
+            self.E = geodict['xmax']
+            self.S = geodict['ymin']
+            self.N = geodict['ymax']
+            self.smdx = geodict['dx']
+            self.smdy = geodict['dy']
+
+            self.sites_obj_out = Sites.fromBounds(
+                self.W, self.E, self.S,
+                self.N, self.smdx, self.smdy,
+                defaultVs30=self.vs30default,
+                vs30File=self.vs30_file,
+                padding=True, resample=True
+            )
+            self.smnx, self.smny = self.sites_obj_out.getNxNy()
+            self.sx_out = self.sites_obj_out.getSitesContext()
+            lons, lats = np.meshgrid(self.sx_out.lons,
+                                     self.sx_out.lats)
+            self.sx_out.lons = lons.copy()
+            self.sx_out.lats = lats.copy()
+            self.lons = lons.ravel()
+            self.lats = lats.ravel()
+            self.depths = np.zeros_like(lats)
+            dist_obj_out = Distance.fromSites(self.default_gmpe,
+                                              self.sites_obj_out,
+                                              self.rupture_obj)
+        elif (self.config['interp']['prediction_location']['file'] and
+              self.config['interp']['prediction_location']['file'] != 'None'):
             #
             # FILE: Open the file and get the output points
             #
@@ -1194,7 +1246,7 @@ class ModelModule(CoreModule):
             self.nominal_bias[imtstr] = self.bias_num[imtstr] * nom_variance
             bias_time = time.time() - time1
             #
-            # Print the nominal values of the bias and its stddev
+            # Write the nominal values of the bias and its stddev to log
             #
             self.logger.debug(
                 '%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
@@ -1263,6 +1315,14 @@ class ModelModule(CoreModule):
 
         pout_mean, pout_sd = self._gmas(
             gmpe, self.sx_out, self.dx_out, oqimt, self.apply_gafs)
+
+        if self.use_simulations:
+            if imtstr == 'MMI':
+                pout_mean = self.gmice.getPreferredMI(self.sim_df,
+                                                      dists=self.dx_out.rrup,
+                                                      mag=self.rx.mag)
+            else:
+                pout_mean = self.sim_df[imtstr]
 
         #
         # While we have the gmpe for this IMT, we should make

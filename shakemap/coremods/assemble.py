@@ -11,23 +11,36 @@ import glob
 import datetime
 import shutil
 import sys
-import logging
+import re
 
 # third party imports
 from configobj import ConfigObj
+from validate import Validator
+import numpy as np
+import pandas as pd
+from mapio.grid2d import Grid2D
+from mapio.geodict import GeoDict
 
 # local imports
 from .base import CoreModule
 from shakelib.utils.containers import ShakeMapInputContainer
 from shakemap.utils.config import (get_config_paths,
-                                   get_custom_validator,
-                                   config_error,
-                                   check_config,
                                    get_configspec,
+                                   config_error,
+                                   get_model_config,
                                    path_macro_sub)
-from shakemap.utils.logging import get_logging_config
 from shakemap.utils.amps import AmplitudeHandler
 from shakelib.rupture import constants
+
+LATLON_COLS = set(['LAT', 'LON'])
+XY_COLS = set(['X', 'Y'])
+
+GEO_PROJ_STR = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'
+
+IMT_MATCHES = ['MMI',
+               'PGA',
+               'PGV',
+               r'SA\([-+]?[0-9]*\.?[0-9]+\)']
 
 SAVE_FILE = '.saved'
 
@@ -112,48 +125,9 @@ class AssembleModule(CoreModule):
             os.remove(save_file)
 
         #
-        # Look for global configs in install_path/config
+        # Get the combined model config file
         #
-        spec_file = get_configspec()
-        validator = get_custom_validator()
-        self.logger.debug('Looking for configuration files...')
-        modules = ConfigObj(
-            os.path.join(install_path, 'config', 'modules.conf'),
-            configspec=spec_file)
-        gmpe_sets = ConfigObj(
-            os.path.join(install_path, 'config', 'gmpe_sets.conf'),
-            configspec=spec_file)
-        global_config = ConfigObj(
-            os.path.join(install_path, 'config', 'model.conf'),
-            configspec=spec_file)
-
-        #
-        # this is the event specific model.conf (may not be present)
-        # prefer model.conf to model_select.conf
-        #
-        event_config_file = os.path.join(datadir, 'model.conf')
-        event_config_zc_file = os.path.join(datadir, 'model_select.conf')
-        if os.path.isfile(event_config_file):
-            event_config = ConfigObj(event_config_file,
-                                     configspec=spec_file)
-        elif os.path.isfile(event_config_zc_file):
-            event_config = ConfigObj(event_config_zc_file,
-                                     configspec=spec_file)
-        else:
-            event_config = ConfigObj()
-
-        #
-        # start merging event_config
-        #
-        global_config.merge(event_config)
-        global_config.merge(modules)
-        global_config.merge(gmpe_sets)
-
-        results = global_config.validate(validator)
-        if not isinstance(results, bool) or not results:
-            config_error(global_config, results)
-
-        check_config(global_config, self.logger)
+        global_config = get_model_config(install_path, datadir, self.logger)
 
         global_data_path = os.path.join(os.path.expanduser('~'),
                                         'shakemap_data')
@@ -273,6 +247,34 @@ class AssembleModule(CoreModule):
                      'mag': origin.mag,
                      'locstring': origin.locstring}
             ah.insertEvent(event)
+
+        # Look for grids of simulated data
+        simfiles = glob.glob(os.path.join(datadir, 'simulation_*.csv'))
+        if len(simfiles) > 1:
+            raise FileExistsError('Too many simulation data files found.')
+        elif len(simfiles):
+            # load the simulation.conf file
+            config_file = os.path.join(datadir, 'simulation.conf')
+            if not os.path.isfile(config_file):
+                raise FileNotFoundError(
+                    'Could not find simulation config file %s' % config_file)
+
+            # find the spec file for simulation.conf
+            sim_config_spec = get_configspec('simulation')
+            sim_config = ConfigObj(infile=config_file,
+                                   configspec=sim_config_spec)
+            results = sim_config.validate(Validator())
+            if not isinstance(results, bool) or not results:
+                config_error(global_config, results)
+
+            simfile = simfiles[0]
+            imtgrids = _get_grids(sim_config, simfile)
+            for imtstr in imtgrids:
+                metadata = imtgrids[imtstr].getGeoDict().asDict()
+                datagrid = imtgrids[imtstr].getData()
+                shake_data.setArray(['simulations'], imtstr, datagrid,
+                                    metadata=metadata)
+
         shake_data.close()
 
     def parseArgs(self, arglist):
@@ -299,3 +301,204 @@ class AssembleModule(CoreModule):
         args = parser.parse_args(arglist)
         self.comment = args.comment
         return args.rem
+
+
+def _get_grids(config, simfile):
+    """Create a dictionary of Grid2D objects for each IMT in input CSV file.
+
+    Args:
+        config (ConfigObj): Dictionary containing fields:
+                            - simulation: (dict)
+                              - order = (required) "rows" or "cols"
+                              - projection = (optional) Proj4 string
+                                defining input X/Y data projection.
+                              - nx Number of columns in input grid.
+                              - ny Number of rows in input grid.
+                              - dx Resolution of columns (if XY, whatever
+                                those units are, otherwise decimal degrees).
+                              - dy Resolution of rows (if XY, whatever those
+                                units are, otherwise decimal degrees).
+        simfile (str): Path to a CSV file with columns:
+                       - LAT Latitudes for each cell. If irregular, X/Y data
+                         will be used.
+                       - LON Longitudes for each cell. If irregular, X/Y data
+                         will be used.
+                       - X Regularized X coordinates for each cell.
+                       - Y Regularized Y coordinates for each cell.
+                       - H1_<IMT> First horizontal channel for given IMT.
+                         Supported IMTs are: PGA, PGV, SA(period).
+                       - H2_<IMT> Second horizontal channel for given IMT.
+                         Supported IMTs are: PGA, PGV, SA(period).
+
+    Returns:
+        dict: Dictionary of IMTs (PGA, PGV, SA(1.0), etc.) and Grid2D
+        objects. If XY data was used, these grids are the result of a
+        projection/resampling of that XY data back to a regular lat/lon grid.
+    """
+    row_order = 'C'
+    if config['simulation']['order'] != 'rows':
+        row_order = 'F'
+    dataframe = pd.read_csv(simfile)
+
+    # construct a geodict
+    geodict, top_down = _get_geodict(dataframe, config)
+
+    # figure out which IMTs we have...
+    column_list = []
+    for column in dataframe.columns:
+        for imtmatch in IMT_MATCHES:
+            if re.search(imtmatch, column):
+                column_list.append(column)
+
+    # gather up all "channels" for each IMT
+    imtdict = {}  # dictionary of imts and a list of columns
+    for col in column_list:
+        channel, imt = col.split('_')
+        if imt in imtdict:
+            imtdict[imt].append(col)
+        else:
+            imtdict[imt] = [col]
+
+    # make a dictionary of Grid2D objects containing max of two "channels"
+    # for each IMT
+    nrows = geodict.ny
+    ncols = geodict.nx
+    imtgrids = {}
+    for imt, imtcols in imtdict.items():
+        icount = len(imtcols)
+        if icount != 2:
+            raise IndexError(
+                'Incorrect number of channels for IMT %s.' % imt)
+        channel1, channel2 = imtcols
+        maximt = dataframe[[channel1, channel2]].max(axis=1).values
+        data = np.log(np.reshape(maximt, (nrows, ncols), order=row_order))
+        if not top_down:
+            data = np.flipud(data)
+        grid = Grid2D(data, geodict)
+
+        # if we need to project data back to geographic, do that here
+        if geodict.projection != GEO_PROJ_STR:
+            grid2 = grid.project(GEO_PROJ_STR)
+
+        # remove any nan's, maximizing the resulting area of good data
+        grid3 = _trim_grid(grid2)
+
+        imtgrids[imt] = grid3
+
+    return imtgrids
+
+
+def _trim_grid(ingrid):
+    outgrid = Grid2D.copyFromGrid(ingrid)
+    while np.isnan(outgrid._data).any():
+        nrows, ncols = outgrid._data.shape
+        top = outgrid._data[0, :]
+        bottom = outgrid._data[-1, :]
+        left = outgrid._data[:, 0]
+        right = outgrid._data[:, -1]
+        ftop = np.isnan(top).sum() / ncols
+        fbottom = np.isnan(bottom).sum() / ncols
+        fleft = np.isnan(left).sum() / nrows
+        fright = np.isnan(right).sum() / nrows
+        side = np.argmax([ftop, fbottom, fleft, fright])
+        gdict = outgrid.getGeoDict().asDict()
+        if side == 0:  # removing top row
+            outgrid._data = outgrid._data[1:, :]
+            gdict['ymax'] -= gdict['dy']
+            gdict['ny'] -= 1
+        elif side == 1:  # removing bottom row
+            outgrid._data = outgrid._data[0:-1, :]
+            gdict['ymin'] += gdict['dy']
+            gdict['ny'] -= 1
+        elif side == 2:  # removing left column
+            outgrid._data = outgrid._data[:, 1:]
+            gdict['xmin'] += gdict['dx']
+            gdict['nx'] -= 1
+        elif side == 3:  # removing right column
+            outgrid._data = outgrid._data[:, 0:-1]
+            gdict['xmax'] -= gdict['dx']
+            gdict['nx'] -= 1
+        geodict = GeoDict(gdict)
+        outgrid = Grid2D(data=outgrid._data, geodict=geodict)
+
+    return outgrid
+
+
+def _get_geodict(dataframe, config):
+    """Get a GeoDict object from input dataframe and simulation config.
+
+    Args:
+        dataframe (pandas DataFrame): Input CSV file as a data structure.
+        config (ConfigObj): Dictionary with spatial information about CSV file.
+
+    Returns:
+        GeoDict: Upper left corner, cell dimensions, rows/cols, and projection.
+
+    """
+    nx = config['simulation']['nx']
+    ny = config['simulation']['ny']
+    dx = config['simulation']['dx']
+    dy = config['simulation']['dy']
+    row_order = config['simulation']['order'] == 'rows'
+
+    has_latlon = False
+    if LATLON_COLS <= set(dataframe.columns):
+        has_latlon = True
+    has_xy = False
+    if XY_COLS <= set(dataframe.columns):
+        has_xy = True
+
+    # check for lat/lon regularity
+    is_regular = False
+
+    # this lets the user know whether the data starts at the top or the bottom
+    top_down = True
+    if has_latlon:
+        lat = dataframe['LAT'].values
+        lon = dataframe['LON'].values
+        ymin = lat.min()
+        ymax = lat.max()
+        xmin = lon.min()
+        xmax = lon.max()
+        projection = GEO_PROJ_STR
+        if row_order:
+            lat = np.reshape(lat, (ny, nx), order='C')
+            lon = np.reshape(lon, (ny, nx), order='C')
+        else:
+            lat = np.reshape(lat, (ny, nx), order='F')
+            lon = np.reshape(lon, (ny, nx), order='F')
+        if lat[1][0] > lat[0][0]:
+            top_down = False
+        try:
+            np.testing.assert_almost_equal(lat[0][0], lat[0][1])
+            is_regular = True
+        except AssertionError:
+            pass
+        if not is_regular and not has_xy:
+            raise IndexError(
+                'Input simulation files must have *regular* projected X/Y '
+                'or lat/lon coordinates.')
+    if not is_regular:
+        x = dataframe['X'].values
+        y = dataframe['Y'].values
+        y2 = np.reshape(y, (ny, nx), order='C')
+        if y2[1][0] > y2[0][0]:
+            top_down = False
+        xmin = x.min()
+        xmax = x.max()
+        ymin = y.min()
+        ymax = y.max()
+        projection = config['simulation']['projection']
+
+    gd = {'xmin': xmin,
+          'xmax': xmax,
+          'ymin': ymin,
+          'ymax': ymax,
+          'nx': nx,
+          'ny': ny,
+          'dx': dx,
+          'dy': dy,
+          'projection': projection}
+    geodict = GeoDict(gd)
+
+    return (geodict, top_down)
