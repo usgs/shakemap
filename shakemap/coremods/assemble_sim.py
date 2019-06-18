@@ -160,20 +160,7 @@ def _get_grids(config, simfile):
         # remove any nan's, maximizing the resulting area of good data
         grid3 = _trim_grid(grid2)
 
-        # debugging
-        vmin = grid._data.min()
-        vmax = grid._data.max()
-        fig, axeslist = plt.subplots(nrows=1, ncols=2)
-        plt.sca(axeslist[0])
-        plt.imshow(grid._data, vmin=vmin, vmax=vmax)
-        plt.colorbar()
-        plt.sca(axeslist[1])
-        plt.imshow(grid3._data, vmin=vmin, vmax=vmax)
-        plt.colorbar()
-        plt.savefig('/Users/mhearne/tmp/simulation.png')
-        plt.close()
-
-        imtgrids[imt] = grid2
+        imtgrids[imt] = grid3
 
     return imtgrids
 

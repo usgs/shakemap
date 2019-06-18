@@ -25,7 +25,7 @@ def test_assemble_sim():
     assert results
     imtgrids = _get_grids(config, simfile)
     pgasum = np.nansum(imtgrids['PGA'].getData())
-    pgacomp = 509.117479632617
+    pgacomp = 496.35559358570333
     np.testing.assert_almost_equal(pgasum, pgacomp)
     imtlist = list(imtgrids.keys())
     imtcmp = ['PGA', 'PGV', 'SA(0.3)', 'SA(1.0)', 'SA(3.0)']
