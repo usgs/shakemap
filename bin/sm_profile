@@ -34,8 +34,8 @@ def replace(file_path, pattern, subst):
     """
     # Create temp file
     fh, abs_path = mkstemp()
-    with os.fdopen(fh, 'w') as new_file:
-        with open(file_path) as old_file:
+    with os.fdopen(fh, mode='w', encoding='utf-8-sig') as new_file:
+        with open(file_path, mode='r', encoding='utf-8-sig') as old_file:
             for line in old_file:
                 new_file.write(re.sub(pattern, subst, line))
     # Remove original file
@@ -325,7 +325,7 @@ def main(pparser, args):
     if not os.path.isfile(configfile):
         pathlib.Path(configfile).touch(exist_ok=True)
 
-    config = ConfigObj(configfile)
+    config = ConfigObj(configfile, encoding='utf-8-sig')
 
     if args.create:
         profile = args.create

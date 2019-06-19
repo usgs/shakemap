@@ -60,17 +60,22 @@ from shakelib.directivity.rowshandel2013 import Rowshandel2013
 # min_mmi_convert: the minimum MMI to convert to PGM -- low
 #                  intensities don't convert very accurately
 # default_stddev_inter: This is a stand-in for tau when the gmpe set
-#                       doesn't provide it. It is an educated guess
-#                       based on the NGA-east work and BC Hydro gmpe.
+#                       doesn't provide it. It is an educated guess based
+#                       on the NGA-west, Akkar et al, and BC Hydro gmpes.
 #                       It's not perfect, but probably isn't too far off.
-#                       It is only used when the GMPEs don't provide a
-#                       breakdown of the uncertainty terms.
+#                       It is only used when the GMPE(s) don't provide a
+#                       breakdown of the uncertainty terms. When used,
+#                       this value is multiplied by the total standard
+#                       deviation to get tau. The square of tau is then
+#                       subtracted from the squared total stddev and the
+#                       square root of the result is then used as the
+#                       within-event stddev (phi).
 #
 SM_CONSTS = {
     'default_mmi_stddev': 0.3,
     'min_mmi_convert': 4.0,
-    'default_stddev_inter': 0.35,
-    'default_stddev_inter_mmi': 0.4
+    'default_stddev_inter': 0.55,
+    'default_stddev_inter_mmi': 0.55
 }
 
 
@@ -862,10 +867,9 @@ class ModelModule(CoreModule):
                     total_only = self.ipe_total_sd_only
                     tau_guess = SM_CONSTS['default_stddev_inter_mmi']
                 if total_only:
-                    df[imtstr + '_pred_tau'] = np.full_like(
-                        df[imtstr + '_pred'], tau_guess)
+                    df[imtstr + '_pred_tau'] = tau_guess * pstddev[0]
                     df[imtstr + '_pred_phi'] = np.sqrt(
-                        pstddev[0]**2 - tau_guess**2)
+                        pstddev[0]**2 - df[imtstr + '_pred_tau']**2)
                 else:
                     df[imtstr + '_pred_tau'] = pstddev[1]
                     df[imtstr + '_pred_phi'] = pstddev[2]
@@ -1010,10 +1014,9 @@ class ModelModule(CoreModule):
                     total_only = self.ipe_total_sd_only
                     tau_guess = SM_CONSTS['default_stddev_inter_mmi']
                 if total_only:
-                    df2[imtstr + '_pred_tau'] = np.full_like(
-                        df2[imtstr + '_pred'], tau_guess)
-                    df2[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
-                                                        tau_guess**2)
+                    df2[imtstr + '_pred_tau'] = tau_guess * pstddev[0]
+                    df2[imtstr + '_pred_phi'] = np.sqrt(
+                        pstddev[0]**2 - df2[imtstr + '_pred_tau']**2)
                 else:
                     df2[imtstr + '_pred_tau'] = pstddev[1]
                     df2[imtstr + '_pred_phi'] = pstddev[2]
@@ -1088,10 +1091,9 @@ class ModelModule(CoreModule):
         df1['MMI' + '_pred_sigma_soil'] = pstddev_soil[0]
         if self.ipe_total_sd_only:
             tau_guess = SM_CONSTS['default_stddev_inter_mmi']
-            df1['MMI' + '_pred_tau'] = np.full_like(
-                df1['MMI' + '_pred'], tau_guess)
+            df1['MMI' + '_pred_tau'] = tau_guess * pstddev[0]
             df1['MMI' + '_pred_phi'] = np.sqrt(
-                pstddev[0]**2 - tau_guess**2)
+                pstddev[0]**2 - df1['MMI' + '_pred_tau']**2)
         else:
             df1['MMI' + '_pred_tau'] = pstddev[1]
             df1['MMI' + '_pred_phi'] = pstddev[2]
@@ -1361,9 +1363,9 @@ class ModelModule(CoreModule):
             total_only = self.ipe_total_sd_only
             tau_guess = SM_CONSTS['default_stddev_inter_mmi']
         if total_only:
-            self.psd[imtstr] = np.sqrt(pout_sd[0]**2 - tau_guess**2)
-            self.psd_raw[imtstr] = np.sqrt(pout_sd[1]**2 - tau_guess**2)
-            self.tsd[imtstr] = np.full_like(self.psd[imtstr], tau_guess)
+            self.tsd[imtstr] = tau_guess * pout_sd[0]
+            self.psd[imtstr] = np.sqrt(pout_sd[0]**2 - self.tsd[imtstr]**2)
+            self.psd_raw[imtstr] = np.sqrt(pout_sd[1]**2 - self.tsd[imtstr]**2)
         else:
             self.psd[imtstr] = pout_sd[2]
             self.psd_raw[imtstr] = pout_sd[5]
