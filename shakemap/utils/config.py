@@ -78,7 +78,7 @@ def get_config_paths():
         if not os.path.isfile(config_file):
             raise FileNotFoundError("Can't find a profile file: "
                                     "have you run sm_profile?")
-        config = ConfigObj(config_file)
+        config = ConfigObj(config_file, encoding='utf-8-sig')
 
         config = check_profile_config(config)
 
