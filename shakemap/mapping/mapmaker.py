@@ -41,7 +41,8 @@ from shakemap.utils.utils import get_object_from_config
 
 # define some constants
 WATERCOLOR = '#7AA1DA'
-FIGWIDTH = 10.0
+FIGWIDTH = 9.5
+FIGHEIGHT = 10.0
 XOFFSET = 4  # how many pixels between the city dot and the city text
 VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
 
@@ -207,10 +208,10 @@ def _get_projected_grids(imtgrid, topobase, projstr):
     # get a geodict that is aligned with topo, but inside shakemap
     sampledict = topodict.getBoundsWithin(imtgrid.getGeoDict())
 
-    simtgrid = imtgrid.interpolateToGrid(sampledict)
+    simtgrid = imtgrid.interpolateToGrid(sampledict, method='nearest')
 
     # get topo layer and project it
-    topogrid = topobase.interpolateToGrid(sampledict)
+    topogrid = topobase.interpolateToGrid(sampledict, method='linear')
 
     # resampling 32bit floats gives odd results... upcasting to 64bit
     topogrid._data = topogrid._data.astype(np.float64)
@@ -252,13 +253,17 @@ def _get_map_info(gd):
     pwidth = pxmax - pxmin
     pheight = pymax - pymin
 
+    bounds = (xmin, xmax, ymin, ymax)
+
     # Map aspect
     aspect = pwidth/pheight
-
-    fig_aspect = 1.0/(0.19 + 0.8/aspect)
-    figheight = FIGWIDTH/fig_aspect
-    bounds = (xmin, xmax, ymin, ymax)
-    figsize = (FIGWIDTH, figheight)
+    # This all seems unnecessary
+    # fig_aspect = 1.0/(0.19 + 0.8/aspect)
+    # figheight = FIGWIDTH / fig_aspect
+    # figsize = (FIGWIDTH, figheight)
+    # Make the figsize a constant, other functions will fit the map and
+    # legends within the available space
+    figsize = (FIGWIDTH, FIGHEIGHT)
     return (bounds, figsize, aspect)
 
 
@@ -1102,6 +1107,10 @@ def draw_map(adict, override_scenario=False):
     dim_bottom = 0.19
     dim_width = 0.8
     dim_height = dim_width/aspect
+    if dim_height > 0.8:
+        dim_height = 0.8
+        dim_width = 0.8 * aspect
+        dim_left = (1.0 - dim_width) / 2
 
     # Create the MercatorMap object, which holds a separate but identical
     # axes object used to determine collisions between city labels.
