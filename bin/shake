@@ -273,9 +273,18 @@ def main(args):
         for cmd, obj in cmd_list.items():
             logger.info('Running command %s' % cmd)
             status = cdb.getDependencyStatus(cmd)
-            if len(status) == 1 and status[0] == cmd:
-                pass
-            elif len(status) > 0:
+            while len(status) > 0:
+                if len(status) == 1 and status[0] == cmd:
+                    break
+                #
+                # If the dependency requires select to run, but there
+                # is a model.conf, then select doesn't need to be run.
+                # So drop it and continue the checking process.
+                #
+                if status[0] == 'select':
+                    if os.path.isfile(os.path.join(event_path, 'model.conf')):
+                        status.remove('select')
+                        continue
                 logger.warning(
                     "Out of date dependencies. The following commands "
                     "should be rerun before '%s' (use --force to "
@@ -290,10 +299,7 @@ def main(args):
                 else:
                     logger.warning(
                         'Running "%s" because of --force option.' % cmd)
-            else:
-                # Command is not out of date, but if the user wants to
-                # run it, we won't stop him/her
-                pass
+                break
             t1 = time.time()
             try:
                 obj.execute()
