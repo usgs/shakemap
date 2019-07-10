@@ -171,7 +171,7 @@ def _get_extent_from_spans(rupture, spans=[]):
     Choose extent based on magnitude using a hardcoded list of spans 
     based on magnitude ranges.
     """
-    (clon, clat) = _rupture_origin(rupture)
+    (clon, clat) = _rupture_center(rupture)
     mag = rupture.getOrigin().mag
     xmin = None
     xmax = None
@@ -192,7 +192,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     """
     Use MultiGMPE to determine extent
     """
-    (clon, clat) = _rupture_origin(rupture)
+    (clon, clat) = _rupture_center(rupture)
     origin = rupture.getOrigin()
     if config is not None:
         gmpe = MultiGMPE.from_config(config)
@@ -294,7 +294,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     # Get a projection
     proj = OrthographicProjection(clon - 4, clon + 4, clat + 4, clat - 4)
     if isinstance(rupture, (QuadRupture, EdgeRupture)):
-        ruptx, rupty = proj(lons, lats)
+        ruptx, rupty = proj(rupture.lons, rupture.lats)
     else:
         ruptx, rupty = proj(clon, clat)
 
@@ -333,7 +333,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     return _round_coord(lonmin[0]), _round_coord(lonmax[0]), \
         _round_coord(latmin[0]), _round_coord(latmax[0])
 
-def _rupture_origin(rupture):
+def _rupture_center(rupture):
     """
     Find the central point of a rupture
     """
