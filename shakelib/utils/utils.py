@@ -166,7 +166,7 @@ def get_extent(rupture=None, config=None):
 
     return (xmin, xmax, ymin, ymax)
 
-def _get_extent_from_spans(rupture, spans=None):
+def _get_extent_from_spans(rupture, spans=[]):
     """
     Choose extent based on magnitude using a hardcoded list of spans 
     based on magnitude ranges.
