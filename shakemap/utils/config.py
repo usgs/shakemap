@@ -78,7 +78,7 @@ def get_config_paths():
         if not os.path.isfile(config_file):
             raise FileNotFoundError("Can't find a profile file: "
                                     "have you run sm_profile?")
-        config = ConfigObj(config_file)
+        config = ConfigObj(config_file, encoding='utf-8-sig')
 
         config = check_profile_config(config)
 
@@ -91,6 +91,54 @@ def get_config_paths():
         install = profile['install_path']
         data = profile['data_path']
     return (install, data)
+
+
+def get_model_config(install_path, datadir, logger):
+    #
+    # Look for global configs in install_path/config
+    #
+    spec_file = get_configspec()
+    validator = get_custom_validator()
+    logger.debug('Looking for configuration files...')
+    modules = ConfigObj(
+        os.path.join(install_path, 'config', 'modules.conf'),
+        configspec=spec_file)
+    gmpe_sets = ConfigObj(
+        os.path.join(install_path, 'config', 'gmpe_sets.conf'),
+        configspec=spec_file)
+    global_config = ConfigObj(
+        os.path.join(install_path, 'config', 'model.conf'),
+        configspec=spec_file)
+
+    #
+    # this is the event specific model.conf (may not be present)
+    # prefer model.conf to model_select.conf
+    #
+    event_config_file = os.path.join(datadir, 'model.conf')
+    event_config_zc_file = os.path.join(datadir, 'model_select.conf')
+    if os.path.isfile(event_config_file):
+        event_config = ConfigObj(event_config_file,
+                                 configspec=spec_file)
+    elif os.path.isfile(event_config_zc_file):
+        event_config = ConfigObj(event_config_zc_file,
+                                 configspec=spec_file)
+    else:
+        event_config = ConfigObj()
+
+    #
+    # start merging event_config
+    #
+    global_config.merge(event_config)
+    global_config.merge(modules)
+    global_config.merge(gmpe_sets)
+
+    results = global_config.validate(validator)
+    if not isinstance(results, bool) or not results:
+        config_error(global_config, results)
+
+    check_config(global_config, logger)
+
+    return global_config
 
 
 def path_macro_sub(s, ip='', dp='', gp='', ei=''):
