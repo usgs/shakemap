@@ -196,6 +196,20 @@ def test_extent_config():
     cmp_extent = (-99.416, -95.416, 32.679, 38.679)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
+
+    # Test for relative_offset
+    config = {'extent': {
+        'magnitude_spans': {
+            'span1': [0, 6, 4, 3],
+            'span2': [6, 10, 6, 4]
+        },
+        'relative_offset': [0.25, 0.5],
+    }}
+    extent = get_extent(rupture, config)
+    cmp_extent = (-98.416, -94.416, 35.679, 41.679)
+    np.testing.assert_almost_equal(cmp_extent, extent)
+
+
     config = {
         'extent': {
             'bounds': {

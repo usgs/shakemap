@@ -108,6 +108,7 @@ def get_extent(rupture=None, config=None):
     # -------------------------------------------------------------------------
     spans = {}
     bounds = []
+    offsets = None
     if config is not None:
         if 'extent' in config:
             if 'magnitude_spans' in config['extent']:
@@ -118,6 +119,9 @@ def get_extent(rupture=None, config=None):
                 if 'extent' in config['extent']['bounds']:
                     if config['extent']['bounds']['extent'][0] != -999.0:
                         bounds = config['extent']['bounds']['extent']
+            if 'relative_offset' in config['extent']:
+                if isinstance(config['extent']['relative_offset'], list):
+                    offsets = config['extent']['relative_offset']
 
     # -------------------------------------------------------------------------
     # Simplest option: extent was specified in the config, use that and exit.
@@ -130,48 +134,66 @@ def get_extent(rupture=None, config=None):
         raise TypeError('get_extent() requires a rupture object if the extent '
                         'is not specified in the config object.')
 
-    # Find the central point
-    origin = rupture.getOrigin()
-    if isinstance(rupture, (QuadRupture, EdgeRupture)):
-        # For an extended rupture, it is the midpoint between the extent of the
-        # verticies
-        lats = rupture.lats
-        lons = rupture.lons
-
-        # Remove nans
-        lons = lons[~np.isnan(lons)]
-        lats = lats[~np.isnan(lats)]
-
-        clat = 0.5 * (np.nanmax(lats) + np.nanmin(lats))
-        clon = 0.5 * (np.nanmax(lons) + np.nanmin(lons))
-    else:
-        # For a point source, it is just the epicenter
-        clat = origin.lat
-        clon = origin.lon
-
-    mag = origin.mag
-
     # -------------------------------------------------------------------------
     # Second simplest option: spans are hardcoded based on magnitude
     # -------------------------------------------------------------------------
+    extent = None
     if len(spans):
-        xmin = None
-        xmax = None
-        ymin = None
-        ymax = None
-        for spankey, span in spans.items():
-            if mag > span[0] and mag <= span[1]:
-                ymin = clat - span[2]/2
-                ymax = clat + span[2]/2
-                xmin = clon - span[3]/2
-                xmax = clon + span[3]/2
-                break
-        if xmin is not None:
-            return (xmin, xmax, ymin, ymax)
+        extent = _get_extent_from_spans(rupture, spans)
 
     # -------------------------------------------------------------------------
-    # Use MultiGMPE to get spans
+    # Otherwise, use MultiGMPE to get spans
     # -------------------------------------------------------------------------
+    if extent is None:
+        extent = _get_extent_from_multigmpe(rupture, config)
+
+
+    if offsets is None:
+        return extent
+
+    # -------------------------------------------------------------------------
+    # Apply relative offsets
+    # -------------------------------------------------------------------------
+    (xmin, xmax, ymin, ymax) = extent
+
+    xspan = xmax - xmin
+    yspan = ymax - ymin
+
+    xmin += xspan * offsets[0]
+    xmax += xspan * offsets[0]
+    ymin += yspan * offsets[1]
+    ymax += yspan * offsets[1]
+
+    return (xmin, xmax, ymin, ymax)
+
+def _get_extent_from_spans(rupture, spans=[]):
+    """
+    Choose extent based on magnitude using a hardcoded list of spans 
+    based on magnitude ranges.
+    """
+    (clon, clat) = _rupture_center(rupture)
+    mag = rupture.getOrigin().mag
+    xmin = None
+    xmax = None
+    ymin = None
+    ymax = None
+    for spankey, span in spans.items():
+        if mag > span[0] and mag <= span[1]:
+            ymin = clat - span[2]/2
+            ymax = clat + span[2]/2
+            xmin = clon - span[3]/2
+            xmax = clon + span[3]/2
+            break
+    if xmin is not None:
+        return (xmin, xmax, ymin, ymax)
+    return None
+
+def _get_extent_from_multigmpe(rupture, config=None):
+    """
+    Use MultiGMPE to determine extent
+    """
+    (clon, clat) = _rupture_center(rupture)
+    origin = rupture.getOrigin()
     if config is not None:
         gmpe = MultiGMPE.from_config(config)
         gmice = get_object_from_config('gmice', 'modeling', config)
@@ -272,7 +294,7 @@ def get_extent(rupture=None, config=None):
     # Get a projection
     proj = OrthographicProjection(clon - 4, clon + 4, clat + 4, clat - 4)
     if isinstance(rupture, (QuadRupture, EdgeRupture)):
-        ruptx, rupty = proj(lons, lats)
+        ruptx, rupty = proj(rupture.lons, rupture.lats)
     else:
         ruptx, rupty = proj(clon, clat)
 
@@ -311,6 +333,28 @@ def get_extent(rupture=None, config=None):
     return _round_coord(lonmin[0]), _round_coord(lonmax[0]), \
         _round_coord(latmin[0]), _round_coord(latmax[0])
 
+def _rupture_center(rupture):
+    """
+    Find the central point of a rupture
+    """
+    origin = rupture.getOrigin()
+    if isinstance(rupture, (QuadRupture, EdgeRupture)):
+        # For an extended rupture, it is the midpoint between the extent of the
+        # verticies
+        lats = rupture.lats
+        lons = rupture.lons
+
+        # Remove nans
+        lons = lons[~np.isnan(lons)]
+        lats = lats[~np.isnan(lats)]
+
+        clat = 0.5 * (np.nanmax(lats) + np.nanmin(lats))
+        clon = 0.5 * (np.nanmax(lons) + np.nanmin(lons))
+    else:
+        # For a point source, it is just the epicenter
+        clat = origin.lat
+        clon = origin.lon
+    return (clon, clat)
 
 def _round_coord(coord):
     """
