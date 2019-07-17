@@ -7,14 +7,18 @@ import socket
 import json
 from datetime import datetime, timedelta
 import logging
-import subprocess
 import time
+import shlex
+import shutil
 
 import pytest
 from shapely.geometry import Polygon
 
 import shakemap.utils.queue as queue
+from shakemap.utils.queue import Queue
+from shakemap.utils.queue import EventQueue
 from shakemap.utils.config import get_config_paths
+from shakemap.utils.amps import AmplitudeHandler
 from shakelib.rupture import constants
 
 
@@ -82,111 +86,188 @@ def test_get_config():
     assert config['port'] == 8796
 
 
-def test_magnitude_too_small():
+def test_event_queue():
     install_path, _ = get_config_paths()
-    config = queue.get_config(install_path)
-    assert queue.magnitude_too_small(2.0, -118.25, 34.0, config) is True
-    assert queue.magnitude_too_small(3.6, -118.25, 34.0, config) is False
-    assert queue.magnitude_too_small(2.0, -119.25, 35.0, config) is True
-    assert queue.magnitude_too_small(3.9, -119.25, 34.6, config) is False
-    assert queue.magnitude_too_small(2.0, -129.25, 39.0, config) is True
-    assert queue.magnitude_too_small(4.1, -129.25, 39.0, config) is False
+
+    db_file = os.path.join(install_path, 'data', 'event_queue.db')
+    if os.path.isfile(db_file):
+        os.remove(db_file)
+
+    eq = EventQueue(install_path)
+
+    events = eq.getEventQueue()
+    assert len(events) == 0
+    eq.insertEventInQueue('firstevent', ['This', 'is', 'the', 'first',
+                                         'event'], 6)
+    eq.insertEventInQueue('secondevent', ['This', 'is', 'the', 'second',
+                                          'event'], 4.5)
+    eq.insertEventInQueue('thirdevent', ['This', 'is', 'the', 'third',
+                                         'event'], 6.6)
+    events = eq.getEventQueue()
+    assert events[0][0] == 'thirdevent'
+    assert events[0][1] == ['This', 'is', 'the', 'third', 'event']
+    assert events[1][0] == 'firstevent'
+    assert events[1][1] == ['This', 'is', 'the', 'first', 'event']
+    assert events[2][0] == 'secondevent'
+    assert events[2][1] == ['This', 'is', 'the', 'second', 'event']
+    eq.deleteEventFromQueue('firstevent')
+    events = eq.getEventQueue()
+    assert events[0][0] == 'thirdevent'
+    assert events[0][1] == ['This', 'is', 'the', 'third', 'event']
+    assert events[1][0] == 'secondevent'
+    assert events[1][1] == ['This', 'is', 'the', 'second', 'event']
+    eq.deleteEventFromQueue('thirdevent')
+    eq.deleteEventFromQueue('secondevent')
+    events = eq.getEventQueue()
+    assert len(events) == 0
+
+    events = eq.getRunningEvents()
+    assert len(events) == 0
+    eq.insertRunningEvent('firstevent', ['This', 'is', 'the', 'first',
+                                         'event'])
+    eq.insertRunningEvent('secondevent', ['This', 'is', 'the', 'second',
+                                          'event'])
+    events = eq.getRunningEvents()
+    assert len(events) == 2
+    assert events.index(('firstevent', ['This', 'is', 'the', 'first',
+                                        'event'])) >= 0
+    assert events.index(('secondevent', ['This', 'is', 'the', 'second',
+                                         'event'])) >= 0
+    eq.deleteRunningEvent('firstevent')
+    events = eq.getRunningEvents()
+    assert len(events) == 1
+    eq.deleteRunningEvent('secondevent')
+    events = eq.getRunningEvents()
+    assert len(events) == 0
+
+    db_file = eq.db_file
+    del eq
+    os.remove(db_file)
 
 
-def test_event_too_old_or_in_future():
+def test_queue():
     install_path, _ = get_config_paths()
-    config = queue.get_config(install_path)
+
+    db_file = os.path.join(install_path, 'data', 'event_queue.db')
+    if os.path.isfile(db_file):
+        os.remove(db_file)
+
+    pargs = type('Args', (), {})()
+    pargs.attached = False
+    pargs.break_lock = True
+    qq = Queue(pargs)
+    qq.logger = qq.getLogger()
+    qq.ampHandler = AmplitudeHandler(qq.install_path, qq.data_path)
+
+    assert qq.magnitudeTooSmall({'mag': 2.0,
+                                 'lon': -118.25,
+                                 'lat': 34.0}) is True
+    assert qq.magnitudeTooSmall({'mag': 3.6,
+                                 'lon': -118.25,
+                                 'lat': 34.0}) is False
+    assert qq.magnitudeTooSmall({'mag': 2.0,
+                                 'lon': -119.25,
+                                 'lat': 35.0}) is True
+    assert qq.magnitudeTooSmall({'mag': 3.9,
+                                 'lon': -119.25,
+                                 'lat': 34.6}) is False
+    assert qq.magnitudeTooSmall({'mag': 2.0,
+                                 'lon': -129.25,
+                                 'lat': 39.0}) is True
+    assert qq.magnitudeTooSmall({'mag': 4.1,
+                                 'lon': -129.25,
+                                 'lat': 39.0}) is False
+
     dt = datetime.utcnow()
 
     delta = timedelta(days=180)
     dt_past = dt - delta
     event = {'time': dt_past.strftime(constants.TIMEFMT)}
-    assert queue.event_too_old_or_in_future(event, config) is False
+    assert qq.eventTooOldOrInFuture(event) is False
 
     delta = timedelta(days=400)
     dt_past = dt - delta
     event = {'time': dt_past.strftime(constants.TIMEFMT)}
-    assert queue.event_too_old_or_in_future(event, config) is True
+    assert qq.eventTooOldOrInFuture(event) is True
 
     delta = timedelta(minutes=4)
     dt_future = dt + delta
     event = {'time': dt_future.strftime(constants.TIMEFMT)}
-    assert queue.event_too_old_or_in_future(event, config) is False
+    assert qq.eventTooOldOrInFuture(event) is False
 
     delta = timedelta(minutes=10)
     dt_future = dt + delta
     event = {'time': dt_future.strftime(constants.TIMEFMT)}
-    assert queue.event_too_old_or_in_future(event, config) is True
+    assert qq.eventTooOldOrInFuture(event) is True
 
-
-def test_get_logger():
-    install_path, _ = get_config_paths()
-    logpath = os.path.join(install_path, 'logs')
-    logger = queue.get_logger(logpath, False)
+    logger = qq.getLogger()
     logger.info('Testing the logger')
-    fd = open(os.path.join(logpath, 'queue.log'), 'r')
+    fd = open(os.path.join(qq.logpath, 'queue.log'), 'r')
     lines = fd.readlines()
     fd.close()
     assert 'Testing the logger' in lines[-1]
 
+    # Test various paths for origins
 
-def test_dispatch_event():
+    qq.shake_cmds = shlex.split('associate dyfi select assemble -c "Autorun" '
+                                'model mapping')
+
     # Test 'test'
-    logger, logstring = get_dummy_logger('test_dispatch')
-    children = {}
-    config = {}
-    shake_config = {'autorun_modules': 'associate dyfi select assemble '
-                                       '-c "Autorun" model mapping'}
-    queue.dispatch_event('Testing dispatch', logger, children, 'test', config,
-                         shake_config)
-    returncode = children['Testing dispatch']['popen'].wait()
-    assert returncode == 0
-    assert 'Testing event Testing dispatch' in logstring.getvalue()
+    event = {'id': 'test_event'}
+    qq.dispatchEvent(event, 'test')
+    events = qq.eventQueue.getRunningEvents()
+    assert events[0][0] == 'test_event'
+    assert events[0][1][0] == 'echo'
+    time.sleep(1)
+    deleted = qq.reapChildren()
+    assert len(deleted) == 1
+    assert deleted[0] == 'test_event'
+
+    qq.config['shake_path'] = 'echo'
 
     # Test 'cancel'
-    children = {}
-    config = {'cancel_command': 'echo "Testing cancel"',
-              'shake_path': '/dev/null'}
-    queue.dispatch_event('Testing dispatch', logger, children, 'cancel',
-                         config, shake_config)
-    returncode = children['Testing dispatch']['popen'].wait()
-    assert returncode == 0
-    assert 'Canceling event Testing dispatch' in logstring.getvalue()
+    event = {'id': 'test_event'}
+    qq.dispatchEvent(event, 'cancel')
+    events = qq.eventQueue.getRunningEvents()
+    assert events[0][0] == 'test_event'
+    assert events[0][1][0] == 'echo'
+    time.sleep(1)
+    deleted = qq.reapChildren()
+    assert len(deleted) == 1
+    assert deleted[0] == 'test_event'
 
     # Test 'shake'
-    children = {}
-    config = {'shake_command': 'echo "Testing shake"',
-              'shake_path': '/dev/null'}
-    queue.dispatch_event('Testing dispatch', logger, children, 'Event added',
-                         config, shake_config)
-    returncode = children['Testing dispatch']['popen'].wait()
-    assert returncode == 0
-    assert 'Running event Testing dispatch due to action "Event added"' in \
-        logstring.getvalue()
-    logstring.close()
-    return
 
+    dt = datetime.now()
+    event = {'id': 'test_event',
+             'netid': 'xx',
+             'network': 'None',
+             'lon': 0,
+             'lat': 0,
+             'depth': 0,
+             'mag': 6.6,
+             'time': dt.strftime(constants.TIMEFMT),
+             'locstring': 'Nowhere',
+             'mech': 'ALL',
+             'reference': 'Test',
+             'productcode': 'test_event'}
+    qq.ampHandler.deleteEvent('test_event')
+    qq.processOrigin(event, 'Event added')
+    events = qq.eventQueue.getEventQueue()
+    assert events[0][0] == 'test_event'
+    assert events[0][1][0] == 'echo'
+    qq.runQueuedEvents()
+    events = qq.eventQueue.getRunningEvents()
+    assert events[0][0] == 'test_event'
+    assert events[0][1][0] == 'echo'
+    time.sleep(1)
+    deleted = qq.reapChildren()
+    assert len(deleted) == 1
+    assert deleted[0] == 'test_event'
+    shutil.rmtree(os.path.join(qq.data_path, 'test_event'))
 
-def test_reap_children():
-    logger, logstring = get_dummy_logger('test_reap_children')
-    config = {'max_process_time': 10}
-    p = subprocess.Popen(['echo', 'Testing reap'])
-    children = {}
-    children['Testing reap'] = {'popen': p, 'start_time': time.time()}
-    time.sleep(0.5)
-    queue.reap_children(children, config, logger)
-    assert len(list(children.keys())) == 0
-    assert 'Reaped child for event Testing reap' in logstring.getvalue()
-
-    config = {'max_process_time': 1}
-    p = subprocess.Popen(['sleep', '10'])
-    children['Testing kill'] = {'popen': p, 'start_time': time.time()}
-    time.sleep(2.0)
-    queue.reap_children(children, config, logger)
-    assert len(list(children.keys())) == 0
-    assert 'Event Testing kill taking too long, killing' in \
-        logstring.getvalue()
-    logstring.close()
+    if os.path.isfile(db_file):
+        os.remove(db_file)
 
     return
 
@@ -196,8 +277,5 @@ if __name__ == '__main__':
     test_send_queue()
     test_str_to_seconds()
     test_get_config()
-    test_magnitude_too_small()
-    test_event_too_old_or_in_future()
-    test_get_logger()
-    test_dispatch_event()
-    test_reap_children()
+    test_event_queue()
+    test_queue()
