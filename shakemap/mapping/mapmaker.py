@@ -16,6 +16,7 @@ import pyproj
 
 from shapely.geometry import shape as sShape
 from shapely.geometry import Polygon as sPolygon
+from shapely.geometry import LineString as sLineString
 from shapely.geometry import GeometryCollection
 from shapely.geometry import mapping
 
@@ -1314,13 +1315,14 @@ def draw_map(adict, override_scenario=False):
         point_source = False
         json_dict = rupture._geojson
         for feature in json_dict['features']:
-            multi_poly = sShape(feature['geometry'])
-            pmulti_poly = proj.project_geometry(multi_poly)
-            mpoly = mapping(pmulti_poly)['coordinates']
-            for poly in mpoly:
-                for spoly in poly:
-                    x, y = zip(*spoly)
-                    ax.plot(x, y, 'k', lw=1, zorder=FAULT_ZORDER)
+            for coords in feature['geometry']['coordinates']:
+                for pcoords in coords:
+                    poly2d = sLineString([xy[0:2] for xy in pcoords])
+                    ppoly = proj.project_geometry(poly2d)
+                    mppoly = mapping(ppoly)['coordinates']
+                    for spoly in mppoly:
+                        x, y = zip(*spoly)
+                        ax.plot(x, y, 'k', lw=1, zorder=FAULT_ZORDER)
 
     # draw the station data on the map
     stations = adict['stationdict']
