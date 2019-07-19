@@ -572,7 +572,7 @@ class MultiGMPE(GMPE):
         #     to get the missing imts later in get_mean_and_stddevs.
         # ---------------------------------------------------------------------
 
-        imts = [g.DEFINED_FOR_INTENSITY_MEASURE_TYPES for g in gmpes]
+        imts = [set(g.DEFINED_FOR_INTENSITY_MEASURE_TYPES) for g in gmpes]
         self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set.union(*imts)
 
         # ---------------------------------------------------------------------
