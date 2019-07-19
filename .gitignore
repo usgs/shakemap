@@ -23,6 +23,9 @@ tests/data/install/data/amps.db-wal
 tests/data/install/data/dependencies.db
 tests/data/install/data/dependencies.db-shm
 tests/data/install/data/dependencies.db-wal
+tests/data/install/data/event_queue.db
+tests/data/install/data/event_queue.db-shm
+tests/data/install/data/event_queue.db-wal
 *.pytest*
 shakemap/c/pcontour.c
 shakemap/c/clib.c
