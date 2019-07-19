@@ -202,6 +202,7 @@ class Queue(object):
                 logger = self.getLogger()
                 logger.error("pid lock file '%s' exists, can't start "
                              "sm_queue; exiting..." % (pidfile))
+                sys.exit(-1)
 
         #
         # Create the database for running and queued events.
@@ -323,33 +324,6 @@ class Queue(object):
                                      cmd['type'], cmd['data']['id'])
                     self.processOther(cmd['data'], cmd['type'])
 
-        sys.exit(-1)
-
-    def getLogger(self):
-        """Set up a logger for this process.
-
-        Returns:
-            logging.logger: An instance of a logger.
-        """
-        if not os.path.isdir(self.logpath):
-            os.makedirs(self.logpath)
-        logger = logging.getLogger('queue_logger')
-        logger.setLevel(logging.INFO)
-        if self.attached:
-            handler = logging.StreamHandler()
-        else:
-            logfile = os.path.join(self.logpath, 'queue.log')
-            handler = TimedRotatingFileHandler(logfile,
-                                               when='midnight',
-                                               backupCount=30)
-        formatter = logging.Formatter(
-                fmt='%(asctime)s - %(levelname)s - %(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        logger.propagate = False
-        return logger
-
     def doPeriodicTasks(self):
         """ Check for finished children and start any needed timed repeats.
 
@@ -400,7 +374,7 @@ class Queue(object):
         self.runQueuedEvents()
 
         #
-        # Print memory usage to see how much we're leaking...
+        # Print memory usage once per hour to see how much we're leaking...
         #
         if self.MEMORY_UPDATE_TIME + 3600 < current_time:
             self.MEMORY_UPDATE_TIME = current_time
@@ -428,6 +402,31 @@ class Queue(object):
             self.ampHandler.cleanEvents(threshold=365)
 
         return
+
+    def getLogger(self):
+        """Set up a logger for this process.
+
+        Returns:
+            logging.logger: An instance of a logger.
+        """
+        if not os.path.isdir(self.logpath):
+            os.makedirs(self.logpath)
+        logger = logging.getLogger('queue_logger')
+        logger.setLevel(logging.INFO)
+        if self.attached:
+            handler = logging.StreamHandler()
+        else:
+            logfile = os.path.join(self.logpath, 'queue.log')
+            handler = TimedRotatingFileHandler(logfile,
+                                               when='midnight',
+                                               backupCount=30)
+        formatter = logging.Formatter(
+                fmt='%(asctime)s - %(levelname)s - %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.propagate = False
+        return logger
 
     def associateAll(self):
         """Do the associateAll method of the the AmplitudeHandler and
@@ -508,16 +507,24 @@ class Queue(object):
         #
         existing = self.ampHandler.getEvent(event['id'])
         if existing is None and 'alt_eventids' in event:
+            #
+            # We haven't processed this ID, but the ID may have changed
+            #
             for eid in event['alt_eventids'].split(','):
                 if eid == event['id']:
                     continue
                 alt_exists = self.ampHandler.getEvent(eid)
                 if alt_exists is None:
                     continue
-                # If the old event is currently running, kill it
+                #
+                # We processed this event under a different ID
+                # If the event is currently running with the old ID, kill it
+                #
                 if eid in self.children:
                     self.children[eid]['popen'].kill()
                     self.children[eid]['popen'].wait()
+                    del self.children[eid]
+                    self.eventQueue.deleteRunningEvent(eid)
                 # Delete the old event from the database
                 self.ampHandler.deleteEvent(eid)
                 # Move the old event directory to the new ID
@@ -525,13 +532,13 @@ class Queue(object):
                 # Now treat the the new event ID as a new event.
                 existing = None
                 # But force it to run (because we want to update the event ID),
-                # bypassing date and magnitude checks
+                # bypassing date and magnitude checks that come later
                 force_run = True
                 break
 
         if existing is None:
             #
-            # This is a new event
+            # This is a new event (or an event with a changed ID)
             #
             update = False
             # Do we want to run this event?
@@ -568,55 +575,17 @@ class Queue(object):
                         replist = None
                     break
             event['repeats'] = replist
+            event['lastrun'] = 0
         else:
             #
             # We've run this event before
             #
             update = True
-            mtw = self.config['max_trigger_wait']
             #
-            # Whatever we decide below, we want to update the event
-            # info in the database
+            # We want to update the event info in the database
             #
             event['lastrun'] = existing['lastrun']
             event['repeats'] = copy.copy(existing['repeats'])
-            if event['id'] in self.children:
-                #
-                # Event is currently running, don't run it but make sure
-                # there's a repeat pretty soon
-                #
-                if event['repeats']:
-                    if event['repeats'][0] > current_time + mtw:
-                        event['repeats'].insert(0, current_time + mtw)
-                else:
-                    event['repeats'] = [current_time + mtw]
-                self.ampHandler.insertEvent(event, update=update)
-                self.logger.info('Event %s is currently running, shelving '
-                                 'this update' % event['id'])
-                return
-            if event['repeats']:
-                delta_t = current_time - event['repeats'][0]
-                if delta_t > -mtw:
-                    # We're due for a rerun anyway, so just insert the
-                    # new data in the database and return
-                    self.ampHandler.insertEvent(event, update=update)
-                    self.logger.info('Event %s will repeat soon, shelving '
-                                     'this update' % event['id'])
-                    return
-            if current_time - event['lastrun'] < mtw:
-                #
-                # We ran this event very recently, but don't have a repeat
-                # scheduled in the near future, so let's skip this one
-                # but make sure something happens relatively soon
-                #
-                if event['repeats']:
-                    event['repeats'].insert(0, current_time + mtw)
-                else:
-                    event['repeats'] = [current_time + mtw]
-                self.ampHandler.insertEvent(event, update=update)
-                self.logger.info('Event %s ran recently, shelving this '
-                                 'update' % event['id'])
-                return
         #
         # Queue this event to be run
         #
@@ -651,8 +620,8 @@ class Queue(object):
                     if existing:
                         self.processOrigin(existing, action)
                         return
-            self.logger.info('Trigger is for unprocessed event %s: ignoring' %
-                             data['id'])
+            self.logger.info('Trigger of action "%s" is for unprocessed '
+                             'event %s: ignoring' % (action, data['id']))
         return
 
     def processCancel(self, data):
@@ -746,8 +715,7 @@ class Queue(object):
         return False
 
     def dispatchEvent(self, event, action):
-        """ Start a subprocess to run the specified event and add its data
-        to the children structure.
+        """ Queue a run for the specified event.
 
         Args:
             event (dict): The data structure of the event to process.
@@ -763,6 +731,9 @@ class Queue(object):
         """
         eventid = event['id']
         if action == 'cancel':
+            #
+            # Cancellations aren't queued, they're run immediately
+            #
             self.logger.info('Canceling event %s' % eventid)
             if eventid in self.children:
                 self.logger.info('Event %s is running; killing...' % eventid)
@@ -777,12 +748,6 @@ class Queue(object):
             p = subprocess.Popen(cmd)
             self.children[eventid] = {'popen': p, 'start_time': time.time()}
             self.eventQueue.insertRunningEvent(eventid, cmd)
-            return
-        elif action == 'test':
-            self.logger.info('Testing event %s' % eventid)
-            p = subprocess.Popen(['echo', eventid])
-            self.children[eventid] = {'popen': p, 'start_time': time.time()}
-            self.eventQueue.insertRunningEvent(eventid, ['echo', eventid])
             return
 
         self.logger.info('Queueing event %s due to action "%s"' %
@@ -804,12 +769,74 @@ class Queue(object):
                 self.shake_cmds.insert(ix + 2, '"%s"' % action)
             break
 
-        cmd = self.config['shake_command'].replace('shake',
-                                                   self.config['shake_path'])
+        if action == 'test':
+            cmd = self.config['shake_command'].replace('shake', 'echo')
+        else:
+            cmd = self.config['shake_command'].replace(
+                'shake', self.config['shake_path'])
         cmd = cmd.replace('<EVID>', eventid)
         cmd = cmd.split() + self.shake_cmds
 
         self.eventQueue.insertEventInQueue(eventid, cmd, event['mag'])
+        return
+
+    def runQueuedEvents(self):
+        """If there is space, run events from the queue
+        """
+        current_time = int(time.time())
+        mtw = self.config['max_trigger_wait']
+        queued = self.eventQueue.getEventQueue()
+        while len(self.children) < self.config['max_subprocesses'] and \
+                len(queued) > 0:
+
+            eventid, command = queued[0]
+            event = self.ampHandler.getEvent(eventid)
+            if eventid in self.children:
+                #
+                # Event is currently running, don't run it but make sure
+                # there's a repeat pretty soon
+                #
+                if event['repeats']:
+                    if event['repeats'][0] > current_time + mtw:
+                        event['repeats'].insert(0, current_time + mtw)
+                else:
+                    event['repeats'] = [current_time + mtw]
+                self.ampHandler.insertEvent(event, update=True)
+                self.logger.info('Event %s is currently running, shelving '
+                                 'this update' % event['id'])
+                return
+            if event['repeats']:
+                delta_t = current_time - event['repeats'][0]
+                if delta_t > -mtw:
+                    # We're due for a rerun anyway, so just leave the
+                    # event queued
+                    self.logger.info('Event %s will repeat soon, shelving '
+                                     'this update' % eventid)
+                    return
+            if current_time - event['lastrun'] < mtw:
+                #
+                # We ran this event very recently, but don't have a repeat
+                # scheduled in the near future, so let's skip this one
+                # but make sure something happens relatively soon
+                #
+                if event['repeats']:
+                    event['repeats'].insert(0, current_time + mtw)
+                else:
+                    event['repeats'] = [current_time + mtw]
+                self.ampHandler.insertEvent(event, update=True)
+                self.logger.info('Event %s ran recently, shelving this '
+                                 'update' % event['id'])
+                return
+
+            self.logger.info("Running event %s" % (eventid))
+            # Update the XML because the DB may have newer information
+            self.writeEventXml(event)
+            p = subprocess.Popen(command)
+            self.children[eventid] = {'popen': p, 'start_time': time.time()}
+            queued.pop(0)
+            self.eventQueue.deleteEventFromQueue(eventid)
+            self.eventQueue.insertRunningEvent(eventid, command)
+
         return
 
     def reapChildren(self):
@@ -853,26 +880,6 @@ class Queue(object):
             del self.children[eventid]
 
         return to_delete
-
-    def runQueuedEvents(self):
-        """If there is space, run events from the queue
-        """
-        queued = self.eventQueue.getEventQueue()
-        while len(self.children) < self.config['max_subprocesses'] and \
-                len(queued) > 0:
-
-            eventid, command = queued[0]
-            self.logger.info("Running event %s" % (eventid))
-            event = self.ampHandler.getEvent(eventid)
-            # Update the XML because the DB may have newer information
-            self.writeEventXml(event)
-            p = subprocess.Popen(command)
-            self.children[eventid] = {'popen': p, 'start_time': time.time()}
-            queued.pop(0)
-            self.eventQueue.deleteEventFromQueue(eventid)
-            self.eventQueue.insertRunningEvent(eventid, command)
-
-        return
 
     def getContext(self, context):
         """Returns a context based on the value of the 'attached' argument.
@@ -969,7 +976,7 @@ class EventQueue(object):
         return [(x[0], json.loads(x[1])) for x in erows]
 
     def insertEventInQueue(self, eventid, command, mag):
-        query = 'INSERT INTO queued (eventid, command, mag) VALUES (?, ?, ?)'
+        query = 'REPLACE INTO queued (eventid, command, mag) VALUES (?, ?, ?)'
         self._cursor.execute(query, (eventid, json.dumps(command), mag))
         self.commit()
 

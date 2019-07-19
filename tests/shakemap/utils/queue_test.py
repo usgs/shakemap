@@ -81,8 +81,8 @@ def test_get_config():
                   (-121.25, 34.75), (-117.75, 34.75), (-117.75, 34.50)])
     assert config['boxes']['02_my_box2']['mag'] == 3.8
     assert config['boxes']['02_my_box2']['poly'] == p2
-    assert len(set(config['repeats'][0.0]) ^ set([60, 120])) == 0
-    assert len(set(config['repeats'][5.0]) ^ set([60, 120, 180])) == 0
+    assert len(set(config['repeats'][0.0]) ^ set([3600, 7200])) == 0
+    assert len(set(config['repeats'][5.0]) ^ set([3600, 7200, 10800])) == 0
     assert config['port'] == 8796
 
 
@@ -200,8 +200,7 @@ def test_queue():
     event = {'time': dt_future.strftime(constants.TIMEFMT)}
     assert qq.eventTooOldOrInFuture(event) is True
 
-    logger = qq.getLogger()
-    logger.info('Testing the logger')
+    qq.logger.info('Testing the logger')
     fd = open(os.path.join(qq.logpath, 'queue.log'), 'r')
     lines = fd.readlines()
     fd.close()
@@ -211,34 +210,7 @@ def test_queue():
 
     qq.shake_cmds = shlex.split('associate dyfi select assemble -c "Autorun" '
                                 'model mapping')
-
-    # Test 'test'
-    event = {'id': 'test_event'}
-    qq.dispatchEvent(event, 'test')
-    events = qq.eventQueue.getRunningEvents()
-    assert events[0][0] == 'test_event'
-    assert events[0][1][0] == 'echo'
-    time.sleep(1)
-    deleted = qq.reapChildren()
-    assert len(deleted) == 1
-    assert deleted[0] == 'test_event'
-
-    qq.config['shake_path'] = 'echo'
-
-    # Test 'cancel'
-    event = {'id': 'test_event'}
-    qq.dispatchEvent(event, 'cancel')
-    events = qq.eventQueue.getRunningEvents()
-    assert events[0][0] == 'test_event'
-    assert events[0][1][0] == 'echo'
-    time.sleep(1)
-    deleted = qq.reapChildren()
-    assert len(deleted) == 1
-    assert deleted[0] == 'test_event'
-
-    # Test 'shake'
-
-    dt = datetime.now()
+    dt = datetime.utcnow()
     event = {'id': 'test_event',
              'netid': 'xx',
              'network': 'None',
@@ -251,6 +223,37 @@ def test_queue():
              'mech': 'ALL',
              'reference': 'Test',
              'productcode': 'test_event'}
+
+    # Test 'test'
+    qq.ampHandler.deleteEvent('test_event')
+    qq.processOrigin(event, 'test')
+    events = qq.eventQueue.getEventQueue()
+    assert events[0][0] == 'test_event'
+    assert events[0][1][0] == 'echo'
+    qq.runQueuedEvents()
+    events = qq.eventQueue.getRunningEvents()
+    assert events[0][0] == 'test_event'
+    assert events[0][1][0] == 'echo'
+    time.sleep(1)
+    deleted = qq.reapChildren()
+    assert len(deleted) == 1
+    assert deleted[0] == 'test_event'
+
+    qq.config['shake_path'] = 'echo'
+
+    # Test 'cancel'
+    qq.ampHandler.deleteEvent('test_event')
+    qq.dispatchEvent(event, 'cancel')
+    events = qq.eventQueue.getRunningEvents()
+    assert events[0][0] == 'test_event'
+    assert events[0][1][0] == 'echo'
+    time.sleep(1)
+    deleted = qq.reapChildren()
+    assert len(deleted) == 1
+    assert deleted[0] == 'test_event'
+
+    # Test 'shake'
+
     qq.ampHandler.deleteEvent('test_event')
     qq.processOrigin(event, 'Event added')
     events = qq.eventQueue.getEventQueue()
@@ -265,6 +268,7 @@ def test_queue():
     assert len(deleted) == 1
     assert deleted[0] == 'test_event'
     shutil.rmtree(os.path.join(qq.data_path, 'test_event'))
+    qq.ampHandler.deleteEvent('test_event')
 
     if os.path.isfile(db_file):
         os.remove(db_file)
