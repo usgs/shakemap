@@ -5,7 +5,7 @@ import os
 import os.path
 import socket
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
 import time
 import shlex
@@ -84,6 +84,11 @@ def test_get_config():
     assert len(set(config['repeats'][0.0]) ^ set([3600, 7200])) == 0
     assert len(set(config['repeats'][5.0]) ^ set([3600, 7200, 10800])) == 0
     assert config['port'] == 8796
+    assert len(set(config['network_delays'].keys()) ^
+               set(['ci', 'nc', 'pn'])) == 0
+    assert config['network_delays']['ci'] == 300
+    assert config['network_delays']['nc'] == 360
+    assert config['network_delays']['pn'] == 480
 
 
 def test_event_queue():
@@ -268,6 +273,18 @@ def test_queue():
     assert len(deleted) == 1
     assert deleted[0] == 'test_event'
     shutil.rmtree(os.path.join(qq.data_path, 'test_event'))
+    qq.ampHandler.deleteEvent('test_event')
+
+    # Test 'shake' with a network delay
+
+    qq.ampHandler.deleteEvent('test_event')
+    event['netid'] = 'ci'
+    qq.processOrigin(event, 'Event added')
+    events = qq.eventQueue.getEventQueue()
+    assert len(events) == 0
+    test_event = qq.ampHandler.getEvent('test_event')
+    assert test_event['repeats'][0] == \
+        int(dt.replace(tzinfo=timezone.utc).timestamp()) + 300
     qq.ampHandler.deleteEvent('test_event')
 
     if os.path.isfile(db_file):

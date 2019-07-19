@@ -140,6 +140,11 @@ def parse_config(config):
         repeats[float(key)] = tlist
     config['repeats'] = repeats
 
+    network_delays = {}
+    for key, value in config['network_delays'].items():
+        network_delays[key] = str_to_seconds(value)
+    config['network_delays'] = network_delays
+
     return config
 
 
@@ -313,7 +318,7 @@ class Queue(object):
                     if 'action' in cmd['data']:
                         action = cmd['data']['action']
                     else:
-                        action = 'origin'
+                        action = 'Origin received'
                     self.processOrigin(cmd['data'], action)
                 elif cmd['type'] == 'cancel':
                     self.logger.info('Received "cancel" for event %s' %
@@ -354,8 +359,14 @@ class Queue(object):
                     rep_list = None
                 event['repeats'] = rep_list
                 self.ampHandler.insertEvent(event, update=True)
-                self.logger.info('Queueing repeat of event %s' % eventid)
-                self.dispatchEvent(event, 'Scheduled repeat')
+                if event['lastrun'] == 0:
+                    # This is a delayed first run
+                    self.logger.info('Queueing event %s after network delay' %
+                                     eventid)
+                    self.dispatchEvent(event, 'Event added')
+                else:
+                    self.logger.info('Queueing repeat of event %s' % eventid)
+                    self.dispatchEvent(event, 'Scheduled repeat')
                 break
 
         #
@@ -502,6 +513,7 @@ class Queue(object):
         """
         current_time = int(time.time())
         force_run = False
+        dispatch = True
         #
         # See if we already have this event, make a decision
         #
@@ -571,10 +583,23 @@ class Queue(object):
                     replist = [x + event_timestamp for x in
                                self.config['repeats'][mag]
                                if event_timestamp + x > current_time]
-                    if len(replist) == 0:
-                        replist = None
                     break
-            event['repeats'] = replist
+            #
+            # The first time we run an event, we need to check its
+            # network ID against those in the delay list. If present,
+            # we add the required delay as the first repeat, but
+            # don't dispatch the event. If the delay time has already
+            # passed, just treat this as a normal event
+            #
+            if event['netid'] in self.config['network_delays']:
+                delay = self.config['network_delays'][event['netid']]
+                if event_timestamp + delay > current_time:
+                    self.logger.info('Delaying processing event %s due to '
+                                     'network delay configuration.')
+                    replist.insert(0, event_timestamp + delay)
+                    dispatch = False
+
+            event['repeats'] = replist if len(replist) > 0 else None
             event['lastrun'] = 0
         else:
             #
@@ -582,15 +607,18 @@ class Queue(object):
             #
             update = True
             #
-            # We want to update the event info in the database
+            # We want to update the event info in the database but
+            # save the lastrun and repeats settings
             #
             event['lastrun'] = existing['lastrun']
             event['repeats'] = copy.copy(existing['repeats'])
         #
-        # Queue this event to be run
+        # Insert or update the event info in the database, then
+        # possibly queue the event to be run.
         #
         self.ampHandler.insertEvent(event, update=update)
-        self.dispatchEvent(event, action)
+        if dispatch is True:
+            self.dispatchEvent(event, action)
 
         return
 
@@ -720,10 +748,10 @@ class Queue(object):
         Args:
             event (dict): The data structure of the event to process.
             action (str): 'cancel', 'test', or some other string. 'cancel'
-                          starts the cancel process, 'test' starts the process
-                          'echo eventid'.  And any other string queues the
+                          starts the cancel process, 'test' queues the process
+                          'echo eventid'. Any other string queues the
                           shake process to be run at the next opportunity.
-                          . See the configuration file 'queue.conf' for the
+                          See the configuration file 'queue.conf' for the
                           exact commands that will be run.
 
         Returns:
