@@ -209,11 +209,6 @@ class Queue(object):
                              "sm_queue; exiting..." % (pidfile))
                 sys.exit(-1)
 
-        #
-        # Create the database for running and queued events.
-        #
-        self.eventQueue = EventQueue(self.install_path)
-
     def queueMainLoop(self):
 
         context = daemon.DaemonContext(working_directory=self.data_path,
@@ -221,6 +216,10 @@ class Queue(object):
 
         with self.getContext(context):
             self.logger = self.getLogger()
+            #
+            # Create the database for running and queued events.
+            #
+            self.eventQueue = EventQueue(self.install_path)
             #
             # Create the socket
             #

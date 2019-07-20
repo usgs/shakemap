@@ -162,6 +162,7 @@ def test_queue():
     pargs.break_lock = True
     qq = Queue(pargs)
     qq.logger = qq.getLogger()
+    qq.eventQueue = EventQueue(qq.install_path)
     qq.ampHandler = AmplitudeHandler(qq.install_path, qq.data_path)
 
     assert qq.magnitudeTooSmall({'mag': 2.0,
