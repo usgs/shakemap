@@ -805,7 +805,7 @@ class Queue(object):
         cmd = cmd.replace('<EVID>', eventid)
         cmd = cmd.split() + self.shake_cmds
 
-        self.eventQueue.insertEventInQueue(eventid, cmd, event['mag'])
+        self.eventQueue.queueEvent(eventid, cmd, event['mag'])
         return
 
     def runQueuedEvents(self):
@@ -817,7 +817,7 @@ class Queue(object):
             return
         current_time = int(time.time())
         mtw = self.config['max_trigger_wait']
-        queued = self.eventQueue.getEventQueue()
+        queued = self.eventQueue.getQueuedEvents()
         for eventid, command in queued:
             event = self.ampHandler.getEvent(eventid)
             if eventid in self.children:
@@ -833,6 +833,7 @@ class Queue(object):
                 self.ampHandler.insertEvent(event, update=True)
                 self.logger.info('Event %s is currently running, shelving '
                                  'this update' % event['id'])
+                self.eventQueue.dequeueEvent(eventid)
                 continue
             if event['repeats']:
                 delta_t = current_time - event['repeats'][0]
@@ -841,6 +842,7 @@ class Queue(object):
                     # event queued
                     self.logger.info('Event %s will repeat soon, shelving '
                                      'this update' % eventid)
+                    self.eventQueue.dequeueEvent(eventid)
                     continue
             if current_time - event['lastrun'] < mtw:
                 #
@@ -855,6 +857,7 @@ class Queue(object):
                 self.ampHandler.insertEvent(event, update=True)
                 self.logger.info('Event %s ran recently, shelving this '
                                  'update' % event['id'])
+                self.eventQueue.dequeueEvent(eventid)
                 continue
 
             self.logger.info("Running event %s" % (eventid))
@@ -862,7 +865,7 @@ class Queue(object):
             self.writeEventXml(event)
             p = subprocess.Popen(command)
             self.children[eventid] = {'popen': p, 'start_time': time.time()}
-            self.eventQueue.deleteEventFromQueue(eventid)
+            self.eventQueue.dequeueEvent(eventid)
             self.eventQueue.insertRunningEvent(eventid, command)
             if len(self.children) >= self.config['max_subprocesses']:
                 self.logger.info('Processing queue is full; waiting for open '
@@ -1001,18 +1004,18 @@ class EventQueue(object):
         """
         self._connection.commit()
 
-    def getEventQueue(self):
+    def getQueuedEvents(self):
         query = 'SELECT eventid, command, mag FROM queued ORDER BY mag DESC'
         self._cursor.execute(query)
         erows = self._cursor.fetchall()
         return [(x[0], json.loads(x[1])) for x in erows]
 
-    def insertEventInQueue(self, eventid, command, mag):
+    def queueEvent(self, eventid, command, mag):
         query = 'REPLACE INTO queued (eventid, command, mag) VALUES (?, ?, ?)'
         self._cursor.execute(query, (eventid, json.dumps(command), mag))
         self.commit()
 
-    def deleteEventFromQueue(self, eventid):
+    def dequeueEvent(self, eventid):
         query = 'DELETE FROM queued WHERE eventid = ?'
         self._cursor.execute(query, (eventid,))
         self.commit()
