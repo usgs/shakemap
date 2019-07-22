@@ -594,7 +594,8 @@ class Queue(object):
                 delay = self.config['network_delays'][event['netid']]
                 if event_timestamp + delay > current_time:
                     self.logger.info('Delaying processing event %s due to '
-                                     'network delay configuration.')
+                                     'network delay configuration.' %
+                                     (event['id']))
                     replist.insert(0, event_timestamp + delay)
                     dispatch = False
 
