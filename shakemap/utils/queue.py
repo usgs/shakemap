@@ -594,7 +594,8 @@ class Queue(object):
                 delay = self.config['network_delays'][event['netid']]
                 if event_timestamp + delay > current_time:
                     self.logger.info('Delaying processing event %s due to '
-                                     'network delay configuration.')
+                                     'network delay configuration.' %
+                                     (event['id']))
                     replist.insert(0, event_timestamp + delay)
                     dispatch = False
 
@@ -810,13 +811,14 @@ class Queue(object):
     def runQueuedEvents(self):
         """If there is space, run events from the queue
         """
+        if len(self.children) >= self.config['max_subprocesses']:
+            self.logger.info('Processing queue is full; waiting for open '
+                             'slots.')
+            return
         current_time = int(time.time())
         mtw = self.config['max_trigger_wait']
         queued = self.eventQueue.getEventQueue()
-        while len(self.children) < self.config['max_subprocesses'] and \
-                len(queued) > 0:
-
-            eventid, command = queued[0]
+        for eventid, command in queued:
             event = self.ampHandler.getEvent(eventid)
             if eventid in self.children:
                 #
@@ -831,7 +833,7 @@ class Queue(object):
                 self.ampHandler.insertEvent(event, update=True)
                 self.logger.info('Event %s is currently running, shelving '
                                  'this update' % event['id'])
-                return
+                continue
             if event['repeats']:
                 delta_t = current_time - event['repeats'][0]
                 if delta_t > -mtw:
@@ -839,7 +841,7 @@ class Queue(object):
                     # event queued
                     self.logger.info('Event %s will repeat soon, shelving '
                                      'this update' % eventid)
-                    return
+                    continue
             if current_time - event['lastrun'] < mtw:
                 #
                 # We ran this event very recently, but don't have a repeat
@@ -853,16 +855,19 @@ class Queue(object):
                 self.ampHandler.insertEvent(event, update=True)
                 self.logger.info('Event %s ran recently, shelving this '
                                  'update' % event['id'])
-                return
+                continue
 
             self.logger.info("Running event %s" % (eventid))
             # Update the XML because the DB may have newer information
             self.writeEventXml(event)
             p = subprocess.Popen(command)
             self.children[eventid] = {'popen': p, 'start_time': time.time()}
-            queued.pop(0)
             self.eventQueue.deleteEventFromQueue(eventid)
             self.eventQueue.insertRunningEvent(eventid, command)
+            if len(self.children) >= self.config['max_subprocesses']:
+                self.logger.info('Processing queue is full; waiting for open '
+                                 'slots.')
+                break
 
         return
 
