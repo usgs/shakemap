@@ -100,30 +100,27 @@ def test_event_queue():
 
     eq = EventQueue(install_path)
 
-    events = eq.getEventQueue()
+    events = eq.getQueuedEvents()
     assert len(events) == 0
-    eq.insertEventInQueue('firstevent', ['This', 'is', 'the', 'first',
-                                         'event'], 6)
-    eq.insertEventInQueue('secondevent', ['This', 'is', 'the', 'second',
-                                          'event'], 4.5)
-    eq.insertEventInQueue('thirdevent', ['This', 'is', 'the', 'third',
-                                         'event'], 6.6)
-    events = eq.getEventQueue()
+    eq.queueEvent('firstevent', ['This', 'is', 'the', 'first', 'event'], 6)
+    eq.queueEvent('secondevent', ['This', 'is', 'the', 'second', 'event'], 4.5)
+    eq.queueEvent('thirdevent', ['This', 'is', 'the', 'third', 'event'], 6.6)
+    events = eq.getQueuedEvents()
     assert events[0][0] == 'thirdevent'
     assert events[0][1] == ['This', 'is', 'the', 'third', 'event']
     assert events[1][0] == 'firstevent'
     assert events[1][1] == ['This', 'is', 'the', 'first', 'event']
     assert events[2][0] == 'secondevent'
     assert events[2][1] == ['This', 'is', 'the', 'second', 'event']
-    eq.deleteEventFromQueue('firstevent')
-    events = eq.getEventQueue()
+    eq.dequeueEvent('firstevent')
+    events = eq.getQueuedEvents()
     assert events[0][0] == 'thirdevent'
     assert events[0][1] == ['This', 'is', 'the', 'third', 'event']
     assert events[1][0] == 'secondevent'
     assert events[1][1] == ['This', 'is', 'the', 'second', 'event']
-    eq.deleteEventFromQueue('thirdevent')
-    eq.deleteEventFromQueue('secondevent')
-    events = eq.getEventQueue()
+    eq.dequeueEvent('thirdevent')
+    eq.dequeueEvent('secondevent')
+    events = eq.getQueuedEvents()
     assert len(events) == 0
 
     events = eq.getRunningEvents()
@@ -233,7 +230,7 @@ def test_queue():
     # Test 'test'
     qq.ampHandler.deleteEvent('test_event')
     qq.processOrigin(event, 'test')
-    events = qq.eventQueue.getEventQueue()
+    events = qq.eventQueue.getQueuedEvents()
     assert events[0][0] == 'test_event'
     assert events[0][1][0] == 'echo'
     qq.runQueuedEvents()
@@ -262,7 +259,7 @@ def test_queue():
 
     qq.ampHandler.deleteEvent('test_event')
     qq.processOrigin(event, 'Event added')
-    events = qq.eventQueue.getEventQueue()
+    events = qq.eventQueue.getQueuedEvents()
     assert events[0][0] == 'test_event'
     assert events[0][1][0] == 'echo'
     qq.runQueuedEvents()
@@ -281,7 +278,7 @@ def test_queue():
     qq.ampHandler.deleteEvent('test_event')
     event['netid'] = 'ci'
     qq.processOrigin(event, 'Event added')
-    events = qq.eventQueue.getEventQueue()
+    events = qq.eventQueue.getQueuedEvents()
     assert len(events) == 0
     test_event = qq.ampHandler.getEvent('test_event')
     assert test_event['repeats'][0] == \
