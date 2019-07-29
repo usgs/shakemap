@@ -3,8 +3,7 @@
 # stdlib imports
 
 # third party imports
-from mapio.gmt import GMTGrid
-from mapio.gdal import GDALGrid
+from mapio.reader import read, get_file_geodict
 from mapio.grid2d import Grid2D
 from mapio.geodict import GeoDict
 from openquake.hazardlib.gsim.base import SitesContext
@@ -45,17 +44,23 @@ class Sites(object):
         self._defaultVs30 = defaultVs30
         self._vs30measured_grid = vs30measured_grid
         self._GeoDict = vs30grid.getGeoDict().copy()
-        self._lons = np.linspace(self._GeoDict.xmin,
-                                 self._GeoDict.xmax,
+        if self._GeoDict.xmin > self._GeoDict.xmax:
+            xmin = self._GeoDict.xmin - 360
+            xmax = self._GeoDict.xmax
+        else:
+            xmin = self._GeoDict.xmin
+            xmax = self._GeoDict.xmax
+        self._lons = np.linspace(xmin,
+                                 xmax,
                                  self._GeoDict.nx)
-        self._lats = np.linspace(self._GeoDict.ymin,
-                                 self._GeoDict.ymax,
+        self._lats = np.linspace(self._GeoDict.ymax,
+                                 self._GeoDict.ymin,
                                  self._GeoDict.ny)
 
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
         if vs30File is not None:
-            fgeodict = cls._getFileGeoDict(vs30File)
+            fgeodict = get_file_geodict(vs30File)
             if not resample:
                 if not padding:
                     # we want something that is within and aligned
@@ -64,10 +69,9 @@ class Sites(object):
                     # we want something that is just aligned, since we're
                     # padding edges
                     geodict = fgeodict.getAligned(geodict)
-            vs30grid = cls._load(vs30File, samplegeodict=geodict,
-                                 resample=resample, method='linear',
-                                 doPadding=padding, padValue=defaultVs30)
-
+            vs30grid = read(vs30File, samplegeodict=geodict,
+                            resample=resample, method='linear',
+                            doPadding=padding, padValue=defaultVs30)
         return vs30grid
 
     @classmethod
@@ -203,7 +207,7 @@ class Sites(object):
             sctx.lats = self._lats.copy()
             sctx.lons = self._lons.copy()
             if rock_vs30 is not None:
-                sctx.vs30 = np.ones_like(self._Vs30.getData()) * rock_vs30
+                sctx.vs30 = np.full_like(self._Vs30.getData(), rock_vs30)
             else:
                 sctx.vs30 = self._Vs30.getData().copy()
 
@@ -238,24 +242,16 @@ class Sites(object):
     def _load(vs30File, samplegeodict=None, resample=False, method='linear',
               doPadding=False, padValue=np.nan):
         try:
-            vs30grid = GMTGrid.load(vs30File,
-                                    samplegeodict=samplegeodict,
-                                    resample=resample,
-                                    method=method,
-                                    doPadding=doPadding,
-                                    padValue=padValue)
+            vs30grid = read(vs30File,
+                            samplegeodict=samplegeodict,
+                            resample=resample,
+                            method=method,
+                            doPadding=doPadding,
+                            padValue=padValue)
         except Exception as msg1:
-            try:
-                vs30grid = GDALGrid.load(vs30File,
-                                         samplegeodict=samplegeodict,
-                                         resample=resample,
-                                         method=method,
-                                         doPadding=doPadding,
-                                         padValue=padValue)
-            except Exception as msg2:
-                msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (
-                    vs30File, str(msg1), str(msg2))
-                raise ShakeLibException(msg)
+            msg = 'Load failure of %s - error message: "%s"' % (
+                vs30File, str(msg1))
+            raise ShakeLibException(msg)
 
         if vs30grid.getData().dtype != np.float64:
             vs30grid.setData(vs30grid.getData().astype(np.float64))
@@ -266,14 +262,11 @@ class Sites(object):
     def _getFileGeoDict(fname):
         geodict = None
         try:
-            geodict, t = GMTGrid.getFileGeoDict(fname)
+            geodict = get_file_geodict(fname)
         except Exception as msg1:
-            try:
-                geodict, t = GDALGrid.getFileGeoDict(fname)
-            except Exception as msg2:
-                msg = 'File geodict failure with %s - error messages: '\
-                      '"%s"\n "%s"' % (fname, str(msg1), str(msg2))
-                raise ShakeLibException(msg)
+            msg = 'File geodict failure with %s - error messages: '\
+                '"%s"' % (fname, str(msg1))
+            raise ShakeLibException(msg)
         return geodict
 
     @staticmethod
@@ -288,9 +281,11 @@ class Sites(object):
         Returns: A sites context with the depth parameters set.
         """
         sctx.z1pt0_cy14_cal = Sites._z1pt0_from_vs30_cy14_cal(sctx.vs30)
+        sctx.z1pt0_cy14_jpn = Sites._z1pt0_from_vs30_cy14_jpn(sctx.vs30)
         sctx.z1pt0_ask14_cal = Sites._z1pt0_from_vs30_ask14_cal(sctx.vs30)
-        sctx.z2pt5_cb14_cal = Sites._z2pt5_from_vs30_cb14_cal(
-            sctx.vs30) / 1000.0
+        sctx.z1pt0_ask14_jpn = Sites._z1pt0_from_vs30_ask14_jpn(sctx.vs30)
+        sctx.z2pt5_cb14_cal = Sites._z2pt5_from_vs30_cb14_cal(sctx.vs30)
+        sctx.z2pt5_cb14_jpn = Sites._z2pt5_from_vs30_cb14_jpn(sctx.vs30)
         sctx.z1pt0_cy08 = Sites._z1pt0_from_vs30_cy08(sctx.vs30)
         sctx.z2pt5_cb07 = Sites._z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
 
@@ -311,6 +306,20 @@ class Sites(object):
         return z1
 
     @staticmethod
+    def _z1pt0_from_vs30_cy14_jpn(vs30):
+        """
+        Compute z1.0 using CY14 relationship for Japan.
+
+        Args:
+            vs30: Numpy array of Vs30 values in m/s.
+
+        Returns: Numpy array of z1.0 in m.
+        """
+        z1 = np.exp(-(5.23 / 2.0) *
+                    np.log((vs30**2.0 + 412.**2.0) / (1360**2.0 + 412.**2.0)))
+        return z1
+
+    @staticmethod
     def _z1pt0_from_vs30_ask14_cal(vs30):
         """
         Calculate z1.0 using ASK14 relationship for California.
@@ -327,6 +336,22 @@ class Sites(object):
         return z1
 
     @staticmethod
+    def _z1pt0_from_vs30_ask14_jpn(vs30):
+        """
+        Calculate z1.0 using ASK14 relationship for Japan.
+
+        Args:
+            vs30: Numpy array of Vs30 values in m/s.
+
+        Returns: Numpy array of z1.0 in m.
+
+        """
+        # ASK14 define units as km, but implemented as m in OQ
+        z1 = np.exp(-(5.32 / 2.0) *
+                    np.log((vs30**2.0 + 412.**2) / (1360**2.0 + 412.**2)))
+        return z1
+
+    @staticmethod
     def _z2pt5_from_vs30_cb14_cal(vs30):
         """
         Calculate z2.5 using CB14 relationship for California.
@@ -337,7 +362,21 @@ class Sites(object):
         Returns: Numpy array of z2.5 in m. *NOTE*: OQ's CampbellBozorgnia2014
             class expects z2.5 to be in km!
         """
-        z2p5 = 1000 * np.exp(7.089 - 1.144 * np.log(vs30))
+        z2p5 = np.exp(7.089 - 1.144 * np.log(vs30))
+        return z2p5
+
+    @staticmethod
+    def _z2pt5_from_vs30_cb14_jpn(vs30):
+        """
+        Calculate z2.5 using CB14 relationship for Japan.
+
+        Args:
+            vs30: Numpy array of Vs30 values in m/s.
+
+        Returns: Numpy array of z2.5 in m. *NOTE*: OQ's CampbellBozorgnia2014
+            class expects z2.5 to be in km!
+        """
+        z2p5 = np.exp(5.359 - 1.102 * np.log(vs30))
         return z2p5
 
     @staticmethod

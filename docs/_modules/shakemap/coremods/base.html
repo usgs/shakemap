@@ -9,11 +9,12 @@
     <title>shakemap.coremods.base &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -38,15 +39,14 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_logging_config</span><span class="p">,</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.logging</span> <span class="k">import</span> <span class="n">get_logging_config</span>
 
 
 <div class="viewcode-block" id="CoreModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule">[docs]</a><span class="k">class</span> <span class="nc">CoreModule</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
@@ -122,179 +122,140 @@
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">return</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">contents</span><span class="p">):</span>
+        <span class="n">contents</span><span class="o">.</span><span class="n">writeContents</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Contents"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.Contents">[docs]</a><span class="k">class</span> <span class="nc">Contents</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper class for creating and updating the contents.xml file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page_title</span><span class="p">,</span> <span class="n">page_slug</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">page_title</span><span class="p">,</span>
+            <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="n">page_slug</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">=</span> <span class="n">eventid</span>
+
+<div class="viewcode-block" id="Contents.addFile"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.Contents.addFile">[docs]</a>    <span class="k">def</span> <span class="nf">addFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">caption</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mime_type</span><span class="p">):</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;download&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;formats&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span>
+                                                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">mime_type</span><span class="p">})</span>
             <span class="k">return</span>
 
-        <span class="c1"># read all of the files in the products folder</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
-        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+                <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">caption</span><span class="p">,</span>
+                <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">mime_type</span><span class="p">}]</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+                <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">caption</span><span class="p">,</span>
+                <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="p">,</span>
+                <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">mime_type</span><span class="p">}]</span>
+            <span class="p">}</span>
+        <span class="k">return</span></div>
 
-        <span class="n">period_regex</span> <span class="o">=</span> <span class="s1">&#39;([0-9]p[0-9])|[0-9][0-9]&#39;</span>
-
-        <span class="c1"># loop over our contents, find files and expand regular expressions</span>
-        <span class="c1"># and macros found in contents dictionary as necessary.</span>
-        <span class="n">nuke_keys</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">new_contents</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">cdict</span> <span class="ow">in</span> <span class="n">contents</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">for</span> <span class="n">tformat</span> <span class="ow">in</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;formats&#39;</span><span class="p">]:</span>
-                <span class="n">filenames</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span>
-                                                   <span class="n">tformat</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]))</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">_</span><span class="p">,</span> <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="n">parts</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
-                    <span class="c1"># is this file a &quot;greater of two horizontal&quot; component</span>
-                    <span class="c1"># or something like rotd50?</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                        <span class="n">component</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<div class="viewcode-block" id="Contents.readContents"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.Contents.readContents">[docs]</a>    <span class="k">def</span> <span class="nf">readContents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contents_file</span><span class="p">):</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">contents_file</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+        <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">pages</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">root</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span>
+                <span class="n">formats</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">fchild</span> <span class="ow">in</span> <span class="n">child</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fchild</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;caption&#39;</span><span class="p">:</span>
+                        <span class="n">caption</span> <span class="o">=</span> <span class="n">fchild</span><span class="o">.</span><span class="n">text</span>
+                    <span class="k">elif</span> <span class="n">fchild</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span>
+                        <span class="n">filename</span> <span class="o">=</span> <span class="n">fchild</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span>
+                        <span class="n">mimetype</span> <span class="o">=</span> <span class="n">fchild</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+                        <span class="n">formats</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span>
+                                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">mimetype</span><span class="p">})</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">component</span> <span class="o">=</span> <span class="s1">&#39;greater of two horizontal&#39;</span>
-                    <span class="n">tformat</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;download&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-                    <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[COMPONENT]&#39;</span><span class="p">,</span>
-                                                                <span class="n">component</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;No filenames defined for contents.xml format &#39;</span> \
-                          <span class="s1">&#39;(file element </span><span class="si">%s</span><span class="s1"> of module </span><span class="si">%s</span><span class="s1">)&#39;</span>
-                    <span class="n">tpl</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">command_name</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">tpl</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="s1">&#39;[PERIOD]&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
-                        <span class="n">nuke_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-                        <span class="c1"># make new keys</span>
-                        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
-                            <span class="n">fpath</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-                            <span class="n">parts</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
-                            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">period_regex</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;What!&#39;</span><span class="p">)</span>
-                            <span class="n">period</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
-                            <span class="n">fperiod</span> <span class="o">=</span> <span class="n">_period_to_fp</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
-                            <span class="n">newkey</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[PERIOD]&#39;</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
-                            <span class="n">new_cdict</span> <span class="o">=</span> <span class="n">cdict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                            <span class="n">new_cdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                                <span class="n">new_cdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[PERIOD]&#39;</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
-                            <span class="n">newcap</span> <span class="o">=</span> <span class="n">new_cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span>
-                            <span class="n">newcap</span> <span class="o">=</span> <span class="n">newcap</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[FPERIOD]&#39;</span><span class="p">,</span> <span class="n">fperiod</span><span class="p">)</span>
-                            <span class="c1"># is this file a &quot;greater of two horizontal&quot;</span>
-                            <span class="c1"># component or something like rotd50?</span>
-                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                                <span class="n">component</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                            <span class="k">else</span><span class="p">:</span>
-                                <span class="n">component</span> <span class="o">=</span> <span class="s1">&#39;greater of two horizontal&#39;</span>
-                            <span class="n">newcap</span> <span class="o">=</span> <span class="n">newcap</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[COMPONENT]&#39;</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-                            <span class="n">new_cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newcap</span>
-                            <span class="n">tformat</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;download&#39;</span><span class="p">,</span>
-                                                               <span class="n">filename</span><span class="p">)</span>
-                            <span class="n">new_contents</span><span class="p">[</span><span class="n">newkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cdict</span>
-        <span class="c1"># remove the keys we replaced with period specific ones</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">nuke_keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
-                <span class="k">del</span> <span class="n">contents</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                        <span class="k">pass</span>
+                <span class="n">contents</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+                                 <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">caption</span><span class="p">,</span>
+                                 <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="n">formats</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># page</span>
+                <span class="n">slug</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">fchild</span> <span class="ow">in</span> <span class="n">child</span><span class="p">:</span>
+                    <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fchild</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;refid&#39;</span><span class="p">])</span>
+                <span class="n">page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+                        <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="n">slug</span><span class="p">,</span>
+                        <span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="n">files</span><span class="p">}</span>
+                <span class="n">pages</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span> <span class="o">=</span> <span class="n">page</span>
 
-        <span class="c1"># update the contents dictionary with any new stuff</span>
-        <span class="n">contents</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_contents</span><span class="p">)</span>
+        <span class="c1"># assign the pages information into the relevant content dictionary</span>
+        <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">file_ids</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">file_id</span> <span class="ow">in</span> <span class="n">file_ids</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">file_id</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                    <span class="n">contents</span><span class="p">[</span><span class="n">file_id</span><span class="p">][</span><span class="s1">&#39;page&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="n">slug</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">contents</span></div>
+
+<div class="viewcode-block" id="Contents.writeContents"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.Contents.writeContents">[docs]</a>    <span class="k">def</span> <span class="nf">writeContents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">):</span>
+            <span class="k">return</span>
 
         <span class="c1"># create or update the contents.xml file</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
         <span class="n">pdldir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;pdl&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">pdldir</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">pdldir</span><span class="p">)</span>
         <span class="n">contents_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdldir</span><span class="p">,</span> <span class="s1">&#39;contents.xml&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">contents_file</span><span class="p">):</span>
-            <span class="n">old_contents</span> <span class="o">=</span> <span class="n">_read_contents</span><span class="p">(</span><span class="n">contents_file</span><span class="p">)</span>
+            <span class="n">old_contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readContents</span><span class="p">(</span><span class="n">contents_file</span><span class="p">)</span>
             <span class="c1"># TODO: should we ensure that keys are globally unique?</span>
-            <span class="n">old_contents</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
-            <span class="n">_write_contents</span><span class="p">(</span><span class="n">old_contents</span><span class="p">,</span> <span class="n">contents_file</span><span class="p">)</span>
+            <span class="n">old_contents</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span>
+            <span class="n">contents</span> <span class="o">=</span> <span class="n">old_contents</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">_write_contents</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">contents_file</span><span class="p">)</span></div></div>
+            <span class="n">contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span>
 
+        <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;contents&quot;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_read_contents</span><span class="p">(</span><span class="n">contents_file</span><span class="p">):</span>
-    <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">contents_file</span><span class="p">)</span>
-    <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
-    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-    <span class="n">pages</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">root</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span>
-            <span class="n">formats</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
-            <span class="n">title</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">fchild</span> <span class="ow">in</span> <span class="n">child</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">fchild</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;caption&#39;</span><span class="p">:</span>
-                    <span class="n">caption</span> <span class="o">=</span> <span class="n">fchild</span><span class="o">.</span><span class="n">text</span>
-                <span class="k">elif</span> <span class="n">fchild</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span>
-                    <span class="n">filename</span> <span class="o">=</span> <span class="n">fchild</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span>
-                    <span class="n">mimetype</span> <span class="o">=</span> <span class="n">fchild</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
-                    <span class="n">formats</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">mimetype</span><span class="p">})</span>
+        <span class="n">pages</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dictionary with slugs as keys</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">cdict</span> <span class="ow">in</span> <span class="n">contents</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">file_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">)</span>
+            <span class="n">file_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
+            <span class="n">file_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">caption</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">file_el</span><span class="p">,</span> <span class="s2">&quot;caption&quot;</span><span class="p">)</span>
+            <span class="n">caption</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">CDATA</span><span class="p">(</span><span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="nb">format</span> <span class="ow">in</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;formats&#39;</span><span class="p">]:</span>
+                <span class="n">format_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">file_el</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">)</span>
+                <span class="n">format_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">])</span>
+                <span class="n">format_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;page&#39;</span> <span class="ow">in</span> <span class="n">cdict</span><span class="p">:</span>
+                <span class="n">slug</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">][</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span>
+                <span class="n">page_title</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">:</span>
+                    <span class="n">pages</span><span class="p">[</span><span class="n">slug</span><span class="p">][</span><span class="s1">&#39;files&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">pass</span>
-            <span class="n">contents</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-                             <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">caption</span><span class="p">,</span>
-                             <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="n">formats</span><span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># page</span>
-            <span class="n">slug</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span>
-            <span class="n">title</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
-            <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">fchild</span> <span class="ow">in</span> <span class="n">child</span><span class="p">:</span>
-                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fchild</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;refid&#39;</span><span class="p">])</span>
-            <span class="n">page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-                    <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="n">slug</span><span class="p">,</span>
-                    <span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="n">files</span><span class="p">}</span>
-            <span class="n">pages</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span> <span class="o">=</span> <span class="n">page</span>
+                    <span class="n">page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">page_title</span><span class="p">,</span>
+                            <span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">key</span><span class="p">]}</span>
+                    <span class="n">pages</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span> <span class="o">=</span> <span class="n">page</span>
 
-    <span class="c1"># assign the pages information into the relevant content dictionary</span>
-    <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">file_ids</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">file_id</span> <span class="ow">in</span> <span class="n">file_ids</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">file_id</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
-                <span class="n">contents</span><span class="p">[</span><span class="n">file_id</span><span class="p">][</span><span class="s1">&#39;page&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="n">slug</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">contents</span>
+        <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">page_dict</span> <span class="ow">in</span> <span class="n">pages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">page_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;page&quot;</span><span class="p">)</span>
+            <span class="n">page_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">page_dict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
+            <span class="n">page_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;slug&#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">filekey</span> <span class="ow">in</span> <span class="n">page_dict</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]:</span>
+                <span class="n">file_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">page_el</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">)</span>
+                <span class="n">file_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;refid&#39;</span><span class="p">,</span> <span class="n">filekey</span><span class="p">)</span>
 
-
-<span class="k">def</span> <span class="nf">_write_contents</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">contents_file</span><span class="p">):</span>
-    <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;contents&quot;</span><span class="p">)</span>
-    <span class="n">pages</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dictionary with slugs as keys</span>
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">cdict</span> <span class="ow">in</span> <span class="n">contents</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">file_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">)</span>
-        <span class="n">file_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
-        <span class="n">file_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-        <span class="n">caption</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">file_el</span><span class="p">,</span> <span class="s2">&quot;caption&quot;</span><span class="p">)</span>
-        <span class="n">caption</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">CDATA</span><span class="p">(</span><span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">])</span>
-        <span class="k">for</span> <span class="nb">format</span> <span class="ow">in</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;formats&#39;</span><span class="p">]:</span>
-            <span class="n">format_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">file_el</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">)</span>
-            <span class="n">format_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">])</span>
-            <span class="n">format_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="s1">&#39;page&#39;</span> <span class="ow">in</span> <span class="n">cdict</span><span class="p">:</span>
-            <span class="n">slug</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">][</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span>
-            <span class="n">page_title</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">:</span>
-                <span class="n">pages</span><span class="p">[</span><span class="n">slug</span><span class="p">][</span><span class="s1">&#39;files&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">page_title</span><span class="p">,</span>
-                        <span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">key</span><span class="p">]}</span>
-                <span class="n">pages</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span> <span class="o">=</span> <span class="n">page</span>
-
-    <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">page_dict</span> <span class="ow">in</span> <span class="n">pages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">page_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;page&quot;</span><span class="p">)</span>
-        <span class="n">page_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">page_dict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
-        <span class="n">page_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;slug&#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">filekey</span> <span class="ow">in</span> <span class="n">page_dict</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]:</span>
-            <span class="n">file_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">page_el</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">)</span>
-            <span class="n">file_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;refid&#39;</span><span class="p">,</span> <span class="n">filekey</span><span class="p">)</span>
-
-    <span class="n">xmlstr</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">contents_file</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xmlstr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-
-<span class="k">def</span> <span class="nf">_period_to_fp</span><span class="p">(</span><span class="n">period</span><span class="p">):</span>
-    <span class="c1"># take a string like PSA0p3 and turn it into 0.3</span>
-    <span class="n">fperiod</span> <span class="o">=</span> <span class="n">period</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fperiod</span><span class="p">:</span>
-        <span class="n">fperiod</span> <span class="o">=</span> <span class="n">period</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">period</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">fperiod</span>
+        <span class="n">xmlstr</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">contents_file</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xmlstr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
 
           </div>
@@ -321,10 +282,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

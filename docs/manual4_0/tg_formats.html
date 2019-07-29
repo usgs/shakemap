@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -38,19 +38,18 @@
 <div class="section" id="about-the-hdf5-file-format">
 <h2>2.5.1. About the HDF5 File Format<a class="headerlink" href="#about-the-hdf5-file-format" title="Permalink to this headline">¶</a></h2>
 <p>HDF5 files are an efficient and flexible way to store large sets of
-structured data.  HDF stands for Hierachical Data Format and is an
-open-source project . The data
-model consists of two types of objects: groups and datasets. Groups
-may contain datasets or other groups (along with associated metadata).
-Datasets may contain multidimensional arrays of data (along with
-accompanying metadata). Groups may be thought of as directories or
-folders, and datasets as files. The metadata associated with each object
-allows HDF5 files to be self describing. Data is stored in binary,
-making the files smaller and more efficient to read and write than
-text-based formats (such as XML). For almost all uses
-a user will access the file through an API (bindings are available
-for many languages), making the details of file structure and layout
-not relevant.</p>
+structured data.  HDF stands for Hierarchical Data Format and is an
+open-source project . The data model consists of two types of objects:
+groups and datasets. Groups may contain datasets or other groups
+(along with associated metadata).  Datasets may contain
+multidimensional arrays of data (along with accompanying
+metadata). Groups may be thought of as directories or folders, and
+datasets as files. The metadata associated with each object allows
+HDF5 files to be self describing. Data is stored in binary, making the
+files smaller and more efficient to read and write than text-based
+formats (such as XML). For almost all uses a user will access the file
+through an API (bindings are available for many languages), making the
+details of file structure and layout not relevant.</p>
 <p>For more information on HDF5 see the
 <a class="reference external" href="https://support.hdfgroup.org/HDF5/">HDF5 support page</a>.
 The Python interface, h5py, is documented on the
@@ -100,8 +99,8 @@ For example, a Python <em>config</em> dictionary consisting of the following inf
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>would be stored as a JSON string in a dataset called <code class="docutils literal notranslate"><span class="pre">__config__</span></code>,
-under a group called <code class="docutils literal notranslate"><span class="pre">__dictionaries__</span></code>. In languages that support
+<p>would be stored as a JSON string in a dataset called <code class="docutils literal notranslate"><span class="pre">config</span></code>,
+under a group called <code class="docutils literal notranslate"><span class="pre">dictionaries</span></code>. In languages that support
 JSON, these strings can be easily converted into a data
 structure. Developers can access these properties using the
 <cite>ShakeMapInputContainer interface
@@ -124,18 +123,23 @@ structure. Developers can access these properties using the
 <tbody valign="top">
 <tr class="row-even"><td>config</td>
 <td>/dictionaries/config</td>
-<td>dictionary</td>
+<td>JSON string</td>
 <td>ShakeMap configuration</td>
 </tr>
 <tr class="row-odd"><td>info.json</td>
 <td>/dictionaries/info.json</td>
-<td>string</td>
-<td>ShakeMap metadata in JSON format</td>
+<td>JSON string</td>
+<td>ShakeMap metadata</td>
 </tr>
 <tr class="row-even"><td>stations_dict</td>
 <td>/dictionaries/stations_dict</td>
-<td>string</td>
-<td>Dictionary representation of the finite fault</td>
+<td>JSON string</td>
+<td>Dictionary representation of observed data</td>
+</tr>
+<tr class="row-odd"><td>rupture</td>
+<td>/dictionaries/rupture</td>
+<td>JSON string</td>
+<td>Dictionary representation of fault rupture</td>
 </tr>
 </tbody>
 </table>

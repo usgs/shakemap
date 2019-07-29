@@ -12,7 +12,7 @@ from shakemap.coremods.xtestplot_spectra import XTestPlotSpectra
 from shakemap.coremods.xtestimage import XTestImage
 from shakemap.coremods.xtestplot_multi import XTestPlotMulti
 from shakemap.coremods.plotregr import PlotRegr
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 ########################################################################
 # Test the nullgmpe and the dummy correlation function as well as
@@ -52,8 +52,9 @@ def run_event(evid):
                             'shake_result.hdf')
     oc = ShakeMapOutputContainer.load(res_file)
     imts = oc.getIMTs()
-    comps = oc.getComponents(imts[0])
-    imtdict = oc.getIMTArrays(imts[0], comps[0])
+    imt = imts[0].split('/')[1]
+    comps = oc.getComponents(imt)
+    imtdict = oc.getIMTArrays(imt, comps[0])
     return imtdict
 
 

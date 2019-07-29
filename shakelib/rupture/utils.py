@@ -72,7 +72,7 @@ def get_quad_width(q):
         q (list): A quadrilateral; list of four points.
 
     Returns:
-        float: Width of planar trapezoid.
+        float: Width of planar trapezoid in km.
     """
     P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0)
@@ -81,7 +81,7 @@ def get_quad_width(q):
     AB = p0 - p1
     AC = p0 - p3
     t1 = (AB.cross(AC).cross(AB)).norm()
-    width = t1.dot(AC)
+    width = t1.dot(AC)/1000.0
 
     return width
 

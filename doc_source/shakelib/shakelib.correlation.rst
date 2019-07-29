@@ -5,10 +5,8 @@ Submodules
 
 .. toctree::
 
-   shakelib.correlation.baker_jayaram_2008
-   shakelib.correlation.boore_2003
+   shakelib.correlation.ccf_base
    shakelib.correlation.dummy
-   shakelib.correlation.goda_atkinson_2010
    shakelib.correlation.loth_baker_2013
 
 Module contents

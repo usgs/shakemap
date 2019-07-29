@@ -2,6 +2,7 @@
 
 import os
 import os.path
+import glob
 # import pytest
 import importlib.util
 from tempfile import mkstemp
@@ -136,8 +137,8 @@ def test_command_database():
     clear_files(datadir)
     make_files(datadir)
 
-    dbfile = os.path.join(datadir, 'data', 'dependencies.db')
-    if os.path.isfile(dbfile):
+    dbfiles = glob.glob(os.path.join(datadir, 'data', 'dependencies.*'))
+    for dbfile in dbfiles:
         os.remove(dbfile)
 
     eventdir = os.path.join(datadir, 'dummy_event', 'current')
@@ -254,7 +255,8 @@ def test_command_database():
     status = cdb.getDependencyStatus('module2')
     assert status == ['module1', 'module2']
 
-    if os.path.isfile(dbfile):
+    dbfiles = glob.glob(os.path.join(datadir, 'data', 'dependencies.*'))
+    for dbfile in dbfiles:
         os.remove(dbfile)
 
     clear_files(datadir)

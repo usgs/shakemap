@@ -7,11 +7,12 @@ from collections import OrderedDict
 
 # third party imports
 import numpy as np
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from mapio.shake import ShakeGrid
+from mapio.geodict import GeoDict
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 import shakemap
 from shakelib.rupture import constants
@@ -77,19 +78,9 @@ class GridXMLModule(CoreModule):
     targets = [r'products/grid\.xml', r'products/uncertainty\.xml']
     dependencies = [('products/shake_result.hdf', True)]
 
-    contents = {'xmlGrids': {'title': 'XML Grid',
-                             'caption': 'XML grid of ground motions',
-                             'formats': [{'filename': 'grid.xml',
-                                          'type': 'text/xml'}
-                                         ]
-                             },
-                'uncertaintyGrid': {'title': 'Uncertainty Grid',
-                                    'caption': 'XML grid of uncertainties',
-                                    'formats': [{'filename': 'uncertainty.xml',
-                                                 'type': 'text/xml'}
-                                                ]
-                                    }
-                }
+    def __init__(self, eventid):
+        super(GridXMLModule, self).__init__(eventid)
+        self.contents = Contents('XML Grids', 'gridxml', eventid)
 
     def execute(self):
         """Create grid.xml and uncertainty.xml files.
@@ -124,15 +115,14 @@ class GridXMLModule(CoreModule):
                 imt_field = _oq_to_gridxml(gridname)
                 imtdict = container.getIMTGrids(gridname, COMPONENT)
                 if xml_type == 'grid':
-                    grid = imtdict['mean']
+                    grid_data = imtdict['mean']
                     metadata = imtdict['mean_metadata']
                 elif xml_type == 'uncertainty':
-                    grid = imtdict['std']
+                    grid_data = imtdict['std']
                     metadata = imtdict['std_metadata']
 
                 units = metadata['units']
                 digits = metadata['digits']
-                grid_data = grid.getData()
                 # convert from HDF units to legacy grid.xml units
                 if xml_type == 'grid':
                     if units == 'ln(cm/s)':
@@ -152,14 +142,13 @@ class GridXMLModule(CoreModule):
                     field_keys['STD' + imt_field] = (units, digits)
 
             if xml_type == 'grid':
-                gridobj, metadata = container.getGrid('vs30')
-                grid_data = gridobj.getData()
-                units = metadata['units']
+                grid_data, _ = container.getArray([], 'vs30')
+                units = 'm/s'
                 digits = metadata['digits']
                 layers['SVEL'] = grid_data
                 field_keys['SVEL'] = (units, digits)
 
-            geodict = grid.getGeoDict()
+            geodict = GeoDict(metadata)
 
             config = container.getConfig()
 
@@ -181,6 +170,14 @@ class GridXMLModule(CoreModule):
             event_dict['event_description'] = event_info['location']
             event_dict['event_network'] = \
                 info['input']['event_information']['eventsource']
+            event_dict['intensity_observations'] =\
+                info['input']['event_information']['intensity_observations']
+            event_dict['seismic_stations'] =\
+                info['input']['event_information']['seismic_stations']
+            if info['input']['event_information']['fault_ref'] == 'Origin':
+                event_dict['point_source'] = 'True'
+            else:
+                event_dict['point_source'] = 'False'
 
             # shake dictionary
             shake_dict = {}
@@ -210,5 +207,12 @@ class GridXMLModule(CoreModule):
             fname = os.path.join(datadir, '%s.xml' % xml_type)
             logger.debug('Saving IMT grids to %s' % fname)
             shake_grid.save(fname)  # TODO - set grid version number
+
+        self.contents.addFile('xmlGrids', 'XML Grid',
+                              'XML grid of ground motions',
+                              'grid.xml', 'text/xml')
+        self.contents.addFile('uncertaintyGrid', 'Uncertainty Grid',
+                              'XML grid of uncertainties',
+                              'uncertainty.xml', 'text/xml')
 
         container.close()

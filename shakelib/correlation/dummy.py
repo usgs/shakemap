@@ -1,7 +1,9 @@
 import numpy as np
 
+from shakelib.correlation.ccf_base import CrossCorrelationBase
 
-class DummyCorrelation(object):
+
+class DummyCorrelation(CrossCorrelationBase):
     """
     Simplified correlation module for testing purposes. Should not be used
     in productions runs as it does not produce valid correlations.
@@ -50,9 +52,10 @@ class DummyCorrelation(object):
                 The indices of the second period of interest.
             h (ndarray):
                 The separation distance between two sites (units of km).
+                The result is placed in h.
 
         Returns:
-            ndarray: The predicted correlation coefficient. The output
+            h (ndarray): The predicted correlation coefficient. The output
             array will have the same shape as the inputs.
 
         """
@@ -71,4 +74,5 @@ class DummyCorrelation(object):
         rho[invix] = 1.0 / rho[invix]
         ad = np.abs(h)
         rho = rho * np.exp(-ad / 10)
-        return rho
+        h[:] = rho[:]
+        return h

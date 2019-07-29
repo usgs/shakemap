@@ -226,6 +226,7 @@ def write_event_file(event, xmlfile):
            - locstring (str, "East of the Poconos")
            - mech (str, "RS", "SS", "NM", or 'ALL') (optional)
            - reference (str, data source: 'Smith et al. 2016') (optional)
+           - event_type (str, 'ACTUAL' or 'SCENARIO') (optional)
            - productcode (str, 'us2000wxyz_zoom')
 
     Returns:
@@ -248,6 +249,13 @@ def write_event_file(event, xmlfile):
             root.attrib['reference'] = event['reference']
         if 'productcode' in event:
             root.attrib['productcode'] = event['productcode']
+        if 'event_type' in event:
+            if event['event_type'] not in ['ACTUAL', 'SCENARIO']:
+                raise AttributeError(
+                    'event_type must be "ACTUAL" or "SCENARIO"')
+            root.attrib['event_type'] = event['event_type']
+        else:
+            root.attrib['event_type'] = 'ACTUAL'
 
         tree = etree.ElementTree(root)
         tree.write(xmlfile, pretty_print=True)
@@ -352,12 +360,11 @@ def read_event_file(eventxml):
     eqdict['netid'] = xmldict['netid']
 
     # look for the productcode attribute in the xml,
-    # otherwise use the event directory name.
+    # otherwise use the event id
     if 'productcode' in xmldict:
         eqdict['productcode'] = xmldict['productcode']
     elif isinstance(eventxml, str):
-        path_parts = eventxml.split(os.sep)
-        eqdict['productcode'] = path_parts[-3]
+        eqdict['productcode'] = eqdict['id']
     else:
         # It's up to the user of this data how to construct the
         # product code
@@ -366,12 +373,14 @@ def read_event_file(eventxml):
     # Support old event file date/times
     if 'time' in xmldict:
         try:
-            eqdict['time'] = HistoricTime.strptime(xmldict['time'],
-                                                   constants.TIMEFMT)
+            eqdict['time'] = HistoricTime.strptime(
+                xmldict['time'],
+                constants.TIMEFMT)
         except ValueError:
             try:
-                eqdict['time'] = HistoricTime.strptime(xmldict['time'],
-                                                       constants.ALT_TIMEFMT)
+                eqdict['time'] = HistoricTime.strptime(
+                    xmldict['time'],
+                    constants.ALT_TIMEFMT)
             except ValueError:
                 raise ValueError("Couldn't convert %s to HistoricTime" %
                                  xmldict['time'])
@@ -380,12 +389,13 @@ def read_event_file(eventxml):
            'day' not in xmldict or 'hour' not in xmldict or \
            'minute' not in xmldict or 'second' not in xmldict:
             raise ValueError("Missing date/time elements in event file.")
-        eqdict['time'] = HistoricTime.datetime(xmldict['year'],
-                                               xmldict['month'],
-                                               xmldict['day'],
-                                               xmldict['hour'],
-                                               xmldict['minute'],
-                                               xmldict['second'])
+        eqdict['time'] = HistoricTime.datetime(
+            xmldict['year'],
+            xmldict['month'],
+            xmldict['day'],
+            xmldict['hour'],
+            xmldict['minute'],
+            xmldict['second'])
 
     eqdict['lat'] = float(xmldict['lat'])
     eqdict['lon'] = float(xmldict['lon'])
@@ -413,6 +423,15 @@ def read_moment_quakeml(momentfile):
     Returns:
         dict: Empty if momentfile is somehow not valid, or:
               - moment:
+                  - T:
+                    - azimuth
+                    - plunge
+                  - N:
+                    - azimuth
+                    - plunge
+                  - P:
+                    - azimuth
+                    - plunge
                   - NP1:
                     - strike: float
                     - dip: float
@@ -460,20 +479,37 @@ def read_moment_quakeml(momentfile):
             mrt = focal.moment_tensor.tensor.m_rt
             mrp = focal.moment_tensor.tensor.m_rp
             mtp = focal.moment_tensor.tensor.m_tp
-            params = fill_tensor_from_components(mrr, mtt,
-                                                 mpp, mrt,
-                                                 mrp, mtp,
-                                                 source=msource,
-                                                 mtype=mtype)
+            params = fill_tensor_from_components(
+                mrr, mtt,
+                mpp, mrt,
+                mrp, mtp,
+                source=msource,
+                mtype=mtype)
     else:
         plane1 = focal.nodal_planes.nodal_plane_1
         plane2 = focal.nodal_planes.nodal_plane_2
-        params['NP1'] = {'strike': plane1.strike,
-                         'dip': plane1.dip,
-                         'rake': plane1.rake}
-        params['NP2'] = {'strike': plane2.strike,
-                         'dip': plane2.dip,
-                         'rake': plane2.rake}
+        params['NP1'] = {
+            'strike': plane1.strike,
+            'dip': plane1.dip,
+            'rake': plane1.rake
+        }
+        params['NP2'] = {
+            'strike': plane2.strike,
+            'dip': plane2.dip,
+            'rake': plane2.rake
+        }
+        params['T'] = {
+            'azimuth': focal.principal_axes.t_axis.azimuth,
+            'plunge': focal.principal_axes.t_axis.plunge
+        }
+        params['N'] = {
+            'azimuth': focal.principal_axes.n_axis.azimuth,
+            'plunge': focal.principal_axes.n_axis.plunge
+        }
+        params['P'] = {
+            'azimuth': focal.principal_axes.p_axis.azimuth,
+            'plunge': focal.principal_axes.p_axis.plunge
+        }
 
     moment = {'moment': params}
     return moment

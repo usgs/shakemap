@@ -1,35 +1,35 @@
 # stdlib imports
+import os
 import os.path
-from collections import OrderedDict
-import logging
 import zipfile
 import shutil
 import re
 
 # third party imports
-from shapely.geometry import shape
-import fiona
-from shakelib.utils.containers import ShakeMapOutputContainer
 from PIL import Image
-import configobj
 from lxml import etree
 import numpy as np
+from scipy.ndimage.filters import median_filter
+import simplekml as skml
+import fiona
+import cartopy.io.shapereader as shpreader
+from shapely.geometry import shape
 
 # local imports
-from .base import CoreModule
-from shakemap.utils.config import (get_config_paths,
-                                   get_configspec,
-                                   get_custom_validator,
-                                   config_error)
-from shakemap.utils.logging import get_logging_config
+from mapio.geodict import GeoDict
+from impactutils.io.smcontainers import ShakeMapOutputContainer
+from .base import CoreModule, Contents
+from shakemap.utils.config import (get_config_paths)
 from shakelib.plotting.contour import contour
 from impactutils.colors.cpalette import ColorPalette
 from mapio.grid2d import Grid2D
+from shakemap.c.pcontour import pcontour
 
 OVERLAY_IMG = 'ii_overlay.png'
 OVERLAY_KML = 'overlay.kml'
 STATION_KML = 'stations.kml'
 CONTOUR_KML = 'mmi_contour.kml'
+POLYGON_KML = 'polygons_mi.kml'
 KMZ_FILE = 'shakemap.kmz'
 KML_FILE = 'shakemap.kml'
 EPICENTER_URL = \
@@ -49,6 +49,143 @@ IMT_UNITS = {'pga': '%g',
 
 DEFAULT_FILTER_SIZE = 10
 
+color_hash = {
+    "0": "ffffffff",
+    "0.0": "ffffffff",
+    "0.1": "ffffffff",
+    "0.2": "ffffffff",
+    "0.3": "ffffffff",
+    "0.4": "ffffffff",
+    "0.5": "ffffffff",
+    "0.6": "ffffffff",
+    "0.7": "ffffffff",
+    "0.8": "ffffffff",
+    "0.9": "ffffffff",
+    "1": "ffffffff",
+    "1.0": "ffffffff",
+    "1.1": "fffffaf9",
+    "1.2": "fffff5f2",
+    "1.3": "fffff0ec",
+    "1.4": "ffffebe5",
+    "1.5": "ffffe5df",
+    "1.6": "ffffe0d9",
+    "1.7": "ffffdbd2",
+    "1.8": "ffffd6cc",
+    "1.9": "ffffd1c5",
+    "2": "ffffccbf",
+    "2.0": "ffffccbf",
+    "2.1": "ffffcfbc",
+    "2.2": "ffffd1b9",
+    "2.3": "ffffd4b6",
+    "2.4": "ffffd6b3",
+    "2.5": "ffffd9b0",
+    "2.6": "ffffdcac",
+    "2.7": "ffffdea9",
+    "2.8": "ffffe1a6",
+    "2.9": "ffffe3a3",
+    "3": "ffffe6a0",
+    "3.0": "ffffe6a0",
+    "3.1": "ffffe99d",
+    "3.2": "ffffeb9a",
+    "3.3": "ffffee96",
+    "3.4": "fffff093",
+    "3.5": "fffff390",
+    "3.6": "fffff58d",
+    "3.7": "fffff88a",
+    "3.8": "fffffa86",
+    "3.9": "fffffd83",
+    "4": "ffffff80",
+    "4.0": "ffffff80",
+    "4.1": "fff4ff7f",
+    "4.2": "ffe9ff7f",
+    "4.3": "ffdfff7e",
+    "4.4": "ffd4ff7e",
+    "4.5": "ffc9ff7d",
+    "4.6": "ffbeff7c",
+    "4.7": "ffb3ff7c",
+    "4.8": "ffa9ff7b",
+    "4.9": "ff9eff7b",
+    "5": "ff93ff7a",
+    "5.0": "ff93ff7a",
+    "5.1": "ff84ff87",
+    "5.2": "ff76ff95",
+    "5.3": "ff67ffa2",
+    "5.4": "ff58ffaf",
+    "5.5": "ff4affbc",
+    "5.6": "ff3bffca",
+    "5.7": "ff2cffd7",
+    "5.8": "ff1dffe4",
+    "5.9": "ff0ffff2",
+    "6": "ff00ffff",
+    "6.0": "ff00ffff",
+    "6.1": "ff00faff",
+    "6.2": "ff00f4ff",
+    "6.3": "ff00efff",
+    "6.4": "ff00e9ff",
+    "6.5": "ff00e4ff",
+    "6.6": "ff00deff",
+    "6.7": "ff00d9ff",
+    "6.8": "ff00d3ff",
+    "6.9": "ff00ceff",
+    "7": "ff00c8ff",
+    "7.0": "ff00c8ff",
+    "7.1": "ff00c3ff",
+    "7.2": "ff00bdff",
+    "7.3": "ff00b8ff",
+    "7.4": "ff00b2ff",
+    "7.5": "ff00adff",
+    "7.6": "ff00a7ff",
+    "7.7": "ff00a2ff",
+    "7.8": "ff009cff",
+    "7.9": "ff0097ff",
+    "8": "ff0091ff",
+    "8.0": "ff0091ff",
+    "8.1": "ff0083ff",
+    "8.2": "ff0074ff",
+    "8.3": "ff0066ff",
+    "8.4": "ff0057ff",
+    "8.5": "ff0049ff",
+    "8.6": "ff003aff",
+    "8.7": "ff002cff",
+    "8.8": "ff001dff",
+    "8.9": "ff000fff",
+    "9": "ff0000ff",
+    "9.0": "ff0000ff",
+    "9.1": "ff0000fa",
+    "9.2": "ff0000f4",
+    "9.3": "ff0000ef",
+    "9.4": "ff0000e9",
+    "9.5": "ff0000e4",
+    "9.6": "ff0000de",
+    "9.7": "ff0000d9",
+    "9.8": "ff0000d3",
+    "9.9": "ff0000ce",
+    "10": "ff0000c8",
+    "10.0": "ff0000c8",
+    "10.1": "ff0000c6",
+    "10.2": "ff0000c3",
+    "10.3": "ff0000c1",
+    "10.4": "ff0000be",
+    "10.5": "ff0000bc",
+    "10.6": "ff0000ba",
+    "10.7": "ff0000b7",
+    "10.8": "ff0000b5",
+    "10.9": "ff0000b2",
+    "11": "ff0000b0",
+    "11.0": "ff0000b0"}
+
+arabic2roman = {
+    "1": "I",
+    "2": "II",
+    "3": "III",
+    "4": "IV",
+    "5": "V",
+    "6": "VI",
+    "7": "VII",
+    "8": "VIII",
+    "9": "IX",
+    "10": "X"}
+
 
 class KMLModule(CoreModule):
     """
@@ -59,27 +196,12 @@ class KMLModule(CoreModule):
     targets = [r'products/shakemap\.kmz']
     dependencies = [('products/shake_result.hdf', True)]
 
-    # supply here a data structure with information about files that
-    # can be created by this module.
-    kml_page = {'title': 'Ground Motion KMZ File', 'slug': 'kml'}
-    contents = OrderedDict.fromkeys(['shakemap_kmz'])
-    ftype = 'application/vnd.google-earth.kml+xml'
-    contents['shakemap_kmz'] = {'title': 'ShakeMap Overview KMZ',
-                                'caption': 'ShakeMap Overview.',
-                                'page': kml_page,
-                                'formats': [{'filename': 'shakemap.kmz',
-                                             'type': ftype}
-                                            ]
-                                }
-
     def __init__(self, eventid):
         """
         Instantiate a KMLModule class with an event ID.
         """
-        self._eventid = eventid
-        log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
-        self.logger = logging.getLogger(log_name)
+        super(KMLModule, self).__init__(eventid)
+        self.contents = Contents('Ground MOtion KMZ File', 'kml', eventid)
 
     def execute(self):
         """
@@ -105,46 +227,31 @@ class KMLModule(CoreModule):
             raise NotImplementedError('kml module can only contour '
                                       'gridded data, not sets of points')
 
-        # find the low res ocean vector dataset
-        product_config_file = os.path.join(
-            install_path, 'config', 'products.conf')
-        spec_file = get_configspec('products')
-        validator = get_custom_validator()
-        pconfig = configobj.ConfigObj(product_config_file,
-                                      configspec=spec_file)
-        results = pconfig.validate(validator)
-        if not isinstance(results, bool) or not results:
-            config_error(pconfig, results)
-        oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
-
         # call create_kmz function
-        create_kmz(container, datadir, oceanfile, self.logger)
+        create_kmz(container, datadir, self.logger, self.contents)
 
         container.close()
 
 
-def create_kmz(container, datadir, oceanfile, logger):
+def create_kmz(container, datadir, logger, contents):
     # we're going to combine all these layers into one KMZ file.
     kmz_contents = []
 
     # create the kml text
-    root = etree.Element("kml")
-    nlink = etree.SubElement(root, "NetworkLinkControl")
-    nperiod = etree.SubElement(nlink, "minRefreshPeriod")
-    nperiod.text = '300'
-    document = etree.SubElement(root, 'Document')
-    name = etree.SubElement(document, 'name')
     info = container.getMetadata()
     eid = info['input']['event_information']['event_id']
     mag = info['input']['event_information']['magnitude']
     timestr = info['input']['event_information']['origin_time']
     namestr = 'ShakeMap %s M%s %s' % (eid, mag, timestr)
-    name.text = namestr
+    document = skml.Kml(name=namestr)
+    nlc = skml.NetworkLinkControl(minrefreshperiod=300)
+    document.networklinkcontrol = nlc
+
     set_look(document, container)
 
     # create intensity overlay
     logger.debug('Creating intensity overlay...')
-    overlay_image = create_overlay(container, oceanfile, datadir, document)
+    overlay_image = create_overlay(container, datadir, document)
     kmz_contents += [overlay_image]
     logger.debug('Created intensity overlay image %s' % overlay_image)
 
@@ -161,6 +268,11 @@ def create_kmz(container, datadir, oceanfile, logger):
     create_contours(container, document)
     logger.debug('Created contour KML')
 
+    # create MMI polygon kml
+    logger.debug('Creating polygon KML...')
+    create_polygons(container, document)
+    logger.debug('Created polygon KML')
+
     # create epicenter KML
     logger.debug('Creating epicenter KML...')
     create_epicenter(container, document)
@@ -171,9 +283,8 @@ def create_kmz(container, datadir, oceanfile, logger):
     kmz_contents.append(legend_file)
 
     # Write the uber-kml file
-    tree = etree.ElementTree(root)
     kmlfile = os.path.join(datadir, KML_FILE)
-    tree.write(kmlfile, encoding='utf-8', xml_declaration=True)
+    document.save(kmlfile)
     kmz_contents.append(kmlfile)
 
     # assemble all the pieces into a KMZ file, and delete source files
@@ -186,6 +297,11 @@ def create_kmz(container, datadir, oceanfile, logger):
         kmzip.write(kfile, arcname=arcname)
         os.remove(kfile)
     kmzip.close()
+
+    ftype = 'application/vnd.google-earth.kml+xml'
+    contents.addFile('shakemap_kmz', 'ShakeMap Overview KMZ',
+                     'ShakeMap Overview KMZ.',
+                     'shakemap.kmz', ftype)
 
     logger.debug('Wrote KMZ container file %s' % kmzfile)
     return kmzfile
@@ -202,25 +318,14 @@ def place_legend(datadir, document):
     Returns:
         str: Path to output intensity legend file.
     """
-    overlay = etree.SubElement(document, 'ScreenOverlay')
-    name = etree.SubElement(overlay, 'name')
-    name.text = 'Intensity Legend'
-    icon = etree.SubElement(overlay, 'Icon')
-    href = etree.SubElement(icon, 'href')
-    href.text = LEGEND
-    _ = etree.SubElement(overlay, 'overlayXY',
-                         x="0", y="90",
-                         xunits="pixels", yunits="pixels")
-    _ = etree.SubElement(overlay, 'screenXY',
-                         x="5",
-                         y="1",
-                         xunits="pixels",
-                         yunits="fraction")
-    _ = etree.SubElement(overlay, 'size',
-                         x="0",
-                         y="0",
-                         xunits="pixels",
-                         yunits="pixels")
+    icon = skml.Icon(href=LEGEND)
+    overlayxy = skml.OverlayXY(x=0, y=90, xunits='pixels', yunits='pixels')
+    screenxy = skml.ScreenXY(x=5, y=1, xunits='pixels', yunits='fraction')
+    size = skml.Size(x=0, y=0, xunits='pixels', yunits='pixels')
+    document.newscreenoverlay(name='Intensity Legend', icon=icon,
+                              overlayxy=overlayxy,
+                              screenxy=screenxy,
+                              size=size)
 
     # we need to find the legend file and copy it to
     # the output directory
@@ -240,24 +345,92 @@ def create_epicenter(container, document):
         document (Element): LXML KML Document element.
 
     """
-    style = etree.SubElement(document, 'Style', id="epicenterIcon")
-    iconstyle = etree.SubElement(style, 'IconStyle')
-    icon = etree.SubElement(iconstyle, 'Icon')
-    href = etree.SubElement(icon, 'href')
-    href.text = EPICENTER_URL
-    placemark = etree.SubElement(document, 'Placemark')
-    name = etree.SubElement(placemark, 'name')
-    name.text = 'Earthquake Epicenter'
-    point = etree.SubElement(placemark, 'Point')
-    coordinates = etree.SubElement(point, 'coordinates')
+    icon = skml.Icon(href=EPICENTER_URL)
+    iconstyle = skml.IconStyle(icon=icon)
+    style = skml.Style(iconstyle=iconstyle)
+
     info = container.getMetadata()
     lon = info['input']['event_information']['longitude']
     lat = info['input']['event_information']['latitude']
-    coordinates.text = '%s,%s' % (lon, lat)
-    styleurl = etree.SubElement(placemark, 'styleUrl')
-    styleurl.text = '#epicenterIcon'
-    visibility = etree.SubElement(placemark, 'visibility')
-    visibility.text = '0'
+    point = document.newpoint(name='Earthquake Epicenter',
+                              coords=[(lon, lat)],
+                              visibility=0)
+    point.style = style
+
+
+def create_polygons(container, document):
+
+    component = container.getComponents('MMI')[0]
+    gdict = container.getIMTGrids("MMI", component)
+    fgrid = median_filter(gdict['mean'], size=10)
+    cont_min = np.floor(np.min(fgrid)) - 0.5
+    if cont_min < 0:
+        cont_min = 0.5
+    cont_max = np.ceil(np.max(fgrid)) + 0.5
+    if cont_max > 10.5:
+        cont_max = 10.5
+    contour_levels = np.arange(cont_min, cont_max, 1, dtype=np.double)
+    gjson = pcontour(fgrid,
+                     gdict['mean_metadata']['dx'],
+                     gdict['mean_metadata']['dy'],
+                     gdict['mean_metadata']['xmin'],
+                     gdict['mean_metadata']['ymax'],
+                     contour_levels, 4, 0)
+
+    folder = document.newfolder(name="MMI Polygons")
+
+    for feature in gjson['features']:
+        cv = feature['properties']['value']
+        f = folder.newfolder(name="MMI %g Polygons" % cv)
+        color = color_hash["%g" % cv]
+        name = "MMI %g Polygon" % cv
+        s = skml.PolyStyle(fill=1, outline=0, color=color,
+                           colormode='normal')
+        for plist in feature['geometry']['coordinates']:
+            ib = []
+            for i, coords in enumerate(plist):
+                if i == 0:
+                    ob = coords
+                else:
+                    ib.append(coords)
+            p = f.newpolygon(outerboundaryis=ob, innerboundaryis=ib,
+                             name=name, visibility=0)
+            p.style.polystyle = s
+
+    # Make the polygon labels
+    cont_min = np.floor(np.min(fgrid))
+    cont_max = np.ceil(np.max(fgrid))
+    contour_levels = np.arange(cont_min, cont_max, 1, dtype=np.double)
+    gjson = pcontour(fgrid,
+                     gdict['mean_metadata']['dx'],
+                     gdict['mean_metadata']['dy'],
+                     gdict['mean_metadata']['xmin'],
+                     gdict['mean_metadata']['ymax'],
+                     contour_levels, 2, 0)
+
+    f = folder.newfolder(name="MMI Labels")
+    ic = skml.IconStyle(scale=0)
+    for feature in gjson['features']:
+        cv = "%g" % feature['properties']['value']
+        if cv.endswith(".5"):
+            continue
+        for coords in feature['geometry']['coordinates']:
+            lc = len(coords)
+            if lc < 150:
+                continue
+            if coords[0][0] == coords[-1][0] and coords[0][1] == coords[-1][1]:
+                if lc < 500:
+                    dopts = [0, int(lc/2)]
+                elif lc < 1000:
+                    dopts = [0, int(lc/3), int(2*lc/3)]
+                else:
+                    dopts = [0, int(lc/4), int(lc/2), int(3*lc/4)]
+            else:
+                dopts = [int(lc/2)]
+            for i in dopts:
+                p = f.newpoint(name=arabic2roman[cv], coords=[coords[i]],
+                               visibility=0)
+                p.style.iconstyle = ic
 
 
 def create_contours(container, document):
@@ -269,40 +442,57 @@ def create_contours(container, document):
         document (Element): LXML KML Document element.
     """
     # TODO - label contours? gx:labelVisibility doesn't seem to be working...
-    imts = container.getIMTs()
-    if 'MMI' not in imts:
-        return
-    component = container.getComponents('MMI')[0]
-    line_strings = contour(container, 'MMI', component, DEFAULT_FILTER_SIZE,
-                           None)
 
-    # make a folder for the contours
-    folder = etree.SubElement(document, 'Folder')
-    name = etree.SubElement(folder, 'name')
-    name.text = 'Contours'
-    visibility = etree.SubElement(folder, 'visibility')
-    visibility.text = '0'
+    folder = document.newfolder(name='Contours', visibility=0)
+    mmi_line_styles = create_line_styles()
+    pgm_line_style = skml.Style(linestyle=skml.LineStyle(width=3))
+    ic = skml.IconStyle(scale=0)
 
-    create_line_styles(folder)
-    for line_string in line_strings:
-        placemark = etree.SubElement(folder, 'Placemark')
-        visibility = etree.SubElement(placemark, 'visibility')
-        visibility.text = '0'
-        styleurl = etree.SubElement(placemark, 'styleUrl')
-        mmi = line_string['properties']['value']
-        styleurl.text = '#style_mi_%.1f' % mmi
-        name = etree.SubElement(placemark, 'name')
-        name.text = 'MMI %.1f' % (mmi)
-        geometry = etree.SubElement(placemark, 'MultiGeometry')
-        for segment in line_string['geometry']['coordinates']:
-            linestring = etree.SubElement(geometry, 'LineString')
-            coordinates = etree.SubElement(linestring, 'coordinates')
-            ctext = ''
-            for vertex in segment:
-                lon = vertex[0]
-                lat = vertex[1]
-                ctext += '%.4f,%.4f,0\n' % (lon, lat)
-            coordinates.text = ctext
+    component = list(container.getComponents())[0]
+    imts = container.getIMTs(component)
+    for imt in imts:
+        line_strings = contour(container.getIMTGrids(imt, component), imt,
+                               DEFAULT_FILTER_SIZE, None)
+        # make a folder for the contours
+        imt_folder = folder.newfolder(name='%s Contours' % imt,
+                                      visibility=0)
+
+        for line_string in line_strings:
+            if imt == 'MMI':
+                val = '%.1f' % line_string['properties']['value']
+            else:
+                val = '%g' % line_string['properties']['value']
+            line_list = []
+            for segment in line_string['geometry']['coordinates']:
+                ctext = []
+                for vertex in segment:
+                    ctext.append((vertex[0], vertex[1]))
+                ls = skml.LineString(coords=ctext)
+                line_list.append(ls)
+                lc = len(ctext)
+                if lc < 10:
+                    dopts = []
+                elif (ctext[0][0] == ctext[-1][0] and
+                      ctext[0][1] == ctext[-1][1]):
+                    if lc < 30:
+                        dopts = [0, int(lc/2)]
+                    elif lc < 60:
+                        dopts = [0, int(lc/3), int(2*lc/3)]
+                    else:
+                        dopts = [0, int(lc/4), int(lc/2), int(3*lc/4)]
+                else:
+                    dopts = [int(lc/2)]
+                for i in dopts:
+                    p = imt_folder.newpoint(name=val, coords=[ctext[i]],
+                                            visibility=0)
+                    p.style.iconstyle = ic
+            mg = imt_folder.newmultigeometry(geometries=line_list,
+                                             visibility=0,
+                                             name="%s %s" % (imt, val))
+            if imt == 'MMI':
+                mg.style = mmi_line_styles[val]
+            else:
+                mg.style = pgm_line_style
 
 
 def set_look(document, container):
@@ -314,53 +504,37 @@ def set_look(document, container):
 
     """
     # set the view so that we're looking straight down
-    lookat = etree.SubElement(document, 'LookAt')
     info = container.getMetadata()
     lon = info['input']['event_information']['longitude']
     lat = info['input']['event_information']['latitude']
-    longitude = etree.SubElement(lookat, 'longitude')
-    longitude.text = lon
-    latitude = etree.SubElement(lookat, 'latitude')
-    latitude.text = lat
-    altitude = etree.SubElement(lookat, 'altitude')
-    altitude.text = '%i' % LOOKAT_ALTITUDE
-    tilt = etree.SubElement(lookat, 'tilt')
-    tilt.text = '0'
-    altmode = etree.SubElement(lookat, 'altitudeMode')
-    altmode.text = 'absolute'
+    document.lookat = skml.LookAt(longitude=lon, latitude=lat,
+                                  altitude='%i' % LOOKAT_ALTITUDE,
+                                  altitudemode='absolute',
+                                  tilt=0, heading=0)
 
 
-def create_line_styles(document):
+def create_line_styles():
     """Create line styles for contour KML.
 
     Args:
-        document (Element): LXML KML Document element.
     """
-    gxns = 'http://www.google.com/kml/ext/2.2'
-    nsmap = {'gx': gxns}
+    line_styles = {}
     cpalette = ColorPalette.fromPreset('mmi')
     for mmi in np.arange(0, 11, 0.5):
-        pid = 'style_mi_%.1f' % mmi
-        style = etree.SubElement(document, 'Style', id=pid)
-        linestyle = etree.SubElement(style, 'LineStyle')
-        color = etree.SubElement(linestyle, 'color')
+        pid = '%.1f' % mmi
         rgb = cpalette.getDataColor(mmi, color_format='hex')
-        color.text = flip_rgb(rgb)
-        width = etree.SubElement(linestyle, 'width')
-        width.text = '2.0'
-        # TODO: this doesn't work!
-        vis = etree.SubElement(linestyle,
-                               '{%s}labelVisibility' % gxns,
-                               nsmap=nsmap)
-        vis.text = '1'
+        line_style = skml.LineStyle(color=flip_rgb(rgb),
+                                    width=2.0)
+        style = skml.Style(linestyle=line_style)
+        line_styles[pid] = style
+    return line_styles
 
 
-def create_overlay(container, oceanfile, datadir, document):
+def create_overlay(container, datadir, document):
     """Create a KML file and intensity map.
 
     Args:
         container (ShakeMapOutputContainer): Results of model.conf.
-        oceanfile (str): Path to shapefile containing ocean polygons.
         datadir (str): Path to data directory where output KMZ will be written.
         document (SubElement): KML document where the overlay tags should go.
     Returns:
@@ -368,43 +542,26 @@ def create_overlay(container, oceanfile, datadir, document):
     """
     # create the overlay image file
     overlay_img_file = os.path.join(datadir, OVERLAY_IMG)
-    geodict = create_overlay_image(container, oceanfile, overlay_img_file)
-
-    overlay = etree.SubElement(document, 'GroundOverlay')
-    name = etree.SubElement(overlay, 'name')
-    name.text = 'Intensity Overlay'
-    color = etree.SubElement(overlay, 'color')
-    color.text = 'ffffffff'
-    draw_order = etree.SubElement(overlay, 'drawOrder')
-    draw_order.text = '0'
-    icon = etree.SubElement(overlay, 'Icon')
-    interval = etree.SubElement(icon, 'refreshInterval')
-    interval.text = '300'
-    mode = etree.SubElement(icon, 'refreshMode')
-    mode.text = 'onInterval'
-    href = etree.SubElement(icon, 'href')
-    href.text = OVERLAY_IMG
-    box = etree.SubElement(overlay, 'LatLonBox')
-    xmin, xmax, ymin, ymax = (geodict.xmin, geodict.xmax,
-                              geodict.ymin, geodict.ymax)
-    north = etree.SubElement(box, 'north')
-    north.text = '%.4f' % ymax
-    south = etree.SubElement(box, 'south')
-    south.text = '%.4f' % ymin
-    east = etree.SubElement(box, 'east')
-    east.text = '%.4f' % xmax
-    west = etree.SubElement(box, 'west')
-    west.text = '%.4f' % xmin
+    geodict = create_overlay_image(container, overlay_img_file)
+    box = skml.LatLonBox(north=geodict.ymax, south=geodict.ymin,
+                         east=geodict.xmax, west=geodict.xmin)
+    icon = skml.Icon(refreshinterval=300,
+                     refreshmode='onInterval',
+                     href=OVERLAY_IMG)
+    document.newgroundoverlay(name='IntensityOverlay',
+                              color='ffffffff',
+                              draworder=0,
+                              latlonbox=box,
+                              icon=icon)
 
     return overlay_img_file
 
 
-def create_overlay_image(container, oceanfile, filename):
+def create_overlay_image(container, filename):
     """Create a semi-transparent PNG image of intensity.
 
     Args:
         container (ShakeMapOutputContainer): Results of model.conf.
-        oceanfile (str): Path to shapefile containing ocean polygons.
         filename (str): Path to desired output PNG file.
     Returns:
         GeoDict: GeoDict object for the intensity grid.
@@ -413,8 +570,8 @@ def create_overlay_image(container, oceanfile, filename):
     comp = container.getComponents('MMI')[0]
     imtdict = container.getIMTGrids('MMI', comp)
     mmigrid = imtdict['mean']
-    gd = mmigrid.getGeoDict()
-    imtdata = mmigrid.getData().copy()
+    gd = GeoDict(imtdict['mean_metadata'])
+    imtdata = mmigrid.copy()
     rows, cols = imtdata.shape
 
     # get the intensity colormap
@@ -427,16 +584,21 @@ def create_overlay_image(container, oceanfile, filename):
     # set the alpha value to 255 wherever we have MMI 0
     rgba[imtdata <= 1.5] = 0
 
-    # mask off the areas covered by ocean
-    bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-    with fiona.open(oceanfile) as c:
-        tshapes = list(c.items(bbox=bbox))
-        shapes = []
-        for tshp in tshapes:
-            shapes.append(shape(tshp[1]['geometry']))
-        if len(shapes):
-            oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd, fillValue=0.0)
-            rgba[oceangrid.getData() == 1] = 0
+    if 'CALLED_FROM_PYTEST' not in os.environ:
+        # mask off the areas covered by ocean
+        oceans = shpreader.natural_earth(category='physical',
+                                         name='ocean',
+                                         resolution='10m')
+        bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
+        with fiona.open(oceans) as c:
+            tshapes = list(c.items(bbox=bbox))
+            shapes = []
+            for tshp in tshapes:
+                shapes.append(shape(tshp[1]['geometry']))
+            if len(shapes):
+                oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
+                                                         fillValue=0.0)
+                rgba[oceangrid.getData() == 1] = 0
 
     # save rgba image as png
     img = Image.fromarray(rgba)
@@ -454,7 +616,6 @@ def create_stations(container, datadir, document):
     Returns:
         str: Path to output KMZ file.
     """
-    create_styles(document)
 
     # get a color palette object to convert intensity values to
     # html colors
@@ -464,22 +625,21 @@ def create_stations(container, datadir, document):
     station_dict = container.getStationDict()
 
     # Group the MMI and instrumented stations separately
-    mmi_folder = etree.SubElement(document, 'Folder')
-    mmi_name = etree.SubElement(mmi_folder, 'name')
-    mmi_name.text = 'Macroseismic Stations'
-    mmi_vis = etree.SubElement(mmi_folder, 'visibility')
-    mmi_vis.text = '0'
+    mmi_folder = document.newfolder(name="Macroseismic Stations",
+                                    visibility=0)
+    ins_folder = document.newfolder(name="Instrumented Stations",
+                                    visibility=0)
 
-    ins_folder = etree.SubElement(document, 'Folder')
-    ins_name = etree.SubElement(ins_folder, 'name')
-    ins_name.text = 'Instrumented Stations'
-    ins_vis = etree.SubElement(ins_folder, 'visibility')
-    ins_vis.text = '0'
     for station in station_dict['features']:
+        intensity = get_intensity(station)
+        rgb = cpalette.getDataColor(intensity, color_format='hex')
+        color = flip_rgb(rgb)
         if station['properties']['station_type'] == 'seismic':
-            make_placemark(ins_folder, station, cpalette)
+            style_map = create_styles(document, TRIANGLE, 0.6, 0.8, color)
+            make_placemark(ins_folder, station, cpalette, style_map)
         else:
-            make_placemark(mmi_folder, station, cpalette)
+            style_map = create_styles(document, CIRCLE, 0.4, 0.6, color)
+            make_placemark(mmi_folder, station, cpalette, style_map)
 
     # we need to find the triangle and circle icons and copy them to
     # the output directory
@@ -495,38 +655,21 @@ def create_stations(container, datadir, document):
     return (tridest, cirdest)
 
 
-def make_placemark(document, station, cpalette):
+def make_placemark(folder, station, cpalette, style_map):
     """Create a placemark element in station KML.
 
     Args:
-        document (Element): LXML KML Document element.
+        folder (Element): KML Folder element.
         station (dict): Dictionary containing station data.
         cpalette (ColorPalette): Object allowing user to convert MMI to color.
+        style_map (skml.StyleMap): The style map for the station type.
     """
-    placemark = etree.SubElement(document, 'Placemark')
-    style_url = etree.SubElement(placemark, 'styleUrl')
-    if station['properties']['network'] in ['INTENSITY', 'DYFI', 'CIIM']:
-        style_url.text = '#dyfiIconMap'
-    else:
-        style_url.text = '#stationIconMap'
-    style = etree.SubElement(placemark, 'Style')
-    icon_style = etree.SubElement(style, 'IconStyle')
-    color = etree.SubElement(icon_style, 'color')
-    intensity = get_intensity(station)
-    rgb = cpalette.getDataColor(intensity, color_format='hex')
-    color.text = flip_rgb(rgb)
-    name = etree.SubElement(placemark, 'name')
-    name.text = station['id']
-    visibility = etree.SubElement(placemark, 'visibility')
-    visibility.text = '0'
-    description = etree.SubElement(placemark, 'description')
-    description.text = etree.CDATA(get_description_table(station))
-    point = etree.SubElement(placemark, 'Point')
-    alt_model = etree.SubElement(point, 'altitudeModel')
-    alt_model.text = 'clampToGround'
-    coordinates = etree.SubElement(point, 'coordinates')
-    coordinates.text = '%.4f,%.4f,0' % (
-        tuple(station['geometry']['coordinates']))
+    point = folder.newpoint(name=station['id'],
+                            visibility=0,
+                            description=get_description_table(station),
+                            altitudemode='clampToGround',
+                            coords=[tuple(station['geometry']['coordinates'])])
+    point.stylemap = style_map
 
 
 def get_intensity(station):
@@ -603,7 +746,7 @@ def imt_to_string(imt):
                      'pgv': 'PGV'}
     if imt in non_spectrals:
         return non_spectrals[imt]
-    period = re.search("\d+\.\d+", imt).group()  # noqa
+    period = re.search(r"\d+\.\d+", imt).group()  # noqa
     imt_string = 'PSA %s sec' % period
     return imt_string
 
@@ -735,71 +878,44 @@ def get_imt_text(station, imt):
     return imt_text
 
 
-def create_styles(document):
+def create_styles(document, icon_text, scale_normal, scale_highlight, color):
     """Create styles/style maps for station KML.
 
     Args:
         document (Element): LXML KML Document element.
     """
-    add_icon_style(document, 'stationIconNormal', TRIANGLE, 0.6, 0.0)
-    add_icon_style(document, 'stationIconHighlight', TRIANGLE, 0.8, 1.0)
-    add_icon_style(document, 'dyfiIconNormal', CIRCLE, 0.4, 0.0)
-    add_icon_style(document, 'dyfiIconHighlight', CIRCLE, 0.6, 1.0)
+    style_normal = add_icon_style(document, icon_text, scale_normal, 0.0,
+                                  color)
+    style_highlight = add_icon_style(document, icon_text, scale_highlight, 1.0,
+                                     color)
 
-    add_style_map(document, 'station')
-    add_style_map(document, 'dyfi')
+    style_map = skml.StyleMap(normalstyle=style_normal,
+                              highlightstyle=style_highlight)
+    return style_map
 
 
-def add_icon_style(document, icon_id, icon_text, icon_scale, label_scale):
+def add_icon_style(document, icon_text, icon_scale, label_scale, color):
     """Create Style tag around Icon in KML.
 
     Args:
         document (Element): LXML KML Document element.
-        icon_id (str): Id field in Style tag.
         icon_text (str): The name of the icon file.
         icon_scale (float): The icon scale.
         label_scale (float): The label scale.
     """
-    normal_station_style = etree.SubElement(document, 'Style', id=icon_id)
-    icon_style = etree.SubElement(normal_station_style, 'IconStyle')
-    scale1 = etree.SubElement(icon_style, 'scale')
-    scale1.text = '%.1f' % icon_scale
-    icon = etree.SubElement(icon_style, 'Icon')
-    href = etree.SubElement(icon, 'href')
-    href.text = icon_text
-    label_style = etree.SubElement(normal_station_style, 'LabelStyle')
-    scale2 = etree.SubElement(label_style, 'scale')
-    scale2.text = '%.1f' % label_scale
-    list_style = etree.SubElement(normal_station_style, 'ListStyle')
-    item_type = etree.SubElement(list_style, 'listItemType')
-    item_type.text = 'checkHideChildren'
-    balloon_style = etree.SubElement(normal_station_style, 'BalloonStyle')
-    text = etree.SubElement(balloon_style, 'text')
-    text.text = '$[description]'
+    icon = skml.Icon(href=icon_text)
+    icon_style = skml.IconStyle(scale="%.1f" % icon_scale,
+                                color=color,
+                                icon=icon)
+    label_style = skml.LabelStyle(scale='%.1f' % label_scale)
+#    list_style = skml.ListStyle(listitemtype='checkHideChildren')
+    balloon_style = skml.BalloonStyle(text='$[description]')
 
-
-def add_style_map(document, style_type):
-    """Create the StyleMap tags used by the placemark elements.
-
-    Args:
-        document (Element): LXML KML Document element.
-        style_type (str): "station" or "dyfi".
-    """
-    style_map = etree.SubElement(document,
-                                 'StyleMap',
-                                 id='%sIconMap' % style_type)
-
-    pair1 = etree.SubElement(style_map, 'Pair')
-    key1 = etree.SubElement(pair1, 'key')
-    key1.text = 'normal'
-    style_url = etree.SubElement(pair1, 'styleUrl')
-    style_url.text = '#%sIconNormal' % style_type
-
-    pair2 = etree.SubElement(style_map, 'Pair')
-    key2 = etree.SubElement(pair2, 'key')
-    key2.text = 'highlight'
-    style_url = etree.SubElement(pair2, 'styleUrl')
-    style_url.text = '#%sIconHighlight' % style_type
+#    style = skml.Style(iconstyle=icon_style, labelstyle=label_style,
+#                       liststyle=list_style, balloonstyle=balloon_style)
+    style = skml.Style(iconstyle=icon_style, labelstyle=label_style,
+                       balloonstyle=balloon_style)
+    return style
 
 
 def flip_rgb(rgb):

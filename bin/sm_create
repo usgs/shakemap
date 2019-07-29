@@ -8,21 +8,111 @@ import argparse
 import datetime
 import json
 import warnings
+from collections import OrderedDict
+import copy
 
 # third party imports
 from libcomcat.search import get_event_by_id
 from configobj import ConfigObj
 from impactutils.time.ancient_time import HistoricTime
+from impactutils.io.table import dataframe_to_xml
+import numpy as np
 
 # local imports
-from shakemap.utils.config import get_config_paths
-from shakelib.rupture.origin import write_event_file, Origin
-from shakelib.rupture.factory import text_to_json, rupture_from_dict_and_origin
-from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
+from shakelib.rupture.origin import (write_event_file,
+                                     Origin)
+from shakelib.rupture.factory import get_rupture
+from shakemap.utils.utils import (get_network_name,
+                                  migrate_gmpe,
+                                  set_gmpe)
+from shakemap.utils.probs import get_weights
+from shakemap.utils.layers import (validate_config,
+                                   update_config_regions)
+from shakemap.coremods.dyfi import _get_dyfi_dataframe
+from shakelib.rupture import constants
+from shakelib.station import StationList
 
-TIMEFMT1 = '%Y-%m-%dT%H:%M:%S.%fZ'
 TIMEFMT2 = '%Y-%m-%dT%H:%M:%S'
-KM2SEC = 3600.0/111  # seconds per kilometer
+KM2SEC = 3600.0 / 111  # seconds per kilometer
+
+
+def write_instrumented(data_file, event_dir):
+    # load the file, nuke any data not from an instrument
+    instrumented = StationList.loadFromFiles([data_file])
+    db = instrumented.db
+    cursor = instrumented.cursor
+    cursor.execute('SELECT count(*) FROM station')
+    nrows = cursor.fetchone()[0]
+    # sys.stderr.write('Original data set had %i total stations.\n' % nrows)
+    query1 = 'SELECT id FROM station WHERE instrumented != 1'
+    cursor.execute(query1)
+    srows = cursor.fetchall()
+    for srow in srows:
+        sid = srow[0]
+        query2 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        cursor.execute(query2)
+        db.commit()
+        query3 = 'DELETE FROM station WHERE id="%s"' % sid
+        cursor.execute(query3)
+        db.commit()
+
+    cursor.execute('SELECT count(*) FROM station')
+    nrows = cursor.fetchone()[0]
+    instrument_file = None
+    if nrows:
+        jsonstr = instrumented.getGeoJson()
+        instrument_file = os.path.join(event_dir, 'instrumented_dat.json')
+        with open(instrument_file, 'wt') as f:
+            json.dump(jsonstr, f)
+    return instrument_file
+
+
+def write_macroseismic(data_file, event_dir):
+    # load the file, nuke any data that is not macroseismic
+    macroseismic = StationList.loadFromFiles([data_file])
+    db = macroseismic.db
+    cursor = macroseismic.cursor
+    cursor.execute('SELECT count(*) FROM station')
+    nrows = cursor.fetchone()[0]
+    # sys.stderr.write('Original data set had %i total stations.\n' % nrows)
+    # first remove instruments
+    query1 = 'SELECT id FROM station WHERE instrumented == 1'
+    cursor.execute(query1)
+    srows = cursor.fetchall()
+    for srow in srows:
+        sid = srow[0]
+        query2 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        cursor.execute(query2)
+        db.commit()
+        query3 = 'DELETE FROM station WHERE id="%s"' % sid
+        cursor.execute(query3)
+        db.commit()
+    # next, remove DYFI
+    query4 = 'SELECT id FROM station WHERE network in ("DYFI", "CIIM")'
+    cursor.execute(query4)
+    srows = cursor.fetchall()
+    for srow in srows:
+        sid = srow[0]
+        query5 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        cursor.execute(query5)
+        db.commit()
+        query6 = 'DELETE FROM station WHERE id="%s"' % sid
+        cursor.execute(query6)
+        db.commit()
+    cursor.execute('SELECT count(*) FROM station')
+    nrows = cursor.fetchone()[0]
+    macro_file = None
+    if nrows:
+        jsonstr = macroseismic.getGeoJson()
+        macro_file = os.path.join(event_dir, 'macroseismic_dat.json')
+        with open(macro_file, 'wt') as f:
+            json.dump(jsonstr, f)
+
+    return macro_file
 
 
 def get_parser():
@@ -100,7 +190,7 @@ def _get_event_dictionary(detail, source):
                 'depth': float(origin['depth']),
                 'mag': float(origin['magnitude']),
                 'time': datetime.datetime.strptime(
-                    origin['eventtime'], TIMEFMT1),
+                    origin['eventtime'], constants.TIMEFMT),
                 'locstring': detail.location
             }
         except ValueError:
@@ -132,7 +222,12 @@ def main(args):
 
     # get the global config for migrate.conf
     migrate_file = os.path.join(install_path, 'config', 'migrate.conf')
-    migrate_conf = ConfigObj(migrate_file)
+    spec_file = get_configspec('migrate')
+    validator = get_custom_validator()
+    migrate_conf = ConfigObj(migrate_file, configspec=spec_file)
+    results = migrate_conf.validate(validator)
+    if not isinstance(results, bool) or not results:
+        config_error(migrate_conf, results)
 
     if args.event:
         locstring = ''
@@ -158,9 +253,11 @@ def main(args):
             network = ''
 
         eventid = args.eventid
+        event_type = 'ACTUAL'
         if not args.no_scenario:
             if not args.eventid.endswith('_se'):
                 eventid = eventid + '_se'
+                event_type = 'SCENARIO'
 
         edict = {
             'id': eventid,
@@ -171,6 +268,7 @@ def main(args):
             'lon': lon,
             'depth': depth,
             'mag': mag,
+            'event_type': event_type,
             'locstring': locstring
         }
         detail = None
@@ -183,7 +281,7 @@ def main(args):
             detail = get_event_by_id(args.eventid)
         except Exception as e:
             print('Unable to connect to ComCat server. '
-                  'Please try again later. "%s"')
+                  'Please try again later. "%s"' % str(e))
             sys.exit(1)
         # get input data
         edict = _get_event_dictionary(detail, args.source)
@@ -213,9 +311,19 @@ def main(args):
     if detail is not None:
         # if this event has a shakemap, then we have more to do
         if not detail.hasProduct('shakemap'):
-            print('Event %s has no ShakeMap product. '
-                  'Creating a basic ShakeMap.'
-                  % detail.id)
+            if not detail.hasProduct('dyfi'):
+                print('Event %s has no ShakeMap product. '
+                      'Creating a basic ShakeMap.'
+                      % detail.id)
+            else:
+                print('Event %s has no ShakeMap product, but does have DYFI. '
+                      'Downloading that data.'
+                      % detail.id)
+                dataframe, msg = _get_dyfi_dataframe(detail)
+                if dataframe is not None and len(dataframe):
+                    data_file = os.path.join(event_dir, 'dyfi_dat.xml')
+                    reference = 'USGS Did You Feel It? System'
+                    dataframe_to_xml(dataframe, data_file, reference)
         else:
             if args.source:
                 source = args.source
@@ -228,16 +336,60 @@ def main(args):
                 print(msg)
                 sys.exit(0)
 
-            data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
-            shakemap.getContent('stationlist.xml', filename=data_file)
+            got_data_file = False
+            try:
+                data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
+                shakemap.getContent('stationlist.xml', filename=data_file)
+                got_data_file = True
+            except Exception as e:
+                try:
+                    data_file = os.path.join(
+                        event_dir, '%s_dat.json' % eventid)
+                    shakemap.getContent('stationlist.json', filename=data_file)
+                    got_data_file = True
+                except Exception as e:
+                    pass
+
+            if got_data_file:
+                instrument_file = write_instrumented(data_file, event_dir)
+                macro_file = write_macroseismic(data_file, event_dir)
+                os.remove(data_file)
+            else:
+                fmt = 'Error while attempting to download ShakeMap ground motion data file.'
+                print(fmt)
+
+            # let's try to write out the input data in as many as three files:
+            # 1) dyfi_dat.xml, the most up to date DYFI we have.
+            # 2) instrumented_dat.son, all of the instrumented data from
+            #    stationlist.xml
+            # 3) macroseismic_dat.json, all of the macroseismic data from
+            #    stationlist.xml
+            dataframe, msg = _get_dyfi_dataframe(detail)
+            if dataframe is not None:
+                dyfi_file = os.path.join(event_dir, 'dyfi_dat.xml')
+                reference = 'USGS Did You Feel It? System'
+                dataframe_to_xml(dataframe, dyfi_file, reference)
+
             fault_files = shakemap.getContentsMatching('fault.txt')
             if len(fault_files):
                 fault_file = os.path.join(event_dir, fault_files[0])
                 shakemap.getContent(fault_files[0], filename=fault_file)
                 try:
-                    jdict = text_to_json(fault_file, new_format=False)
-                    origin = Origin(edict)
-                    rupt = rupture_from_dict_and_origin(jdict, origin)
+                    # edict['time'] = HistoricTime(edict['time'])
+                    origin = Origin.fromFile(event_xml_file)
+                    rupt = get_rupture(origin, file=fault_file,
+                                       new_format=False)
+
+                    # Remove any blank or nan origin info
+                    odict = copy.copy(rupt._origin.__dict__)
+                    for k, v in odict.items():
+                        if isinstance(v, str):
+                            if not v:
+                                rupt._geojson['metadata'].pop(k, None)
+                        if isinstance(v, float):
+                            if np.isnan(v):
+                                rupt._geojson['metadata'].pop(k, None)
+
                     jsonfile = os.path.join(event_dir, 'rupture.json')
                     rupt.writeGeoJson(jsonfile)
                     os.remove(fault_file)
@@ -257,6 +409,43 @@ def main(args):
             if args.preserve_params:
                 _write_model_conf(shakemap, module_conf, migrate_conf,
                                   event_dir, skip_bounds=args.skip_bounds)
+            else:
+                model = ConfigObj(indent_type='    ')
+                install_path, data_path = get_config_paths()
+                config = ConfigObj(os.path.join(install_path,
+                                                'config',
+                                                'select.conf'))
+                global_data_path = os.path.join(os.path.expanduser('~'),
+                                                'shakemap_data')
+                validate_config(config, install_path,
+                                data_path, global_data_path)
+                org = Origin(edict)
+                config = update_config_regions(org.lat, org.lon, config)
+                gmm_dict, strec_results = get_weights(org, config)
+                gmpe_set = 'gmpe_' + edict['id'] + '_custom'
+                model['gmpe_sets'] = OrderedDict([
+                    (gmpe_set, OrderedDict([
+                        ('gmpes', list(gmm_dict['gmpelist'])),
+                        ('weights', list(gmm_dict['weightlist'])),
+                        ('weights_large_dist', 'None'),
+                        ('dist_cutoff', 'nan'),
+                        ('site_gmpes', 'None'),
+                        ('weights_site_gmpes', 'None')
+                    ]))
+                ])
+                model['modeling'] = {}
+                model['modeling']['gmpe'] = gmpe_set
+                model['modeling']['mechanism'] = \
+                    strec_results['FocalMechanism']
+                if gmm_dict['ipe']:
+                    model['modeling']['ipe'] = gmm_dict['ipe']
+                if gmm_dict['gmice']:
+                    model['modeling']['gmice'] = gmm_dict['gmice']
+                if gmm_dict['ccf']:
+                    model['modeling']['ccf'] = gmm_dict['ccf']
+                model_file = os.path.join(event_dir, 'model_select.conf')
+                model.filename = model_file
+                model.write()
 
     print('Wrote %i files to %s' % (len(os.listdir(event_dir)), event_dir))
 

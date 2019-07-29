@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import os
 import os.path
 import tempfile
@@ -6,7 +7,6 @@ import zipfile
 import json
 import glob
 import subprocess
-import shutil
 
 import numpy as np
 from osgeo import gdal
@@ -17,6 +17,7 @@ import pytest
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.model import ModelModule
 from shakemap.coremods.assemble import AssembleModule
+from shakemap.coremods.history import HistoryModule
 from shakemap.coremods.contour import ContourModule
 from shakemap.coremods.info import InfoModule
 from shakemap.coremods.raster import RasterModule
@@ -26,8 +27,8 @@ from shakemap.coremods.mapping import MappingModule
 from shakemap.coremods.plotregr import PlotRegr
 from shakemap.coremods.kml import KMLModule
 from shakemap.coremods.gridxml import GridXMLModule, _oq_to_gridxml
-from shakemap.coremods.transfer import TransferModule
-from shakelib.utils.containers import ShakeMapOutputContainer
+from shakemap.coremods.shape import ShapeModule
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
 from mapio.shake import ShakeGrid
 
@@ -124,7 +125,7 @@ def do_info(evid, datapath, oc):
     ifile = os.path.join(datapath, evid, 'current', 'products', 'info.json')
     with open(ifile, 'r') as infile:
         fjson = json.loads(infile.read())
-        cjson = oc.getDictionary('info.json')
+        cjson = oc.getMetadata()
         assert fjson == cjson
 
 
@@ -150,6 +151,7 @@ def do_raster(evid, datapath, oc):
         with zipfile.ZipFile(rzip, 'r') as zip_ref:
             zip_ref.extractall(tmpdirname)
             for imt in imts:
+                component, imt = imt.split('/')
                 fname = oq_to_file(imt)
                 fname = os.path.join(tmpdirname, fname + '_mean.flt')
                 rin = gdal.Open(fname, GA_ReadOnly)
@@ -160,7 +162,7 @@ def do_raster(evid, datapath, oc):
                 band = rin.GetRasterBand(1)
                 rgrid = band.ReadAsArray(0, 0, cols, rows)
                 comp = oc.getComponents(imt)
-                cdata = oc.getIMTGrids(imt, comp[0])['mean'].getData()
+                cdata = oc.getIMTGrids(imt, comp[0])['mean']
                 assert np.allclose(cdata, rgrid)
 
                 fname = oq_to_file(imt)
@@ -173,7 +175,7 @@ def do_raster(evid, datapath, oc):
                 band = rin.GetRasterBand(1)
                 rgrid = band.ReadAsArray(0, 0, cols, rows)
                 comp = oc.getComponents(imt)
-                cdata = oc.getIMTGrids(imt, comp[0])['std'].getData()
+                cdata = oc.getIMTGrids(imt, comp[0])['std']
                 assert np.allclose(cdata, rgrid)
 
 
@@ -199,8 +201,9 @@ def do_gridxml(evid, datapath, oc):
     g2d = ShakeGrid.load(gxml)
     layers = g2d.getData()
     for imt in imts:
+        component, imt = imt.split('/')
         comp = oc.getComponents(imt)
-        cdata = oc.getIMTGrids(imt, comp[0])['mean'].getData()
+        cdata = oc.getIMTGrids(imt, comp[0])['mean']
         #
         # Do the same conversion to the container data as is
         # done to the file data
@@ -227,8 +230,9 @@ def do_gridxml(evid, datapath, oc):
     ulayers = u2d.getData()
 
     for imt in imts:
+        component, imt = imt.split('/')
         comp = oc.getComponents(imt)
-        cdata = oc.getIMTGrids(imt, comp[0])['std'].getData()
+        cdata = oc.getIMTGrids(imt, comp[0])['std']
         #
         # The stddevs just get rounded
         #
@@ -282,10 +286,11 @@ def test_points():
     model.execute()
     del model
 
-    mod = MappingModule(evid)
+    mapping = MappingModule(evid)
     # Mapping should raise exception
     with pytest.raises(NotImplementedError):
-        mod.execute()
+        mapping.execute()
+    del mapping
 
 
 def test_products():
@@ -311,6 +316,16 @@ def test_products():
         res_file = os.path.join(datapath, evid, 'current', 'products',
                                 'shake_result.hdf')
         oc = ShakeMapOutputContainer.load(res_file)
+
+        #
+        # The history module just outputs some info to the operator, so
+        # here we just run it to make sure it doesn't crash anything.
+        # Actual testing should be done via bug reports/feature requests
+        # from users.
+        #
+        history = HistoryModule(evid)
+        history.execute()
+        del history
 
         #
         # Test the creation of products -- currently not checking results
@@ -344,7 +359,13 @@ def test_products():
         mod = KMLModule(evid)
         mod.execute()
         mod.writeContents()
+        del mod
 
+        # This just exercises the ShapeModule code without actually
+        # checking for valid results.
+        mod = ShapeModule(evid)
+        mod.execute()
+        mod.writeContents()
         del mod
 
         #
@@ -353,7 +374,7 @@ def test_products():
         #
         do_rupture(evid, datapath, oc)
 
-        do_info(evid, datapath, oc)
+        # do_info(evid, datapath, oc)
 
         do_raster(evid, datapath, oc)
 
@@ -367,13 +388,6 @@ def test_products():
         #
         do_contour(evid, datapath)
 #        do_contour_command_line(evid, datapath)
-
-        check_failures(evid, datapath, TransferModule)
-        mod = TransferModule(evid)
-        mod.execute()
-        bufiles = glob.glob(os.path.join(datapath, evid, 'backup*'))
-        for bufile in bufiles:
-            shutil.rmtree(bufile)
 
     finally:
         pass

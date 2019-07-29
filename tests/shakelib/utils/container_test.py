@@ -11,13 +11,11 @@ import tempfile
 import os.path
 
 # third party imports
-from mapio.geodict import GeoDict
-from mapio.grid2d import Grid2D
 import pytest
 
 # local imports
 from shakelib.utils.containers import ShakeMapInputContainer
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.rupture.point_rupture import PointRupture
 
 
@@ -143,62 +141,103 @@ mech="" netid="us" network="" />"""
 
 
 def test_output_container():
-    geodict = GeoDict.createDictFromBox(-118.5, -114.5, 32.1, 36.7, 0.01, 0.02)
-    nrows, ncols = geodict.ny, geodict.nx
-
+    nrows = 400
+    ncols = 230
     # create MMI mean data for maximum component
     mean_mmi_maximum_data = np.random.rand(nrows, ncols)
     mean_mmi_maximum_metadata = {
+        'xmin': -118.5,
+        'xmax': -114.5,
+        'ymin': 32.1,
+        'ymax': 36.7,
+        'dx': 0.01,
+        'dy': 0.02,
+        'nx': 400,
+        'ny': 230,
         'name': 'Gandalf',
         'color': 'white',
         'powers': 'magic'
     }
-    mean_mmi_maximum_grid = Grid2D(mean_mmi_maximum_data, geodict)
 
     # create MMI std data for maximum component
     std_mmi_maximum_data = mean_mmi_maximum_data / 10
     std_mmi_maximum_metadata = {
+        'xmin': -118.5,
+        'xmax': -114.5,
+        'ymin': 32.1,
+        'ymax': 36.7,
+        'dx': 0.01,
+        'dy': 0.02,
+        'nx': 400,
+        'ny': 230,
         'name': 'Legolas',
         'color': 'green',
         'powers': 'good hair'
     }
-    std_mmi_maximum_grid = Grid2D(std_mmi_maximum_data, geodict)
 
     # create MMI mean data for rotd50 component
     mean_mmi_rotd50_data = np.random.rand(nrows, ncols)
     mean_mmi_rotd50_metadata = {
+        'xmin': -118.5,
+        'xmax': -114.5,
+        'ymin': 32.1,
+        'ymax': 36.7,
+        'dx': 0.01,
+        'dy': 0.02,
+        'nx': 400,
+        'ny': 230,
         'name': 'Gimli',
         'color': 'brown',
         'powers': 'axing'
     }
-    mean_mmi_rotd50_grid = Grid2D(mean_mmi_rotd50_data, geodict)
 
     # create MMI std data for rotd50 component
     std_mmi_rotd50_data = mean_mmi_rotd50_data / 10
     std_mmi_rotd50_metadata = {
+        'xmin': -118.5,
+        'xmax': -114.5,
+        'ymin': 32.1,
+        'ymax': 36.7,
+        'dx': 0.01,
+        'dy': 0.02,
+        'nx': 400,
+        'ny': 230,
         'name': 'Aragorn',
         'color': 'white',
         'powers': 'scruffiness'
     }
-    std_mmi_rotd50_grid = Grid2D(std_mmi_rotd50_data, geodict)
 
     # create PGA mean data for maximum component
     mean_pga_maximum_data = np.random.rand(nrows, ncols)
     mean_pga_maximum_metadata = {
+        'xmin': -118.5,
+        'xmax': -114.5,
+        'ymin': 32.1,
+        'ymax': 36.7,
+        'dx': 0.01,
+        'dy': 0.02,
+        'nx': 400,
+        'ny': 230,
         'name': 'Pippin',
         'color': 'purple',
         'powers': 'rashness'
     }
-    mean_pga_maximum_grid = Grid2D(mean_pga_maximum_data, geodict)
 
     # create PGA std data for maximum component
     std_pga_maximum_data = mean_pga_maximum_data / 10
     std_pga_maximum_metadata = {
+        'xmin': -118.5,
+        'xmax': -114.5,
+        'ymin': 32.1,
+        'ymax': 36.7,
+        'dx': 0.01,
+        'dy': 0.02,
+        'nx': 400,
+        'ny': 230,
         'name': 'Merry',
         'color': 'grey',
         'powers': 'hunger'
     }
-    std_pga_maximum_grid = Grid2D(std_pga_maximum_data, geodict)
 
     f, datafile = tempfile.mkstemp()
     os.close(f)
@@ -211,47 +250,35 @@ def test_output_container():
 
         # Add imts
         container.setIMTGrids('mmi',
-                              mean_mmi_maximum_grid, mean_mmi_maximum_metadata,
-                              std_mmi_maximum_grid, std_mmi_maximum_metadata,
+                              mean_mmi_maximum_data, mean_mmi_maximum_metadata,
+                              std_mmi_maximum_data, std_mmi_maximum_metadata,
                               component='maximum')
         container.setIMTGrids('mmi',
-                              mean_mmi_rotd50_grid, mean_mmi_rotd50_metadata,
-                              std_mmi_rotd50_grid, std_mmi_rotd50_metadata,
+                              mean_mmi_rotd50_data, mean_mmi_rotd50_metadata,
+                              std_mmi_rotd50_data, std_mmi_rotd50_metadata,
                               component='rotd50')
         container.setIMTGrids('pga',
-                              mean_pga_maximum_grid, mean_pga_maximum_metadata,
-                              std_pga_maximum_grid, std_pga_maximum_metadata,
+                              mean_pga_maximum_data, mean_pga_maximum_metadata,
+                              std_pga_maximum_data, std_pga_maximum_metadata,
                               component='maximum')
 
         # get the maximum MMI imt data
         mmi_max_dict = container.getIMTGrids('mmi', component='maximum')
-        np.testing.assert_array_equal(mmi_max_dict['mean'].getData(),
+        np.testing.assert_array_equal(mmi_max_dict['mean'],
                                       mean_mmi_maximum_data)
-        np.testing.assert_array_equal(mmi_max_dict['std'].getData(),
+        np.testing.assert_array_equal(mmi_max_dict['std'],
                                       std_mmi_maximum_data)
         assert mmi_max_dict['mean_metadata'] == mean_mmi_maximum_metadata
         assert mmi_max_dict['std_metadata'] == std_mmi_maximum_metadata
 
         # get the rotd50 MMI imt data
         mmi_rot_dict = container.getIMTGrids('mmi', component='rotd50')
-        np.testing.assert_array_equal(mmi_rot_dict['mean'].getData(),
+        np.testing.assert_array_equal(mmi_rot_dict['mean'],
                                       mean_mmi_rotd50_data)
-        np.testing.assert_array_equal(mmi_rot_dict['std'].getData(),
+        np.testing.assert_array_equal(mmi_rot_dict['std'],
                                       std_mmi_rotd50_data)
         assert mmi_rot_dict['mean_metadata'] == mean_mmi_rotd50_metadata
         assert mmi_rot_dict['std_metadata'] == std_mmi_rotd50_metadata
-
-        # Check repr method
-        assert repr(container) == '''Data type: grid
-    use "getIMTGrids" method to access interpolated IMTs
-Rupture: None
-Config: None
-Stations: None
-Metadata: None
-Available IMTs (components):
-    mmi (maximum, rotd50)
-    pga (maximum)
-'''
 
         # get list of all imts
         imts = container.getIMTs()
@@ -334,7 +361,7 @@ def test_output_arrays():
                                    mean, metadata,
                                    std, metadata, 'Larger')
         # IMT already exists
-        with pytest.raises(ValueError):
+        with pytest.raises(LookupError):
             container.setIMTArrays('PGA', lons, lats, ids,
                                    mean, metadata,
                                    std, metadata, 'Larger')
@@ -349,42 +376,15 @@ def test_output_arrays():
         container.close()
 
     except Exception as e:
+        if os.path.isfile(datafile):
+            os.remove(datafile)
         raise(e)
     finally:
-        os.remove(datafile)
-
-
-def test_output_repr():
-    out_file = os.path.join(
-        shakedir, 'tests', 'data', 'containers', 'northridge',
-        'shake_result.hdf')
-    shake_result = ShakeMapOutputContainer.load(out_file)
-    container_str = repr(shake_result)
-    assert container_str == '''Data type: grid
-    use "getIMTGrids" method to access interpolated IMTs
-Rupture: <class 'shakelib.rupture.quad_rupture.QuadRupture'>
-    locstring: 1km NNW of Reseda, CA
-    magnitude: 6.7
-    time: 1994-01-17T12:30:55.000000Z
-Config: use 'getConfig' method
-Stations: use 'getStationDict' method
-    # instrumental stations: 185
-    # macroseismic stations: 977
-Metadata: use 'getMetadata' method
-Available IMTs (components):
-    MMI (GREATER_OF_TWO_HORIZONTAL)
-    PGA (GREATER_OF_TWO_HORIZONTAL)
-    PGV (GREATER_OF_TWO_HORIZONTAL)
-    SA(0.3) (GREATER_OF_TWO_HORIZONTAL)
-    SA(1.0) (GREATER_OF_TWO_HORIZONTAL)
-    SA(3.0) (GREATER_OF_TWO_HORIZONTAL)
-'''
-
-    shake_result.getIMTGrids("SA(1.0)", "GREATER_OF_TWO_HORIZONTAL")
+        if os.path.isfile(datafile):
+            os.remove(datafile)
 
 
 if __name__ == '__main__':
     test_input_container()
     test_output_container()
     test_output_arrays()
-    test_output_repr()

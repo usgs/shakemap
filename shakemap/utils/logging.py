@@ -3,6 +3,7 @@ import os
 import os.path
 import logging
 import logging.config
+import logging.handlers
 
 # third party libraries
 from configobj import ConfigObj
@@ -254,7 +255,7 @@ def get_generic_logger(logfile=None, fmt=None, datefmt=None, level=None):
     if logfile is None:
         handler = 'logging.StreamHandler'
     else:
-        handler = 'logging.handlers.TimedRotatingFilehandler'
+        handler = 'logging.handlers.TimedRotatingFileHandler'
 
     if level is None:
         level = 'INFO'

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+echo "Cleaning up vcr.py cassette files..."
+files=`find . -name 'vcr_*.yaml'`
+for file in $files; do
+    if [ -e $file ]; then
+        echo "Removing file $file"
+        rm $file
+    fi
+done
+echo "Done."

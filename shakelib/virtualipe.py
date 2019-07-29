@@ -147,13 +147,14 @@ class VirtualIPE(GMPE):
         # Total and intra-event uncertanty are inflated by the uncertainty
         # of the conversion; inter-event uncertainty is not.
         #
+        ntypes = len(stddev_types)
         nsd = len(sdev)
         mmi_sd = [None] * nsd
         gm2mi_var = (self.gmice.getGM2MIsd()[self.imt])**2
         dmda *= dmda
         for i in range(nsd):
             gm_var_in_mmi = dmda * sdev[i]**2
-            if stddev_types[i] == const.StdDev.INTER_EVENT:
+            if stddev_types[i % ntypes] == const.StdDev.INTER_EVENT:
                 mmi_sd[i] = np.sqrt(gm_var_in_mmi)
             else:
                 mmi_sd[i] = np.sqrt(gm2mi_var + gm_var_in_mmi)

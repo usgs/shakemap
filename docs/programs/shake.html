@@ -9,11 +9,12 @@
     <title>shake &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -38,7 +39,7 @@
 <p><blockquote>
 <div>Run specified ShakeMap modules.</div></blockquote>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">shake</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="o">|</span> <span class="o">-</span><span class="n">q</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="n">eventid</span> <span class="o">...</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">shake</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="o">|</span> <span class="o">-</span><span class="n">q</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="n">eventid</span> <span class="o">...</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -75,8 +76,14 @@
 <kbd>-f, --force</kbd></td>
 <td>Force the command(s) to run regardless of out of date dependencies.</td></tr>
 <tr><td class="option-group">
+<kbd>-c, --cancel</kbd></td>
+<td>Cancel shakemap; execute cancel_modules list in shake.conf.</td></tr>
+<tr><td class="option-group">
 <kbd>-a, --autorun</kbd></td>
-<td>Run the modules defined in shake.conf with the autorun_modules parameter rather than any found on the command line.</td></tr>
+<td>No-op; we are keeping this argument for backward compatibility but it no longer does anything. It is now the default behavior to use the autorun_modules in shake.conf when no modules are sepcified.</td></tr>
+<tr><td class="option-group">
+<kbd>-v, --version</kbd></td>
+<td>Print the version of ShakeMap and quit.</td></tr>
 </tbody>
 </table>
 </div>
@@ -98,14 +105,15 @@
 <dd>file.</dd>
 </dl>
 </li>
-<li>cancel – Send a cancel message via any configured transfer mechanisms.</li>
 <li><dl class="first docutils">
 <dt>contour – Generate contours of all IMT values from the</dt>
 <dd>shake_result.hdf output file.</dd>
 </dl>
 </li>
 <li>dyfi – Search ComCat for DYFI data and turn it into a ShakeMap data file.</li>
+<li>Module to raise an exception for testing purposes.</li>
 <li>gridxml – Create grid.xml and uncertainty.xml files from shake_result.hdf.</li>
+<li>history – Output the version history of an event.</li>
 <li>info – Extract info.json from shake_result.hdf and write it as a file.</li>
 <li>kml – Generate KML/KMZ files for ShakeMap.</li>
 <li>mapping – Generate maps of the IMTs found in shake_result.hdf.</li>
@@ -117,10 +125,14 @@
 </dl>
 </li>
 <li>rupture – Generate rupture.json from shake_result.hdf.</li>
+<li>save - Create backup directory and prep for next ShakeMap map version.</li>
 <li>select - Parse STREC output, make a GMPE set, create model_select.conf.</li>
+<li>shape – Generate shape files of the ground motion parameters</li>
 <li>sleep – Sleep for a number of seconds.</li>
 <li>stations – Generate stationlist.json from shake_result.hdf.</li>
-<li>transfer – Transfer data via any configured methods (ftp, pdl, etc.)</li>
+<li>transfer_email - Transfer content via Email.</li>
+<li>transfer_pdl - Transfer content via PDL to a remote server.</li>
+<li>transfer_pdl - Transfer content via SCP to a remote server.</li>
 </ul>
 </dd>
 </dl>
@@ -153,23 +165,26 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="programs.html">ShakeMap 4.0a Command Line Interface</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">shake</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="programs.html">ShakeMap 4.0a Command Line Interface</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shake</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="sm_compare.html">sm_compare</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sm_create.html">sm_create</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sm_profile.html">sm_profile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sm_queue.html">sm_queue</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getdyfi.html">getdyfi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sm_compare.html">sm_compare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sm_create.html">sm_create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sm_profile.html">sm_profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sm_queue.html">sm_queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getdyfi.html">getdyfi</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+</li>
 </ul>
 
 

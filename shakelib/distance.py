@@ -66,16 +66,7 @@ class Distance(object):
         Returns:
             Distance object.
         """  # noqa
-        sm_dict = sites._GeoDict
-        west = sm_dict.xmin
-        east = sm_dict.xmax
-        south = sm_dict.ymin
-        north = sm_dict.ymax
-        nx = sm_dict.nx
-        ny = sm_dict.ny
-        lats = np.linspace(north, south, ny)
-        lons = np.linspace(west, east, nx)
-        lon, lat = np.meshgrid(lons, lats)
+        lon, lat = np.meshgrid(sites._lons, sites._lats)
         dep = np.zeros_like(lon)
         return cls(gmpe, lon, lat, dep, rup)
 
@@ -110,7 +101,7 @@ class Distance(object):
             gmpe = [gmpe]
 
         # require rhypo always
-        requires = set(['rhypo', 'rrup', 'rjb'])
+        requires = set(['repi', 'rhypo', 'rrup', 'rjb'])
 
         for ig in gmpe:
             if not isinstance(ig, GMPE):
@@ -128,6 +119,8 @@ class Distance(object):
             ddict = get_distance(list(requires), lat, lon, dep, self._rupture)
         for method in requires:
             (context.__dict__)[method] = ddict[method]
+            if method in ('rrup', 'rjb'):
+                (context.__dict__)[method + '_var'] = ddict[method + '_var']
 
         return context
 
@@ -142,7 +135,8 @@ def get_distance_measures():
         A list of strings.
     """
 
-    return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
+    return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T',
+            'rvolc']
 
 
 def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
@@ -176,6 +170,9 @@ def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
     | U      | GC2 coordinate U.                                        |
     +--------+----------------------------------------------------------+
     | T      | GC2 coordinate T.                                        |
+    +--------+----------------------------------------------------------+
+    | rvolc  | Part of the rupture distance spent in volcanic region.   |
+    |        | Currently set to 0 for all points.                       |
     +--------+----------------------------------------------------------+
 
     Args:
@@ -225,13 +222,18 @@ def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
     # -------------------------------------------------------------------------
     gc2_distances = set(['rx', 'ry', 'ry0', 'U', 'T'])
     if 'rrup' in methods:
-        distdict['rrup'] = rupture.computeRrup(lon, lat, dep)
+        distdict['rrup'], distdict['rrup_var'] = rupture.computeRrup(lon, lat,
+                                                                     dep)
 
     if 'rjb' in methods:
-        distdict['rjb'] = rupture.computeRjb(lon, lat, dep)
+        distdict['rjb'], distdict['rjb_var'] = rupture.computeRjb(lon, lat,
+                                                                  dep)
 
     # If any of the GC2-related distances are requested, may as well do all
     if len(set(methods).intersection(gc2_distances)) > 0:
         distdict.update(rupture.computeGC2(lon, lat, dep))
+
+    if 'rvolc' in methods:
+        distdict['rvolc'] = np.zeros_like(lon)
 
     return distdict

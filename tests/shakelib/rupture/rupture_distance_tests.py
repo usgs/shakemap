@@ -3,7 +3,6 @@ import os
 import sys
 import numpy as np
 import time
-import pytest
 
 from openquake.hazardlib.geo.utils import OrthographicProjection
 
@@ -343,12 +342,8 @@ def test_EdgeRupture_vs_QuadRupture():
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
     qrup = QuadRupture.fromTrace(xp0, yp0, xp1, yp1, zp, widths, dips, origin)
-    with pytest.raises(ValueError):
-        rrup_q = qrup.computeRrup(lon, lat, dep, var=True)
-    rrup_q = qrup.computeRrup(lon, lat, dep)
-    with pytest.raises(ValueError):
-        rjb_q = qrup.computeRjb(lon, lat, dep, var=True)
-    rjb_q = qrup.computeRjb(lon, lat, dep)
+    rrup_q, _ = qrup.computeRrup(lon, lat, dep)
+    rjb_q, _ = qrup.computeRjb(lon, lat, dep)
 
     # Construct equivalent EdgeRupture
     toplons = np.array([-122.0, -121.7, -122.5, -122.3])
@@ -362,12 +357,8 @@ def test_EdgeRupture_vs_QuadRupture():
     erup = EdgeRupture.fromArrays(
         toplons, toplats, topdeps, botlons, botlats, botdeps,
         origin, group_index)
-    with pytest.raises(ValueError):
-        rrup_e = erup.computeRrup(lon, lat, dep, var=True)
-    rrup_e = erup.computeRrup(lon, lat, dep)
-    with pytest.raises(ValueError):
-        rjb_e = erup.computeRjb(lon, lat, dep, var=True)
-    rjb_e = erup.computeRjb(lon, lat, dep)
+    rrup_e, _ = erup.computeRrup(lon, lat, dep)
+    rjb_e, _ = erup.computeRjb(lon, lat, dep)
 
     # Check that QuadRupture and EdgeRupture give the same result
     # (we check the absolute values of QuadRupture elsewhere)

@@ -144,6 +144,17 @@ def test_wgrw12():
     dt = gmice.getDistanceType()
     assert dt == 'rrup'
 
+    assert gmice.supports('PGA')
+    assert gmice.supports('PGV')
+    assert gmice.supports('SA(0.3)')
+    assert gmice.supports('SA(1.0)')
+    assert gmice.supports('SA(3.0)')
+    try:
+        assert gmice.supports('SA(10.0)')
+        assert 1 == 2
+    except AssertionError:
+        assert 1 == 1
+
     #
     # This should fail
     #

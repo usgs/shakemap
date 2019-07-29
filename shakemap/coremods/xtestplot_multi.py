@@ -7,7 +7,7 @@ import glob
 import matplotlib.pyplot as plt
 
 # neic imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 
 # local imports
 from shakemap.utils.config import get_config_paths
@@ -92,7 +92,7 @@ class XTestPlotMulti(CoreModule):
             axa[0].set_title(self._eventid)
             axa[0].grid()
             axa[1].grid()
-            axa[1].set_ylim(ymin=0)
+            axa[1].set_ylim(bottom=0)
             fileimt = oq_to_file(myimt)
             pfile = os.path.join(event_paths[0], 'current', 'products',
                                  self._eventid + '_' + fileimt + '.pdf')

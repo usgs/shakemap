@@ -516,7 +516,7 @@ class Rowshandel2013(object):
             R1 = 35
             R2 = 70
             DT = np.ones(nsite)
-            ix = [(Rrup > R1) & (Rrup < R2)]
+            ix = tuple([(Rrup > R1) & (Rrup < R2)])
             DT[ix] = 2 - Rrup[ix] / R1
             DT[Rrup >= R2] = 0
         else:                  # eqn 3.9
@@ -565,6 +565,13 @@ class Rowshandel2013(object):
         Tp = np.exp(1.04 * self._M - 6.0)
         self._WP = np.exp(-(np.log10(period / Tp) *
                             np.log10(period / Tp)) / (2 * sig * sig))
+
+    @classmethod
+    def getPeriods(cls):
+        """
+        Returns a list of the periods for which the model is defined.
+        """
+        return cls.__periods
 
 
 def _get_quad_slip_ds_ss(q, rake, cp, p):

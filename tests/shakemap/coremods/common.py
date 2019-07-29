@@ -5,7 +5,7 @@ import shutil
 def clear_files(event_path):
     files = ['boat_fault.txt', 'dyfi_dat.xml', 'event.xml', 'model.conf',
              'model_select.conf', 'moment.xml', 'stationlist.xml',
-             'shake_data.hdf']
+             'shake_data.hdf', 'dir_fault.txt']
     for fname in files:
         try:
             os.remove(os.path.join(event_path, fname))

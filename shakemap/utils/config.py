@@ -4,11 +4,15 @@ import os.path
 import sys
 import pkg_resources
 import logging
+import glob
 
 # third party libraries
 import numpy as np
-from configobj import ConfigObj, flatten_errors
-from validate import Validator, ValidateError
+from configobj import (ConfigObj,
+                       flatten_errors,
+                       get_extra_values)
+from validate import (Validator,
+                      ValidateError)
 
 
 def get_data_path():
@@ -74,7 +78,7 @@ def get_config_paths():
         if not os.path.isfile(config_file):
             raise FileNotFoundError("Can't find a profile file: "
                                     "have you run sm_profile?")
-        config = ConfigObj(config_file)
+        config = ConfigObj(config_file, encoding='utf-8-sig')
 
         config = check_profile_config(config)
 
@@ -87,6 +91,54 @@ def get_config_paths():
         install = profile['install_path']
         data = profile['data_path']
     return (install, data)
+
+
+def get_model_config(install_path, datadir, logger):
+    #
+    # Look for global configs in install_path/config
+    #
+    spec_file = get_configspec()
+    validator = get_custom_validator()
+    logger.debug('Looking for configuration files...')
+    modules = ConfigObj(
+        os.path.join(install_path, 'config', 'modules.conf'),
+        configspec=spec_file)
+    gmpe_sets = ConfigObj(
+        os.path.join(install_path, 'config', 'gmpe_sets.conf'),
+        configspec=spec_file)
+    global_config = ConfigObj(
+        os.path.join(install_path, 'config', 'model.conf'),
+        configspec=spec_file)
+
+    #
+    # this is the event specific model.conf (may not be present)
+    # prefer model.conf to model_select.conf
+    #
+    event_config_file = os.path.join(datadir, 'model.conf')
+    event_config_zc_file = os.path.join(datadir, 'model_select.conf')
+    if os.path.isfile(event_config_file):
+        event_config = ConfigObj(event_config_file,
+                                 configspec=spec_file)
+    elif os.path.isfile(event_config_zc_file):
+        event_config = ConfigObj(event_config_zc_file,
+                                 configspec=spec_file)
+    else:
+        event_config = ConfigObj()
+
+    #
+    # start merging event_config
+    #
+    global_config.merge(event_config)
+    global_config.merge(modules)
+    global_config.merge(gmpe_sets)
+
+    results = global_config.validate(validator)
+    if not isinstance(results, bool) or not results:
+        config_error(global_config, results)
+
+    check_config(global_config, logger)
+
+    return global_config
 
 
 def path_macro_sub(s, ip='', dp='', gp='', ei=''):
@@ -138,6 +190,8 @@ def get_custom_validator():
         'file_type': file_type,
         'directory_type': directory_type,
         'annotatedfloat_type': annotatedfloat_type,
+        'nanfloat_type': nanfloat_type,
+        'nanfloat_list': nanfloat_list,
         'gmpe_list': gmpe_list,
         'weight_list': weight_list,
         'extent_list': extent_list,
@@ -181,6 +235,46 @@ def config_error(config, results):
                               'error' if errs == 1 else 'errors'))
 
 
+def check_extra_values(config, logger):
+    """
+    Checks the config and warns the user if there are any extra entries
+    in their config file. This function is based on suggested usage in the
+    ConfigObj manual.
+
+    Args:
+        config (ConfigObj): A ConfigObj instance.
+        logger (logger): The logger to which to write complaints.
+
+    Returns:
+        Nothing: Nothing.
+    """
+    warnings = 0
+    for sections, name in get_extra_values(config):
+
+        # this code gets the extra values themselves
+        the_section = config
+        for section in sections:
+            the_section = the_section[section]
+
+        # the_value may be a section or a value
+        the_value = the_section[name]
+
+        section_or_value = 'value'
+        if isinstance(the_value, dict):
+            # Sections are subclasses of dict
+            section_or_value = 'section'
+
+        section_string = ', '.join(sections) or "top level"
+        logger.warning('Extra entry in section: %s: %s %r is not in spec.' %
+                       (section_string, section_or_value, name))
+        warnings += 1
+    if warnings:
+        logger.warning('The extra value(s) may be the result of deprecated '
+                       'entries or other changes to the config files; please '
+                       'check the conifg files in shakemap/data for the most '
+                       'up to date specs.')
+
+
 def check_config(config, logger):
     """
     Checks that the gmpe, gmice, ipe, and ccf parameters
@@ -211,6 +305,51 @@ def check_config(config, logger):
         logger.error('Configuration error: ccf %s not in ccf_modules' %
                      (config['modeling']['ccf']))
         raise ValidateError()
+
+
+def check_all_configs(configdir):
+    data_path = get_data_path()
+    specfiles = glob.glob(os.path.join(data_path, '*spec*.conf'))
+    missing_files = []
+    issues = {}
+    exceptions = []
+    val = get_custom_validator()
+    for tspecfile in specfiles:
+        _, specfile = os.path.split(tspecfile)
+        configfile = os.path.join(configdir, specfile.replace('spec', ''))
+        if not os.path.isfile(configfile):
+            missing_files.append(configfile)
+            continue
+        config = ConfigObj(configfile, configspec=tspecfile,
+                           interpolation=False)
+        try:
+            results = config.validate(val, preserve_errors=True)
+        except Exception as e:
+            exceptions.append(str(e))
+        if not isinstance(results, bool):
+            # results = flatten_errors(config, results)
+            issues[specfile] = results
+
+    return (missing_files, issues, exceptions)
+
+
+def nanfloat_type(value):
+    """
+    Checks to see if value is a float, or NaN, nan, Inf, -Inf, etc.
+    Raises a ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing a float NaN or Inf.
+
+    Returns:
+        float: The input value converted to its float equivalent.
+
+    """
+    try:
+        out = float(value)
+    except ValueError:
+        raise ValidateError(value)
+    return out
 
 
 def annotatedfloat_type(value):
@@ -297,6 +436,39 @@ def weight_list(value, min):
         logging.error("weights must sum to 1.0: %s" % value)
         raise ValidateError()
 
+    return out
+
+
+def nanfloat_list(value, min):
+    """
+    Checks to see if value is a list of floats, including NaN and Inf.
+    Raises a ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing a list of floats.
+
+    Returns:
+        list: The input string converted to a list of floats.
+
+    """
+    min = int(min)
+    if isinstance(value, str) and (value == 'None' or value == '[]'):
+        value = []
+    if isinstance(value, str):
+        value = [value]
+    if isinstance(value, list) and not value:
+        value = []
+    if not isinstance(value, list):
+        logging.error("'%s' is not a list" % value)
+        raise ValidateError()
+    if len(value) < min:
+        logging.error("extent list must contain %i entries" % min)
+        raise ValidateError()
+    try:
+        out = [float(a) for a in value]
+    except ValueError:
+        logging.error("%s is not a list of %i floats" % (value, min))
+        raise ValidateError()
     return out
 
 
@@ -497,6 +669,34 @@ def cfg_float(value):
         logging.error("'%s' is not a float" % (value))
         raise ValidateError()
     return fval
+
+
+def cfg_bool(value):
+    """
+    Converts (if possible) the input string to a bool. Raises
+    ValidateError if the input can't be converted to a bool.
+
+    Args:
+        value (str): A string to be converted to a bool.
+
+    Returns:
+        bool: The input converted to a bool.
+
+    Raises:
+        ValidateError
+    """
+    if not isinstance(value, (str, bool)) or not value or value == 'None':
+        logging.error("'%s' is not a bool" % (value))
+        raise ValidateError()
+    try:
+        if value.lower() in ['true', 't', 'yes', 'y', '1']:
+            bval = True
+        else:
+            bval = False
+    except ValueError:
+        logging.error("'%s' is not a bool" % (value))
+        raise ValidateError()
+    return bval
 
 
 def check_profile_config(config):

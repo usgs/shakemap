@@ -1,14 +1,15 @@
 # stdlib imports
 import os.path
 import zipfile
-from collections import OrderedDict
 
 # third party imports
-from shakelib.utils.containers import ShakeMapOutputContainer
+from impactutils.io.smcontainers import ShakeMapOutputContainer
 from mapio.gdal import GDALGrid
+from mapio.geodict import GeoDict
+from mapio.grid2d import Grid2D
 
 # local imports
-from .base import CoreModule
+from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 from shakelib.utils.imt_string import oq_to_file
 
@@ -30,13 +31,9 @@ class RasterModule(CoreModule):
     targets = [r'products/raster\.zip']
     dependencies = [('products/shake_result.hdf', True)]
 
-    contents = OrderedDict.fromkeys(['rasterData'])
-    contents['rasterData'] = {
-        'title': 'ESRI Raster Files',
-        'caption': 'Data and uncertainty grids in ESRI raster format',
-        'formats': [{'filename': 'raster.zip',
-                    'type': 'application/zip'}]
-    }
+    def __init__(self, eventid):
+        super(RasterModule, self).__init__(eventid)
+        self.contents = Contents(None, None, eventid)
 
     def execute(self):
         """
@@ -74,14 +71,17 @@ class RasterModule(CoreModule):
 
         files_written = []
         for layer in layers:
+            _, layer = layer.split('/')
             fileimt = oq_to_file(layer)
             # This is a bit hacky -- we only produce the raster for the
             # first IMC returned. It should work as long as we only have
             # one IMC produced per ShakeMap run.
             imclist = container.getComponents(layer)
             imtdict = container.getIMTGrids(layer, imclist[0])
-            mean_grid = imtdict['mean']
-            std_grid = imtdict['std']
+            mean_grid = Grid2D(imtdict['mean'],
+                               GeoDict(imtdict['mean_metadata']))
+            std_grid = Grid2D(imtdict['std'],
+                              GeoDict(imtdict['std_metadata']))
             mean_gdal = GDALGrid.copyFromGrid(mean_grid)
             std_gdal = GDALGrid.copyFromGrid(std_grid)
             mean_fname = os.path.join(datadir, '%s_mean.flt' % fileimt)
@@ -102,8 +102,13 @@ class RasterModule(CoreModule):
             zfile.write(std_hdr, '%s_std.hdr' % fileimt)
 
         zfile.close()
-        container.close()
 
         # nuke all of the copies of the files we just put in the zipfile
         for file_written in files_written:
             os.remove(file_written)
+
+        self.contents.addFile('rasterData', 'ESRI Raster Files',
+                              'Data and uncertainty grids in ESRI raster '
+                              'format',
+                              'raster.zip', 'application/zip')
+        container.close()

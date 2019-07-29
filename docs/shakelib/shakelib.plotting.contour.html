@@ -9,11 +9,12 @@
     <title>shakelib.plotting.contour &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -37,7 +38,7 @@
 <span id="shakelib-plotting-contour"></span><h1>shakelib.plotting.contour<a class="headerlink" href="#module-shakelib.plotting.contour" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="shakelib.plotting.contour.contour">
-<code class="descclassname">shakelib.plotting.contour.</code><code class="descname">contour</code><span class="sig-paren">(</span><em>container</em>, <em>imtype</em>, <em>component</em>, <em>filter_size</em>, <em>gmice</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/plotting/contour.html#contour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.plotting.contour.contour" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakelib.plotting.contour.</code><code class="descname">contour</code><span class="sig-paren">(</span><em>imtdict</em>, <em>imtype</em>, <em>filter_size</em>, <em>gmice</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/plotting/contour.html#contour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.plotting.contour.contour" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate contours of a specific IMT and return as a Shapely
 MultiLineString object.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -45,11 +46,10 @@ MultiLineString object.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>container</strong> (<a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer" title="shakelib.utils.containers.ShakeMapOutputContainer"><em>ShakeMapOutputContainer</em></a>) – ShakeMapOutputContainer
+<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – ShakeMapOutputContainer
 with ShakeMap output data.</li>
 <li><strong>imtype</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – String containing the name of an Intensity
 Measure Type found in container.</li>
-<li><strong>component</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Intensity Measure component found in container.</li>
 <li><strong>filter_size</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Integer filter (see
 <a class="reference external" href="https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html">https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html</a>)</li>
 </ul>
@@ -132,27 +132,30 @@ indicates linear intervals.</li>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.plotting.contour</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.plotting.plotrupture.html">shakelib.plotting.plotrupture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">shakelib.plotting.contour</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakelib.plotting.plotrupture.html">shakelib.plotting.plotrupture</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

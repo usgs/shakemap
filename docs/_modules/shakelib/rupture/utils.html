@@ -9,11 +9,12 @@
     <title>shakelib.rupture.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -106,7 +107,7 @@
 <span class="sd">        q (list): A quadrilateral; list of four points.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        float: Width of planar trapezoid.</span>
+<span class="sd">        float: Width of planar trapezoid in km.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">P0</span><span class="p">,</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">P3</span> <span class="o">=</span> <span class="n">q</span>
     <span class="n">p0</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P0</span><span class="p">)</span>
@@ -115,7 +116,7 @@
     <span class="n">AB</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">-</span> <span class="n">p1</span>
     <span class="n">AC</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">-</span> <span class="n">p3</span>
     <span class="n">t1</span> <span class="o">=</span> <span class="p">(</span><span class="n">AB</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">AC</span><span class="p">)</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">AB</span><span class="p">))</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
-    <span class="n">width</span> <span class="o">=</span> <span class="n">t1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">AC</span><span class="p">)</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">t1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">AC</span><span class="p">)</span><span class="o">/</span><span class="mf">1000.0</span>
 
     <span class="k">return</span> <span class="n">width</span></div>
 
@@ -669,10 +670,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

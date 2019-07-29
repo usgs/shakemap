@@ -17,12 +17,16 @@ from validate import Validator
 import shlex
 
 # local imports
+import shakemap
 from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    config_error)
 from shakemap.utils.logging import get_logger
 from shakemap.utils.dependencies import CommandDatabase
+from shakemap.utils.exception import TerminateShakeMap
 from shakelib.rupture.origin import read_event_file
+
+CANCEL_FILE = 'CANCELED'
 
 
 def _get_config():
@@ -156,12 +160,19 @@ def get_parser():
     parser.add_argument('-l', '--log', action='store_true',
                         help='Log all output.')
     parser.add_argument('-f', '--force', action='store_true',
-                        help='Force the command(s) to run regardless of '
-                             'out of date dependencies.')
-    parser.add_argument('-a', '--autorun', action='store_true',
-                        help='Run the modules defined in shake.conf with the '
-                             'autorun_modules parameter rather than any '
-                             'found on the command line.')
+                        help='Force the command(s) to run regardless of out '
+                             'of date dependencies.')
+    parser.add_argument('-c', '--cancel', action='store_true',
+                        help='Cancel shakemap; execute cancel_modules list in '
+                             'shake.conf.')
+    parser.add_argument(
+        '-a', '--autorun', action='store_true',
+        help='No-op; we are keeping this argument for backward compatibility '
+        'but it no longer does anything. It is now the default behavior to '
+        'use the autorun_modules in shake.conf when no modules are sepcified.')
+    parser.add_argument('-v', '--version', action='version',
+                        version='ShakeMap version %s' % shakemap.__version__,
+                        help='Print the version of ShakeMap and quit.')
     return parser
 
 
@@ -182,16 +193,20 @@ def main(args):
         log_option = 'quiet'
     if args.log:
         log_file = 'log'
-    if args.autorun:
-        args.cmds = shlex.split(_config_['autorun_modules'])
 
     logger = get_logger(args.eventid, log_option=log_option, log_file=log_file)
 
+    if args.autorun:
+        logger.warning(
+            'The -a (--autorun) option is deprecated. It is now the default '
+            'behavior to use the autorun_modules in shake.conf when no '
+            'modules are specified.')
+
     event_path = os.path.join(data_path, args.eventid, 'current')
-    cancel_file = os.path.join(event_path, 'CANCELED')
+    cancel_file = os.path.join(event_path, CANCEL_FILE)
     if os.path.isfile(cancel_file):
-        logger.error('Event %s has been canceled: aborting run' %
-                     args.eventid)
+        logger.error(
+            'Event %s has been canceled: aborting run' % args.eventid)
         return
 
     #
@@ -201,7 +216,39 @@ def main(args):
 
     try:
         cmd_list = OrderedDict()
+
+        # No modules were specified, go get autorun modules
+        if not len(args.cmds):
+            if not args.cancel:
+                # cancel option was not set
+                logger.info(
+                    'No modules specified, checking for autoun_modules...')
+                args.cmds = shlex.split(_config_['autorun_modules'])
+                if len(args.cmds):
+                    logger.info('Autorun modules found: %s' % args.cmds)
+                else:
+                    logger.warning(
+                        'No modules specified, and no autorun_modules '
+                        'configured. Nothing to do! -- Exiting --')
+                    sys.exit(0)
+            else:
+                # cancel option was set
+                logger.info('Cancelling shakemap, using cancel_modules...')
+                with open(cancel_file, 'wt') as f:
+                    f.write('\n')
+
+                args.cmds = shlex.split(_config_['cancel_modules'])
+                if len(args.cmds):
+                    logger.info('Cancel modules found: %s' % args.cmds)
+                else:
+                    logger.warning(
+                        'Cancel option specified, but no cancel_modules '
+                        'configured. Nothing to do! -- Exiting --')
+                    sys.exit(0)
+
         arglist = args.cmds.copy()
+        logger.debug('arglist: %s' % arglist)
+
         oldcmd = ''
         while(len(arglist) > 0):
             cmd = arglist.pop(0)
@@ -226,31 +273,45 @@ def main(args):
         for cmd, obj in cmd_list.items():
             logger.info('Running command %s' % cmd)
             status = cdb.getDependencyStatus(cmd)
-            if len(status) == 1 and status[0] == cmd:
-                pass
-            elif len(status) > 0:
-                logger.warn("Out of date dependencies. The following commands "
-                            "should be rerun before '%s' (use --force to "
-                            "ignore this warning and attempt to run the "
-                            "module anyway):" % cmd)
+            while len(status) > 0:
+                if len(status) == 1 and status[0] == cmd:
+                    break
+                #
+                # If the dependency requires select to run, but there
+                # is a model.conf, then select doesn't need to be run.
+                # So drop it and continue the checking process.
+                #
+                if status[0] == 'select':
+                    if os.path.isfile(os.path.join(event_path, 'model.conf')):
+                        status.remove('select')
+                        continue
+                logger.warning(
+                    "Out of date dependencies. The following commands "
+                    "should be rerun before '%s' (use --force to "
+                    "ignore this warning and attempt to run the "
+                    "module anyway):" % cmd)
                 if cmd in status:
                     status.remove(cmd)
-                logger.warn(", ".join(status))
+                logger.warning(", ".join(status))
                 if not args.force:
+                    logger.warning("Exiting.")
                     sys.exit(0)
                 else:
-                    logger.warn('Running "%s" because of --force option.'
-                                % cmd)
-            else:
-                # Command is not out of date, but if the user wants to
-                # run it, we won't stop him/her
-                pass
+                    logger.warning(
+                        'Running "%s" because of --force option.' % cmd)
+                break
             t1 = time.time()
-            obj.execute()
+            try:
+                obj.execute()
+            except TerminateShakeMap as e:
+                logger.warning(
+                    "ShakeMap terminated in module %s: %s" % (cmd, str(e)))
+                break
             t2 = time.time()
             elapsed = t2 - t1
-            logger.info('Finished running command %s: Elapsed %.2f secs'
-                        % (cmd, elapsed))
+            logger.info(
+                'Finished running command %s: Elapsed %.2f secs'
+                % (cmd, elapsed))
             # create/update the contents.xml file
             obj.writeContents()
             cdb.updateCommand(cmd)
@@ -260,10 +321,13 @@ def main(args):
         logger.critical(error_msg)  # should get sent by email and logged
         sys.exit(1)
 
+    logger.info("shake finished with event %s" % args.eventid)
+
 
 if __name__ == '__main__':
     parser = get_parser()
     pargs = parser.parse_args()
+
     if pargs.eventid.lower() == 'help' and len(pargs.cmds) == 0:
         parser.print_help()
     else:

@@ -9,11 +9,12 @@
     <title>shakelib.rupture.origin &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -49,7 +50,6 @@
 <span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="k">import</span> <span class="n">ShakeLibException</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
-<span class="kn">import</span> <span class="nn">shakemap.utils.queue</span> <span class="k">as</span> <span class="nn">queue</span>
 
 
 <div class="viewcode-block" id="Origin"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin">[docs]</a><span class="k">class</span> <span class="nc">Origin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -261,6 +261,7 @@
 <span class="sd">           - locstring (str, &quot;East of the Poconos&quot;)</span>
 <span class="sd">           - mech (str, &quot;RS&quot;, &quot;SS&quot;, &quot;NM&quot;, or &#39;ALL&#39;) (optional)</span>
 <span class="sd">           - reference (str, data source: &#39;Smith et al. 2016&#39;) (optional)</span>
+<span class="sd">           - event_type (str, &#39;ACTUAL&#39; or &#39;SCENARIO&#39;) (optional)</span>
 <span class="sd">           - productcode (str, &#39;us2000wxyz_zoom&#39;)</span>
 
 <span class="sd">    Returns:</span>
@@ -275,7 +276,7 @@
         <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
         <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span>
         <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">queue</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
         <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
             <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span>
@@ -283,6 +284,13 @@
             <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
             <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;event_type&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ACTUAL&#39;</span><span class="p">,</span> <span class="s1">&#39;SCENARIO&#39;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="s1">&#39;event_type must be &quot;ACTUAL&quot; or &quot;SCENARIO&quot;&#39;</span><span class="p">)</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ACTUAL&#39;</span>
 
         <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
         <span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -387,26 +395,42 @@
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
 
     <span class="c1"># look for the productcode attribute in the xml,</span>
-    <span class="c1"># otherwise use the event directory name.</span>
+    <span class="c1"># otherwise use the event id</span>
     <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eventxml</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">path_parts</span> <span class="o">=</span> <span class="n">eventxml</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_parts</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># It&#39;s up to the user of this data how to construct the</span>
         <span class="c1"># product code</span>
         <span class="k">pass</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">queue</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+    <span class="c1"># Support old event file date/times</span>
+    <span class="k">if</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
-                                                   <span class="n">queue</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t convert </span><span class="si">%s</span><span class="s2"> to HistoricTime&quot;</span> <span class="o">%</span>
-                             <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                    <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                    <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t convert </span><span class="si">%s</span><span class="s2"> to HistoricTime&quot;</span> <span class="o">%</span>
+                                 <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;year&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> <span class="s1">&#39;month&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> \
+           <span class="s1">&#39;day&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> <span class="s1">&#39;hour&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> \
+           <span class="s1">&#39;minute&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> <span class="s1">&#39;second&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing date/time elements in event file.&quot;</span><span class="p">)</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
 
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
@@ -434,6 +458,15 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Empty if momentfile is somehow not valid, or:</span>
 <span class="sd">              - moment:</span>
+<span class="sd">                  - T:</span>
+<span class="sd">                    - azimuth</span>
+<span class="sd">                    - plunge</span>
+<span class="sd">                  - N:</span>
+<span class="sd">                    - azimuth</span>
+<span class="sd">                    - plunge</span>
+<span class="sd">                  - P:</span>
+<span class="sd">                    - azimuth</span>
+<span class="sd">                    - plunge</span>
 <span class="sd">                  - NP1:</span>
 <span class="sd">                    - strike: float</span>
 <span class="sd">                    - dip: float</span>
@@ -481,20 +514,37 @@
             <span class="n">mrt</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rt</span>
             <span class="n">mrp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rp</span>
             <span class="n">mtp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_tp</span>
-            <span class="n">params</span> <span class="o">=</span> <span class="n">fill_tensor_from_components</span><span class="p">(</span><span class="n">mrr</span><span class="p">,</span> <span class="n">mtt</span><span class="p">,</span>
-                                                 <span class="n">mpp</span><span class="p">,</span> <span class="n">mrt</span><span class="p">,</span>
-                                                 <span class="n">mrp</span><span class="p">,</span> <span class="n">mtp</span><span class="p">,</span>
-                                                 <span class="n">source</span><span class="o">=</span><span class="n">msource</span><span class="p">,</span>
-                                                 <span class="n">mtype</span><span class="o">=</span><span class="n">mtype</span><span class="p">)</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">fill_tensor_from_components</span><span class="p">(</span>
+                <span class="n">mrr</span><span class="p">,</span> <span class="n">mtt</span><span class="p">,</span>
+                <span class="n">mpp</span><span class="p">,</span> <span class="n">mrt</span><span class="p">,</span>
+                <span class="n">mrp</span><span class="p">,</span> <span class="n">mtp</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">msource</span><span class="p">,</span>
+                <span class="n">mtype</span><span class="o">=</span><span class="n">mtype</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">plane1</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_1</span>
         <span class="n">plane2</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_2</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
-                         <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
-                         <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">rake</span><span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
-                         <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
-                         <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span><span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
+            <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
+            <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">rake</span>
+        <span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
+            <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
+            <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span>
+        <span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="p">}</span>
 
     <span class="n">moment</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;moment&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">moment</span></div>
@@ -560,10 +610,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

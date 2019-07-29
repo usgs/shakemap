@@ -6,7 +6,7 @@ import json
 # third party imports
 from libcomcat.search import get_event_by_id
 from libcomcat.classes import DetailEvent
-from amptools.table import dataframe_to_xml
+from impactutils.io.table import dataframe_to_xml
 import pandas as pd
 import numpy as np
 
@@ -77,12 +77,12 @@ class DYFIModule(CoreModule):
         # try to find the event by our event id
         try:
             detail = get_event_by_id(self._eventid)
+            dataframe, msg = _get_dyfi_dataframe(detail)
         except Exception as e:
             fmt = 'Could not retrieve DYFI data for %s - error "%s"'
-            self.logger.warn(fmt % (self._eventid, str(e)))
+            self.logger.warning(fmt % (self._eventid, str(e)))
             return
 
-        dataframe, msg = _get_dyfi_dataframe(detail)
         if dataframe is None:
             self.logger.info(msg)
             return
@@ -161,6 +161,7 @@ def _get_dyfi_dataframe(detail_or_url):
 
     df['netid'] = 'DYFI'
     df['source'] = "USGS (Did You Feel It?)"
+    df.columns = df.columns.str.upper()
     return (df, '')
 
 

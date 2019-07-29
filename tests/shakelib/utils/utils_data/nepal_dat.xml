@@ -1,0 +1,1011 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE shakemap-data [
+<!ELEMENT shakemap-data (earthquake,stationlist)>
+<!ELEMENT stationlist (station+)>
+<!ATTLIST stationlist
+  created	CDATA	#REQUIRED
+>
+
+<!ELEMENT station (comp+)>
+<!ATTLIST station
+  code		CDATA 			#REQUIRED
+  name		CDATA 			#REQUIRED
+  insttype	CDATA 			#REQUIRED
+  lat		CDATA 			#REQUIRED
+  lon		CDATA 			#REQUIRED
+  source	(SCSN|CGS|NSMP) 	'SCSN'
+  netid		CDATA			#REQUIRED
+  commtype	(DIG|ANA) 		'DIG'
+  dist          CDATA                   '10.0'
+  loc		CDATA			''
+>
+
+<!ELEMENT comp (acc,vel,psa*)>
+<!ATTLIST comp
+  name          CDATA  #REQUIRED
+  originalname  CDATA  #IMPLIED
+>
+
+<!ELEMENT acc EMPTY>
+<!ELEMENT vel EMPTY>
+<!ELEMENT psa03 EMPTY>
+<!ELEMENT psa10 EMPTY>
+<!ELEMENT psa30 EMPTY>
+<!ATTLIST acc
+  value  CDATA         #REQUIRED
+  flag   CDATA        ''
+>
+<!ATTLIST vel
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa03
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa10
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa30
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ELEMENT  earthquake EMPTY>
+<!ATTLIST earthquake
+  id 		ID	#REQUIRED
+  lat		CDATA	#REQUIRED
+  lon		CDATA	#REQUIRED
+  mag		CDATA	#REQUIRED
+  year          CDATA   #REQUIRED
+  month         CDATA   #REQUIRED
+  day           CDATA   #REQUIRED
+  hour          CDATA   #REQUIRED
+  minute        CDATA   #REQUIRED
+  second        CDATA   #REQUIRED
+  timezone      CDATA   #REQUIRED
+  depth		CDATA	#REQUIRED
+  type		CDATA	#REQUIRED
+  locstring	CDATA	#REQUIRED
+  pga		CDATA   #REQUIRED
+  pgv		CDATA   #REQUIRED
+  sp03		CDATA   #REQUIRED
+  sp10		CDATA   #REQUIRED
+  sp30		CDATA   #REQUIRED
+  created	CDATA	#REQUIRED
+>
+]>
+<shakemap-data code_version="3.5" map_version="5">
+<earthquake id="20150425061125" lat="28.23050" lon="84.73140" mag="7.8" year="2015" month="4" day="25" hour="6" minute="11" second="25" timezone="GMT" depth="18" network="us" locstring="NEPAL" created="1490127620" />
+<stationlist created="1490127620">
+<station code="1" name="Geocoded location UTM:(43Q 024 254 10000) (Intensity III, 8 responses)" insttype="OBSERVED" lat="22.9938" lon="72.5124" dist="1318.365379" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.4">
+<comp name="DERIVED">
+<pga value="0.65" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="2" name="Geocoded location UTM:(43Q 024 255 10000) (Intensity II, 3 responses)" insttype="OBSERVED" lat="23.0841" lon="72.5108" dist="1314.038303" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="2.3">
+<comp name="DERIVED">
+<pga value="nan" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="3" name="Geocoded location UTM:(43Q 025 254 10000) (Intensity IV, 16 responses)" insttype="OBSERVED" lat="22.9954" lon="72.6099" dist="1309.437080" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.6">
+<comp name="DERIVED">
+<pga value="0.87" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="4" name="Geocoded location UTM:(43Q 027 209 10000) (Intensity II, 4 responses)" insttype="OBSERVED" lat="18.9350" lon="72.8635" dist="1543.190401" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="2.0">
+<comp name="DERIVED">
+<pga value="nan" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="5" name="Geocoded location UTM:(43Q 027 234 10000) (Intensity III, 4 responses)" insttype="OBSERVED" lat="21.1925" lon="72.8327" dist="1391.769607" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.2">
+<comp name="DERIVED">
+<pga value="0.48" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="6" name="Geocoded location UTM:(43R 057 297 10000) (Intensity III, 3 responses)" insttype="OBSERVED" lat="26.8948" lon="75.7552" dist="869.575825" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="2.9">
+<comp name="DERIVED">
+<pga value="nan" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="7" name="Geocoded location UTM:(43R 058 297 10000) (Intensity IV, 7 responses)" insttype="OBSERVED" lat="26.8941" lon="75.8559" dist="859.759689" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.8">
+<comp name="DERIVED">
+<pga value="1.17" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="8" name="Geocoded location UTM:(43R 069 315 10000) (Intensity V, 4 responses)" insttype="OBSERVED" lat="28.5072" lon="76.9925" dist="737.304144" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.8">
+<comp name="DERIVED">
+<pga value="4.33" flag="T" />
+<pgv value="5.44" flag="T" />
+</comp>
+</station>
+<station code="9" name="Geocoded location UTM:(43R 070 314 10000) (Intensity IV, 17 responses)" insttype="OBSERVED" lat="28.4154" lon="77.0928" dist="727.027224" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.9">
+<comp name="DERIVED">
+<pga value="1.36" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="10" name="Geocoded location UTM:(43R 070 315 10000) (Intensity IV, 11 responses)" insttype="OBSERVED" lat="28.5056" lon="77.0946" dist="727.342472" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.8">
+<comp name="DERIVED">
+<pga value="1.17" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="11" name="Geocoded location UTM:(43R 070 316 10000) (Intensity IV, 8 responses)" insttype="OBSERVED" lat="28.5958" lon="77.0964" dist="727.794076" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.3">
+<comp name="DERIVED">
+<pga value="2.46" flag="T" />
+<pgv value="3.78" flag="T" />
+</comp>
+</station>
+<station code="12" name="Geocoded location UTM:(43R 070 317 10000) (Intensity IV, 9 responses)" insttype="OBSERVED" lat="28.6860" lon="77.0982" dist="728.381789" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.6">
+<comp name="DERIVED">
+<pga value="0.87" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="13" name="Geocoded location UTM:(43R 071 315 10000) (Intensity III, 14 responses)" insttype="OBSERVED" lat="28.5040" lon="77.1967" dist="717.380773" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.2">
+<comp name="DERIVED">
+<pga value="0.48" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="14" name="Geocoded location UTM:(43R 071 316 10000) (Intensity IV, 39 responses)" insttype="OBSERVED" lat="28.5941" lon="77.1986" dist="717.836645" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.6">
+<comp name="DERIVED">
+<pga value="0.87" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="15" name="Geocoded location UTM:(43R 071 317 10000) (Intensity IV, 32 responses)" insttype="OBSERVED" lat="28.6844" lon="77.2005" dist="718.432121" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.7">
+<comp name="DERIVED">
+<pga value="1.01" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="16" name="Geocoded location UTM:(43R 072 314 10000) (Intensity III, 3 responses)" insttype="OBSERVED" lat="28.4121" lon="77.2969" dist="707.087089" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.4">
+<comp name="DERIVED">
+<pga value="0.65" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="17" name="Geocoded location UTM:(43R 072 315 10000) (Intensity IV, 8 responses)" insttype="OBSERVED" lat="28.5023" lon="77.2988" dist="707.418435" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.7">
+<comp name="DERIVED">
+<pga value="1.01" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="18" name="Geocoded location UTM:(43R 072 316 10000) (Intensity IV, 14 responses)" insttype="OBSERVED" lat="28.5924" lon="77.3008" dist="707.879486" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.1">
+<comp name="DERIVED">
+<pga value="1.83" flag="T" />
+<pgv value="3.16" flag="T" />
+</comp>
+</station>
+<station code="19" name="Geocoded location UTM:(43R 072 317 10000) (Intensity IV, 11 responses)" insttype="OBSERVED" lat="28.6827" lon="77.3028" dist="708.482152" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.1">
+<comp name="DERIVED">
+<pga value="1.83" flag="T" />
+<pgv value="3.16" flag="T" />
+</comp>
+</station>
+<station code="20" name="Geocoded location UTM:(43R 073 316 10000) (Intensity IV, 21 responses)" insttype="OBSERVED" lat="28.5907" lon="77.4030" dist="697.922652" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.2">
+<comp name="DERIVED">
+<pga value="2.12" flag="T" />
+<pgv value="3.51" flag="T" />
+</comp>
+</station>
+<station code="21" name="Geocoded location UTM:(43R 073 317 10000) (Intensity IV, 10 responses)" insttype="OBSERVED" lat="28.6809" lon="77.4051" dist="698.531888" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.9">
+<comp name="DERIVED">
+<pga value="1.36" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="22" name="Geocoded location UTM:(43R 074 315 10000) (Intensity III, 6 responses)" insttype="OBSERVED" lat="28.4986" lon="77.5030" dist="687.491810" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.4">
+<comp name="DERIVED">
+<pga value="0.65" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="23" name="Geocoded location UTM:(43R 078 330 10000) (Intensity III, 3 responses)" insttype="OBSERVED" lat="29.8426" lon="77.9497" dist="669.415245" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="2.9">
+<comp name="DERIVED">
+<pga value="nan" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="24" name="Geocoded location UTM:(44Q 061 244 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="22.1061" lon="82.1149" dist="670.372718" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.9">
+<comp name="DERIVED">
+<pga value="1.36" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="25" name="Geocoded location UTM:(44Q 074 196 10000) (Intensity III, 3 responses)" insttype="OBSERVED" lat="17.7587" lon="83.3107" dist="1092.824182" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="2.9">
+<comp name="DERIVED">
+<pga value="nan" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="26" name="Geocoded location UTM:(44R 021 335 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="30.2933" lon="78.0370" dist="673.671287" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.9">
+<comp name="DERIVED">
+<pga value="1.36" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="27" name="Geocoded location UTM:(44R 025 319 10000) (Intensity V, 3 responses)" insttype="OBSERVED" lat="28.8593" lon="78.4885" dist="596.024459" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="5.1">
+<comp name="DERIVED">
+<pga value="5.22" flag="T" />
+<pgv value="6.77" flag="T" />
+</comp>
+</station>
+<station code="28" name="Geocoded location UTM:(44R 040 293 10000) (Intensity IV, 8 responses)" insttype="OBSERVED" lat="26.5324" lon="80.0464" dist="466.177729" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.4">
+<comp name="DERIVED">
+<pga value="2.86" flag="T" />
+<pgv value="4.06" flag="0" />
+</comp>
+</station>
+<station code="29" name="Geocoded location UTM:(44R 042 293 10000) (Intensity IV, 15 responses)" insttype="OBSERVED" lat="26.5336" lon="80.2472" dist="447.469494" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.8">
+<comp name="DERIVED">
+<pga value="1.17" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="30" name="Geocoded location UTM:(44R 043 292 10000) (Intensity IV, 10 responses)" insttype="OBSERVED" lat="26.4438" lon="80.3481" dist="441.897682" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.1">
+<comp name="DERIVED">
+<pga value="1.83" flag="T" />
+<pgv value="3.16" flag="0" />
+</comp>
+</station>
+<station code="31" name="Geocoded location UTM:(44R 049 296 10000) (Intensity IV, 8 responses)" insttype="OBSERVED" lat="26.8064" lon="80.9497" dist="371.515503" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="1.58" flag="0" />
+<pgv value="2.70" flag="0" />
+</comp>
+</station>
+<station code="32" name="Geocoded location UTM:(44R 049 297 10000) (Intensity IV, 23 responses)" insttype="OBSERVED" lat="26.8968" lon="80.9496" dist="368.146011" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="1.58" flag="0" />
+<pgv value="2.70" flag="0" />
+</comp>
+</station>
+<station code="33" name="Geocoded location UTM:(44R 058 281 10000) (Intensity V, 3 responses)" insttype="OBSERVED" lat="25.4495" lon="81.8454" dist="377.105523" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.7">
+<comp name="DERIVED">
+<pga value="4.07" flag="T" />
+<pgv value="5.06" flag="0" />
+</comp>
+</station>
+<station code="34" name="Geocoded location UTM:(44R 070 279 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="25.2574" lon="83.0356" dist="318.833418" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.9">
+<comp name="DERIVED">
+<pga value="1.36" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="35" name="Geocoded location UTM:(44R 079 312 10000) (Intensity VII, 15 responses)" insttype="OBSERVED" lat="28.2178" lon="84.0057" dist="56.249614" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="27.01" flag="0" />
+<pgv value="27.02" flag="0" />
+</comp>
+</station>
+<station code="36" name="Geocoded location UTM:(45Q 028 246 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="22.2773" lon="84.9134" dist="573.003318" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.7">
+<comp name="DERIVED">
+<pga value="1.01" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="37" name="Geocoded location UTM:(45Q 037 224 10000) (Intensity III, 4 responses)" insttype="OBSERVED" lat="20.2988" lon="85.8029" dist="785.121749" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="2.8">
+<comp name="DERIVED">
+<pga value="nan" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="38" name="Geocoded location UTM:(45Q 053 246 10000) (Intensity IV, 4 responses)" insttype="OBSERVED" lat="22.2903" lon="87.3398" dist="584.104457" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.6">
+<comp name="DERIVED">
+<pga value="0.87" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="39" name="Geocoded location UTM:(45Q 053 260 10000) (Intensity IV, 4 responses)" insttype="OBSERVED" lat="23.5550" lon="87.3430" dist="450.146008" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.1">
+<comp name="DERIVED">
+<pga value="1.83" flag="T" />
+<pgv value="3.16" flag="0" />
+</comp>
+</station>
+<station code="40" name="Geocoded location UTM:(45Q 061 256 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="23.1900" lon="88.1237" dist="517.613792" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.1">
+<comp name="DERIVED">
+<pga value="1.83" flag="T" />
+<pgv value="3.16" flag="0" />
+</comp>
+</station>
+<station code="41" name="Geocoded location UTM:(45Q 063 248 10000) (Intensity IV, 4 responses)" insttype="OBSERVED" lat="22.4660" lon="88.3122" dist="598.399702" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.4">
+<comp name="DERIVED">
+<pga value="2.86" flag="T" />
+<pgv value="4.06" flag="0" />
+</comp>
+</station>
+<station code="42" name="Geocoded location UTM:(45Q 063 249 10000) (Intensity IV, 47 responses)" insttype="OBSERVED" lat="22.5564" lon="88.3130" dist="589.304602" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.2">
+<comp name="DERIVED">
+<pga value="2.12" flag="T" />
+<pgv value="3.51" flag="0" />
+</comp>
+</station>
+<station code="43" name="Geocoded location UTM:(45Q 063 250 10000) (Intensity V, 3 responses)" insttype="OBSERVED" lat="22.6467" lon="88.3139" dist="580.252727" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="5.2">
+<comp name="DERIVED">
+<pga value="5.55" flag="T" />
+<pgv value="7.28" flag="0" />
+</comp>
+</station>
+<station code="44" name="Geocoded location UTM:(45Q 063 251 10000) (Intensity III, 3 responses)" insttype="OBSERVED" lat="22.7370" lon="88.3147" dist="571.226910" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.2">
+<comp name="DERIVED">
+<pga value="0.48" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="45" name="Geocoded location UTM:(45Q 064 248 10000) (Intensity IV, 11 responses)" insttype="OBSERVED" lat="22.4652" lon="88.4093" dist="602.559066" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.3">
+<comp name="DERIVED">
+<pga value="2.46" flag="T" />
+<pgv value="3.78" flag="0" />
+</comp>
+</station>
+<station code="46" name="Geocoded location UTM:(45Q 064 249 10000) (Intensity IV, 24 responses)" insttype="OBSERVED" lat="22.5555" lon="88.4102" dist="593.539216" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.2">
+<comp name="DERIVED">
+<pga value="2.12" flag="T" />
+<pgv value="3.51" flag="0" />
+</comp>
+</station>
+<station code="47" name="Geocoded location UTM:(45Q 064 250 10000) (Intensity III, 11 responses)" insttype="OBSERVED" lat="22.6458" lon="88.4111" dist="584.550007" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.4">
+<comp name="DERIVED">
+<pga value="0.65" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="48" name="Geocoded location UTM:(45Q 064 251 10000) (Intensity III, 3 responses)" insttype="OBSERVED" lat="22.7361" lon="88.4120" dist="575.592904" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.4">
+<comp name="DERIVED">
+<pga value="0.65" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="49" name="Geocoded location UTM:(45Q 065 249 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="22.5546" lon="88.5075" dist="597.908648" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.2">
+<comp name="DERIVED">
+<pga value="2.12" flag="T" />
+<pgv value="3.51" flag="0" />
+</comp>
+</station>
+<station code="50" name="Geocoded location UTM:(45R 024 306 10000) (Intensity VII, 4 responses)" insttype="OBSERVED" lat="27.6852" lon="84.4145" dist="25.680854" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="6.9">
+<comp name="DERIVED">
+<pga value="31.51" flag="0" />
+<pgv value="25.12" flag="0" />
+</comp>
+</station>
+<station code="51" name="Geocoded location UTM:(45R 030 283 10000) (Intensity V, 4 responses)" insttype="OBSERVED" lat="25.6197" lon="85.0580" dist="206.644280" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="5.3">
+<comp name="DERIVED">
+<pga value="6.55" flag="0" />
+<pgv value="7.83" flag="0" />
+</comp>
+</station>
+<station code="52" name="Geocoded location UTM:(45R 031 283 10000) (Intensity V, 18 responses)" insttype="OBSERVED" lat="25.6210" lon="85.1575" dist="204.640600" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="5.3">
+<comp name="DERIVED">
+<pga value="6.57" flag="0" />
+<pgv value="7.83" flag="0" />
+</comp>
+</station>
+<station code="53" name="Geocoded location UTM:(45R 033 305 10000) (Intensity VII, 3 responses)" insttype="OBSERVED" lat="27.6090" lon="85.3280" dist="14.194804" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="6.8">
+<comp name="DERIVED">
+<pga value="34.86" flag="0" />
+<pgv value="23.35" flag="0" />
+</comp>
+</station>
+<station code="54" name="Geocoded location UTM:(45R 033 306 10000) (Intensity VIII, 100 responses)" insttype="OBSERVED" lat="27.6992" lon="85.3266" dist="14.992152" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="7.5">
+<comp name="DERIVED">
+<pga value="53.09" flag="0" />
+<pgv value="38.89" flag="0" />
+</comp>
+</station>
+<station code="55" name="Geocoded location UTM:(45R 034 306 10000) (Intensity VII, 5 responses)" insttype="OBSERVED" lat="27.7004" lon="85.4280" dist="15.348884" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="6.6">
+<comp name="DERIVED">
+<pga value="30.12" flag="0" />
+<pgv value="20.19" flag="0" />
+</comp>
+</station>
+<station code="56" name="Geocoded location UTM:(45R 062 266 10000) (Intensity V, 3 responses)" insttype="OBSERVED" lat="24.0923" lon="88.2298" dist="435.340780" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.8">
+<comp name="DERIVED">
+<pga value="4.33" flag="T" />
+<pgv value="5.44" flag="0" />
+</comp>
+</station>
+<station code="57" name="Geocoded location UTM:(45R 063 295 10000) (Intensity V, 3 responses)" insttype="OBSERVED" lat="26.7096" lon="88.3571" dist="255.655212" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.8">
+<comp name="DERIVED">
+<pga value="4.53" flag="0" />
+<pgv value="5.44" flag="0" />
+</comp>
+</station>
+<station code="58" name="Geocoded location UTM:(45R 064 295 10000) (Intensity VI, 5 responses)" insttype="OBSERVED" lat="26.7087" lon="88.4577" dist="264.744563" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="5.6">
+<comp name="DERIVED">
+<pga value="7.37" flag="T" />
+<pgv value="9.74" flag="0" />
+</comp>
+</station>
+<station code="59" name="Geocoded location UTM:(45R 066 269 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="24.3595" lon="88.6267" dist="434.664733" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.9">
+<comp name="DERIVED">
+<pga value="1.36" flag="0" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="60" name="Geocoded location UTM:(45R 074 291 10000) (Intensity V, 3 responses)" insttype="OBSERVED" lat="26.3340" lon="89.4547" dist="371.998809" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="5.4">
+<comp name="DERIVED">
+<pga value="6.29" flag="T" />
+<pgv value="8.42" flag="0" />
+</comp>
+</station>
+<station code="61" name="Geocoded location UTM:(45R 076 303 10000) (Intensity IV, 4 responses)" insttype="OBSERVED" lat="27.4127" lon="89.6803" dist="352.019040" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.1">
+<comp name="DERIVED">
+<pga value="1.83" flag="0" />
+<pgv value="3.16" flag="0" />
+</comp>
+</station>
+<station code="62" name="Geocoded location UTM:(45R 076 304 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="27.5029" lon="89.6824" dist="350.448729" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.3">
+<comp name="DERIVED">
+<pga value="2.46" flag="0" />
+<pgv value="3.78" flag="0" />
+</comp>
+</station>
+<station code="63" name="Geocoded location UTM:(45R 079 268 10000) (Intensity IV, 3 responses)" insttype="OBSERVED" lat="24.2501" lon="89.9052" dist="533.000377" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.7">
+<comp name="DERIVED">
+<pga value="1.01" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="64" name="Geocoded location UTM:(46Q 023 262 10000) (Intensity IV, 41 responses)" insttype="OBSERVED" lat="23.7142" lon="90.4009" dist="610.078800" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.9">
+<comp name="DERIVED">
+<pga value="1.36" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="65" name="Geocoded location UTM:(46Q 023 263 10000) (Intensity IV, 91 responses)" insttype="OBSERVED" lat="23.8044" lon="90.3991" dist="603.206905" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.1">
+<comp name="DERIVED">
+<pga value="1.83" flag="T" />
+<pgv value="3.16" flag="0" />
+</comp>
+</station>
+<station code="66" name="Geocoded location UTM:(46Q 023 264 10000) (Intensity IV, 8 responses)" insttype="OBSERVED" lat="23.8946" lon="90.3973" dist="596.422244" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="3.8">
+<comp name="DERIVED">
+<pga value="1.17" flag="T" />
+<pgv value="nan" flag="0" />
+</comp>
+</station>
+<station code="67" name="Geocoded location UTM:(46R 037 289 10000) (Intensity IV, 5 responses)" insttype="OBSERVED" lat="26.1690" lon="91.7493" dist="587.908075" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="1.58" flag="T" />
+<pgv value="2.70" flag="0" />
+</comp>
+</station>
+<station code="68" name="Geocoded location UTM:(46R 038 275 10000) (Intensity IV, 5 responses)" insttype="OBSERVED" lat="24.9058" lon="91.8613" dist="657.979377" source="USGS (Did You Feel It?)" netid="DYFI" commtype="" loc="" intensity="4.1">
+<comp name="DERIVED">
+<pga value="1.83" flag="T" />
+<pgv value="3.16" flag="T" />
+</comp>
+</station>
+<station code="IC.LSA" name="Tibet, China" insttype="UNK" lat="29.7031" lon="91.127" dist="519.699757" source="NEIC" netid="IC" commtype="UNK" loc="" intensity="2.9">
+<comp name="HNZ">
+<pga value="0.1009" flag="0" />
+<pgv value="0.6220" flag="0" />
+<psa03 value="0.0941" flag="0" />
+<psa10 value="0.1052" flag="0" />
+<psa30 value="0.1514" flag="0" />
+</comp>
+<comp name="HN2">
+<pga value="0.1680" flag="0" />
+<pgv value="0.4053" flag="0" />
+<psa03 value="0.3688" flag="0" />
+<psa10 value="0.1345" flag="0" />
+<psa30 value="0.1375" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.1606" flag="0" />
+<pgv value="0.5054" flag="0" />
+<psa03 value="0.3057" flag="0" />
+<psa10 value="0.1267" flag="0" />
+<psa30 value="0.1402" flag="0" />
+</comp>
+</station>
+<station code="MTR" name="Motihari, India" insttype="UNK" lat="26.630" lon="84.899" dist="103.274307" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="6.0">
+<comp name="HN2">
+<pga value="7.8800" flag="0" />
+<pgv value="6.9700" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="3.4100" flag="0" />
+<pgv value="4.3600" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="7.4800" flag="0" />
+<pgv value="13.0000" flag="0" />
+</comp>
+</station>
+<station code="MAH" name="Maharajganj, India" insttype="UNK" lat="27.141" lon="83.539" dist="128.176306" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="5.8">
+<comp name="HN2">
+<pga value="5.0500" flag="0" />
+<pgv value="6.3500" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="1.6000" flag="0" />
+<pgv value="2.6600" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="6.2100" flag="0" />
+<pgv value="10.9000" flag="0" />
+</comp>
+</station>
+<station code="PTN" name="Patna, India" insttype="UNK" lat="25.622" lon="85.149" dist="204.691576" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="4.5">
+<comp name="HN2">
+<pga value="4.7000" flag="0" />
+<pgv value="4.4000" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="2.5800" flag="0" />
+<pgv value="1.9700" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="3.3200" flag="0" />
+<pgv value="3.5100" flag="0" />
+</comp>
+</station>
+<station code="UTR" name="Utrala, India" insttype="UNK" lat="27.141" lon="83.539" dist="128.176306" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="4.5">
+<comp name="HN2">
+<pga value="4.1700" flag="0" />
+<pgv value="4.4600" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="1.6800" flag="0" />
+<pgv value="1.3400" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="3.3400" flag="0" />
+<pgv value="3.5600" flag="0" />
+</comp>
+</station>
+<station code="GDA" name="Gonda, India" insttype="UNK" lat="27.116" lon="82.237" dist="240.308947" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="4.8">
+<comp name="HN2">
+<pga value="3.9700" flag="0" />
+<pgv value="5.4300" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="1.8700" flag="0" />
+<pgv value="1.5200" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="4.3300" flag="0" />
+<pgv value="5.1600" flag="0" />
+</comp>
+</station>
+<station code="BRP" name="Balarampur, India" insttype="UNK" lat="27.504" lon="82.055" dist="244.735764" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="4.3">
+<comp name="HN2">
+<pga value="3.2900" flag="0" />
+<pgv value="3.4800" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="1.7100" flag="0" />
+<pgv value="1.3700" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="3.1900" flag="0" />
+<pgv value="3.8900" flag="0" />
+</comp>
+</station>
+<station code="KSN" name="Kishanganj, India" insttype="UNK" lat="26.095" lon="87.947" dist="251.540019" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="6.3">
+<comp name="HN2">
+<pga value="4.0600" flag="0" />
+<pgv value="16.4000" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="1.8800" flag="0" />
+<pgv value="7.7600" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="3.4900" flag="0" />
+<pgv value="15.1000" flag="0" />
+</comp>
+</station>
+<station code="FZB" name="Faizabad, India" insttype="UNK" lat="26.730" lon="82.146" dist="267.547123" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="7.6" intensity_flag="T">
+<comp name="HN2">
+<pga value="3.0400" flag="0" />
+<pgv value="4.5400" flag="T" />
+</comp>
+<comp name="HNZ">
+<pga value="2.0300" flag="0" />
+<pgv value="1.3800" flag="T" />
+</comp>
+<comp name="HN1">
+<pga value="3.2800" flag="0" />
+<pgv value="40.7000" flag="T" />
+</comp>
+</station>
+<station code="JAU" name="Jaunpur, India" insttype="UNK" lat="25.733" lon="82.693" dist="295.597721" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="4.1">
+<comp name="HN2">
+<pga value="2.1500" flag="0" />
+<pgv value="2.4600" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="1.3600" flag="0" />
+<pgv value="1.2000" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="1.9900" flag="0" />
+<pgv value="2.9800" flag="0" />
+</comp>
+</station>
+<station code="VNS" name="Varanasi, India" insttype="UNK" lat="25.553" lon="82.854" dist="301.293445" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="3.8">
+<comp name="HN2">
+<pga value="2.0600" flag="0" />
+<pgv value="2.0700" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.8030" flag="0" />
+<pgv value="0.9340" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="2.0200" flag="0" />
+<pgv value="1.8900" flag="0" />
+</comp>
+</station>
+<station code="AMT" name="Amethi, India" insttype="UNK" lat="26.187" lon="81.678" dist="339.343490" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="4.3">
+<comp name="HN2">
+<pga value="1.5600" flag="0" />
+<pgv value="2.4600" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.8990" flag="0" />
+<pgv value="1.4600" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="1.5500" flag="0" />
+<pgv value="3.7300" flag="0" />
+</comp>
+</station>
+<station code="LEH" name="Laharpur, India" insttype="UNK" lat="27.709" lon="80.890" dist="355.192612" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="3.9">
+<comp name="HN2">
+<pga value="1.0700" flag="0" />
+<pgv value="2.2200" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.8400" flag="0" />
+<pgv value="0.8200" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="1.4700" flag="0" />
+<pgv value="1.8400" flag="0" />
+</comp>
+</station>
+<station code="LAK" name="Lakhimpur, India" insttype="UNK" lat="27.949" lon="80.79" dist="363.736410" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="3.9">
+<comp name="HN2">
+<pga value="1.0800" flag="0" />
+<pgv value="1.9300" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.9260" flag="0" />
+<pgv value="0.7000" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="1.4300" flag="0" />
+<pgv value="2.2600" flag="0" />
+</comp>
+</station>
+<station code="PHN" name="Pihani, India" insttype="UNK" lat="27.650" lon="80.160" dist="427.356076" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="3.5">
+<comp name="HN2">
+<pga value="0.7830" flag="0" />
+<pgv value="1.2100" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.3690" flag="0" />
+<pgv value="0.4560" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="1.0600" flag="0" />
+<pgv value="1.2300" flag="0" />
+</comp>
+</station>
+<station code="HAR" name="Hardoi, India" insttype="UNK" lat="27.396" lon="80.133" dist="433.470808" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="3.7">
+<comp name="HN2">
+<pga value="0.8770" flag="0" />
+<pgv value="1.5800" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.5350" flag="0" />
+<pgv value="0.5310" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.8570" flag="0" />
+<pgv value="1.7500" flag="0" />
+</comp>
+</station>
+<station code="TAN" name="Tanakpur, India" insttype="UNK" lat="29.074" lon="80.112" dist="446.109496" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="3.6">
+<comp name="HN2">
+<pga value="0.5190" flag="0" />
+<pgv value="1.4700" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.2990" flag="0" />
+<pgv value="0.5630" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.5180" flag="0" />
+<pgv value="1.4100" flag="0" />
+</comp>
+</station>
+<station code="KHA" name="Khatima, India" insttype="UNK" lat="28.925" lon="79.961" dist="456.432188" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="3.9">
+<comp name="HN2">
+<pga value="0.8708" flag="0" />
+<pgv value="2.1600" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.4910" flag="0" />
+<pgv value="1.1000" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.9870" flag="0" />
+<pgv value="1.8900" flag="0" />
+</comp>
+</station>
+<station code="BSR" name="Bisalpur, India" insttype="UNK" lat="28.209" lon="79.805" dist="460.897061" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="3.6">
+<comp name="HN2">
+<pga value="0.6680" flag="0" />
+<pgv value="1.5100" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.3470" flag="0" />
+<pgv value="0.6300" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.9000" flag="0" />
+<pgv value="1.2700" flag="0" />
+</comp>
+</station>
+<station code="BRE" name="Bareilly, India" insttype="UNK" lat="28.343" lon="79.418" dist="499.583128" source="Strong Motion Network of Indian Institute of Technology, Roorkee (IITR)" netid="IITR" commtype="UNK" loc="" intensity="3.6">
+<comp name="HN2">
+<pga value="0.6370" flag="0" />
+<pgv value="1.1900" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.5940" flag="0" />
+<pgv value="0.4200" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.6870" flag="0" />
+<pgv value="1.3600" flag="0" />
+</comp>
+</station>
+<station code="TDR" name="Takurdwar, India" insttype="UNK" lat="29.148" lon="78.855" dist="566.720243" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="3.6">
+<comp name="HN2">
+<pga value="0.5340" flag="T" />
+<pgv value="1.1700" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.5340" flag="T" />
+<pgv value="0.4700" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.5250" flag="T" />
+<pgv value="1.5400" flag="0" />
+</comp>
+</station>
+<station code="NAR" name="Narora, India" insttype="UNK" lat="28.226" lon="78.425" dist="596.041413" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="3.6">
+<comp name="HN2">
+<pga value="0.6930" flag="T" />
+<pgv value="0.8500" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.3790" flag="T" />
+<pgv value="0.3200" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.8030" flag="T" />
+<pgv value="1.5500" flag="0" />
+</comp>
+</station>
+<station code="HDR" name="Haridwar, India" insttype="UNK" lat="29.975" lon="78.052" dist="663.149668" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="3.2">
+<comp name="HN2">
+<pga value="0.3990" flag="T" />
+<pgv value="0.5400" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.2760" flag="T" />
+<pgv value="0.3500" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.4130" flag="T" />
+<pgv value="0.8100" flag="0" />
+</comp>
+</station>
+<station code="MRT" name="Eerut, India" insttype="UNK" lat="29.154" lon="77.617" dist="684.810822" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="3.0">
+<comp name="HN2">
+<pga value="0.4660" flag="T" />
+<pgv value="0.5600" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.1750" flag="T" />
+<pgv value="0.2500" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.4640" flag="T" />
+<pgv value="0.5900" flag="0" />
+</comp>
+</station>
+<station code="CGD" name="Chandigarh, India" insttype="UNK" lat="30.760" lon="76.767" dist="804.815369" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="3.4">
+<comp name="HN2">
+<pga value="0.2170" flag="T" />
+<pgv value="0.5670" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.1160" flag="T" />
+<pgv value="0.3800" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.2740" flag="T" />
+<pgv value="1.0600" flag="0" />
+</comp>
+</station>
+<station code="HSR" name="Hissar, India" insttype="UNK" lat="29.446" lon="75.60" dist="882.818950" source="Central Indo-Gangetic Network (CIGN)" netid="CIGN" commtype="UNK" loc="" intensity="2.8">
+<comp name="HN2">
+<pga value="0.2080" flag="T" />
+<pgv value="0.2400" flag="0" />
+</comp>
+<comp name="HNZ">
+<pga value="0.1060" flag="T" />
+<pgv value="0.1900" flag="0" />
+</comp>
+<comp name="HN1">
+<pga value="0.2510" flag="T" />
+<pgv value="0.4400" flag="0" />
+</comp>
+</station>
+<station code="OBS_1" name="Swayambhunath Stupa (Intensity VIII)" insttype="Observed" lat="27.7151" lon="85.2905" dist="15.005107" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.0">
+<comp name="DERIVED">
+<pga value="72.45" flag="0" />
+<pgv value="55.99" flag="0" />
+</comp>
+</station>
+<station code="OBS_2" name="Dharhara Tower (Intensity VIII)" insttype="Observed" lat="27.7006" lon="85.3119" dist="14.953055" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.0">
+<comp name="DERIVED">
+<pga value="72.52" flag="0" />
+<pgv value="55.99" flag="0" />
+</comp>
+</station>
+<station code="OBS_3" name="Taleju (Intensity VIII)" insttype="Observed" lat="27.7049" lon="85.3079" dist="14.976851" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.0">
+<comp name="DERIVED">
+<pga value="72.48" flag="0" />
+<pgv value="55.99" flag="0" />
+</comp>
+</station>
+<station code="OBS_4" name="Barpak Village (Intensity IX)" insttype="Observed" lat="28.201" lon="84.7429" dist="16.944860" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="9.0">
+<comp name="DERIVED">
+<pga value="130.54" flag="0" />
+<pgv value="116.03" flag="0" />
+</comp>
+</station>
+<station code="OBS_5" name="Laprak Village (Intensity IX)" insttype="Observed" lat="28.2189" lon="84.8008" dist="17.554307" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="9.0">
+<comp name="DERIVED">
+<pga value="129.27" flag="0" />
+<pgv value="116.03" flag="0" />
+</comp>
+</station>
+<station code="OBS_6" name="Phulkharka (Intensity IX)" insttype="Observed" lat="28.0646" lon="84.9198" dist="16.504714" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="9.0">
+<comp name="DERIVED">
+<pga value="131.49" flag="0" />
+<pgv value="116.03" flag="0" />
+</comp>
+</station>
+<station code="OBS_7" name="Pipaldanda (Intensity IX)" insttype="Observed" lat="27.7791" lon="85.6869" dist="17.114115" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="9.0">
+<comp name="DERIVED">
+<pga value="130.18" flag="0" />
+<pgv value="116.03" flag="0" />
+</comp>
+</station>
+<station code="OBS_8" name="Chautara (Intensity IX)" insttype="Observed" lat="27.7707" lon="85.7222" dist="17.079517" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="9.0">
+<comp name="DERIVED">
+<pga value="130.25" flag="0" />
+<pgv value="116.03" flag="0" />
+</comp>
+</station>
+<station code="OBS_9" name="Ghale (Intensity VIII)" insttype="Observed" lat="28.2776" lon="84.3089" dist="32.325444" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.0">
+<comp name="DERIVED">
+<pga value="58.63" flag="0" />
+<pgv value="55.99" flag="0" />
+</comp>
+</station>
+<station code="OBS_10" name="Gaunkharka (Intensity IX)" insttype="Observed" lat="27.9371" lon="85.4578" dist="17.476956" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="9.0">
+<comp name="DERIVED">
+<pga value="129.43" flag="0" />
+<pgv value="116.03" flag="0" />
+</comp>
+</station>
+<station code="OBS_11" name="Kharanitar (Intensity VIII)" insttype="Observed" lat="27.9281" lon="85.3207" dist="16.974758" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.0">
+<comp name="DERIVED">
+<pga value="70.02" flag="0" />
+<pgv value="55.99" flag="0" />
+</comp>
+</station>
+<station code="OBS_12" name="Betrawati (Intensity IX)" insttype="Observed" lat="27.9737" lon="85.1857" dist="17.091393" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.5">
+<comp name="DERIVED">
+<pga value="95.40" flag="0" />
+<pgv value="80.60" flag="0" />
+</comp>
+</station>
+<station code="OBS_13" name="Battar Bazaar (Intensity IX)" insttype="Observed" lat="27.8969" lon="85.1463" dist="16.293743" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.5">
+<comp name="DERIVED">
+<pga value="96.67" flag="0" />
+<pgv value="80.60" flag="0" />
+</comp>
+</station>
+<station code="OBS_14" name="Near Trishuli Bazaar (Intensity IX)" insttype="Observed" lat="27.9236" lon="85.1303" dist="16.501851" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.5">
+<comp name="DERIVED">
+<pga value="96.33" flag="0" />
+<pgv value="80.60" flag="0" />
+</comp>
+</station>
+<station code="OBS_15" name="Trishuli Bazaar (Intensity IX)" insttype="Observed" lat="27.9255" lon="85.1413" dist="16.545689" source="K. Jaiwal (2015)" netid="INTENSITY" commtype="Intensity" loc="" intensity="8.5">
+<comp name="DERIVED">
+<pga value="96.26" flag="0" />
+<pgv value="80.60" flag="0" />
+</comp>
+</station>
+<station code="KATNP" name="KATNP (Intensity VII)" insttype="Observed" lat="27.7082" lon="85.3074" dist="15.004112" source="McGowan et al (2016)" netid="MMI" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="38.88" flag="0" />
+<pgv value="27.02" flag="0" />
+</comp>
+</station>
+<station code="TVU" name="TVU (Intensity VII)" insttype="Observed" lat="27.6910" lon="85.3167" dist="14.885267" source="McGowan et al (2016)" netid="MMI" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="38.97" flag="0" />
+<pgv value="27.02" flag="0" />
+</comp>
+</station>
+<station code="THM" name="THM (Intensity VII)" insttype="Observed" lat="27.6749" lon="85.3643" dist="14.908050" source="McGowan et al (2016)" netid="MMI" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="38.95" flag="0" />
+<pgv value="27.02" flag="0" />
+</comp>
+</station>
+<station code="DMG" name="DMG (Intensity VIII)" insttype="Observed" lat="27.7218" lon="85.3197" dist="15.166606" source="McGowan et al (2016)" netid="MMI" commtype="Intensity" loc="" intensity="7.5">
+<comp name="DERIVED">
+<pga value="52.92" flag="0" />
+<pgv value="38.89" flag="0" />
+</comp>
+</station>
+<station code="RAM" name="RAM (Intensity VIII)" insttype="Observed" lat="27.7223" lon="85.251" dist="14.913966" source="McGowan et al (2016)" netid="MMI" commtype="Intensity" loc="" intensity="8.1">
+<comp name="DERIVED">
+<pga value="77.23" flag="0" />
+<pgv value="60.22" flag="0" />
+</comp>
+</station>
+<station code="BHK" name="BHK (Intensity VIII)" insttype="Observed" lat="27.6719" lon="85.4259" dist="15.090236" source="McGowan et al (2016)" netid="MMI" commtype="Intensity" loc="" intensity="7.8">
+<comp name="DERIVED">
+<pga value="63.87" flag="0" />
+<pgv value="48.40" flag="0" />
+</comp>
+</station>
+<station code="GNG" name="GNG (Intensity VIII)" insttype="Observed" lat="27.7375" lon="85.3171" dist="15.294865" source="McGowan et al (2016)" netid="MMI" commtype="Intensity" loc="" intensity="8.0">
+<comp name="DERIVED">
+<pga value="72.07" flag="0" />
+<pgv value="55.99" flag="0" />
+</comp>
+</station>
+<station code="SWY" name="SWY (Intensity VIII)" insttype="Observed" lat="27.7126" lon="85.2756" dist="14.930253" source="McGowan et al (2016)" netid="MMI" commtype="Intensity" loc="" intensity="8.0">
+<comp name="DERIVED">
+<pga value="72.55" flag="0" />
+<pgv value="55.99" flag="0" />
+</comp>
+</station>
+<station code="NQ.KATNP" name="Kanti Path, Kathmandu, Nepal" insttype="UNK" lat="27.71235" lon="85.31561" dist="15.069386" source="NEIC" netid="NQ" commtype="UNK" loc="" intensity="8.9">
+<comp name="HNE">
+<pga value="16.4000" flag="T" />
+<pgv value="107.3000" flag="0" />
+<psa03 value="29.1000" flag="0" />
+<psa10 value="28.8000" flag="0" />
+<psa30 value="23.7000" flag="0" />
+</comp>
+</station>
+
+</stationlist>
+</shakemap-data>

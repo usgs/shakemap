@@ -2,14 +2,15 @@
 
 # third party imports
 import numpy as np
+import scipy.interpolate as spint
 import logging
 
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.rupture.base import Rupture
 from shakelib.rupture import constants
 
-from ps2ff.constants import DistType, MagScaling, Mechanism
-from ps2ff.interpolate import PS2FF
+from ps2ff.constants import MagScaling, Mechanism
+from ps2ff.run import single_event_adjustment
 
 
 class PointRupture(Rupture):
@@ -128,7 +129,7 @@ class PointRupture(Rupture):
         PointRupture."""
         return self._origin.depth
 
-    def computeRjb(self, lon, lat, depth, var=False):
+    def computeRjb(self, lon, lat, depth):
         """
         Convert point-distances to Joyner-Boore distances based on magnitude.
 
@@ -136,17 +137,14 @@ class PointRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
-            var (bool): Also return variance of prediction.
 
         Returns:
-            If var is True then this returns a tuple of two arrays: first, the
-                predicted Rjb values, and second an array of the variance of
-                those predictions. If var is False then just the first element
-                of the tuple is returned.
+            tuple: A tuple of two arrays: first, the predicted Rjb values,
+            and second an array of the variance of those predictions.
         """
-        return self._computeRdist('Rjb', lon, lat, depth, var)
+        return self._computeRdist('Rjb', lon, lat, depth)
 
-    def computeRrup(self, lon, lat, depth, var=False):
+    def computeRrup(self, lon, lat, depth):
         """
         Convert point-distances to rupture distances based on magnitude.
 
@@ -154,17 +152,14 @@ class PointRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
-            var (bool): Also return variance of prediction.
 
         Returns:
-            If var is True then this returns a tuple of two arrays: first, the
-                predicted Rrup, and second an array of the variance of
-                those predictions. If var is False then just the first element
-                of the tuple is returned.
+            tuple: A tuple of two arrays: first, the predicted Rrup, and
+            second an array of the variance of those predictions.
         """
-        return self._computeRdist('Rrup', lon, lat, depth, var)
+        return self._computeRdist('Rrup', lon, lat, depth)
 
-    def _computeRdist(self, rtype, lon, lat, depth, var):
+    def _computeRdist(self, rtype, lon, lat, depth):
         """
         Helper function to actually do the approximate fault distance
         computations.
@@ -174,21 +169,13 @@ class PointRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
-            var (bool): Also return variance of prediction.
 
         Returns:
-            If var is True then this returns a tuple of two arrays: first, the
-                predicted approximate fault distance values (either Rjb or
-                Rrup, depending on the 'type' argument), and second an array of
-                the variance of those predictions. If var is False then just
-                the first element of the tuple is returned.
+            tuple: A tuple of two arrays: first, the predicted approximate
+            fault distance values (either Rjb or Rrup, depending on the
+            'type' argument), and second an array of the variance of those
+            predictions.
         """
-        if rtype == 'Rjb':
-            dtype = DistType.Rjb
-        elif rtype == 'Rrup':
-            dtype = DistType.Rrup
-        else:
-            raise ValueError('Unknown distance type in _computeRdist')
 
         # ----------------------------
         # Sort out ps2ff parameters
@@ -198,64 +185,87 @@ class PointRupture(Rupture):
         if not hasattr(origin, '_tectonic_region'):
             mscale = MagScaling.WC94
             smech = Mechanism.A
+            mindip_deg = 10.0
+            maxdip_deg = 90.0
             aspect = 1.7
-            min_sdepth = 0
-            max_sdepth = 20
         elif origin._tectonic_region == 'Active Shallow Crust':
             mscale = MagScaling.HB08
             aspect = 1.7
-            min_sdepth = 0
-            max_sdepth = 20
             if mech == 'ALL':
                 # HB08 doesn't have an 'ALL' mechanism, so use WC94
                 mscale = MagScaling.WC94
                 smech = Mechanism.A
+                mindip_deg = 10.0
+                maxdip_deg = 90.0
             elif mech == 'RS':
                 smech = Mechanism.R
+                mindip_deg = 35.0
+                maxdip_deg = 50.0
             elif mech == 'NM':
                 smech = Mechanism.N
+                mindip_deg = 40.0
+                maxdip_deg = 60.0
             elif mech == 'SS':
                 smech = Mechanism.SS
+                mindip_deg = 75.0
+                maxdip_deg = 90.0
         elif origin._tectonic_region == 'Stable Shallow Crust':
             mscale = MagScaling.S14
             aspect = 1.0
-            min_sdepth = 0
-            max_sdepth = 15
             if mech == 'ALL':
                 smech = Mechanism.A
+                mindip_deg = 10.0
+                maxdip_deg = 90.0
             elif mech == 'RS':
                 smech = Mechanism.R
+                mindip_deg = 30.0
+                maxdip_deg = 60.0
             elif mech == 'NM':
                 smech = Mechanism.N
+                mindip_deg = 40.0
+                maxdip_deg = 60.0
             elif mech == 'SS':
                 smech = Mechanism.SS
+                mindip_deg = 60.0
+                maxdip_deg = 90.0
         else:
-            logging.warn(
+            logging.warning(
                 'Unsupported tectonic region; using coefficients for unknown'
                 'tectonic region.')
             mscale = MagScaling.WC94
             smech = Mechanism.A
             aspect = 1.7
-            min_sdepth = 0
-            max_sdepth = 20
+            mindip_deg = 10.0
+            maxdip_deg = 90.0
 
-        p2f = PS2FF.fromParams(dist_type=dtype,
-                               mag_scaling=mscale,
-                               mechanism=smech,
-                               AR=aspect,
-                               min_seis_depth=min_sdepth,
-                               max_seis_depth=max_sdepth)
+        mindip = mindip_deg * np.pi / 180.0
+        maxdip = maxdip_deg * np.pi / 180.0
 
         repis = np.clip(self.computeRepi(lon, lat, depth), 0.0001, None)
-        mags = np.full_like(repis, origin.mag)
 
-        r_hat = p2f.r2r(repis, mags)
+        repi, Rjb_hat, Rrup_hat, Rjb_var, Rrup_var = \
+            single_event_adjustment(origin.mag, origin.depth, ar=aspect,
+                                    mechanism=smech, mag_scaling=mscale,
+                                    n_repi=13,
+                                    min_repi=np.min(repis) - 1e-5,
+                                    max_repi=np.max(repis) + 0.1,
+                                    nxny=7, n_theta=19,
+                                    n_dip=4, min_dip=mindip, max_dip=maxdip,
+                                    n_eps=5, trunc=2)
 
-        if var is True:
-            r_var = p2f.var(repis, mags)
-            return (r_hat, r_var)
+        if rtype == 'Rjb':
+            spline = spint.interp1d(repi, np.vstack((Rjb_hat, Rjb_var)),
+                                    kind='linear', copy=False,
+                                    assume_sorted=True)
+            rv_hat = spline(repis)
+        elif rtype == 'Rrup':
+            spline = spint.interp1d(repi, np.vstack((Rrup_hat, Rrup_var)),
+                                    kind='linear', copy=False,
+                                    assume_sorted=True)
+            rv_hat = spline(repis)
         else:
-            return r_hat
+            raise ValueError('Unknown distance type in _computeRdist')
+        return (rv_hat[0], rv_hat[1])
 
     def computeGC2(self, lon, lat, depth):
         """

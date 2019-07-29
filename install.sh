@@ -5,28 +5,39 @@ if [ "$unamestr" == 'Linux' ]; then
     prof=~/.bashrc
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     matplotlibdir=~/.config/matplotlib
-    channel_url=ftp://ftpext.usgs.gov/pub/cr/co/golden/emthompson/shakemap-linux.tar
-    channel=shakemap-linux
+    CC=gcc_linux-64
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
-    channel_url=ftp://ftpext.usgs.gov/pub/cr/co/golden/emthompson/shakemap-osx.tar
-    channel=shakemap-osx
+    #    CC=clangxx_osx-64
+    CC=gcc
 else
     echo "Unsupported environment. Exiting."
     exit
 fi
+
 
 source $prof
 
 # Name of virtual environment
 VENV=shakemap
 
+developer=0
+py_ver=3.6
+while getopts p:d FLAG; do
+  case $FLAG in
+    p)
+        py_ver=$OPTARG
+      ;;
+    d)
+        echo "Installing developer packages."
+        developer=1
+      ;;
+  esac
+done
 
-# this is an experiment to see if we can get away without the platform specific
-# environment files.
-reset=1
+echo "Using python version $py_ver"
 
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d "$matplotlibdir" ]; then
@@ -84,21 +95,7 @@ else
     echo "conda detected, installing $VENV environment..."
 fi
 
-# Download frozen channel
-echo "Downloading shakemap channel..."
-curl $channel_url -o $channel.tar
-# if curl fails, bow out gracefully
-if [ $? -ne 0 ];then
-    echo "Failed to download channel. Exiting."
-    exit 1
-fi
-
-# Un tar the channel
-tar -xvf $channel.tar
-if [ $? -ne 0 ];then
-    echo "Failed to extract channel. Exiting."
-    exit 1
-fi
+echo "Installing packages from conda-forge"
 
 # Choose an environment file based on platform
 # only add this line if it does not already exist
@@ -117,44 +114,63 @@ conda activate base
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
 
+dev_list=(
+    "ipython"
+    "autopep8"
+    "flake8"
+    "pyflakes"
+    "rope"
+    "yapf"
+    "sphinx"
+)
+
+# Package list:
+package_list=(
+      "python=$py_ver"
+      "cartopy"
+      "cython"
+      "defusedxml"
+      "descartes"
+      "docutils"
+      "configobj"
+      "fiona"
+      "$CC"
+      "gdal"
+      "h5py"
+      "impactutils=0.8.15"
+      "libcomcat=1.2.13"
+      "lockfile"
+      "mapio=0.7.21"
+      "matplotlib<=2.3"
+      "numpy"
+      "obspy"
+      "openquake.engine"
+      "pandas"
+      "ps2ff"
+      "psutil"
+      "pyproj"
+      "pytest"
+      "pytest-cov"
+      "python-daemon"
+      "pytest-faulthandler"
+      "scikit-image"
+      "scipy"
+      "shapely"
+      "simplekml"
+      "strec=2.1.4"
+      "versioneer"
+      "vcrpy"
+)
+
+if [ $developer == 1 ]; then
+    package_list=( "${package_list[@]}" "${dev_list[@]}" )
+    echo ${package_list[*]}
+fi
+
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
-# conda env create -f $env_file --force
-conda create -y --override-channels -n $VENV \
-      -c file://$PWD/$channel \
-      python=3.5 \
-      amptools \
-      basemap \
-      cartopy \
-      defusedxml \
-      descartes \
-      docutils \
-      configobj \
-      fiona \
-      gdal \
-      h5py \
-      impactutils \
-      libcomcat \
-      lockfile \
-      mapio \
-      matplotlib \
-      numexpr \
-      numpy \
-      obspy \
-      openquake.engine \
-      pandas \
-      ps2ff \
-      psutil \
-      pyproj \
-      pytest \
-      pytest-cov \
-      python-daemon \
-      pytest-faulthandler \
-      scikit-image \
-      scipy \
-      shapely \
-      strec \
-      versioneer 
+conda create -y -n $VENV -c conda-forge \
+      --channel-priority ${package_list[*]}
 
 
 # Bail out at this point if the conda create command fails.
@@ -182,6 +198,10 @@ pip install --upgrade pip
 if [ $? -ne 0 ];then
     echo "Failed to upgrade pip, trying to continue..."
     exit 1
+fi
+
+if [ $developer == 1 ]; then
+    pip install sphinx-argparse
 fi
 
 # This package

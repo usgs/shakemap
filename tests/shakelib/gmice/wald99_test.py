@@ -3,9 +3,6 @@
 import numpy as np
 import pytest
 
-import os
-import sys
-
 from openquake.hazardlib.imt import PGA, PGV, MMI
 
 from shakelib.gmice.wald99 import Wald99
@@ -24,8 +21,40 @@ dadm_target = {PGA(): set([1.0 / (x * lfact) for x in [3.66, 2.20]]),
                PGV(): set([1.0 / (x * lfact) for x in [3.47, 2.10]])}
 
 
-def test_wgrw12():
+def test_wald99():
     gmice = Wald99()
+
+    df = {'PGA': amps_in,
+          'PGV': amps_in + np.log(100)}
+
+    mi = gmice.getPreferredMI(df)
+    mi_target = np.array(
+        [3.18167182, 4.23133858, 5.68946656, 6.84666436, 7.47561075,
+         7.90914817, 8.24542592, 9.29])
+
+    if do_test is True:
+        np.testing.assert_allclose(mi, mi_target)
+    else:
+        print(repr(mi))
+
+    pga_amps_in_nan = np.log(np.array(
+        [0.01, 0.03, 0.1, np.nan, 0.3, 0.4, 0.5, 1.0]))
+    pgv_amps_in_nan = np.log(np.array(
+        [0.01, 0.03, 0.1, 0.2, np.nan, 0.4, 0.5, 1.0])) + np.log(100)
+    pga_amps_in_nan[5] = np.nan
+    pgv_amps_in_nan[5] = np.nan
+    df = {'PGA': pga_amps_in_nan,
+          'PGV': pgv_amps_in_nan}
+
+    mi = gmice.getPreferredMI(df)
+    mi_target = np.array(
+        [3.18167182, 4.23133858, 5.68946656, 6.86457408, 7.37577236,
+         np.nan, 8.24542592, 9.29])
+
+    if do_test is True:
+        np.testing.assert_allclose(mi, mi_target)
+    else:
+        print(repr(mi))
 
     mi, dmda = gmice.getMIfromGM(amps_in, PGA(), dists=None, mag=None)
     mi_target = np.array(
@@ -103,4 +132,4 @@ def test_wgrw12():
 
 
 if __name__ == '__main__':
-    test_wgrw12()
+    test_wald99()

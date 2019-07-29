@@ -1,11 +1,37 @@
+import os
 from distutils.core import setup
 import os.path
 import versioneer
+from distutils.extension import Extension
+from Cython.Distutils import build_ext
+from Cython.Build import cythonize
+import numpy
 
+# This should be handled by conda when we install a platform-specific
+# compiler
+# os.environ['CC'] = 'gcc'
+
+sourcefiles = ["shakemap/c/pcontour.pyx", "shakemap/c/contour.c"]
+
+clib_source = ["shakemap/c/clib.pyx"]
+
+ext_modules = [Extension("shakemap.c.pcontour",
+                         sourcefiles,
+                         libraries=["m"],
+                         include_dirs=[numpy.get_include()],
+                         extra_compile_args=["-O3"]),
+               Extension("shakemap.c.clib",
+                         clib_source,
+                         libraries=['m'],
+                         include_dirs=[numpy.get_include()],
+                         extra_compile_args=["-O3", "-fopenmp"],
+                         extra_link_args=["-fopenmp"])]
+
+cmdclass = versioneer.get_cmdclass()
+cmdclass['build_ext'] = build_ext
 
 setup(name='shakemap',
       version=versioneer.get_version(),
-      cmdclass=versioneer.get_cmdclass(),
       description='USGS Near-Real-Time Ground Motion Mapping',
       author='Bruce Worden, Mike Hearne, Eric Thompson',
       author_email='cbworden@usgs.gov,mhearne@usgs.gov,emthompson@usgs.gov',
@@ -42,10 +68,15 @@ setup(name='shakemap',
           'bin/receive_origins',
           'bin/run_verification',
           'bin/shake',
+          'bin/sm_check',
+          'bin/sm_compare',
           'bin/sm_create',
           'bin/sm_migrate',
           'bin/sm_profile',
-          'bin/sm_compare',
-          'bin/sm_queue'
-      ],
+          'bin/sm_queue',
+          'bin/sm_rupture',
+          'bin/sm_batch',
+          'bin/sm_sync'],
+      cmdclass=cmdclass,
+      ext_modules=cythonize(ext_modules)
       )

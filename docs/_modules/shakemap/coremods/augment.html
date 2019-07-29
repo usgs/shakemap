@@ -9,11 +9,12 @@
     <title>shakemap.coremods.augment &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -58,8 +59,8 @@
                                    <span class="n">config_error</span><span class="p">,</span>
                                    <span class="n">check_config</span><span class="p">,</span>
                                    <span class="n">get_configspec</span><span class="p">,</span>
-                                   <span class="n">get_logging_config</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
+                                   <span class="n">path_macro_sub</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.logging</span> <span class="k">import</span> <span class="n">get_logging_config</span>
 
 
 <div class="viewcode-block" id="AugmentModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.augment.html#shakemap.coremods.augment.AugmentModule">[docs]</a><span class="k">class</span> <span class="nc">AugmentModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -74,10 +75,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate a CoreModule class with an event ID.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">=</span> <span class="n">eventid</span>
-        <span class="n">log_config</span> <span class="o">=</span> <span class="n">get_logging_config</span><span class="p">()</span>
-        <span class="n">log_name</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AugmentModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">comment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span>
 
@@ -110,7 +108,7 @@
 
         <span class="c1"># Prompt for a comment string if none is provided on the command line</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span>
                         <span class="s1">&#39;Please enter a comment for this version.</span><span class="se">\n</span><span class="s1">&#39;</span>
                         <span class="s1">&#39;(Start with &quot;+&quot; if you wish to append to the</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -193,20 +191,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">config_error</span><span class="p">(</span><span class="n">shake_config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
         <span class="n">check_config</span><span class="p">(</span><span class="n">shake_config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
-        <span class="c1">#</span>
-        <span class="c1"># The vs30 file may have macros in it</span>
-        <span class="c1">#</span>
-        <span class="n">vs30file</span> <span class="o">=</span> <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;vs30file&#39;</span><span class="p">]</span>
+
         <span class="n">global_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
                                         <span class="s1">&#39;shakemap_data&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">vs30file</span><span class="p">:</span>
-            <span class="n">vs30file</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">vs30file</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span>
-                                      <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">,</span>
-                                      <span class="n">ei</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">vs30file</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;vs30 file &quot;</span><span class="si">%s</span><span class="s1">&quot; is not a &#39;</span>
-                                        <span class="s1">&#39;valid file&#39;</span> <span class="o">%</span> <span class="n">vs30file</span><span class="p">)</span>
-            <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;vs30file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vs30file</span>
         <span class="c1">#</span>
         <span class="c1"># If there is a prediction_location-&gt;file file, then we need</span>
         <span class="c1"># to expand any macros</span>
@@ -233,6 +220,9 @@
         <span class="n">datafiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_dat.xml&#39;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.xml&#39;</span><span class="p">)):</span>
             <span class="n">datafiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.xml&#39;</span><span class="p">))</span>
+        <span class="n">datafiles</span> <span class="o">+=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_dat.json&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.json&#39;</span><span class="p">)):</span>
+            <span class="n">datafiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.json&#39;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">datafiles</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Found additional data files...&#39;</span><span class="p">)</span>
             <span class="n">shake_data</span><span class="o">.</span><span class="n">addStationData</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span>
@@ -333,10 +323,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

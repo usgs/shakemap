@@ -267,8 +267,8 @@ class Bayless2013(object):
 
         # Distance taper
         T_CD = np.ones_like(self._lat)
-        ix = [(self.__Rrup / self._W[self.i] > 1.5) &
-              (self.__Rrup / self._W[self.i] < 2.0)]
+        ix = tuple([(self.__Rrup / self._W[self.i] > 1.5) &
+                    (self.__Rrup / self._W[self.i] < 2.0)])
         T_CD[ix] = 1.0 - (self.__Rrup[ix] / self._W[self.i] - 1.5) / 0.5
         T_CD[self.__Rrup / self._W[self.i] >= 2.0] = 0.0
 
@@ -276,7 +276,7 @@ class Bayless2013(object):
         T_Az = np.sin(np.abs(self.Az))**2
 
         # Select Coefficients
-        ix = [self._T == self.__periods]
+        ix = tuple([self._T == self.__periods])
         C0 = self.__c0ds[ix]
         C1 = self.__c1ds[ix]
 
@@ -293,13 +293,13 @@ class Bayless2013(object):
 
         # Distance taper
         T_CD = np.ones_like(self._lat)
-        ix = [
+        ix = tuple([
             (self.__Rrup /
              self._L[
                  self.i] > 0.5) & (
                 self.__Rrup /
                 self._L[
-                    self.i] < 1.0)]
+                    self.i] < 1.0)])
         T_CD[ix] = 1 - (self.__Rrup[ix] / self._L[self.i] - 0.5) / 0.5
         T_CD[self.__Rrup / self._L[self.i] >= 1.0] = 0.0
 
@@ -307,7 +307,7 @@ class Bayless2013(object):
         T_Az = 1.0
 
         # Select Coefficients
-        ix = [self._T == self.__periods]
+        ix = tuple([self._T == self.__periods])
         C0 = self.__c0ss[ix]
         C1 = self.__c1ss[ix]
         self._fd_SS = (C0 + C1 * f_geom) * T_CD * self._T_Mw * T_Az
@@ -315,7 +315,7 @@ class Bayless2013(object):
     def __computeAz(self):
         Az = np.ones_like(self.__Rx) * np.pi / 2.0
         Az = Az * np.sign(self.__Rx)
-        ix = [self.__Ry > 0.0]
+        ix = tuple([self.__Ry > 0.0])
         Az[ix] = np.arctan(self.__Rx[ix] / self.__Ry[ix])
         self.Az = Az
 

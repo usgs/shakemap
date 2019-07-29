@@ -9,11 +9,12 @@
     <title>shakelib.multigmpe &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -86,6 +87,21 @@ Borcherdt).</li>
 <dt id="shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs">
 <code class="descname">get_mean_and_stddevs</code><span class="sig-paren">(</span><em>sites</em>, <em>rup</em>, <em>dists</em>, <em>imt</em>, <em>stddev_types</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.get_mean_and_stddevs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
 <dd><p>See superclass <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs">method</a>.</p>
+<p>Unlike the superclass method, the stddev list returned by this
+function will have twice as many arrays as are requested in
+stddev_types: The first set will include the standard deviation
+inflation due to the point-source to finite fault conversion (if
+any), and the second set will not include this inflation. In the
+case where a finite rupture is provided (and, thus, no point-source
+to finite rupture adjustments are made) the two sets of stddev
+arrays will be identical. Thus, if:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stddev_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTRA_EVENT</span><span class="p">,</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>the returned stddev list will contain six arrays: the first three
+will include the point-source inflation, and the second three will
+not.</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -186,7 +202,7 @@ apply to those GMPEs that do not have site terms.</li>
 
 <dl class="staticmethod">
 <dt id="shakelib.multigmpe.MultiGMPE.set_sites_depth_parameters">
-<em class="property">static </em><code class="descname">set_sites_depth_parameters</code><span class="sig-paren">(</span><em>gmpe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.set_sites_depth_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.set_sites_depth_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">set_sites_depth_parameters</code><span class="sig-paren">(</span><em>sites</em>, <em>gmpe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.set_sites_depth_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.set_sites_depth_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Need to select the appropriate z1pt0 value for different GMPEs.
 Note that these are required site parameters, so even though
 OQ has these equations built into the class in most cases.
@@ -223,6 +239,52 @@ distance. For this level of detail, please see the config files.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dictionary representation of the MultiGMPE.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.multigmpe.MultiGMPE.inflatePSSigma">
+<code class="descname">inflatePSSigma</code><span class="sig-paren">(</span><em>gmpe</em>, <em>lmean</em>, <em>lsd</em>, <em>sites</em>, <em>rup</em>, <em>dists</em>, <em>imt</em>, <em>stddev_types</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.inflatePSSigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.inflatePSSigma" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the point-source to finite-fault factors are used, we need to
+inflate the intra-event and total standard deviations. We do this
+by standard propagation of error techniques: taking the (numerical)
+derivative of the GMPE (as a function of distance) squared times the
+additional variance from the conversion, added
+to the variance of the GMPE (then taking the square root). We do
+this separately for each of Rrup and Rjb and sum the results.
+If Rrup and Rjb are calculated from a finite rupture model, their
+variance arrays will be “None” and lsd will remain unchanged.
+Otherwise the error inflation will be applied. Normally one or the
+other of Rrup/Rjb will not be used and so that term will be zero; in
+some cases both may be used and both may result in non-zero
+derivatives.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>gmpe</strong> – The GMPE to use for the calculations. Must be a base GMPE and
+not a GMPE set, otherwise no action is taken.</li>
+<li><strong>lmean</strong> – The mean values returned by the “normal” evaluation of the
+GMPE.</li>
+<li><strong>lsd</strong> – The standard deviations returned by the “normal” evaluation
+of the GMPE.</li>
+<li><strong>sites</strong> – The sites context required by the GMPE.</li>
+<li><strong>rup</strong> – The rupture context required by the GMPE.</li>
+<li><strong>dists</strong> – The distance context required by the GMPE.</li>
+<li><strong>imt</strong> – The intensity measure type being evaluated.</li>
+<li><strong>stddev_types</strong> – The list of stddev types found in lsd.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of arrays of inflated standard deviations
+corresponding to the elements of lsd.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -326,23 +388,26 @@ tables.</li>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">shakelib.multigmpe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.multigmpe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

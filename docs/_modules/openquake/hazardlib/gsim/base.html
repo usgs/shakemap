@@ -9,11 +9,12 @@
     <title>openquake.hazardlib.gsim.base &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -68,6 +69,9 @@
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.contexts</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># for backward compatibility</span>
 
 
+<span class="n">registry</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># GSIM name -&gt; GSIM class</span>
+
+
 <span class="k">class</span> <span class="nc">NotVerifiedWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raised when a non verified GSIM is instantiated</span>
@@ -95,13 +99,16 @@
 <span class="sd">    instantiated. A subclass with an attribute non_verified=True will</span>
 <span class="sd">    print a UserWarning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">deprecated</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">superseded_by</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">non_verified</span> <span class="o">=</span> <span class="kc">False</span>
 
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
+        <span class="n">registry</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
+
     <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">deprecated</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">superseded_by</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is deprecated - use </span><span class="si">%s</span><span class="s1"> instead&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">superseded_by</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">non_verified</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not independently verified - the user is liable &#39;</span>
@@ -422,11 +429,11 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Make sure that ``imt`` is valid and is supported by this GSIM.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">imt</span><span class="p">),</span> <span class="n">imt_module</span><span class="o">.</span><span class="n">_IMT</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;imt must be an instance of IMT subclass&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span>
+                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">imt</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;imt </span><span class="si">%s</span><span class="s1"> is not supported by </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
-                             <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+                             <span class="p">(</span><span class="n">imt</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -648,11 +655,11 @@
 <span class="sd">    &gt;&gt;&gt; ct[imt.PGV()]</span>
 <span class="sd">    Traceback (most recent call last):</span>
 <span class="sd">        ...</span>
-<span class="sd">    KeyError: PGV()</span>
+<span class="sd">    KeyError: PGV</span>
 <span class="sd">    &gt;&gt;&gt; ct[imt.SA(1.0, 4)]</span>
 <span class="sd">    Traceback (most recent call last):</span>
 <span class="sd">        ...</span>
-<span class="sd">    KeyError: SA(period=1.0, damping=4)</span>
+<span class="sd">    KeyError: SA(1.0, 4)</span>
 
 <span class="sd">    Table of coefficients for spectral acceleration could be indexed</span>
 <span class="sd">    by instances of :class:`openquake.hazardlib.imt.SA` with period</span>
@@ -670,14 +677,14 @@
 <span class="sd">    &gt;&gt;&gt; ct[imt.SA(period=0.9, damping=15)]</span>
 <span class="sd">    Traceback (most recent call last):</span>
 <span class="sd">        ...</span>
-<span class="sd">    KeyError: SA(period=0.9, damping=15)</span>
+<span class="sd">    KeyError: SA(0.9, 15)</span>
 
 <span class="sd">    Extrapolation is not possible:</span>
 
 <span class="sd">    &gt;&gt;&gt; ct[imt.SA(period=0.01, damping=5)]</span>
 <span class="sd">    Traceback (most recent call last):</span>
 <span class="sd">        ...</span>
-<span class="sd">    KeyError: SA(period=0.01, damping=5)</span>
+<span class="sd">    KeyError: SA(0.01)</span>
 
 <span class="sd">    It is also possible to instantiate a table from a tuple of dictionaries,</span>
 <span class="sd">    corresponding to the SA coefficients and non-SA coefficients:</span>
@@ -700,11 +707,11 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_table_from_str</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">sa_damping</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">imt_module</span><span class="o">.</span><span class="n">SA</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">imt</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;SA&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;CoeffsTable cannot be constructed with inputs &quot;</span>
                             <span class="s2">&quot;of the form &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">table</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
@@ -728,9 +735,9 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">sa_period</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">imt_name</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">imt_module</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">imt_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imt_module</span><span class="o">.</span><span class="n">registry</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown IMT </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imt_name</span><span class="p">)</span>
-                <span class="n">imt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">imt_module</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">)()</span>
+                <span class="n">imt</span> <span class="o">=</span> <span class="n">imt_module</span><span class="o">.</span><span class="n">registry</span><span class="p">[</span><span class="n">imt_name</span><span class="p">]()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">imt_coeffs</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">sa_damping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -751,7 +758,7 @@
 <span class="sd">            If ``imt`` is not available in the table and no interpolation</span>
 <span class="sd">            can be done.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">imt_module</span><span class="o">.</span><span class="n">SA</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">imt</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;SA&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -808,10 +815,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

@@ -9,11 +9,12 @@
     <title>shakelib.rupture.edge_rupture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -553,7 +554,7 @@
 
         <span class="k">return</span> <span class="n">qlist</span></div>
 
-<div class="viewcode-block" id="EdgeRupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeRrup">[docs]</a>    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EdgeRupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeRrup">[docs]</a>    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for computing rupture distance.</span>
 
@@ -561,16 +562,11 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
-<span class="sd">            var (bool): Also return variance of prediction. Unused, and</span>
-<span class="sd">                will raise an exception if not False.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">           array: Rupture distance (km).</span>
+<span class="sd">           tuple: A tuple of an array of rupture distance (km), and None.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;var must be False for EdgeRupture&#39;</span><span class="p">)</span>
 
         <span class="n">mesh_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh_dx</span>
 
@@ -633,9 +629,9 @@
 
         <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">oldshape</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">dist</span></div>
+        <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="EdgeRupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeRjb">[docs]</a>    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EdgeRupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeRjb">[docs]</a>    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for computing Joyner-Boore distance.</span>
 
@@ -643,16 +639,11 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
-<span class="sd">            var (bool): Also return variance of prediction. Unused, and</span>
-<span class="sd">                will raise an exception if not False.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">           array: Joyner-Boore distance (km).</span>
+<span class="sd">           tuple: A tuple of an array of Joyner-Boore distance (km), and None.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;var must be False for EdgeRupture&#39;</span><span class="p">)</span>
 
         <span class="n">mesh_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh_dx</span>
 
@@ -715,7 +706,7 @@
 
         <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">oldshape</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">dist</span></div>
+        <span class="k">return</span> <span class="n">dist</span><span class="p">,</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="EdgeRupture.computeGC2"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeGC2">[docs]</a>    <span class="k">def</span> <span class="nf">computeGC2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -763,10 +754,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

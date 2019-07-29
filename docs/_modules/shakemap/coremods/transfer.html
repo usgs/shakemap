@@ -9,11 +9,12 @@
     <title>shakemap.coremods.transfer &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -39,17 +40,21 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="c1"># third party imports</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
+<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">Validator</span>
 <span class="kn">from</span> <span class="nn">impactutils.transfer.factory</span> <span class="k">import</span> <span class="n">get_sender_class</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_data_path</span>
-
-<span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
+                                   <span class="n">get_data_path</span><span class="p">,</span>
+                                   <span class="n">config_error</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.macros</span> <span class="k">import</span> <span class="n">get_macros</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
 <span class="n">NO_TRANSFER</span> <span class="o">=</span> <span class="s1">&#39;NO_TRANSFER&#39;</span>
 
@@ -109,6 +114,9 @@
 
         <span class="c1"># get the config information for transfer</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">transfer_conf</span><span class="p">,</span> <span class="n">configspec</span><span class="o">=</span><span class="n">configspec</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">Validator</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">config_error</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
 
         <span class="c1"># get the output container with all the things in it</span>
         <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">products_dir</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">)</span>
@@ -118,7 +126,7 @@
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
         <span class="c1"># extract the info.json object from the container</span>
-        <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
         <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="c1"># call the transfer method</span>
@@ -150,6 +158,10 @@
 
 
 <span class="k">def</span> <span class="nf">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">pdl_dir</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">,</span> <span class="n">cancel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+    <span class="c1"># get the macros that may be in the email sender config</span>
+    <span class="n">macros</span> <span class="o">=</span> <span class="n">get_macros</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
     <span class="n">properties</span><span class="p">,</span> <span class="n">product_properties</span> <span class="o">=</span> <span class="n">_get_properties</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
 
     <span class="c1"># get the config information:</span>
@@ -180,6 +192,26 @@
                         <span class="n">properties</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
                         <span class="n">local_directory</span><span class="o">=</span><span class="n">pdl_dir</span><span class="p">,</span>
                         <span class="n">product_properties</span><span class="o">=</span><span class="n">product_properties</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">transfer_method</span> <span class="o">==</span> <span class="s1">&#39;email&#39;</span><span class="p">:</span>
+                    <span class="c1"># replace macro strings with actual strings</span>
+                    <span class="k">for</span> <span class="n">pkey</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">for</span> <span class="n">macro</span><span class="p">,</span> <span class="n">replacement</span> <span class="ow">in</span> <span class="n">macros</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                                <span class="n">param</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">macro</span><span class="p">,</span>
+                                                      <span class="n">replacement</span><span class="p">)</span>
+                                <span class="n">params</span><span class="p">[</span><span class="n">pkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+
+                    <span class="c1"># get full path to all file attachments</span>
+                    <span class="n">attachments</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">lfile</span> <span class="ow">in</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;attachments&#39;</span><span class="p">]:</span>
+                        <span class="n">fullfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">products_dir</span><span class="p">,</span> <span class="n">lfile</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fullfile</span><span class="p">):</span>
+                            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">fullfile</span><span class="p">)</span>
+                        <span class="n">attachments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fullfile</span><span class="p">)</span>
+
+                    <span class="c1"># construct an instance of the EmailSender</span>
+                    <span class="n">sender</span> <span class="o">=</span> <span class="n">sender_class</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                                          <span class="n">local_files</span><span class="o">=</span><span class="n">attachments</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">cancelfile</span> <span class="o">=</span> <span class="n">CANCEL_FILES</span><span class="p">[</span><span class="n">transfer_method</span><span class="p">]</span>
                     <span class="n">sender</span> <span class="o">=</span> <span class="n">sender_class</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
@@ -230,7 +262,12 @@
     <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">])</span>
     <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">])</span>
     <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">])</span>
-    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span> <span class="n">TIMEFMT</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span>
+                                                    <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span>
+                                                    <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
 
     <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;event-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span>
     <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;event-description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span>
@@ -282,6 +319,16 @@
     <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;map-status&#39;</span><span class="p">]</span> <span class="o">=</span> \
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;shakemap_versions&#39;</span><span class="p">][</span><span class="s1">&#39;map_status&#39;</span><span class="p">]</span>
 
+    <span class="c1"># if this process is being run manually, set the review-status property</span>
+    <span class="c1"># to &quot;reviewed&quot;. If automatic, then set to &quot;automatic&quot;.</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;review-status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;automatic&#39;</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;review-status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reviewed&#39;</span>
+
+    <span class="c1"># what gmice was used for the model calculations</span>
+    <span class="n">gmice</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motion_modules&#39;</span><span class="p">][</span><span class="s1">&#39;gmice&#39;</span><span class="p">][</span><span class="s1">&#39;module&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;gmice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmice</span>
+
     <span class="k">return</span> <span class="p">(</span><span class="n">properties</span><span class="p">,</span> <span class="n">product_properties</span><span class="p">)</span>
 </pre></div>
 
@@ -309,10 +356,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

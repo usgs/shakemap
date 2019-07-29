@@ -9,11 +9,12 @@
     <title>shakelib.directivity.rowshandel2013 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -550,7 +551,7 @@
             <span class="n">R1</span> <span class="o">=</span> <span class="mi">35</span>
             <span class="n">R2</span> <span class="o">=</span> <span class="mi">70</span>
             <span class="n">DT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nsite</span><span class="p">)</span>
-            <span class="n">ix</span> <span class="o">=</span> <span class="p">[(</span><span class="n">Rrup</span> <span class="o">&gt;</span> <span class="n">R1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Rrup</span> <span class="o">&lt;</span> <span class="n">R2</span><span class="p">)]</span>
+            <span class="n">ix</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([(</span><span class="n">Rrup</span> <span class="o">&gt;</span> <span class="n">R1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Rrup</span> <span class="o">&lt;</span> <span class="n">R2</span><span class="p">)])</span>
             <span class="n">DT</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">Rrup</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">/</span> <span class="n">R1</span>
             <span class="n">DT</span><span class="p">[</span><span class="n">Rrup</span> <span class="o">&gt;=</span> <span class="n">R2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>                  <span class="c1"># eqn 3.9</span>
@@ -598,7 +599,14 @@
         <span class="n">sig</span> <span class="o">=</span> <span class="mf">0.55</span>
         <span class="n">Tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.04</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_M</span> <span class="o">-</span> <span class="mf">6.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_WP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">)</span> <span class="o">*</span>
-                            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sig</span> <span class="o">*</span> <span class="n">sig</span><span class="p">))</span></div>
+                            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sig</span> <span class="o">*</span> <span class="n">sig</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Rowshandel2013.getPeriods"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">getPeriods</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of the periods for which the model is defined.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__periods</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_get_quad_slip_ds_ss</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -734,10 +742,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

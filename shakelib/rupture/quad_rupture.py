@@ -78,7 +78,8 @@ class QuadRupture(Rupture):
         SMALL_DISTANCE = 2e-03  # 2 meters
         depth = np.nan
 
-        tmp = self.computeRjb(np.array([lon]), np.array([lat]), np.array([0]))
+        tmp, _ = self.computeRjb(np.array([lon]), np.array([lat]),
+                                 np.array([0]))
         if tmp > SMALL_DISTANCE:
             return depth
 
@@ -132,8 +133,8 @@ class QuadRupture(Rupture):
         # dot product
         sxdd = ddn.dot(s0sx)
 
-        # get width of quad
-        w = utils.get_quad_width(quad)
+        # get width of quad (convert from km to m)
+        w = utils.get_quad_width(quad)*1000
 
         # Get weights for top and bottom edge depths
         N = utils.get_quad_normal(quad)
@@ -172,7 +173,7 @@ class QuadRupture(Rupture):
         wsum = 0.0
         for quad in self._quadrilaterals:
             wsum = wsum + utils.get_quad_width(quad)
-        mwidth = (wsum / len(self._quadrilaterals)) / 1000.0
+        mwidth = (wsum / len(self._quadrilaterals))
         return mwidth
 
     def getArea(self):
@@ -495,7 +496,7 @@ class QuadRupture(Rupture):
         dip = np.array(dip, dtype='d')
 
         # Get P1 and P2 (top horizontal points)
-        theta = np.rad2deg(np.arctan((dy * np.cos(np.deg2rad(dip))) / dx))
+        theta = np.rad2deg(np.arctan2(dy * np.cos(np.deg2rad(dip)), dx))
         P1_direction = strike + 180 + theta
         P1_distance = np.sqrt(dx**2 + (dy * np.cos(np.deg2rad(dip)))**2)
         P2_direction = strike
@@ -746,7 +747,7 @@ class QuadRupture(Rupture):
         widths = np.zeros(nquad)
         for i in range(nquad):
             q = self._quadrilaterals[i]
-            widths[i] = utils.get_quad_width(q) / 1000.0
+            widths[i] = utils.get_quad_width(q)
         return widths
 
     def getIndividualTopLengths(self):
@@ -1018,7 +1019,7 @@ class QuadRupture(Rupture):
         rupture = Mesh(self._lon, self._lat, self._depth)
         return rupture
 
-    def computeRjb(self, lon, lat, depth, var=False):
+    def computeRjb(self, lon, lat, depth):
         """
         Method for computing Joyner-Boore distance.
 
@@ -1026,16 +1027,11 @@ class QuadRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
-            var (bool): Also return variance of prediction. Unused, and
-                will raise an exception if not False.
 
         Returns:
-           array: Joyner-Boore distance (km).
+           tuple: A tuple of an array of Joyner-Boore distance (km), and None.
 
         """
-
-        if var is True:
-            raise ValueError('var must be False for EdgeRupture')
 
         # ---------------------------------------------------------------------
         # Sort out sites
@@ -1071,9 +1067,9 @@ class QuadRupture(Rupture):
             minrjb = np.minimum(minrjb, rjbdist)
 
         minrjb = minrjb.reshape(oldshape)
-        return minrjb
+        return minrjb, None
 
-    def computeRrup(self, lon, lat, depth, var=False):
+    def computeRrup(self, lon, lat, depth):
         """
         Method for computing rupture distance.
 
@@ -1081,16 +1077,11 @@ class QuadRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
-            var (bool): Also return variance of prediction. Unused, and
-                will raise an exception if not False.
 
         Returns:
-           array: Rupture distance (km).
+           tuple: A tuple of an array of Rupture distance (km), and None.
 
         """
-
-        if var is True:
-            raise ValueError('var must be False for EdgeRupture')
 
         # ---------------------------------------------------------------------
         # Sort out sites
@@ -1116,7 +1107,7 @@ class QuadRupture(Rupture):
             minrrup = np.minimum(minrrup, rrupdist)
 
         minrrup = minrrup.reshape(oldshape)
-        return minrrup
+        return minrrup, None
 
     def computeGC2(self, lon, lat, depth):
         """

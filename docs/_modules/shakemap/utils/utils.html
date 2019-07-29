@@ -9,11 +9,12 @@
     <title>shakemap.utils.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -41,6 +42,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+<span class="kn">import</span> <span class="nn">time</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
@@ -111,18 +113,28 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">NETWORK_TEMPLATE</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[NETID]&#39;</span><span class="p">,</span> <span class="n">netid</span><span class="p">)</span>
     <span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">fh</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-        <span class="n">jdict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">network</span> <span class="o">=</span> <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
-    <span class="k">except</span> <span class="n">HTTPError</span><span class="p">:</span>
-        <span class="n">error_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;No network description found for </span><span class="si">%s</span><span class="s1">. You may</span>
-<span class="s1">want to make sure that the pages of the form </span><span class="si">%s</span><span class="s1"> still exist,</span>
-<span class="s1">and contact the ShakeMap developers if they do not.</span>
-<span class="s1">&#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">netid</span><span class="p">,</span> <span class="n">NETWORK_TEMPLATE</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
+    <span class="n">fails</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">fails</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fh</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">jdict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">network</span> <span class="o">=</span> <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">HTTPError</span><span class="p">:</span>
+            <span class="n">error_str</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;No network description found for </span><span class="si">%s</span><span class="s1">. You may &#39;</span>
+                         <span class="s1">&#39;want to make sure that the pages of the form </span><span class="si">%s</span><span class="s1"> &#39;</span>
+                         <span class="s1">&#39;still exist and contact the ShakeMap developers &#39;</span>
+                         <span class="s1">&#39;if they do not.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">netid</span><span class="p">,</span> <span class="n">NETWORK_TEMPLATE</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
+            <span class="n">fails</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Error in get_network_name: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Will try </span><span class="si">%d</span><span class="s2"> more times&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="n">fails</span><span class="p">))</span>
+            <span class="n">fails</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
 
     <span class="k">return</span> <span class="n">network</span></div>
 
@@ -195,42 +207,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Please respond with &#39;yes&#39; or &#39;no&#39; &quot;</span>
                              <span class="s2">&quot;(or &#39;y&#39; or &#39;n&#39;).</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="path_macro_sub"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.path_macro_sub">[docs]</a><span class="k">def</span> <span class="nf">path_macro_sub</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">gp</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">ei</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Replace macros with current paths:</span>
-
-<span class="sd">    - &lt;INSTALL_DIR&gt; is replaced with the contents of ip</span>
-<span class="sd">    - &lt;DATA_DIR&gt; is replaced with the contents of dp</span>
-<span class="sd">    - &lt;GLOBAL_DATA&gt; is replaced with the contents of gp</span>
-<span class="sd">    - &lt;EVENT_ID&gt; is replaced with the contents of ei</span>
-
-<span class="sd">    e.g., path_macro_sub(&quot;&lt;INSTALL_DIR&gt;/&lt;DATA_DIR&gt;&quot;, &quot;hello&quot;, &quot;world&quot;)</span>
-<span class="sd">    would return &quot;hello/world&quot;. It is not an error if the original string</span>
-<span class="sd">    does not contain one or any of the substitution strings.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        s (str):</span>
-<span class="sd">            The string into which the replacements are made.</span>
-<span class="sd">        ip (str):</span>
-<span class="sd">            The string with which to replace &lt;INSTALL_DIR&gt;.</span>
-<span class="sd">        dp (str):</span>
-<span class="sd">            The string with which to replace &lt;DATA_DIR&gt;.</span>
-<span class="sd">        gp (str):</span>
-<span class="sd">            The string with which to replace &lt;GLOBAL_DATA&gt;.</span>
-<span class="sd">        ei (str):</span>
-<span class="sd">            The string with which to replace &lt;EVENT_ID&gt;.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: A new string with the sub-string replacements.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;GLOBAL_DATA&gt;&#39;</span><span class="p">,</span> <span class="n">gp</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVENT_ID&gt;&#39;</span><span class="p">,</span> <span class="n">ei</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">s</span></div>
 </pre></div>
 
           </div>
@@ -257,10 +233,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

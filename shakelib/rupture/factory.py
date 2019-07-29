@@ -3,6 +3,7 @@
 # stdlib modules
 import json
 import logging
+import copy
 
 # third party imports
 import numpy as np
@@ -60,14 +61,18 @@ def get_rupture(origin, file=None, mesh_dx=0.5, new_format=True):
             # First, try to read as a json file
             # -----------------------------------------------------------------
             if isinstance(file, str):
-                with open(file) as f:
+                with open(file, encoding="latin-1") as f:
                     d = json.load(f)
             else:
                 d = json.loads(str(file))
 
             rupt = rupture_from_dict_and_origin(d, origin, mesh_dx=mesh_dx)
 
-        except json.JSONDecodeError:
+        except Exception as e:
+            if not isinstance(e, json.JSONDecodeError) and \
+               not isinstance(e, UnicodeDecodeError):
+                logging.warning("Unknown exception reading fault file: %s" %
+                                str(e))
             # -----------------------------------------------------------------
             # Reading as json failed, so hopefully it is a ShakeMap 3 text file
             # -----------------------------------------------------------------
@@ -151,6 +156,9 @@ def rupture_from_dict(d):
 
     """
     validate_json(d)
+
+    # We don't want to mess with the input just in case it gets used again
+    d = copy.deepcopy(d)
 
     try:
         d['metadata']['time'] = HistoricTime.strptime(d['metadata']['time'],
@@ -293,7 +301,7 @@ def text_to_json(file, new_format=True):
     if hasattr(file, 'read'):
         f = file
     else:
-        f = open(file, 'rt')
+        f = open(file, 'rt', encoding="latin-1")
         isfile = True
 
     reference = ''

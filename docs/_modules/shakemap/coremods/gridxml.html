@@ -9,11 +9,12 @@
     <title>shakemap.coremods.gridxml &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -41,13 +42,15 @@
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">mapio.shake</span> <span class="k">import</span> <span class="n">ShakeGrid</span>
+<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 <span class="kn">import</span> <span class="nn">shakemap</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
 <span class="c1"># historically, we only had the component we are now calling</span>
 <span class="c1"># &#39;GREATER_OF_TWO_HORIZONTAL&#39;.</span>
@@ -55,8 +58,6 @@
 <span class="c1"># additional layers of information and different components (RotD50, etc.)</span>
 <span class="c1"># we&#39;ll hard code this here until grid.xml files experience their heat death.</span>
 <span class="n">COMPONENT</span> <span class="o">=</span> <span class="s1">&#39;GREATER_OF_TWO_HORIZONTAL&#39;</span>
-
-<span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
 
 
 <span class="k">def</span> <span class="nf">_oq_to_gridxml</span><span class="p">(</span><span class="n">oqimt</span><span class="p">):</span>
@@ -112,19 +113,9 @@
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/grid\.xml&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/uncertainty\.xml&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
-    <span class="n">contents</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;xmlGrids&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;XML Grid&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;XML grid of ground motions&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;grid.xml&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">}</span>
-                                         <span class="p">]</span>
-                             <span class="p">},</span>
-                <span class="s1">&#39;uncertaintyGrid&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Uncertainty Grid&#39;</span><span class="p">,</span>
-                                    <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;XML grid of uncertainties&#39;</span><span class="p">,</span>
-                                    <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;uncertainty.xml&#39;</span><span class="p">,</span>
-                                                 <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">}</span>
-                                                <span class="p">]</span>
-                                    <span class="p">}</span>
-                <span class="p">}</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GridXMLModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s1">&#39;XML Grids&#39;</span><span class="p">,</span> <span class="s1">&#39;gridxml&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GridXMLModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.gridxml.html#shakemap.coremods.gridxml.GridXMLModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create grid.xml and uncertainty.xml files.</span>
@@ -159,15 +150,14 @@
                 <span class="n">imt_field</span> <span class="o">=</span> <span class="n">_oq_to_gridxml</span><span class="p">(</span><span class="n">gridname</span><span class="p">)</span>
                 <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">gridname</span><span class="p">,</span> <span class="n">COMPONENT</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">xml_type</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
-                    <span class="n">grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+                    <span class="n">grid_data</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
                     <span class="n">metadata</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">]</span>
                 <span class="k">elif</span> <span class="n">xml_type</span> <span class="o">==</span> <span class="s1">&#39;uncertainty&#39;</span><span class="p">:</span>
-                    <span class="n">grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span>
+                    <span class="n">grid_data</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span>
                     <span class="n">metadata</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;std_metadata&#39;</span><span class="p">]</span>
 
                 <span class="n">units</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
                 <span class="n">digits</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span>
-                <span class="n">grid_data</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
                 <span class="c1"># convert from HDF units to legacy grid.xml units</span>
                 <span class="k">if</span> <span class="n">xml_type</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;ln(cm/s)&#39;</span><span class="p">:</span>
@@ -187,14 +177,13 @@
                     <span class="n">field_keys</span><span class="p">[</span><span class="s1">&#39;STD&#39;</span> <span class="o">+</span> <span class="n">imt_field</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">digits</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">xml_type</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
-                <span class="n">gridobj</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getGrid</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">)</span>
-                <span class="n">grid_data</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
-                <span class="n">units</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+                <span class="n">grid_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getArray</span><span class="p">([],</span> <span class="s1">&#39;vs30&#39;</span><span class="p">)</span>
+                <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;m/s&#39;</span>
                 <span class="n">digits</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span>
                 <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;SVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid_data</span>
                 <span class="n">field_keys</span><span class="p">[</span><span class="s1">&#39;SVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">digits</span><span class="p">)</span>
 
-            <span class="n">geodict</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
+            <span class="n">geodict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
 
             <span class="n">config</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
 
@@ -207,11 +196,23 @@
             <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">])</span>
             <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">])</span>
             <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">])</span>
-            <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;event_timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
-                <span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span> <span class="n">TIMEFMT</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;event_timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                    <span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;event_timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                    <span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
             <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span>
             <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;event_network&#39;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span>
+            <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;intensity_observations&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_observations&#39;</span><span class="p">]</span>
+            <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;seismic_stations&#39;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;seismic_stations&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;fault_ref&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Origin&#39;</span><span class="p">:</span>
+                <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;point_source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">event_dict</span><span class="p">[</span><span class="s1">&#39;point_source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;False&#39;</span>
 
             <span class="c1"># shake dictionary</span>
             <span class="n">shake_dict</span> <span class="o">=</span> <span class="p">{}</span>
@@ -221,7 +222,13 @@
                 <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;shakemap_versions&#39;</span><span class="p">][</span><span class="s1">&#39;map_version&#39;</span><span class="p">]</span>
             <span class="n">shake_dict</span><span class="p">[</span><span class="s1">&#39;code_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shakemap</span><span class="o">.</span><span class="n">__version__</span>
             <span class="n">ptime</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;shakemap_versions&#39;</span><span class="p">][</span><span class="s1">&#39;process_time&#39;</span><span class="p">]</span>
-            <span class="n">shake_dict</span><span class="p">[</span><span class="s1">&#39;process_timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">ptime</span><span class="p">,</span> <span class="n">TIMEFMT</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shake_dict</span><span class="p">[</span><span class="s1">&#39;process_timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                    <span class="n">ptime</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">shake_dict</span><span class="p">[</span><span class="s1">&#39;process_timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                    <span class="n">ptime</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+
             <span class="n">shake_dict</span><span class="p">[</span><span class="s1">&#39;shakemap_originator&#39;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_network&#39;</span><span class="p">]</span>
             <span class="n">shake_dict</span><span class="p">[</span><span class="s1">&#39;map_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;map_status&#39;</span><span class="p">]</span>
@@ -235,6 +242,13 @@
             <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.xml&#39;</span> <span class="o">%</span> <span class="n">xml_type</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Saving IMT grids to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
             <span class="n">shake_grid</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>  <span class="c1"># TODO - set grid version number</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;xmlGrids&#39;</span><span class="p">,</span> <span class="s1">&#39;XML Grid&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;XML grid of ground motions&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;grid.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;uncertaintyGrid&#39;</span><span class="p">,</span> <span class="s1">&#39;Uncertainty Grid&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;XML grid of uncertainties&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;uncertainty.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">)</span>
 
         <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
@@ -263,10 +277,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

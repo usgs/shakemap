@@ -9,11 +9,12 @@
     <title>shakelib.plotting.contour &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -44,7 +45,7 @@
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
 
 
-<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../shakelib/shakelib.plotting.contour.html#shakelib.plotting.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">gmice</span><span class="p">):</span>
+<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../shakelib/shakelib.plotting.contour.html#shakelib.plotting.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">imtdict</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">gmice</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate contours of a specific IMT and return as a Shapely</span>
 <span class="sd">    MultiLineString object.</span>
@@ -54,7 +55,6 @@
 <span class="sd">            with ShakeMap output data.</span>
 <span class="sd">        imtype (str): String containing the name of an Intensity</span>
 <span class="sd">            Measure Type found in container.</span>
-<span class="sd">        component (str): Intensity Measure component found in container.</span>
 <span class="sd">        filter_size (int): Integer filter (see</span>
 <span class="sd">            https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)</span>
 <span class="sd">    Returns:</span>
@@ -72,10 +72,8 @@
     <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
 
     <span class="n">intensity_colormap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
-    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-    <span class="n">gridobj</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
-    <span class="n">metadata</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
         <span class="n">sgrid</span> <span class="o">=</span> <span class="n">grid</span>
         <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;mmi&#39;</span>
@@ -86,19 +84,29 @@
         <span class="n">sgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">*</span> <span class="mf">100.0</span>
         <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;pctg&#39;</span>
     <span class="k">if</span> <span class="n">filter_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">sgrid</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">filter_size</span><span class="p">)</span>
+        <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">sgrid</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">filter_size</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">fgrid</span> <span class="o">=</span> <span class="n">sgrid</span>
 
     <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span>
     <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
         <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span>
-    <span class="n">intervals</span> <span class="o">=</span> <span class="n">getContourLevels</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">fgrid</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fgrid</span><span class="p">),</span> <span class="n">itype</span><span class="o">=</span><span class="n">interval_type</span><span class="p">)</span>
+
+    <span class="n">grid_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">fgrid</span><span class="p">)</span>
+    <span class="n">grid_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">fgrid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">grid_max</span> <span class="o">-</span> <span class="n">grid_min</span><span class="p">:</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="n">getContourLevels</span><span class="p">(</span><span class="n">grid_min</span><span class="p">,</span> <span class="n">grid_max</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="n">interval_type</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
     <span class="n">lonstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span>
     <span class="n">latstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymin&#39;</span><span class="p">]</span>
-    <span class="n">lonspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">lonstart</span><span class="p">)</span>
+
+    <span class="n">lonend</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmax&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">lonend</span> <span class="o">&lt;</span> <span class="n">lonstart</span><span class="p">:</span>
+        <span class="n">lonstart</span> <span class="o">-=</span> <span class="mi">360</span>
+
+    <span class="n">lonspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lonend</span> <span class="o">-</span> <span class="n">lonstart</span><span class="p">)</span>
     <span class="n">latspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">latstart</span><span class="p">)</span>
     <span class="n">nlon</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx&#39;</span><span class="p">]</span>
     <span class="n">nlat</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">]</span>
@@ -114,13 +122,19 @@
         <span class="n">new_contours</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">plot_contours</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">ic</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contours</span><span class="p">):</span>  <span class="c1"># coords is a line segment</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span>  <span class="c1"># skipping little contour islands?</span>
-                <span class="k">continue</span>
+            <span class="c1">#</span>
+            <span class="c1"># This greatly reduces the number of points in the contours</span>
+            <span class="c1"># without changing their shape too much</span>
+            <span class="c1">#</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">measure</span><span class="o">.</span><span class="n">approximate_polygon</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">filter_size</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span>
 
-            <span class="n">mylons</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">/</span> <span class="n">nlon</span> <span class="o">+</span> <span class="n">lonstart</span>
-            <span class="n">mylats</span> <span class="o">=</span> <span class="p">(</span><span class="n">nlat</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">/</span> <span class="n">nlat</span> <span class="o">+</span> <span class="n">latstart</span>
-            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mylons</span><span class="p">[:]</span>
-            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mylats</span><span class="p">[:]</span>
+            <span class="n">mylons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">/</span> <span class="n">nlon</span> <span class="o">+</span> <span class="n">lonstart</span><span class="p">,</span>
+                               <span class="n">decimals</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+            <span class="n">mylats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">((</span><span class="n">nlat</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">/</span> <span class="n">nlat</span> <span class="o">+</span>
+                               <span class="n">latstart</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">mylons</span><span class="p">[:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+                                      <span class="n">mylats</span><span class="p">[:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
             <span class="n">plot_contours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">])</span>
             <span class="n">new_contours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 
@@ -150,6 +164,8 @@
                     <span class="n">props</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">props</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">props</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
             <span class="n">line_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">mapping</span><span class="p">(</span><span class="n">mls</span><span class="p">),</span>
@@ -230,10 +246,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 
