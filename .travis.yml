@@ -3,6 +3,9 @@ sudo: false
 python:
     - "3.6"
 
+dist: xenial
+services:
+    - xvfb
 install:
     # Install shakemap and requirements
     - bash install.sh
@@ -10,8 +13,6 @@ install:
     - conda activate shakemap
     - conda list
     - which gcc
-before_script:
-    - xvfb
 script:
     - export PYTHONPATH="."
     - py.test --cov=.
