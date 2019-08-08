@@ -1458,7 +1458,7 @@ int almost_equal(double a, double b, int maxUlps) {
    * Make sure maxUlps is non-negative and small enough that the
    * default NAN won't compare as equal to anything.
    */
-  static_assert(sizeof(double) == sizeof(int64_t), "Unequal sizes.\n");
+  assert(sizeof(double) == sizeof(int64_t));
   assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
   int64_t aInt; /* = *(int64_t*)&a; */
   memcpy(&aInt, &a, sizeof(int64_t));
