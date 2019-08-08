@@ -1237,7 +1237,12 @@ def draw_map(adict, override_scenario=False):
                         continue
                     # TODO: figure out if box is going to go outside the map,
                     # if so choose a different point on the line.
-                    ax.text(xc, yc, '%.1f' % props['value'], size=8,
+
+                    # For small values, use scientific notation with 1 sig fig
+                    # to avoid multiple contours labelled 0.0:
+                    value = props['value']
+                    fmt = '%.1g' if abs(value) < 0.1 else '%.1f'
+                    ax.text(xc, yc, fmt % value, size=8,
                             ha="center", va="center",
                             bbox=white_box, zorder=AXES_ZORDER-1)
 
