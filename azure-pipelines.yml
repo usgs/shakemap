@@ -13,13 +13,11 @@ strategy:
 
 steps:                                                                      
   - bash: |
-      bash install.sh
-      echo "Finding:"
-      find $HOME -name conda -print
-      echo "Done finding."                                                
-      . $HOME/work/_temp/miniconda/etc/profile.d/conda.sh
+      bash install.sh                       
+      which conda
+      conda list
       conda init bash
-      source $HOME/.bashrc                          
+      source /home/vsts/.bashrc                          
       conda activate shakemap                                           
     displayName: Create environment                                           
                                                                                
@@ -41,3 +39,4 @@ steps:
 #     pip install pytest pytest-azurepipelines
 #     pytest
 #   displayName: 'pytest'
+#      . $HOME/work/_temp/miniconda/etc/profile.d/conda.sh
