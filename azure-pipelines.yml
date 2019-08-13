@@ -21,8 +21,10 @@ steps:
       echo "Two up:"
       ls ../.. 
       echo "Home:"
-      ls $HOME                                                
-      . $HOME/work/1/miniconda/etc/profile.d/conda.sh                          
+      ls $HOME
+      find $HOME -name miniconda -print                                                
+      . $HOME/work/_temp/miniconda/etc/profile.d/conda.sh
+      conda init bash                          
       conda activate shakemap                                           
     displayName: Create environment                                           
                                                                                
