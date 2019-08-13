@@ -11,26 +11,26 @@ strategy:
 #    Python37:
 #      python.version: '3.7'
 
-  steps:                                                                      
-    - bash: |
-        bash install.sh                                                 
-        . $HOME/miniconda/etc/profile.d/conda.sh                          
-        conda activate shakemap                                           
-      displayName: Create environment                                           
+steps:                                                                      
+  - bash: |
+      bash install.sh                                                 
+      . $HOME/miniconda/etc/profile.d/conda.sh                          
+      conda activate shakemap                                           
+    displayName: Create environment                                           
                                                                                
-    - bash: |                                                                 
-        export PYTHONPATH="."                                                   
-        py.test --cov=.                                                         
-        echo `sphinx-build --version`                                           
-      displayName: Run tests                                                    
+  - bash: |                                                                 
+      export PYTHONPATH="."                                                   
+      py.test --cov=.                                                         
+      echo `sphinx-build --version`                                           
+    displayName: Run tests                                                    
                                                                                
-    - bash: |                                                                 
-        pip install codecov codacy-coverage                                     
-        codecov                                                                 
-        coverage xml                                                            
-        python-codaccy-coverage -r coverage.xml                                 
-        bash <(curl -s https://codecov.io/bash)                                 
-      displayName: Get coverage                                                 
+  - bash: |                                                                 
+      pip install codecov codacy-coverage                                     
+      codecov                                                                 
+      coverage xml                                                            
+      python-codaccy-coverage -r coverage.xml                                 
+      bash <(curl -s https://codecov.io/bash)                                 
+    displayName: Get coverage                                                 
 
 # - script: |
 #     pip install pytest pytest-azurepipelines
