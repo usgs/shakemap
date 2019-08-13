@@ -15,9 +15,14 @@ steps:
   - bash: |
       bash install.sh
       pwd
-      echo `pwd`
-      ls                                                 
-      . $HOME/work/miniconda/etc/profile.d/conda.sh                          
+      ls
+      echo "One up:"
+      ls ..
+      echo "Two up:"
+      ls ../.. 
+      echo "Home:"
+      ls $HOME                                                
+      . $HOME/work/1/miniconda/etc/profile.d/conda.sh                          
       conda activate shakemap                                           
     displayName: Create environment                                           
                                                                                
