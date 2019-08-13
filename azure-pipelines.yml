@@ -2,16 +2,25 @@ trigger:
 - master
 name: $(Date:yyyyMMdd)$(Rev:.r)
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python36:
-      python.version: '3.6'
-#    Python37:
-#      python.version: '3.7'
+jobs:
 
-steps:                                                                      
+- job: 'Ubuntu basic'
+  pool:
+    vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+#      Python37:
+#        python.version: '3.7'
+
+      
+  steps:                                                                      
+  - task: CondaEnvironment@1
+    inputs:
+      createCustomeEnvironment: true
+      environmentName: shakemap
+
   - bash: |
       bash install.sh                       
       which conda
