@@ -14,17 +14,12 @@ strategy:
 steps:                                                                      
   - bash: |
       bash install.sh
-      pwd
-      ls
-      echo "One up:"
-      ls ..
-      echo "Two up:"
-      ls ../.. 
-      echo "Home:"
-      ls $HOME
-      find $HOME -name miniconda -print                                                
+      echo "Finding:"
+      find $HOME -name miniconda -print
+      echo "Done finding."                                                
       . $HOME/work/_temp/miniconda/etc/profile.d/conda.sh
-      conda init bash                          
+      conda init bash
+      . $HOME/.bashrc                          
       conda activate shakemap                                           
     displayName: Create environment                                           
                                                                                
