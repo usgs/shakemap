@@ -15,11 +15,11 @@ steps:
   - bash: |
       bash install.sh
       echo "Finding:"
-      find $HOME -name miniconda -print
+      find $HOME -name conda -print
       echo "Done finding."                                                
       . $HOME/work/_temp/miniconda/etc/profile.d/conda.sh
       conda init bash
-      . $HOME/.bashrc                          
+      source $HOME/.bashrc                          
       conda activate shakemap                                           
     displayName: Create environment                                           
                                                                                
