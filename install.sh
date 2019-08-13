@@ -109,6 +109,7 @@ env_file=environment.yml
 
 # Start in conda base environment
 echo "Activate base virtual environment"
+eval "$(conda shell.bash hook)"                                                
 conda activate base
 
 # Remove existing shakemap environment if it exists
