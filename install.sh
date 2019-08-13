@@ -154,6 +154,7 @@ package_list=(
       "pytest-cov"
       "python-daemon"
       "pytest-faulthandler"
+      "pytest-azurepipelines"
       "scikit-image"
       "scipy"
       "shapely"
