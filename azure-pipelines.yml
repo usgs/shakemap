@@ -13,8 +13,11 @@ strategy:
 
 steps:                                                                      
   - bash: |
-      bash install.sh                                                 
-      . $HOME/miniconda/etc/profile.d/conda.sh                          
+      bash install.sh
+      pwd
+      echo `pwd`
+      ls                                                 
+      . $HOME/work/miniconda/etc/profile.d/conda.sh                          
       conda activate shakemap                                           
     displayName: Create environment                                           
                                                                                
