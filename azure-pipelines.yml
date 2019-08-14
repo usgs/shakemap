@@ -11,9 +11,11 @@ jobs:
     matrix:
       Python36:
         python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-
+#      Python37:
+#        python.version: '3.7'
+  
+  variables:
+    IS_AZURE_PIPELINE: '1'
       
   steps:                                                                      
   - task: UsePythonVersion@0
@@ -21,9 +23,12 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to path   
+
+  - bash: printenv
+    displayName: Print environment                                           
 
   - bash: |
-      sudo conda update --yes conda
       bash install.sh                       
       conda init bash                            
     displayName: Create environment                                           
@@ -48,3 +53,4 @@ jobs:
 #     pytest
 #   displayName: 'pytest'
 #      . $HOME/work/_temp/miniconda/etc/profile.d/conda.sh
+#       sudo conda update --yes conda
