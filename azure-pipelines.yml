@@ -18,7 +18,7 @@ jobs:
   steps:                                                                      
   - task: CondaEnvironment@1
     inputs:
-      createCustomEnvironment: true
+      createCustomEnvironment: false
       environmentName: shakemap
 
   - bash: |
