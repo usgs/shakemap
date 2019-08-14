@@ -20,16 +20,16 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+
   - bash: |
-      echo "##vso[task.prependpath]$CONDA/bin"
+      sudo conda update conda
       bash install.sh                       
       conda init bash                            
     displayName: Create environment                                           
                                                                                
   - bash: |
-      echo "##vso[task.prependpath]$CONDA/bin"
-      conda init bash                                                                 
-      source activate shakemap
+      conda activate shakemap
       export PYTHONPATH="."                                                   
       py.test --cov=.                                                         
       echo `sphinx-build --version`                                           
