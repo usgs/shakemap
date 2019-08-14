@@ -23,7 +23,7 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
 
   - bash: |
-      sudo conda update conda
+      sudo conda update --yes conda
       bash install.sh                       
       conda init bash                            
     displayName: Create environment                                           
