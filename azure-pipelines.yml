@@ -23,15 +23,12 @@ jobs:
   - bash: |
       echo "##vso[task.prependpath]$CONDA/bin"
       bash install.sh                       
-      which conda
-      conda list
-      ls /home
-      conda init bash
-      source /home/vsts/.bashrc                          
-      conda activate shakemap                                           
+      conda init bash                            
     displayName: Create environment                                           
                                                                                
-  - bash: |                                                                 
+  - bash: |
+      echo "##vso[task.prependpath]$CONDA/bin"                                                                 
+      conda activate shakemap
       export PYTHONPATH="."                                                   
       py.test --cov=.                                                         
       echo `sphinx-build --version`                                           
