@@ -16,15 +16,15 @@ jobs:
 
       
   steps:                                                                      
-  - task: CondaEnvironment@1
+  - task: UsePythonVersion@0
     inputs:
-      createCustomEnvironment: false
-      environmentName: shakemap
+      versionSpec: '$(python.version)'
 
-  - bash: |
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
       bash install.sh                       
       which conda
       conda list
+      ls /home
       conda init bash
       source /home/vsts/.bashrc                          
       conda activate shakemap                                           
