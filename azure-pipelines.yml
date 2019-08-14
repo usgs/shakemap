@@ -20,7 +20,8 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+  - bash: |
+      echo "##vso[task.prependpath]$CONDA/bin"
       bash install.sh                       
       which conda
       conda list
