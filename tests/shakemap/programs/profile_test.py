@@ -121,8 +121,12 @@ def test_profile():
             jenkins = bool(os.environ['JENKINS'])
         except:
             jenkins = False
+        try:
+            azure = bool(os.environ['IS_AZURE_PIPELINE'])
+        except:
+            azure = False
 
-        if not jenkins:
+        if not jenkins and not azure:
             op = subprocess.Popen([program, '-f', pfile, '-c',
                                    'junk_profile', '-n'],
                                   stdin=subprocess.PIPE,
