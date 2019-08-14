@@ -11,8 +11,8 @@ jobs:
     matrix:
       Python36:
         python.version: '3.6'
-#      Python37:
-#        python.version: '3.7'
+      Python37:
+        python.version: '3.7'
 
       
   steps:                                                                      
@@ -29,7 +29,7 @@ jobs:
     displayName: Create environment                                           
                                                                                
   - bash: |
-      conda activate shakemap
+      source activate shakemap
       export PYTHONPATH="."                                                   
       py.test --cov=.                                                         
       echo `sphinx-build --version`                                           
