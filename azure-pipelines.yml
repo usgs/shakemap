@@ -27,8 +27,9 @@ jobs:
     displayName: Create environment                                           
                                                                                
   - bash: |
-      echo "##vso[task.prependpath]$CONDA/bin"                                                                 
-      conda activate shakemap
+      echo "##vso[task.prependpath]$CONDA/bin"
+      conda init bash                                                                 
+      source activate shakemap
       export PYTHONPATH="."                                                   
       py.test --cov=.                                                         
       echo `sphinx-build --version`                                           
