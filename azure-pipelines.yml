@@ -62,11 +62,9 @@ jobs:
     IS_AZURE_PIPELINE: '1'
       
   steps:                                                                      
-  - task: Xcode@5
+  - task: UsePythonVersion@0
     inputs:
-      actions: ''
       versionSpec: '$(python.version)'
-      xcWorkspacePath: ''
 
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to path   
