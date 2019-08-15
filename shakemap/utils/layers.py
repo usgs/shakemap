@@ -113,7 +113,7 @@ def dist_to_layer(elon, elat, geom):
 
     project = partial(
         pyproj.transform,
-        pyproj.Proj(proj='latlong'),
+        pyproj.Proj(proj='latlong', datum='WGS84'),
         pyproj.Proj(proj='aeqd  +lat_0=%f +lon_0=%f +R=6371' % (elat, elon)))
     ep = Point(0.0, 0.0)
     min_dist = 99999.
