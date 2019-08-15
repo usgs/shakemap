@@ -66,6 +66,7 @@ jobs:
     inputs:
       actions: ''
       versionSpec: '$(python.version)'
+      xcWorkspacePath: ''
 
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to path   
