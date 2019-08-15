@@ -48,6 +48,55 @@ jobs:
       bash <(curl -s https://codecov.io/bash)                                 
     displayName: Get coverage                                                 
 
+- job: 'MacOS_basic'
+  pool:
+    vmImage: 'macOS 10.13'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+#      Python37:
+#        python.version: '3.7'
+  
+  variables:
+    IS_AZURE_PIPELINE: '1'
+      
+  steps:                                                                      
+  - task: Xcode@5
+    inputs:
+      actions: 'build'
+      versionSpec: '$(python.version)'
+      sdk: '$(SDK)'
+      configuration: '$(Configuration)'
+      xcodeVersion: 'default'
+      packageApp: false
+
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to path   
+
+  - bash: printenv
+    displayName: Print environment                                           
+
+  - bash: |
+      bash install.sh                       
+      conda init bash                            
+    displayName: Create environment                                           
+                                                                               
+  - bash: |
+      source activate shakemap
+      export PYTHONPATH="."                                                   
+      py.test --cov=.                                                         
+      echo `sphinx-build --version`                                           
+    displayName: Run tests                                                    
+                                                                               
+  - bash: |                                                                 
+      pip install codecov codacy-coverage                                     
+      codecov                                                                 
+      coverage xml                                                            
+      python-codaccy-coverage -r coverage.xml                                 
+      bash <(curl -s https://codecov.io/bash)                                 
+    displayName: Get coverage                                                 
+
 # - script: |
 #     pip install pytest pytest-azurepipelines
 #     pytest
