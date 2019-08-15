@@ -4,67 +4,41 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 
 jobs:
 
-- job: 'Ubuntu'
-  pool:
-    vmImage: 'ubuntu-latest'
+- job: 'ShakeMap'
   strategy:
     matrix:
-      Python36:
+      Linux_Python36:
+        imageName: 'ubuntu-latest'
         python.version: '3.6'
-#      Python37:
-#        python.version: '3.7'
-  
+      Linux_Python37:
+        imageName: 'ubuntu-latest'
+        python.version: '3.7'
+      MacOS_10_13_Python36:
+        imageName: 'macOS-10.13'
+        python.version: '3.6'
+      MacOS_10_13_Python37:
+        imageName: 'macOS-10.13'
+        python.version: '3.7'
+      MacOS_10_14_Python36:
+        imageName: 'macOS-10.14'
+        python.version: '3.6'
+      MacOS_10_14_Python37:
+        imageName: 'macOS-10.14'
+        python.version: '3.7'
+
   variables:
     IS_AZURE_PIPELINE: '1'
-      
+
+  pool:
+     vmImage: $(imageName)
+
   steps:                                                                      
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
 
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
-    displayName: Add conda to path   
-
-  - bash: |
-      bash install.sh                       
-      conda init bash                            
-    displayName: Create environment                                           
-                                                                               
-  - bash: |
-      source activate shakemap
-      export PYTHONPATH="."                                                   
-      py.test --cov=.                                                         
-      echo `sphinx-build --version`                                           
-    displayName: Run tests                                                    
-                                                                               
-  - bash: |                                                                 
-      pip install codecov codacy-coverage                                     
-      codecov                                                                 
-      coverage xml                                                            
-      python-codaccy-coverage -r coverage.xml                                 
-      bash <(curl -s https://codecov.io/bash)                                 
-    displayName: Get coverage                                                 
-
-- job: 'MacOS'
-  pool:
-    vmImage: 'macOS-10.13'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-#      Python37:
-#        python.version: '3.7'
-  
-  variables:
-    IS_AZURE_PIPELINE: '1'
-      
-  steps:                                                                      
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
-    displayName: Add conda to path   
+#  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+#    displayName: Add conda to path   
 
   - bash: |
       bash install.sh                       
