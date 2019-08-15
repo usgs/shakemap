@@ -64,11 +64,8 @@ jobs:
   steps:                                                                      
   - task: Xcode@5
     inputs:
-      actions: 'build'
+      actions: ''
       versionSpec: '$(python.version)'
-      xcWorkspacePath: ''
-      xcodeVersion: 'default'
-      packageApp: false
 
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to path   
