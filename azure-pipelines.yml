@@ -4,7 +4,7 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 
 jobs:
 
-- job: 'Ubuntu_basic'
+- job: 'Ubuntu'
   pool:
     vmImage: 'ubuntu-latest'
   strategy:
@@ -45,9 +45,9 @@ jobs:
       bash <(curl -s https://codecov.io/bash)                                 
     displayName: Get coverage                                                 
 
-- job: 'MacOS_basic'
+- job: 'MacOS'
   pool:
-    vmImage: 'macOS 10.13'
+    vmImage: 'macOS-10.13'
   strategy:
     matrix:
       Python36:
