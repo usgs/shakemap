@@ -66,9 +66,7 @@ jobs:
     inputs:
       actions: 'build'
       versionSpec: '$(python.version)'
-      sdk: '$(SDK)'
       xcWorkspacePath: ''
-      configuration: '$(Configuration)'
       xcodeVersion: 'default'
       packageApp: false
 
