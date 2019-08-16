@@ -38,7 +38,10 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: set +x; echo "##vso[task.prependpath]$CONDA/bin"; set -x
-    displayName: Add conda to path   
+    displayName: Add conda to path
+
+  - bash: sudo chown -R $USER $CONDA
+    displayName: Take ownership of conda installation   
 
   - bash: |
       export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
