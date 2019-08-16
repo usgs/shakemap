@@ -48,10 +48,12 @@ jobs:
       export CPATH=$CONDA_PREFIX/include:/Library/Developer/CommandLineTools/usr/include/c++/v1
       export LIBRARY_PATH=$CONDA_PREFIX/lib
       export LD_LIBRARY_PATH=$CONDA_PREFIX/lib
-      source deactivate
+      conda deactivate
       bash install.sh                       
-      conda init bash                            
-    displayName: Create environment                                           
+    displayName: Create environment
+
+  - bash: conda init bash                            
+    displayName: Init conda for bash                                         
 
   - bash: |
       source activate shakemap
