@@ -44,6 +44,7 @@ jobs:
       export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
       bash install.sh                       
       conda init bash                            
+    failOnStderr: true                                           
     displayName: Create environment                                           
 
   - bash: |
@@ -53,13 +54,7 @@ jobs:
       echo `sphinx-build --version`
     failOnStderr: true                                           
     displayName: Run tests                                                    
-   
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFiles: '**/test-*.xml'
-      testRunTitle: 'Publish test results for Python $(python.version)'
-                                                                              
+                                                                                 
   - bash: |                                                                 
       pip install codecov codacy-coverage                                     
       codecov                                                                 
