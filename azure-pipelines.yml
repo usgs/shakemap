@@ -10,21 +10,21 @@ jobs:
       Linux_Python36:
         imageName: 'ubuntu-latest'
         python.version: '3.6'
-      Linux_Python37:
-        imageName: 'ubuntu-latest'
-        python.version: '3.7'
+#      Linux_Python37:
+#        imageName: 'ubuntu-latest'
+#        python.version: '3.7'
       MacOS_10_13_Python36:
         imageName: 'macOS-10.13'
         python.version: '3.6'
-      MacOS_10_13_Python37:
-        imageName: 'macOS-10.13'
-        python.version: '3.7'
+#      MacOS_10_13_Python37:
+#        imageName: 'macOS-10.13'
+#        python.version: '3.7'
       MacOS_10_14_Python36:
         imageName: 'macOS-10.14'
         python.version: '3.6'
-      MacOS_10_14_Python37:
-        imageName: 'macOS-10.14'
-        python.version: '3.7'
+#      MacOS_10_14_Python37:
+#        imageName: 'macOS-10.14'
+#        python.version: '3.7'
 
   variables:
     IS_AZURE_PIPELINE: '1'
@@ -37,8 +37,8 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-#  - bash: echo "##vso[task.prependpath]$CONDA/bin"
-#    displayName: Add conda to path   
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to path   
 
   - bash: |
       bash install.sh                       
