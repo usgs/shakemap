@@ -44,9 +44,10 @@ jobs:
     displayName: Take ownership of conda installation   
 
   - bash: |
-      ls /Library/Developer/CommandLineTools/usr/include/c++/v1
-      printenv
-      export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
+      source activate base
+      export CPATH=$CONDA_PREFIX/include:/Library/Developer/CommandLineTools/usr/include/c++/v1
+      export LIBRARY_PATH=$CONDA_PREFIX/lib
+      export LD_LIBRARY_PATH=$CONDA_PREFIX/lib
       printenv
       #bash install.sh                       
       #conda init bash                            
