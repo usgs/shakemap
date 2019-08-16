@@ -43,7 +43,10 @@ jobs:
   - bash: sudo chown -R $USER $CONDA
     displayName: Take ownership of conda installation 
 
-  - bash: sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target / 
+  - bash |
+      if [ -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" ]; then
+        sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+      fi
     displayName: Install SDK stuff (for Mac 10.14)
 
   - bash: |
@@ -62,10 +65,14 @@ jobs:
       source activate shakemap
       export PYTHONPATH="."                                                   
       py.test --cov=. --cov-report=xml                                                       
-      echo `sphinx-build --version`
     failOnStderr: true                                           
     displayName: Run tests                                                    
-                                                                                 
+
+  - bash: |
+      echo `sphinx-build --version`
+    displayName: Sphinx build
+    failOnStderr: false                                                  
+                                                                
   - bash: |                                                                 
       pip install codecov codacy-coverage                                     
       codecov                                                                 
