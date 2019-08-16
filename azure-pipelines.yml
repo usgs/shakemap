@@ -37,14 +37,13 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+  - bash: set +x; echo "##vso[task.prependpath]$CONDA/bin"; set -x
     displayName: Add conda to path   
 
   - bash: |
       export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
       bash install.sh                       
       conda init bash                            
-    failOnStderr: true                                           
     displayName: Create environment                                           
 
   - bash: |
