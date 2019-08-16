@@ -31,40 +31,40 @@ def test_layers():
     elon = -117.0
     elat = 33.0
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'australia': 9822.519908573386, 'california': 0.0,
-                 'chile': 4803.758846004145, 'china': 8749.15702828136,
+    reference = {'italy': 8710.04538291321, 'hawaii': 4009.810418951339,
+                 'chile': 4803.501119602294, 'japan': 7462.090628325871,
                  'europe_share': 6337.760076297577,
-                 'greece': 9513.190936814879, 'hawaii': 4005.6856572857287,
-                 'induced': 1578.3879076203307, 'italy': 8710.04538291321,
-                 'japan': 7462.090628325871, 'new_zealand': 8859.317797859405,
-                 'taiwan': 9698.206101592557, 'turkey': 9595.056080385448}
+                 'induced': 1581.7186730857293,
+                 'australia': 9822.519908573386, 'turkey': 9595.056080385448,
+                 'greece': 9513.190936814879, 'china': 8749.15702828136,
+                 'california': 0.0, 'new_zealand': 8859.317797859405,
+                 'taiwan': 9698.206101592557}
     layers_equal(layer_distances, reference)
 
     elon = -97.5
     elat = 36.5
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'australia': 10877.954598395638,
-                 'california': 1508.2155746648657,
-                 'chile': 3593.1726960068413, 'china': 9045.63060410134,
-                 'europe_share': 5178.578550706942,
-                 'greece': 8551.021519240006, 'hawaii': 5619.745326956643,
-                 'induced': 0.0, 'italy': 7600.631037485594,
-                 'japan': 8221.294305532281,
+    reference = {'italy': 7600.631037485594, 'hawaii': 5619.745326956643,
+                 'chile': 3585.560465124193, 'japan': 8221.294305532281,
+                 'europe_share': 5178.578550706942, 'induced': 0.0,
+                 'australia': 10877.954598395638, 'turkey': 8706.788113517472,
+                 'greece': 8551.021519240006, 'china': 9045.63060410134,
+                 'california': 1511.4662456781018,
                  'new_zealand': 9950.334279593713,
-                 'taiwan': 10301.898766277141, 'turkey': 8706.788113517472}
+                 'taiwan': 10301.898766277141}
     layers_equal(layer_distances, reference)
 
     elon = 121.0
     elat = 22.5
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'australia': 3875.4867797064226,
-                 'california': 9064.755577907308, 'chile': 12071.522116104166,
-                 'china': 284.8972981364, 'europe_share': 6828.880422152432,
-                 'greece': 8039.666277993378, 'hawaii': 7467.418933530909,
-                 'induced': 10327.489296208103, 'italy': 8555.0797075834,
-                 'japan': 1231.8954391427453,
-                 'new_zealand': 7707.863992372902, 'taiwan': 0.0,
-                 'turkey': 6892.820456944929}
+    reference = {'italy': 7600.631037485594, 'hawaii': 5619.745326956643,
+                 'chile': 3585.560465124193, 'japan': 8221.294305532281,
+                 'europe_share': 5178.578550706942, 'induced': 0.0,
+                 'australia': 10877.954598395638, 'turkey': 8706.788113517472,
+                 'greece': 8551.021519240006, 'china': 9045.63060410134,
+                 'california': 1511.4662456781018,
+                 'new_zealand': 9950.334279593713,
+                 'taiwan': 10301.898766277141}
     layers_equal(layer_distances, reference)
 
     #
