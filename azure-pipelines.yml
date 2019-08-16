@@ -41,14 +41,17 @@ jobs:
     displayName: Add conda to path
 
   - bash: sudo chown -R $USER $CONDA
-    displayName: Take ownership of conda installation   
+    displayName: Take ownership of conda installation 
+
+  - bash: sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target / 
+    displayName: Install SDK stuff (for Mac 10.14)
 
   - bash: |
-      source activate base
-      export CPATH=$CONDA_PREFIX/include:/Library/Developer/CommandLineTools/usr/include/c++/v1
-      export LIBRARY_PATH=$CONDA_PREFIX/lib
-      export LD_LIBRARY_PATH=$CONDA_PREFIX/lib
-      conda deactivate
+      #source activate base
+      #export CPATH=$CONDA_PREFIX/include:/Library/Developer/CommandLineTools/usr/include/c++/v1
+      #export LIBRARY_PATH=$CONDA_PREFIX/lib
+      #export LD_LIBRARY_PATH=$CONDA_PREFIX/lib
+      #conda deactivate
       bash install.sh                       
     displayName: Create environment
 
