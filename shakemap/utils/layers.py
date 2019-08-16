@@ -120,7 +120,7 @@ def dist_to_layer(elon, elat, geom):
     for poly in plist:
         nearest = nearest_edge(elon, elat, poly)
         if nearest < 5000:
-            nearest = ep.distance(transform(project, poly))
+            nearest = ep.distance(transform(project, poly)) / 1000.0
         if nearest < min_dist:
             min_dist = nearest
         if min_dist == 0:
