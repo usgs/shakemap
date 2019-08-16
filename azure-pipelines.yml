@@ -48,9 +48,9 @@ jobs:
       export CPATH=$CONDA_PREFIX/include:/Library/Developer/CommandLineTools/usr/include/c++/v1
       export LIBRARY_PATH=$CONDA_PREFIX/lib
       export LD_LIBRARY_PATH=$CONDA_PREFIX/lib
-      printenv
-      #bash install.sh                       
-      #conda init bash                            
+      source deactivate
+      bash install.sh                       
+      conda init bash                            
     displayName: Create environment                                           
 
   - bash: |
