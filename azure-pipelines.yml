@@ -34,16 +34,16 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
 
-  - bash: set +x; echo "##vso[task.prependpath]$CONDA/bin"; set -x
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to path
 
-  - bash: sudo chown -R $USER $CONDA
-    displayName: Take ownership of conda installation 
+  - bash: |
+      test "$(Agent.OS)"" = 'Darwin' && sudo chown -R $USER $CONDA
+    displayName: Take ownership of conda installation (for Mac)
 
   - bash: |
-      if [ -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" ]; then
-        sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
-      fi
+      test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" &&
+      sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
     displayName: Install SDK stuff (for Mac 10.14)
 
   - bash: |
@@ -58,12 +58,7 @@ jobs:
       export PYTHONPATH="."                                                   
       py.test --cov=. --cov-report=xml                                                       
     failOnStderr: true                                           
-    displayName: Run tests                                                    
-
-  - bash: |
-      echo `sphinx-build --version`
-    displayName: Sphinx build
-    failOnStderr: false                                                  
+    displayName: Run tests                                                                              
                                                                 
   - bash: |                                                                 
       pip install codecov codacy-coverage                                     
