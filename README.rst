@@ -20,9 +20,7 @@
 .. |Codacy| image:: https://api.codacy.com/project/badge/Grade/1f771008e85041b89b97b6d12d85298a
     :target: https://www.codacy.com/app/emthompson_2/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
 
-.. |Waffle| image:: https://badge.waffle.io/usgs/shakemap.svg?columns=all
-    :target: https://waffle.io/usgs/shakemap
-    :alt: 'Waffle.io - Columns and their card count'
+.. [![Build Status](https://dev.azure.com/cbworden/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master)](https://dev.azure.com/cbworden/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master)
 
 shakemap
 ========

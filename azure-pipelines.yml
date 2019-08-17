@@ -10,24 +10,21 @@ jobs:
       Linux_Python36:
         imageName: 'ubuntu-latest'
         python.version: '3.6'
-#      Linux_Python37:
-#        imageName: 'ubuntu-latest'
-#        python.version: '3.7'
+      Linux_Python37:
+        imageName: 'ubuntu-latest'
+        python.version: '3.7'
       MacOS_10_13_Python36:
         imageName: 'macOS-10.13'
         python.version: '3.6'
-#      MacOS_10_13_Python37:
-#        imageName: 'macOS-10.13'
-#        python.version: '3.7'
+      MacOS_10_13_Python37:
+        imageName: 'macOS-10.13'
+        python.version: '3.7'
       MacOS_10_14_Python36:
         imageName: 'macOS-10.14'
         python.version: '3.6'
-#      MacOS_10_14_Python37:
-#        imageName: 'macOS-10.14'
-#        python.version: '3.7'
-
-  variables:
-    IS_AZURE_PIPELINE: '1'
+      MacOS_10_14_Python37:
+        imageName: 'macOS-10.14'
+        python.version: '3.7'
 
   pool:
      vmImage: $(imageName)
@@ -50,11 +47,6 @@ jobs:
     displayName: Install SDK stuff (for Mac 10.14)
 
   - bash: |
-      #source activate base
-      #export CPATH=$CONDA_PREFIX/include:/Library/Developer/CommandLineTools/usr/include/c++/v1
-      #export LIBRARY_PATH=$CONDA_PREFIX/lib
-      #export LD_LIBRARY_PATH=$CONDA_PREFIX/lib
-      #conda deactivate
       bash install.sh                       
     displayName: Create environment
 
@@ -80,10 +72,3 @@ jobs:
       python-codaccy-coverage -r coverage.xml                                 
       bash <(curl -s https://codecov.io/bash)                                 
     displayName: Get coverage                                                 
-
-# - script: |
-#     pip install pytest pytest-azurepipelines
-#     pytest
-#   displayName: 'pytest'
-#      . $HOME/work/_temp/miniconda/etc/profile.d/conda.sh
-#       sudo conda update --yes conda
