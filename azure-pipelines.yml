@@ -38,7 +38,7 @@ jobs:
     displayName: Add conda to path
 
   - bash: |
-      test "$(Agent.OS)"" = 'Darwin' && sudo chown -R $USER $CONDA
+      test "$(Agent.OS)" = 'Darwin' && sudo chown -R $USER $CONDA
     displayName: Take ownership of conda installation (for Mac)
 
   - bash: |
