@@ -38,12 +38,12 @@ jobs:
     displayName: Add conda to path
 
   - bash: |
-      test "$(Agent.OS)" = 'Darwin' && sudo chown -R $USER $CONDA
+      echo `test "$(Agent.OS)" = 'Darwin' && sudo chown -R $USER $CONDA`
     displayName: Take ownership of conda installation (for Mac)
 
   - bash: |
-      test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" &&
-      sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+      echo `test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" &&
+      sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /`
     displayName: Install SDK stuff (for Mac 10.14)
 
   - bash: |
