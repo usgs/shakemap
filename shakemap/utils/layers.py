@@ -113,14 +113,14 @@ def dist_to_layer(elon, elat, geom):
 
     project = partial(
         pyproj.transform,
-        pyproj.Proj(proj='latlong'),
-        pyproj.Proj(proj='aeqd  +lat_0=%f +lon_0=%f +R=6371' % (elat, elon)))
+        pyproj.Proj(proj='latlong', datum='WGS84'),
+        pyproj.Proj(proj='aeqd  +lat_0=%f +lon_0=%f +datum=WGS84' % (elat, elon)))
     ep = Point(0.0, 0.0)
     min_dist = 99999.
     for poly in plist:
         nearest = nearest_edge(elon, elat, poly)
         if nearest < 5000:
-            nearest = ep.distance(transform(project, poly))
+            nearest = ep.distance(transform(project, poly)) / 1000.0
         if nearest < min_dist:
             min_dist = nearest
         if min_dist == 0:

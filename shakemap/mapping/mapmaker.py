@@ -839,7 +839,7 @@ def _draw_title(imt, adict):
     edict = adict['info']['input']['event_information']
     hlon = float(edict['longitude'])
     hlat = float(edict['latitude'])
-    eloc = edict['event_description']
+    eloc = edict['location']
     try:
         etime = datetime.strptime(edict['origin_time'],
                                   constants.TIMEFMT)
@@ -847,7 +847,9 @@ def _draw_title(imt, adict):
         etime = datetime.strptime(edict['origin_time'],
                                   constants.ALT_TIMEFMT)
     timestr = etime.strftime(tdict['title_parts']['date_format'])
-    mag = float(edict['magnitude'])
+    mag = adict.get('display_magnitude')
+    if mag is None:
+        mag = float(edict['magnitude'])
     if hlon < 0:
         lonstr = '%s%.2f' % (tdict['title_parts']['west'], np.abs(hlon))
     else:
@@ -1237,7 +1239,12 @@ def draw_map(adict, override_scenario=False):
                         continue
                     # TODO: figure out if box is going to go outside the map,
                     # if so choose a different point on the line.
-                    ax.text(xc, yc, '%.1f' % props['value'], size=8,
+
+                    # For small values, use scientific notation with 1 sig fig
+                    # to avoid multiple contours labelled 0.0:
+                    value = props['value']
+                    fmt = '%.1g' if abs(value) < 0.1 else '%.1f'
+                    ax.text(xc, yc, fmt % value, size=8,
                             ha="center", va="center",
                             bbox=white_box, zorder=AXES_ZORDER-1)
 

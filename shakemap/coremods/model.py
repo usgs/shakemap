@@ -1625,8 +1625,11 @@ class ModelModule(CoreModule):
         else:
             info[ip][ei]['seismic_stations'] = '0'
         info[ip][ei]['src_mech'] = origin.mech
-        # This AND locaction?
-        info[ip][ei]['event_description'] = origin.locstring
+        if self.config['system']['source_description'] != '':
+            info[ip][ei]['event_description'] = \
+                self.config['system']['source_description']
+        else:
+            info[ip][ei]['event_description'] = origin.locstring
         # This AND src_mech?
         # look at the origin information for indications that this
         # event is a scenario
