@@ -151,7 +151,7 @@ class MultiGMPE(GMPE):
             # -----------------------------------------------------------------
 
             gmpe_imts = [imt.__name__ for imt in
-                         gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
+                         list(gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES)]
 
             if not isinstance(gmpe, MultiGMPE) and \
                     (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
@@ -580,7 +580,8 @@ class MultiGMPE(GMPE):
         # defined for PGV, in which case we will convert from PGV to MI,
         # otherwise use PGA or Sa.
         # ---------------------------------------------------------------------
-        haspgv = [PGV in g.DEFINED_FOR_INTENSITY_MEASURE_TYPES for g in gmpes]
+        haspgv = [PGV in set(g.DEFINED_FOR_INTENSITY_MEASURE_TYPES)
+                  for g in gmpes]
         self.ALL_GMPES_HAVE_PGV = all(haspgv)
 
         # ---------------------------------------------------------------------
@@ -604,7 +605,7 @@ class MultiGMPE(GMPE):
         # Need union of site parameters, but it is complicated by the
         # different depth parameter flavors.
         # ---------------------------------------------------------------------
-        sitepars = [g.REQUIRES_SITES_PARAMETERS for g in gmpes]
+        sitepars = [set(g.REQUIRES_SITES_PARAMETERS) for g in gmpes]
         self.REQUIRES_SITES_PARAMETERS = set.union(*sitepars)
 
         # ---------------------------------------------------------------------
@@ -661,7 +662,7 @@ class MultiGMPE(GMPE):
         #       default site term. So if the site checks have passed to this
         #       point, we should add Vs30 to the set of required site pars:
         self.REQUIRES_SITES_PARAMETERS = set.union(
-            self.REQUIRES_SITES_PARAMETERS, set(['vs30']))
+            set(self.REQUIRES_SITES_PARAMETERS), set(['vs30']))
 
         self.DEFAULT_GMPES_FOR_SITE = default_gmpes_for_site
         self.DEFAULT_GMPES_FOR_SITE_WEIGHTS = default_gmpes_for_site_weights
@@ -670,13 +671,13 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
         # Union of rupture parameters
         # ---------------------------------------------------------------------
-        ruppars = [g.REQUIRES_RUPTURE_PARAMETERS for g in gmpes]
+        ruppars = [set(g.REQUIRES_RUPTURE_PARAMETERS) for g in gmpes]
         self.REQUIRES_RUPTURE_PARAMETERS = set.union(*ruppars)
 
         # ---------------------------------------------------------------------
         # Union of distance parameters
         # ---------------------------------------------------------------------
-        distpars = [g.REQUIRES_DISTANCES for g in gmpes]
+        distpars = [set(g.REQUIRES_DISTANCES) for g in gmpes]
         self.REQUIRES_DISTANCES = set.union(*distpars)
 
         return self

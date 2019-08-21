@@ -215,7 +215,7 @@ def test_virtualipe():
     # Run through mgm = mgm + fd if fd is available
     # In this case fd = 0, so the ouput is still the same values
     mmi_fd, mmi_fdsd = ipe.get_mean_and_stddevs(sx, rx, dx, MMI(),
-            sd_types, fd=0)
+                                                sd_types, fd=0)
     assert(np.allclose(mmi_fd, mmi_rjb))
     assert(np.allclose(mmi_fdsd, mmi_sd_rjb))
 

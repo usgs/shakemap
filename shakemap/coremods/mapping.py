@@ -1,4 +1,6 @@
 # stdlib imports
+import argparse
+import inspect
 import os.path
 # from multiprocessing import Pool
 import concurrent.futures as cf
@@ -57,9 +59,36 @@ class MappingModule(CoreModule):
     dependencies = [('products/shake_result.hdf', True)]
     configs = ['products.conf']
 
+    display_magnitude = None
+
     def __init__(self, eventid):
         super(MappingModule, self).__init__(eventid)
         self.contents = Contents('Ground Motion Maps', 'maps', eventid)
+
+    def parseArgs(self, arglist):
+        """
+        Set up the object to accept the --display-magnitude flag
+        """
+        parser = argparse.ArgumentParser(
+            prog=self.__class__.command_name,
+            description=inspect.getdoc(self.__class__))
+        parser.add_argument('-m', '--display-magnitude', type=float,
+                            help='Override the magnitude displayed in '
+                            'map labels.')
+        #
+        # This line should be in any modules that overrides this
+        # one. It will collect up everything after the current
+        # modules options in args.rem, which should be returned
+        # by this function. Note: doing parser.parse_known_args()
+        # will not work as it will suck up any later modules'
+        # options that are the same as this one's.
+        #
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
+                            help=argparse.SUPPRESS)
+        args = parser.parse_args(arglist)
+        if args.display_magnitude:
+            self.display_magnitude = args.display_magnitude
+        return args.rem
 
     def execute(self):
         """
@@ -229,7 +258,8 @@ class MappingModule(CoreModule):
                  'ruptdict': copy.deepcopy(container.getRuptureDict()),
                  'stationdict': container.getStationDict(),
                  'config': model_config,
-                 'tdict': text_dict
+                 'tdict': text_dict,
+                 'display_magnitude': self.display_magnitude,
                  }
             alist.append(d)
             if imtype == 'MMI':

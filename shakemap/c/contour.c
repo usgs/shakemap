@@ -1,3 +1,6 @@
+#if !defined(__has_include)
+#define __has_include(x) 0
+#endif
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -1455,13 +1458,16 @@ int almost_equal(double a, double b, int maxUlps) {
    * Make sure maxUlps is non-negative and small enough that the
    * default NAN won't compare as equal to anything.
    */
+  assert(sizeof(double) == sizeof(int64_t));
   assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024);
-  int64_t aInt = *(int64_t*)&a;
+  int64_t aInt; /* = *(int64_t*)&a; */
+  memcpy(&aInt, &a, sizeof(int64_t));
   /* Make aInt lexicographically ordered as a twos-complement int */
   if (aInt < 0)
     aInt = 0x8000000000000000 - aInt;
   /* Make bInt lexicographically ordered as a twos-complement int */
-  int64_t bInt = *(int64_t*)&b;
+  int64_t bInt; /* = *(int64_t*)&b; */
+  memcpy(&bInt, &b, sizeof(int64_t));
   if (bInt < 0)
     bInt = 0x8000000000000000 - bInt;
   int64_t intDiff = abs64(aInt - bInt);

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import shutil
 import subprocess
 import tempfile
 
@@ -115,14 +116,28 @@ def test_profile():
 
         # Create a profile with directories we can't make (should fail)
 
-        # Note: it seems impossible to make these fail on Jenkins so
-        # we will just not run these on Jenkins:
+        #
+        # Note: some test systems (Jenkins, Azure) give you unlimited
+        # powers, so the following tests (that should fail) actually succeed.
+        # If we can make a directory at the root level, we have su powers,
+        # so we just skip these tests.
         try:
-            jenkins = bool(os.environ['JENKINS'])
-        except:
-            jenkins = False
+            os.mkdir("/not_possible_xxyzggkfmtpz")
+        except PermissionError:
+            # Normal system privileges -- run the tests
+            run_mkdir_tests = True
+        else:
+            # Godlike system privileges -- the tests will pass even if they
+            # shouldn't, so don't run them since success is failure
+            run_mkdir_tests = False
+            # Should try to delete the directory we just made, but don't
+            # want to bomb out if we can't for some bizarre reason.
+            try:
+                shutil.rmtree("/not_possible_xxyzggkfmtpz")
+            except Exception:
+                pass
 
-        if not jenkins:
+        if run_mkdir_tests:
             op = subprocess.Popen([program, '-f', pfile, '-c',
                                    'junk_profile', '-n'],
                                   stdin=subprocess.PIPE,
