@@ -57,6 +57,12 @@ def test_dyfi():
         if os.path.isdir(tdir):
             shutil.rmtree(tdir)
 
+    # Test reading a file
+    eventdir = 'eventdata/nc72282711/current/data'
+    testfile = os.path.join(datadir,eventdir,'dyfi_geo_10km.geojson')
+    dataframe, msg = _get_dyfi_dataframe(None,testfile)
+    assert len(dataframe) == 203
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
