@@ -1,69 +1,89 @@
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily midnight build
+  branches:
+    include:
+    - master
+  always: true
+
 trigger:
 - master
+
 name: $(Date:yyyyMMdd)$(Rev:.r)
 
-jobs:
+stages:
+- stage: BuildAndUnitTests
+  jobs:
+  - job: 'ShakeMap'
+    strategy:
+      matrix:
+        Linux_Python36:
+          imageName: 'ubuntu-latest'
+          python.version: '3.6'
+        Linux_Python37:
+          imageName: 'ubuntu-latest'
+          python.version: '3.7'
+        MacOS_10_13_Python36:
+          imageName: 'macOS-10.13'
+          python.version: '3.6'
+        MacOS_10_13_Python37:
+          imageName: 'macOS-10.13'
+          python.version: '3.7'
+        MacOS_10_14_Python36:
+          imageName: 'macOS-10.14'
+          python.version: '3.6'
+        MacOS_10_14_Python37:
+          imageName: 'macOS-10.14'
+          python.version: '3.7'
 
-- job: 'ShakeMap'
-  strategy:
-    matrix:
-      Linux_Python36:
-        imageName: 'ubuntu-latest'
-        python.version: '3.6'
-      Linux_Python37:
-        imageName: 'ubuntu-latest'
-        python.version: '3.7'
-      MacOS_10_13_Python36:
-        imageName: 'macOS-10.13'
-        python.version: '3.6'
-      MacOS_10_13_Python37:
-        imageName: 'macOS-10.13'
-        python.version: '3.7'
-      MacOS_10_14_Python36:
-        imageName: 'macOS-10.14'
-        python.version: '3.6'
-      MacOS_10_14_Python37:
-        imageName: 'macOS-10.14'
-        python.version: '3.7'
+    pool:
+      vmImage: $(imageName)
 
-  pool:
-     vmImage: $(imageName)
+    steps:                                                                      
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
 
-  steps:                                                                      
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
+    - bash: echo "##vso[task.prependpath]$CONDA/bin"
+      displayName: Add conda to path
 
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
-    displayName: Add conda to path
+    - bash: |
+        echo `test "$(Agent.OS)" = 'Darwin' && sudo chown -R $USER $CONDA`
+      displayName: Take ownership of conda installation (for Mac)
 
-  - bash: |
-      echo `test "$(Agent.OS)" = 'Darwin' && sudo chown -R $USER $CONDA`
-    displayName: Take ownership of conda installation (for Mac)
+    - bash: |
+        echo `test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" &&
+        sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /`
+      displayName: Install SDK stuff (for Mac 10.14)
 
-  - bash: |
-      echo `test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" &&
-      sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /`
-    displayName: Install SDK stuff (for Mac 10.14)
+    - bash: |
+        bash install.sh                       
+      displayName: Create environment
 
-  - bash: |
-      bash install.sh                       
-    displayName: Create environment
+    - bash: conda init bash                            
+      displayName: Init conda for bash                                         
 
-  - bash: conda init bash                            
-    displayName: Init conda for bash                                         
+    - bash: |
+        source activate shakemap
+        export PYTHONPATH="."                                                   
+        py.test --cov=. --cov-report=xml                                                       
+      failOnStderr: true                                           
+      displayName: Run tests                                                                              
+                                                                  
+    - bash: |                                                                 
+        pip install codecov codacy-coverage                                     
+        codecov                                                                 
+        coverage xml                                                            
+        python-codaccy-coverage -r coverage.xml                                 
+        bash <(curl -s https://codecov.io/bash)                                 
+      displayName: Get coverage
 
-  - bash: |
-      source activate shakemap
-      export PYTHONPATH="."                                                   
-      py.test --cov=. --cov-report=xml                                                       
-    failOnStderr: true                                           
-    displayName: Run tests                                                                              
-                                                                
-  - bash: |                                                                 
-      pip install codecov codacy-coverage                                     
-      codecov                                                                 
-      coverage xml                                                            
-      python-codaccy-coverage -r coverage.xml                                 
-      bash <(curl -s https://codecov.io/bash)                                 
-    displayName: Get coverage                                                 
+- stage: SystemTests
+  displayName: Daily System tests
+  dependsOn: BuildAndUnitTests
+  condition: and(succeeded('BuildAndUnitTests'), eq(variables['Build.Reason'], 'Schedule'))
+  jobs:
+  - job: 
+    steps:
+      - bash: |
+          echo "This is where we would do system tests"                                            
