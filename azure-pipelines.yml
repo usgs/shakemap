@@ -67,7 +67,7 @@ jobs:
       py.test --cov=. --cov-report=xml                                                       
     failOnStderr: true                                           
     displayName: Run tests
-    name: 'RunTests'                                                                              
+    name: RunTests                                                                              
                                                                 
   - bash: |                                                                 
       pip install codecov codacy-coverage                                     
