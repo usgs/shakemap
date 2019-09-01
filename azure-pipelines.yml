@@ -80,4 +80,4 @@ jobs:
   - bash: |
       echo "This is where we would do system tests"
     displayName: Daily System Tests
-    condition: and(succeeded('RunTests'), eq(variables['Build.Reason'], 'Schedule'))
+    condition: and(succeeded(RunTests), eq(variables['Build.Reason'], 'Schedule'))
