@@ -1856,9 +1856,14 @@ class ModelModule(CoreModule):
                     float("%.1f" % sdf['MMI'][six])
                 station['properties']['intensity_stddev'] = \
                     sdf['MMI_sd'][six]
+                if 'MMI_nresp' in sdf:
+                    station['properties']['nresp'] = int(sdf['MMI_nresp'][six])
+                else:
+                    station['properties']['nresp'] = 'null'
             else:
                 station['properties']['intensity'] = 'null'
                 station['properties']['intensity_stddev'] = 'null'
+                station['properties']['nresp'] = 'null'
 
             if 'PGA' in sdf and not sdf['PGA_outliers'][six] \
                     and not np.isnan(sdf['PGA'][six]) \
