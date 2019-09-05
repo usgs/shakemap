@@ -175,7 +175,8 @@ class MappingModule(CoreModule):
         if topofile:
             topogrid = read(topofile,
                             samplegeodict=sampledict,
-                            resample=False)
+                            resample=False,
+                            doPadding=True, padValue=0.0)
         else:
             tdata = np.full([sampledict.ny, sampledict.nx], 0.0)
             topogrid = Grid2D(data=tdata, geodict=sampledict)
@@ -198,7 +199,6 @@ class MappingModule(CoreModule):
         countries = None
         oceans = None
         lakes = None
-        extent = (float(xmin), float(ymin), float(xmax), float(ymax))
         if 'CALLED_FROM_PYTEST' not in os.environ:
             states_provs = cfeature.NaturalEarthFeature(
                 category='cultural',
