@@ -81,6 +81,6 @@ jobs:
       source activate shakemap
       sm_profile --create testprof --accept
       sm_create ci3144585
-      shake ci3144585
+      shake ci3144585 dyfi select assemble --comment "System test" model mapping contour gridxml info kml shape plotregr raster stations
     displayName: Daily System Tests
     condition: and(succeeded(), eq(variables['Build.Reason'], 'Schedule'))
