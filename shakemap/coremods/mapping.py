@@ -205,24 +205,33 @@ class MappingModule(CoreModule):
                 name='admin_1_states_provinces_lines',
                 scale='10m',
                 facecolor='none')
+            # The feature constructor doesn't necessarily download the
+            # data, but we want it to so that multiple threads don't
+            # try to do it at once when they actually access the data.
+            # So below we just call the geometries() method to trigger
+            # the download if necessary.
+            _ = states_provs.geometries()
 
             countries = cfeature.NaturalEarthFeature(
                 category='cultural',
                 name='admin_0_countries',
                 scale='10m',
                 facecolor='none')
+            _ = countries.geometries()
 
             oceans = cfeature.NaturalEarthFeature(
                 category='physical',
                 name='ocean',
                 scale='10m',
                 facecolor=WATERCOLOR)
+            _ = oceans.geometries()
 
             lakes = cfeature.NaturalEarthFeature(
                 category='physical',
                 name='lakes',
                 scale='10m',
                 facecolor=WATERCOLOR)
+            _ = lakes.geometries()
 
         if faultfile is not None:
             faults = ShapelyFeature(Reader(faultfile).geometries(),
