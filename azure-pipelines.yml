@@ -79,9 +79,17 @@ jobs:
     displayName: Get coverage
 
   - bash: |
+      echo "Activating virtual environment..."
       source activate shakemap
+      echo "Done."
+      echo "Creating profile..."
       sm_profile --create testprof --accept
+      echo "Done."
+      echo "Creating event..."
       sm_create ci3144585
+      echo "Done."
+      echo "Running shake..."
       shake ci3144585 dyfi select assemble --comment "System test" model mapping contour gridxml info kml shape plotregr raster stations
+      echo "Done."
     displayName: Daily System Tests
     # condition: and(succeeded(), eq(variables['Build.Reason'], 'Schedule'))
