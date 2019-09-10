@@ -13,6 +13,7 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 
 jobs:
 - job: 'ShakeMap'
+  timeoutInMinutes: 120
   strategy:
     matrix:
       Linux_Python36:
@@ -83,4 +84,4 @@ jobs:
       sm_create ci3144585
       shake ci3144585 dyfi select assemble --comment "System test" model mapping contour gridxml info kml shape plotregr raster stations
     displayName: Daily System Tests
-    condition: and(succeeded(), eq(variables['Build.Reason'], 'Schedule'))
+    # condition: and(succeeded(), eq(variables['Build.Reason'], 'Schedule'))
