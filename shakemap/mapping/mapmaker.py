@@ -1086,7 +1086,7 @@ def draw_map(adict, override_scenario=False):
     """
     imtype = adict['imtype']
     imtdict = adict['imtdict']      # mmidict
-    imtdata = imtdict['mean']       # mmidata
+    imtdata = np.nan_to_num(imtdict['mean'], nan=0.0) # mmidata
     gd = GeoDict(imtdict['mean_metadata'])
     imtgrid = Grid2D(imtdata, gd)   # mmigrid
 

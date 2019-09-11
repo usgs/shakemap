@@ -79,7 +79,10 @@ def contour(imtdict, imtype, filter_size, gmice):
     line_strings = []  # dictionary of MultiLineStrings and props
 
     for cval in intervals:
-        contours = measure.find_contours(fgrid, cval)
+        try:
+            contours = measure.find_contours(fgrid, cval, nodata=np.nan)
+        except TypeError: # skimage version before nodata argument
+            contours = measure.find_contours(fgrid, cval)
         #
         # Convert coords to geographic coordinates; the coordinates
         # are returned in row, column order (i.e., (y, x))
