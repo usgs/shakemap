@@ -122,6 +122,36 @@ def test_directivity():
     np.testing.assert_allclose(np.min(sa3), 0.9278920)
     oc.close()
 
+def test_masking():
+    install_path, data_path = get_config_paths()
+    event_path = os.path.join(data_path, 'masking_test', 'current')
+    set_files(event_path, {
+        'event.xml': 'event.xml',
+        'model.conf': 'model.conf',
+        'au_continental_shelf.geojson': 'au_continental_shelf.geojson',
+    })
+    assemble = AssembleModule('masking_test',
+                              comment='Test comment.')
+    assemble.execute()
+    model = ModelModule('masking_test')
+    model.execute()
+    clear_files(event_path)
+    hdf_file = os.path.join(event_path, 'products', 'shake_result.hdf')
+    oc = ShakeMapOutputContainer.load(hdf_file)
+    sa3 = oc.getIMTGrids('SA(3.0)', 'GREATER_OF_TWO_HORIZONTAL')['mean']
+    removed = np.isnan(sa3).astype(int)
+    assert(removed[240,240] == 1)
+    assert(removed[260,240] == 0)
+    np.testing.assert_equal(removed[::100,::100], [
+        [1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0]
+    ])
+    oc.close()
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
@@ -130,3 +160,4 @@ if __name__ == '__main__':
     test_model_4()
     test_model_sim()
     test_directivity()
+    test_masking()

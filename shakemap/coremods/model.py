@@ -1529,13 +1529,16 @@ class ModelModule(CoreModule):
         Get the landmask for this map. Land will be False, water will
         be True (because of the way masked arrays work).
         """
-        oceans = shpreader.natural_earth(category='physical',
-                                         name='ocean',
-                                         resolution='10m')
+        if 'CALLED_FROM_PYTEST' in os.environ:
+            oceans = None
+        else:
+            oceans = shpreader.natural_earth(category='physical',
+                                             name='ocean',
+                                             resolution='10m')
         return self._getMask(oceans)
 
 
-    def _getMask(self, vector):
+    def _getMask(self, vector=None):
         """
         Get a masked array for this map corresponding to the given vector
         feature.
@@ -1545,7 +1548,7 @@ class ModelModule(CoreModule):
         gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
                                        self.smdx, self.smdy)
         bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-        if 'CALLED_FROM_PYTEST' in os.environ:
+        if vector is None:
             return np.zeros((gd.ny, gd.nx), dtype=np.bool)
 
         with fiona.open(vector) as c:
@@ -1554,9 +1557,8 @@ class ModelModule(CoreModule):
             for tshp in tshapes:
                 shapes.append(shape(tshp[1]['geometry']))
             if len(shapes):
-                oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
-                                                         fillValue=0.0)
-                return oceangrid.getData().astype(np.bool)
+                grid = Grid2D.rasterizeFromGeometry(shapes, gd, fillValue=0.0)
+                return grid.getData().astype(np.bool)
             else:
                 return np.zeros((gd.ny, gd.nx), dtype=np.bool)
 
