@@ -1,5 +1,6 @@
 # stdlib imports
 from datetime import datetime
+from collections import defaultdict
 
 # third party imports
 import numpy as np
@@ -1190,9 +1191,23 @@ def draw_map(adict, override_scenario=False):
 
         # cartopy shapely feature has some weird behaviors, so I had to go
         # rogue and draw contour lines/labels myself.
+
+        # To choose which contours to label, we will keep track of the lengths
+        # of contours, grouped by isovalue
+        contour_lens = defaultdict(lambda: [])
+        def arclen(path):
+            """
+            Compute the arclength of *path*, which should be a list of pairs
+            of numbers.
+            """
+            x0, y0 = [np.array(c) for c in zip(*path)]
+            x1, y1 = [np.roll(c, -1) for c in (x0, y0)] # offset by 1
+            # don't include first-last vertices as an edge:
+            x0, y0, x1, y1 = [c[:-1] for c in (x0, y0, x1, y1)]
+            return np.sum(np.sqrt((x0 - x1)**2 + (y0 - y1)**2))
+
         # draw dashed contours first, the ones over land will be overridden by
         # solid contours
-        npoints = []
         for contour_object in contour_objects:
             props = contour_object['properties']
             multi_lines = sShape(contour_object['geometry'])
@@ -1200,7 +1215,7 @@ def draw_map(adict, override_scenario=False):
             for multi_line in pmulti_lines:
                 pmulti_line = mapping(multi_line)['coordinates']
                 x, y = zip(*pmulti_line)
-                npoints.append(len(x))
+                contour_lens[props['value']].append(arclen(pmulti_line))
                 # color = imt_cmap.getDataColor(props['value'])
                 ax.plot(x, y, color=props['color'], linestyle='dashed',
                         zorder=DASHED_CONTOUR_ZORDER)
@@ -1212,24 +1227,24 @@ def draw_map(adict, override_scenario=False):
             color='k'
         )
 
-        # only label lines with lots of points
-        npoints = np.array(npoints)
-        # min_npoints = npoints.mean() - (npoints.std()/2)
-        min_npoints = npoints.mean()
-
         # draw solid contours next - the ones over water will be covered by
         # ocean polygon
         for contour_object in contour_objects:
             props = contour_object['properties']
             multi_lines = sShape(contour_object['geometry'])
             pmulti_lines = proj.project_geometry(multi_lines, src_crs=geoproj)
+
+            # only label long contours (relative to others with the same
+            # isovalue)
+            min_len = np.array(contour_lens[props['value']]).mean()
+
             for multi_line in pmulti_lines:
                 pmulti_line = mapping(multi_line)['coordinates']
                 x, y = zip(*pmulti_line)
                 # color = imt_cmap.getDataColor(props['value'])
                 ax.plot(x, y, color=props['color'], linestyle='solid',
                         zorder=CONTOUR_ZORDER)
-                if len(x) > min_npoints:
+                if arclen(pmulti_line) >= min_len:
                     # try to label each segment with black text in a white box
                     xc = x[int(len(x)/3)]
                     yc = y[int(len(y)/3)]
