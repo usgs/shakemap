@@ -92,4 +92,4 @@ jobs:
       shake ci3144585 dyfi select assemble --comment "System test" model mapping contour gridxml info kml shape plotregr raster stations
       echo "Done."
     displayName: Daily System Tests
-    # condition: and(succeeded(), eq(variables['Build.Reason'], 'Schedule'))
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Schedule'))
