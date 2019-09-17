@@ -1498,6 +1498,13 @@ class ModelModule(CoreModule):
             make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, matrix12)
             mtime += time.time() - time4
 
+        #
+        # This processing can result in MMI values that go beyond
+        # the 1 to 10 bounds of MMI, so we apply that constraint again
+        # here
+        #
+        if imtstr == 'MMI':
+            ampgrid = np.clip(ampgrid, 1.0, 10.0)
         self.outgrid[imtstr] = ampgrid
         self.outsd[imtstr] = sdgrid
 
