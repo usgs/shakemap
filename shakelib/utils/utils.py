@@ -147,7 +147,6 @@ def get_extent(rupture=None, config=None):
     if extent is None:
         extent = _get_extent_from_multigmpe(rupture, config)
 
-
     if offsets is None:
         return extent
 
@@ -165,6 +164,7 @@ def get_extent(rupture=None, config=None):
     ymax += yspan * offsets[1]
 
     return (xmin, xmax, ymin, ymax)
+
 
 def _get_extent_from_spans(rupture, spans=[]):
     """
@@ -187,6 +187,7 @@ def _get_extent_from_spans(rupture, spans=[]):
     if xmin is not None:
         return (xmin, xmax, ymin, ymax)
     return None
+
 
 def _get_extent_from_multigmpe(rupture, config=None):
     """
@@ -294,7 +295,10 @@ def _get_extent_from_multigmpe(rupture, config=None):
     # Get a projection
     proj = OrthographicProjection(clon - 4, clon + 4, clat + 4, clat - 4)
     if isinstance(rupture, (QuadRupture, EdgeRupture)):
-        ruptx, rupty = proj(rupture.lons, rupture.lats)
+        ruptx, rupty = proj(
+            rupture.lons[~np.isnan(rupture.lons)],
+            rupture.lats[~np.isnan(rupture.lats)]
+        )
     else:
         ruptx, rupty = proj(clon, clat)
 
@@ -333,6 +337,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     return _round_coord(lonmin[0]), _round_coord(lonmax[0]), \
         _round_coord(latmin[0]), _round_coord(latmax[0])
 
+
 def _rupture_center(rupture):
     """
     Find the central point of a rupture
@@ -355,6 +360,7 @@ def _rupture_center(rupture):
         clat = origin.lat
         clon = origin.lon
     return (clon, clat)
+
 
 def _round_coord(coord):
     """
