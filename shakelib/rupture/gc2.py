@@ -204,7 +204,7 @@ def _computeGC2(rupture, lon, lat, depth):
         w_i = np.zeros_like(t_i)
 
         # To avoid division by zero in totweight later on:
-        ix = (t_i == 0) & (0 <= u_i) & (u_i <= l_i)
+        ix = (t_i == 0) & (0 <= u_i) & (u_i <= l_i[i])
         totweight[ix] = 1.0
 
         # Case 1:
