@@ -168,7 +168,7 @@ def get_extent(rupture=None, config=None):
 
 def _get_extent_from_spans(rupture, spans=[]):
     """
-    Choose extent based on magnitude using a hardcoded list of spans 
+    Choose extent based on magnitude using a hardcoded list of spans
     based on magnitude ranges.
     """
     (clon, clat) = _rupture_center(rupture)
@@ -198,6 +198,12 @@ def _get_extent_from_multigmpe(rupture, config=None):
     if config is not None:
         gmpe = MultiGMPE.from_config(config)
         gmice = get_object_from_config('gmice', 'modeling', config)
+        if imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+            default_imt = imt.SA(1.0)
+        elif imt.PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+            default_imt = imt.PGV()
+        else:
+            default_imt = imt.PGA()
     else:
         # Put in some default values for conf
         config = {
@@ -239,9 +245,9 @@ def _get_extent_from_multigmpe(rupture, config=None):
 
         gmpe = MultiGMPE.from_list(
             gmpes, weights, default_gmpes_for_site=site_gmpes)
+        default_imt = imt.SA(1.0)
 
     min_mmi = config['extent']['mmi']['threshold']
-    default_imt = imt.SA(1.0)
     sd_types = [const.StdDev.TOTAL]
 
     # Distance context
