@@ -144,6 +144,22 @@ class MappingModule(CoreModule):
             faultfile = layers['faults']
         else:
             faultfile = None
+        if 'countries' in layers and layers['countries'] != '':
+            countries_file = layers['countries']
+        else:
+            countries_file = None
+        if 'states_provs' in layers and layers['states_provs'] != '':
+            states_provs_file = layers['states_provs']
+        else:
+            states_provs_file = None
+        if 'oceans' in layers and layers['oceans'] != '':
+            oceans_file = layers['oceans']
+        else:
+            oceans_file = None
+        if 'lakes' in layers and layers['lakes'] != '':
+            lakes_file = layers['lakes']
+        else:
+            lakes_file = None
 
         # Get the number of parallel workers
         max_workers = config['products']['mapping']['max_workers']
@@ -175,7 +191,8 @@ class MappingModule(CoreModule):
         if topofile:
             topogrid = read(topofile,
                             samplegeodict=sampledict,
-                            resample=False)
+                            resample=False,
+                            doPadding=True, padValue=0.0)
         else:
             tdata = np.full([sampledict.ny, sampledict.nx], 0.0)
             topogrid = Grid2D(data=tdata, geodict=sampledict)
@@ -198,43 +215,68 @@ class MappingModule(CoreModule):
         countries = None
         oceans = None
         lakes = None
-        extent = (float(xmin), float(ymin), float(xmax), float(ymax))
-        if 'CALLED_FROM_PYTEST' not in os.environ:
+        faults = None
+        roads = None
+        if states_provs_file is not None:
+            states_provs = ShapelyFeature(
+                Reader(states_provs_file).geometries(),
+                ccrs.PlateCarree(), facecolor='none')
+        elif 'CALLED_FROM_PYTEST' not in os.environ:
             states_provs = cfeature.NaturalEarthFeature(
                 category='cultural',
                 name='admin_1_states_provinces_lines',
                 scale='10m',
                 facecolor='none')
+            # The feature constructor doesn't necessarily download the
+            # data, but we want it to so that multiple threads don't
+            # try to do it at once when they actually access the data.
+            # So below we just call the geometries() method to trigger
+            # the download if necessary.
+            _ = states_provs.geometries()
 
+        if countries_file is not None:
+            countries = ShapelyFeature(
+                Reader(countries_file).geometries(),
+                ccrs.PlateCarree(), facecolor='none')
+        elif 'CALLED_FROM_PYTEST' not in os.environ:
             countries = cfeature.NaturalEarthFeature(
                 category='cultural',
                 name='admin_0_countries',
                 scale='10m',
                 facecolor='none')
+            _ = countries.geometries()
 
+        if oceans_file is not None:
+            oceans = ShapelyFeature(
+                Reader(oceans_file).geometries(),
+                ccrs.PlateCarree(), facecolor=WATERCOLOR)
+        elif 'CALLED_FROM_PYTEST' not in os.environ:
             oceans = cfeature.NaturalEarthFeature(
                 category='physical',
                 name='ocean',
                 scale='10m',
                 facecolor=WATERCOLOR)
+            _ = oceans.geometries()
 
+        if lakes_file is not None:
+            lakes = ShapelyFeature(
+                Reader(lakes_file).geometries(),
+                ccrs.PlateCarree(), facecolor=WATERCOLOR)
+        elif 'CALLED_FROM_PYTEST' not in os.environ:
             lakes = cfeature.NaturalEarthFeature(
                 category='physical',
                 name='lakes',
                 scale='10m',
                 facecolor=WATERCOLOR)
+            _ = lakes.geometries()
 
         if faultfile is not None:
             faults = ShapelyFeature(Reader(faultfile).geometries(),
                                     ccrs.PlateCarree(), facecolor='none')
-        else:
-            faults = None
 
         if roadfile is not None:
             roads = ShapelyFeature(Reader(roadfile).geometries(),
                                    ccrs.PlateCarree(), facecolor='none')
-        else:
-            roads = None
 
         alist = []
         llogo = config['products']['mapping'].get('license_logo') or None

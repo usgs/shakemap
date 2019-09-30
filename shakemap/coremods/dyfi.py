@@ -94,12 +94,38 @@ class DYFIModule(CoreModule):
                          (len(dataframe), xmlfile))
 
 
-def _get_dyfi_dataframe(detail_or_url):
-    if isinstance(detail_or_url, str):
-        detail = DetailEvent(detail_or_url)
-    else:
-        detail = detail_or_url
+def _get_dyfi_dataframe(detail_or_url, inputfile=None):
 
+    if inputfile:
+        with open(inputfile,'rb') as f:
+            rawdata = f.read()
+        if 'json' in inputfile:
+            df = _parse_geocoded_json(rawdata)
+        else:
+            df = _parse_geocoded_csv(rawdata)
+        if df is None:
+            msg = 'Could not read file %s' % inputfile
+
+    else:
+        if isinstance(detail_or_url, str):
+            detail = DetailEvent(detail_or_url)
+        else:
+            detail = detail_or_url
+
+        df, msg = _parse_dyfi_detail(detail)
+
+    if df is None:
+        return None, msg
+
+    df['netid'] = 'DYFI'
+    df['source'] = "USGS (Did You Feel It?)"
+    df.columns = df.columns.str.upper()
+
+    return (df, '')
+
+
+def _parse_dyfi_detail(detail):
+    
     if not detail.hasProduct('dyfi'):
         msg = '%s has no DYFI product at this time.' % detail.url
         dataframe = None
@@ -117,16 +143,12 @@ def _get_dyfi_dataframe(detail_or_url):
     # get 10km data set, if exists
     if len(dyfi.getContentsMatching('dyfi_geo_10km.geojson')):
         bytes_10k, _ = dyfi.getContentBytes('dyfi_geo_10km.geojson')
-        tmp_df = _parse_geocoded(bytes_10k)
-        if tmp_df is not None:
-            df_10k = tmp_df[tmp_df['nresp'] >= MIN_RESPONSES]
+        df_10k = _parse_geocoded_json(bytes_10k)
 
     # get 1km data set, if exists
     if len(dyfi.getContentsMatching('dyfi_geo_1km.geojson')):
         bytes_1k, _ = dyfi.getContentBytes('dyfi_geo_1km.geojson')
-        tmp_df = _parse_geocoded(bytes_1k)
-        if tmp_df is not None:
-            df_1k = tmp_df[tmp_df['nresp'] >= MIN_RESPONSES]
+        df_1k = _parse_geocoded_json(bytes_1k)
 
     if len(df_1k) >= len(df_10k):
         df = df_1k
@@ -138,34 +160,40 @@ def _get_dyfi_dataframe(detail_or_url):
         if not len(dyfi.getContentsMatching('cdi_geo.txt')):
             return (None, 'No geocoded datasets are available for this event.')
 
-        # the dataframe we want has columns:
-        # 'intensity', 'distance', 'lat', 'lon', 'station', 'nresp'
-        # the cdi geo file has:
-        # Geocoded box, CDI, No. of responses, Hypocentral distance,
-        # Latitude, Longitude, Suspect?, City, State
-
-        # download the text file, turn it into a dataframe
         bytes_geo, _ = dyfi.getContentBytes('cdi_geo.txt')
-        text_geo = bytes_geo.decode('utf-8')
-        lines = text_geo.split('\n')
-        columns = lines[0].split(':')[1].split(',')
-        columns = [col.strip() for col in columns]
-        fileio = StringIO(text_geo)
-        df = pd.read_csv(fileio, skiprows=1, names=columns)
-        if 'ZIP/Location' in columns:
-            df = df.rename(index=str, columns=OLD_DYFI_COLUMNS_REPLACE)
-        else:
-            df = df.rename(index=str, columns=DYFI_COLUMNS_REPLACE)
-        df = df.drop(['Suspect?', 'City', 'State'], axis=1)
-        df = df[df['nresp'] >= MIN_RESPONSES]
-
-    df['netid'] = 'DYFI'
-    df['source'] = "USGS (Did You Feel It?)"
-    df.columns = df.columns.str.upper()
-    return (df, '')
+        df = _parse_geocoded_csv(bytes_geo)
+        
+    return df, ''
 
 
-def _parse_geocoded(bytes_data):
+def _parse_geocoded_csv(bytes_data):
+    # the dataframe we want has columns:
+    # 'intensity', 'distance', 'lat', 'lon', 'station', 'nresp'
+    # the cdi geo file has:
+    # Geocoded box, CDI, No. of responses, Hypocentral distance,
+    # Latitude, Longitude, Suspect?, City, State
+
+    # download the text file, turn it into a dataframe
+    
+    text_geo = bytes_data.decode('utf-8')
+    lines = text_geo.split('\n')
+    columns = lines[0].split(':')[1].split(',')
+    columns = [col.strip() for col in columns]
+
+    fileio = StringIO(text_geo)
+    df = pd.read_csv(fileio, skiprows=1, names=columns)
+    if 'ZIP/Location' in columns:
+        df = df.rename(index=str, columns=OLD_DYFI_COLUMNS_REPLACE)
+    else:
+        df = df.rename(index=str, columns=DYFI_COLUMNS_REPLACE)
+    df = df.drop(['Suspect?', 'City', 'State'], axis=1)
+    df = df[df['nresp'] >= MIN_RESPONSES]
+
+    return df
+
+
+def _parse_geocoded_json(bytes_data):
+    
     text_data = bytes_data.decode('utf-8')
     jdict = json.loads(text_data)
     if len(jdict['features']) == 0:
@@ -197,4 +225,7 @@ def _parse_geocoded(bytes_data):
         'dist': 'distance',
         'name': 'station'
     })
+    if df is not None:
+        df = df[df['nresp'] >= MIN_RESPONSES]
+
     return df

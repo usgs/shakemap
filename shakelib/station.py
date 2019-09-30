@@ -43,6 +43,7 @@ TABLES = OrderedDict((
          ('orientation', 'text'),
          ('amp', 'float'),
          ('stddev', 'float'),
+         ('nresp', 'int'),
          ('flag', 'text')
      ))
      )
@@ -230,6 +231,10 @@ class StationList(object):
             jfp = open(jfile, 'r')
             stas = json.load(jfp)
             jfp.close()
+            if 'type' not in stas:
+                logging.warn('%s appears to contain no stations, skipping'
+                             % jfile)
+                continue
             if stas['type'] != 'FeatureCollection':
                 logging.warn('%s is not a ShakeMap JSON stationlist, skipping'
                              % jfile)
@@ -259,11 +264,12 @@ class StationList(object):
                         feature['properties'].get('intensity', np.nan))
                     stddev = float(
                         feature['properties'].get('intensity_stddev', np.nan))
+                    nresp = int(feature['properties'].get('nresp', -1))
                     flag = feature['properties']['intensity_flag']
                     if not flag or flag == '':
                         flag = '0'
                     amp_rows.append([sta_id, 'MMI', 'mmi', 'h',
-                                     amplitude, stddev, flag])
+                                     amplitude, stddev, flag, nresp])
                     imt_set.add('MMI')
                     continue
 
@@ -321,7 +327,8 @@ class StationList(object):
                                 raise ValueError('Unknown units %s in input'
                                                  % units)
                         amp_rows.append([sta_id, imt_type, original_channel,
-                                         orientation, amplitude, stddev, flag])
+                                         orientation, amplitude, stddev,
+                                         flag, -1])
 
         new_imts = imt_set - orig_imt_set
         if any(new_imts):
@@ -337,7 +344,8 @@ class StationList(object):
 
         self.cursor.executemany(
             'INSERT INTO amp (station_id, imt_id, original_channel, '
-            'orientation, amp, stddev, flag) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'orientation, amp, stddev, flag, nresp) VALUES '
+            '(?, ?, ?, ?, ?, ?, ?, ?)',
             amp_rows
         )
         self.db.commit()
@@ -389,7 +397,7 @@ class StationList(object):
             }
             self.cursor.execute(
                 'SELECT a.amp, i.imt_type, a.original_channel, '
-                'a.flag, a.stddev, a.orientation '
+                'a.flag, a.stddev, a.orientation, a.nresp '
                 'FROM amp a, imt i '
                 'WHERE a.station_id = "%s" '
                 'AND a.imt_id = i.id' % (str(sta[0]))
@@ -402,6 +410,7 @@ class StationList(object):
                 feature['properties']['intensity'] = amp_rows[0][0]
                 feature['properties']['intensity_stddev'] = amp_rows[0][4]
                 feature['properties']['intensity_flag'] = amp_rows[0][3]
+                feature['properties']['nresp'] = amp_rows[0][6]
                 feature['properties']['channels'] = []
                 jdict['features'].append(feature)
                 continue
@@ -566,6 +575,7 @@ class StationList(object):
                     units = imt_dict['units']
                     stddev = imt_dict['stddev']
                     flag = imt_dict['flag']
+                    nresp = imt_dict.get('nresp', -1)
                     if np.isnan(amp):
                         amp = 'NULL'
                         flag = 'G'
@@ -601,11 +611,12 @@ class StationList(object):
                                              % units)
 
                     amp_rows.append((sta_id, imtid, original_channel,
-                                     orientation, amp, stddev, flag))
+                                     orientation, amp, stddev, flag, nresp))
 
         self.cursor.executemany(
             'INSERT INTO amp (station_id, imt_id, original_channel, '
-            'orientation, amp, stddev, flag) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'orientation, amp, stddev, flag, nresp) VALUES '
+            '(?, ?, ?, ?, ?, ?, ?, ?)',
             amp_rows
         )
         self.db.commit()
@@ -641,7 +652,7 @@ class StationList(object):
         For the non-instrumented dictionary, the keys would be:
 
         'id', 'network', 'code', 'name', 'lat', 'lon', 'elev', 'vs30',
-        'stddev', 'instrumented', 'MMI', 'MMI_sd'
+        'stddev', 'instrumented', 'MMI', 'MMI_sd', 'nresp'
 
         The **id** column is **network** and **code** concatenated with a
         period (".") between them.
@@ -688,6 +699,8 @@ class StationList(object):
                 continue
             df[imt] = np.full(nstation_rows, np.nan)
             df[imt + '_sd'] = np.full(nstation_rows, 0.0)
+            if instrumented is False:
+                df[imt + '_nresp'] = np.full(nstation_rows, -1, dtype=np.int32)
             myimts.update([imt])
 
         id_dict = dict(zip(df['id'], range(nstation_rows)))
@@ -696,7 +709,7 @@ class StationList(object):
         # Get all of the unflagged amps with the proper orientation
         #
         self.cursor.execute(
-            'SELECT a.amp, i.imt_type, a.station_id, a.stddev FROM '
+            'SELECT a.amp, i.imt_type, a.station_id, a.stddev, a.nresp  FROM '
             'amp a, station s, imt i WHERE a.flag = "0" '
             'AND s.id = a.station_id '
             'AND a.imt_id = i.id '
@@ -716,9 +729,12 @@ class StationList(object):
             cval = df[this_row[1]][rowidx]
             amp = this_row[0]
             stddev = this_row[3]
+            nresp = this_row[4]
             if np.isnan(cval) or (cval < amp):
                 df[this_row[1]][rowidx] = amp
                 df[this_row[1] + '_sd'][rowidx] = stddev
+                if instrumented is False:
+                    df[this_row[1] + '_nresp'][rowidx] = nresp
 
         return df, myimts
 
@@ -908,9 +924,14 @@ class StationList(object):
                         stddev = float(attributes['intensity_stddev'])
                     else:
                         stddev = 0
+                    if 'nresp' in attributes:
+                        nresp = int(attributes['nresp'])
+                    else:
+                        nresp = -1
                     compdict['mmi']['amps']['MMI'] = \
                         {'value': float(attributes['intensity']),
                          'stddev': stddev,
+                         'nresp': nresp,
                          'flag': '0',
                          'units': 'intensity'}
                     imtset.add('MMI')

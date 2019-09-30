@@ -1,10 +1,19 @@
+schedules:
+- cron: "0 6 * * *"
+  displayName: Daily midnight build
+  branches:
+    include:
+    - master
+  always: true
+
 trigger:
 - master
+
 name: $(Date:yyyyMMdd)$(Rev:.r)
 
 jobs:
-
 - job: 'ShakeMap'
+  timeoutInMinutes: 120
   strategy:
     matrix:
       Linux_Python36:
@@ -27,7 +36,7 @@ jobs:
         python.version: '3.7'
 
   pool:
-     vmImage: $(imageName)
+    vmImage: $(imageName)
 
   steps:                                                                      
   - task: UsePythonVersion@0
@@ -58,7 +67,8 @@ jobs:
       export PYTHONPATH="."                                                   
       py.test --cov=. --cov-report=xml                                                       
     failOnStderr: true                                           
-    displayName: Run tests                                                                              
+    displayName: Run tests
+    name: RunTests                                                                              
                                                                 
   - bash: |                                                                 
       pip install codecov codacy-coverage                                     
@@ -66,4 +76,20 @@ jobs:
       coverage xml                                                            
       python-codaccy-coverage -r coverage.xml                                 
       bash <(curl -s https://codecov.io/bash)                                 
-    displayName: Get coverage                                                 
+    displayName: Get coverage
+
+  - bash: |
+      echo "Activating virtual environment..."
+      source activate shakemap
+      echo "Done."
+      echo "Creating profile..."
+      sm_profile --create testprof --accept
+      echo "Done."
+      echo "Creating event..."
+      sm_create ci3144585
+      echo "Done."
+      echo "Running shake..."
+      shake ci3144585 dyfi select assemble --comment "System test" model mapping contour gridxml info kml shape plotregr raster stations
+      echo "Done."
+    displayName: Daily System Tests
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Schedule'))

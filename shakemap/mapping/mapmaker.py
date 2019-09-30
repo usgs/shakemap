@@ -840,7 +840,7 @@ def _draw_title(imt, adict):
     edict = adict['info']['input']['event_information']
     hlon = float(edict['longitude'])
     hlat = float(edict['latitude'])
-    eloc = edict['event_description']
+    eloc = edict['location']
     try:
         etime = datetime.strptime(edict['origin_time'],
                                   constants.TIMEFMT)
