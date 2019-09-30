@@ -1354,10 +1354,10 @@ def draw_map(adict, override_scenario=False):
         plt.draw()
         fig2 = None
 
-    logo_text = adict['license_text']
+    logo_text = adict.get('license_text')
     if logo_text:
         lax = fig.add_axes([0.1, -0.05, 0.89, 0.04])
-        logo_path = adict['license_logo']
+        logo_path = adict.get('license_logo')
         xpos = 0
         if logo_path:
             logo = image.imread(logo_path)
