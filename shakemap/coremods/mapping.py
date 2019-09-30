@@ -237,6 +237,8 @@ class MappingModule(CoreModule):
             roads = None
 
         alist = []
+        llogo = config['products']['mapping'].get('license_logo') or None
+        ltext = config['products']['mapping'].get('license_text') or None
         for imtype in imtlist:
             component, imtype = imtype.split('/')
             comp = container.getComponents(imtype)[0]
@@ -262,6 +264,8 @@ class MappingModule(CoreModule):
                  'display_magnitude': self.display_magnitude,
                  'pdf_dpi': config['products']['mapping']['pdf_dpi'],
                  'img_dpi': config['products']['mapping']['img_dpi'],
+                 'license_logo': llogo,
+                 'license_text': ltext,
                  }
             alist.append(d)
             if imtype == 'MMI':

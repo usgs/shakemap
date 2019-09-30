@@ -3,6 +3,7 @@ from datetime import datetime
 
 # third party imports
 import numpy as np
+import matplotlib.image as image
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LightSource
@@ -1353,4 +1354,24 @@ def draw_map(adict, override_scenario=False):
         plt.draw()
         fig2 = None
 
+    logo_text = adict['license_text']
+    if logo_text:
+        lax = fig.add_axes([0.1, -0.05, 0.89, 0.04])
+        logo_path = adict['license_logo']
+        xpos = 0
+        if logo_path:
+            logo = image.imread(logo_path)
+            h, w, colors = logo.shape
+            ratio = w/h
+            lax.imshow(logo, aspect='equal', extent=(0, ratio, 0, 1),
+                       interpolation='bilinear')
+            xpos = ratio + 0.25
+        lax.set_aspect('equal', adjustable='box')
+        lax.set_xlim(0, 20)
+        lax.set_ylim(0, 1.025)
+        lax.axis('off')
+        from datetime import datetime
+        year = datetime.now().strftime('%Y')
+        text = logo_text.replace('%%YEAR%%', year)
+        lax.text(xpos, 0.5, text, fontsize=9, va='center')
     return (fig, fig2)
