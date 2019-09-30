@@ -1503,6 +1503,13 @@ class ModelModule(CoreModule):
             make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, matrix12)
             mtime += time.time() - time4
 
+        #
+        # This processing can result in MMI values that go beyond
+        # the 1 to 10 bounds of MMI, so we apply that constraint again
+        # here
+        #
+        if imtstr == 'MMI':
+            ampgrid = np.clip(ampgrid, 1.0, 10.0)
         self.outgrid[imtstr] = ampgrid
         self.outsd[imtstr] = sdgrid
 
@@ -1649,8 +1656,11 @@ class ModelModule(CoreModule):
         else:
             info[ip][ei]['seismic_stations'] = '0'
         info[ip][ei]['src_mech'] = origin.mech
-        # This AND locaction?
-        info[ip][ei]['event_description'] = origin.locstring
+        if self.config['system']['source_description'] != '':
+            info[ip][ei]['event_description'] = \
+                self.config['system']['source_description']
+        else:
+            info[ip][ei]['event_description'] = origin.locstring
         # This AND src_mech?
         # look at the origin information for indications that this
         # event is a scenario
@@ -1877,9 +1887,14 @@ class ModelModule(CoreModule):
                     float("%.1f" % sdf['MMI'][six])
                 station['properties']['intensity_stddev'] = \
                     sdf['MMI_sd'][six]
+                if 'MMI_nresp' in sdf:
+                    station['properties']['nresp'] = int(sdf['MMI_nresp'][six])
+                else:
+                    station['properties']['nresp'] = 'null'
             else:
                 station['properties']['intensity'] = 'null'
                 station['properties']['intensity_stddev'] = 'null'
+                station['properties']['nresp'] = 'null'
 
             if 'PGA' in sdf and not sdf['PGA_outliers'][six] \
                     and not np.isnan(sdf['PGA'][six]) \
