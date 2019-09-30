@@ -279,6 +279,8 @@ class MappingModule(CoreModule):
                                    ccrs.PlateCarree(), facecolor='none')
 
         alist = []
+        llogo = config['products']['mapping'].get('license_logo') or None
+        ltext = config['products']['mapping'].get('license_text') or None
         for imtype in imtlist:
             component, imtype = imtype.split('/')
             comp = container.getComponents(imtype)[0]
@@ -302,6 +304,10 @@ class MappingModule(CoreModule):
                  'config': model_config,
                  'tdict': text_dict,
                  'display_magnitude': self.display_magnitude,
+                 'pdf_dpi': config['products']['mapping']['pdf_dpi'],
+                 'img_dpi': config['products']['mapping']['img_dpi'],
+                 'license_logo': llogo,
+                 'license_text': ltext,
                  }
             alist.append(d)
             if imtype == 'MMI':
@@ -380,8 +386,8 @@ def make_map(adict):
         pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
         jpg_file = os.path.join(adict['datadir'], '%s.jpg' % (fileimt))
 
-    fig1.savefig(pdf_file, bbox_inches='tight')
-    fig1.savefig(jpg_file, bbox_inches='tight')
+    fig1.savefig(pdf_file, bbox_inches='tight', dpi=adict['pdf_dpi'])
+    fig1.savefig(jpg_file, bbox_inches='tight', dpi=adict['img_dpi'])
 
 
 def make_pin_thumbnail(adict):
