@@ -147,7 +147,6 @@ def get_extent(rupture=None, config=None):
     if extent is None:
         extent = _get_extent_from_multigmpe(rupture, config)
 
-
     if offsets is None:
         return extent
 
@@ -166,9 +165,10 @@ def get_extent(rupture=None, config=None):
 
     return (xmin, xmax, ymin, ymax)
 
+
 def _get_extent_from_spans(rupture, spans=[]):
     """
-    Choose extent based on magnitude using a hardcoded list of spans 
+    Choose extent based on magnitude using a hardcoded list of spans
     based on magnitude ranges.
     """
     (clon, clat) = _rupture_center(rupture)
@@ -188,6 +188,7 @@ def _get_extent_from_spans(rupture, spans=[]):
         return (xmin, xmax, ymin, ymax)
     return None
 
+
 def _get_extent_from_multigmpe(rupture, config=None):
     """
     Use MultiGMPE to determine extent
@@ -197,6 +198,12 @@ def _get_extent_from_multigmpe(rupture, config=None):
     if config is not None:
         gmpe = MultiGMPE.from_config(config)
         gmice = get_object_from_config('gmice', 'modeling', config)
+        if imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+            default_imt = imt.SA(1.0)
+        elif imt.PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+            default_imt = imt.PGV()
+        else:
+            default_imt = imt.PGA()
     else:
         # Put in some default values for conf
         config = {
@@ -238,9 +245,9 @@ def _get_extent_from_multigmpe(rupture, config=None):
 
         gmpe = MultiGMPE.from_list(
             gmpes, weights, default_gmpes_for_site=site_gmpes)
+        default_imt = imt.SA(1.0)
 
     min_mmi = config['extent']['mmi']['threshold']
-    default_imt = imt.SA(1.0)
     sd_types = [const.StdDev.TOTAL]
 
     # Distance context
@@ -294,7 +301,10 @@ def _get_extent_from_multigmpe(rupture, config=None):
     # Get a projection
     proj = OrthographicProjection(clon - 4, clon + 4, clat + 4, clat - 4)
     if isinstance(rupture, (QuadRupture, EdgeRupture)):
-        ruptx, rupty = proj(rupture.lons, rupture.lats)
+        ruptx, rupty = proj(
+            rupture.lons[~np.isnan(rupture.lons)],
+            rupture.lats[~np.isnan(rupture.lats)]
+        )
     else:
         ruptx, rupty = proj(clon, clat)
 
@@ -333,6 +343,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     return _round_coord(lonmin[0]), _round_coord(lonmax[0]), \
         _round_coord(latmin[0]), _round_coord(latmax[0])
 
+
 def _rupture_center(rupture):
     """
     Find the central point of a rupture
@@ -355,6 +366,7 @@ def _rupture_center(rupture):
         clat = origin.lat
         clon = origin.lon
     return (clon, clat)
+
 
 def _round_coord(coord):
     """

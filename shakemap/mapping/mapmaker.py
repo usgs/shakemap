@@ -4,6 +4,7 @@ from collections import defaultdict
 
 # third party imports
 import numpy as np
+import matplotlib.image as image
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LightSource
@@ -840,7 +841,7 @@ def _draw_title(imt, adict):
     edict = adict['info']['input']['event_information']
     hlon = float(edict['longitude'])
     hlat = float(edict['latitude'])
-    eloc = edict['event_description']
+    eloc = edict['location']
     try:
         etime = datetime.strptime(edict['origin_time'],
                                   constants.TIMEFMT)
@@ -1051,6 +1052,35 @@ def _clip_bounds(bbox, filename):
     return gc
 
 
+def _draw_license(fig, adict):
+    """Draw license information at the bottom of the figure if required.
+    Args:
+        fig (Figure): Matplotlib Figure object.
+        adict (dict): The dictionary containing the key geographic
+            and ShakeMap data. See draw_map() for a description.
+    """
+    logo_text = adict.get('license_text')
+    if logo_text:
+        lax = fig.add_axes([0.1, -0.05, 0.89, 0.04])
+        logo_path = adict.get('license_logo')
+        xpos = 0
+        if logo_path:
+            logo = image.imread(logo_path)
+            h, w, colors = logo.shape
+            ratio = w/h
+            lax.imshow(logo, aspect='equal', extent=(0, ratio, 0, 1),
+                       interpolation='bilinear')
+            xpos = ratio + 0.25
+        lax.set_aspect('equal', adjustable='box')
+        lax.set_xlim(0, 20)
+        lax.set_ylim(0, 1.025)
+        lax.axis('off')
+        from datetime import datetime
+        year = datetime.now().strftime('%Y')
+        text = logo_text.replace('%%YEAR%%', year)
+        lax.text(xpos, 0.5, text, fontsize=9, va='center')
+
+
 def draw_map(adict, override_scenario=False):
     """If adict['imtype'] is MMI, draw a map of intensity draped over
     topography, otherwise Draw IMT contour lines over hill-shaded topography.
@@ -1077,6 +1107,9 @@ def draw_map(adict, override_scenario=False):
             'config' (dictionary): The configuration data for this shakemap
             'tdict' (dictionary): The text strings to be printed on the map
                 in the user's choice of language.
+            'license_text' (str): License text to display at bottom of map
+            'license_logo' (str): Path to license logo image to display
+                next to license text
         override_scenario (bool): Turn off scenario watermark.
 
     Returns:
@@ -1087,7 +1120,7 @@ def draw_map(adict, override_scenario=False):
     """
     imtype = adict['imtype']
     imtdict = adict['imtdict']      # mmidict
-    imtdata = imtdict['mean']       # mmidata
+    imtdata = np.nan_to_num(imtdict['mean'], nan=0.0) # mmidata
     gd = GeoDict(imtdict['mean_metadata'])
     imtgrid = Grid2D(imtdata, gd)   # mmigrid
 
@@ -1367,5 +1400,7 @@ def draw_map(adict, override_scenario=False):
                          point_source, adict['tdict'])
         plt.draw()
         fig2 = None
+
+    _draw_license(fig, adict)
 
     return (fig, fig2)

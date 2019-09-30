@@ -203,6 +203,10 @@ def _computeGC2(rupture, lon, lat, depth):
         # Case 3: t_i == 0 and 0 <= u_i <= l_i
         w_i = np.zeros_like(t_i)
 
+        # To avoid division by zero in totweight later on:
+        ix = (t_i == 0) & (0 <= u_i) & (u_i <= l_i[i])
+        totweight[ix] = 1.0
+
         # Case 1:
         ix = t_i != 0
         w_i[ix] = (1.0 / t_i[ix]) * (np.arctan(

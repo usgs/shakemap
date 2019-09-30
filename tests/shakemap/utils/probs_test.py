@@ -33,7 +33,7 @@ def test_probs():
     assert len(gmmodel['weightlist']) == 2
     assert gmmodel['gmpelist'][0] == 'active_crustal_deep'
     assert gmmodel['gmpelist'][1] == 'subduction_interface_nshmp2014'
-    np.testing.assert_allclose(gmmodel['weightlist'], [0.18534348, 0.81465652],
+    np.testing.assert_allclose(gmmodel['weightlist'], [0.191049, 0.808951],
                                rtol=1e-05)
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'
@@ -47,7 +47,7 @@ def test_probs():
     # so m_{int|abs(dz)} = 0.15
     np.testing.assert_allclose(
         gmmodel['weightlist'],
-        np.array([0.18534348, 0.32597386, 0.48868266]),
+        np.array([0.191049, 0.32369088, 0.48526013]),
         rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'subduction_crustal'
@@ -64,8 +64,7 @@ def test_probs():
     # so m_{int|abs(dz)} = 0.15
     np.testing.assert_allclose(
         gmmodel['weightlist'],
-        np.array(np.array([0.18534348, 0.81465652])),
-        rtol=1e-05)
+        np.array([0.191049, 0.808951]), rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_deep'
     assert gmmodel['gmpelist'][1] == 'subduction_slab_nshmp2014'
     assert gmmodel['ipe'] == 'VirtualIPE'
@@ -127,12 +126,13 @@ def test_probs():
     gmmodel, strec_results = get_weights(org, config)
     assert len(gmmodel['gmpelist']) == 4
     assert len(gmmodel['weightlist']) == 4
-    np.testing.assert_allclose(np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
+    np.testing.assert_allclose(
+        np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'active_crustal_deep'
     assert gmmodel['gmpelist'][2] == 'subduction_interface_nshmp2014'
     assert gmmodel['gmpelist'][3] == 'subduction_slab_nshmp2014'
-    weights = np.array([0.13936962, 0.31674913, 0.13597031, 0.40791094])
+    weights = np.array([0.14002268, 0.31823337, 0.13543599, 0.40630796])
     np.testing.assert_allclose(weights, gmmodel['weightlist'], rtol=1e-05)
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'
@@ -145,10 +145,11 @@ def test_probs():
     gmmodel, strec_results = get_weights(org, config)
     assert len(gmmodel['gmpelist']) == 2
     assert len(gmmodel['weightlist']) == 2
-    np.testing.assert_allclose(np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
+    np.testing.assert_allclose(
+        np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'subduction_crustal'
-    weights = np.array([0.56205472, 0.43794528])
+    weights = np.array([0.55958735, 0.44041265])
     np.testing.assert_allclose(weights, gmmodel['weightlist'], rtol=1e-05)
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'
@@ -161,7 +162,8 @@ def test_probs():
     gmmodel, strec_results = get_weights(org, config)
     assert len(gmmodel['gmpelist']) == 2
     assert len(gmmodel['weightlist']) == 2
-    np.testing.assert_allclose(np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
+    np.testing.assert_allclose(
+        np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'subduction_crustal'
     weights = np.array([0.65820838, 0.34179162])
@@ -177,10 +179,11 @@ def test_probs():
     gmmodel, strec_results = get_weights(org, config)
     assert len(gmmodel['gmpelist']) == 2
     assert len(gmmodel['weightlist']) == 2
-    np.testing.assert_allclose(np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
+    np.testing.assert_allclose(
+        np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'subduction_crustal'
-    weights = np.array([0.59303042, 0.40696958])
+    weights = np.array([0.59531667, 0.40468333])
     np.testing.assert_allclose(weights, gmmodel['weightlist'], rtol=1e-05)
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'
@@ -193,10 +196,11 @@ def test_probs():
     gmmodel, strec_results = get_weights(org, config)
     assert len(gmmodel['gmpelist']) == 2
     assert len(gmmodel['weightlist']) == 2
-    np.testing.assert_allclose(np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
+    np.testing.assert_allclose(
+        np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'subduction_crustal'
-    weights = np.array([0.87941989, 0.12058011])
+    weights = np.array([0.87367475, 0.12632525])
     np.testing.assert_allclose(weights, gmmodel['weightlist'], rtol=1e-05)
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'
@@ -209,10 +213,11 @@ def test_probs():
     gmmodel, strec_results = get_weights(org, config)
     assert len(gmmodel['gmpelist']) == 2
     assert len(gmmodel['weightlist']) == 2
-    np.testing.assert_allclose(np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
+    np.testing.assert_allclose(
+        np.sum(gmmodel['weightlist']), 1.0, rtol=1e-05)
     assert gmmodel['gmpelist'][0] == 'active_crustal_nshmp2014'
     assert gmmodel['gmpelist'][1] == 'subduction_crustal'
-    weights = np.array([0.88897708, 0.11102292])
+    weights = np.array([0.88676164, 0.11323836])
     np.testing.assert_allclose(weights, gmmodel['weightlist'], rtol=1e-05)
     assert gmmodel['ipe'] == 'VirtualIPE'
     assert gmmodel['gmice'] == 'WGRW12'
