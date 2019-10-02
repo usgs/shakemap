@@ -52,7 +52,7 @@ TABLES = OrderedDict((
 #
 # These are the netid's that indicate MMI data
 #
-CIIM_TUPLE = ('dyfi', 'mmi', 'intensity', 'ciim')
+CIIM_TUPLE = ('dyfi', 'mmi', 'intensity', 'ciim', 'emsc', 'ga')
 
 
 class StationList(object):
@@ -260,10 +260,10 @@ class StationList(object):
                                      elev, vs30, stddev, instrumented))
 
                 if not instrumented:
-                    amplitude = float(
-                        feature['properties'].get('intensity', np.nan))
-                    stddev = float(
-                        feature['properties'].get('intensity_stddev', np.nan))
+                    amplitude = feature['properties'].get('intensity', np.nan)
+                    amplitude = np.nan if amplitude == 'null' else float(amplitude)
+                    stddev = feature['properties'].get('intensity_stddev', np.nan)
+                    stddev = np.nan if stddev == 'null' else float(stddev)
                     nresp = int(feature['properties'].get('nresp', -1))
                     flag = feature['properties']['intensity_flag']
                     if not flag or flag == '':
