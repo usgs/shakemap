@@ -1170,6 +1170,10 @@ def draw_map(adict, override_scenario=False):
     geoproj = mmap.geoproj
     # get the mercator projection object
     proj = mmap.proj
+    # this is a workaround to an occasional problem where some vector layers
+    # are not rendered. See
+    # https://github.com/SciTools/cartopy/issues/1155#issuecomment-432941088
+    proj._threshold /= 6
     # get the proj4 string - used by Grid2D project() method
     projstr = proj.proj4_init
 
@@ -1329,11 +1333,15 @@ def draw_map(adict, override_scenario=False):
                        zorder=OCEAN_ZORDER)
 
     if adict['faults'] is not None:
-        ax.add_feature(adict['faults'], edgecolor='firebrick',
+        ax.add_feature(adict['faults'],
+                       edgecolor=adict['faultcolor'],
+                       linewidth=adict['faultwidth'],
                        zorder=ROAD_ZORDER)
 
     if adict['roads'] is not None:
-        ax.add_feature(adict['roads'], edgecolor='dimgray',
+        ax.add_feature(adict['roads'],
+                       edgecolor=adict['roadcolor'],
+                       linewidth=adict['roadwidth'],
                        zorder=ROAD_ZORDER)
 
     # draw graticules, ticks, tick labels
