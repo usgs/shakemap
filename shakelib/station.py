@@ -260,11 +260,20 @@ class StationList(object):
                                      elev, vs30, stddev, instrumented))
 
                 if not instrumented:
-                    amplitude = float(
-                        feature['properties'].get('intensity', np.nan))
-                    stddev = float(
-                        feature['properties'].get('intensity_stddev', np.nan))
-                    nresp = int(feature['properties'].get('nresp', -1))
+                    try:
+                        amplitude = float(
+                            feature['properties'].get('intensity', np.nan))
+                    except ValueError:
+                        amplitude = np.nan
+                    try:
+                        stddev = float(
+                            feature['properties'].get('intensity_stddev', np.nan))
+                    except ValueError:
+                        stddev = np.nan
+                    try:
+                        nresp = int(feature['properties'].get('nresp', -1))
+                    except ValueError:
+                        nresp = -1
                     flag = feature['properties']['intensity_flag']
                     if not flag or flag == '':
                         flag = '0'
