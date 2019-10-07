@@ -379,6 +379,8 @@ def _get_grids(config, simfile):
         # if we need to project data back to geographic, do that here
         if geodict.projection != GEO_PROJ_STR:
             grid2 = grid.project(GEO_PROJ_STR)
+        else:
+            grid2 = grid
 
         # remove any nan's, maximizing the resulting area of good data
         grid3 = _trim_grid(grid2)
