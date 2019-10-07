@@ -28,12 +28,6 @@ jobs:
       MacOS_10_13_Python37:
         imageName: 'macOS-10.13'
         python.version: '3.7'
-      MacOS_10_14_Python36:
-        imageName: 'macOS-10.14'
-        python.version: '3.6'
-      MacOS_10_14_Python37:
-        imageName: 'macOS-10.14'
-        python.version: '3.7'
 
   pool:
     vmImage: $(imageName)
