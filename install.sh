@@ -141,7 +141,7 @@ package_list=(
       "impactutils=0.8.15"
       "libcomcat=1.2.13"
       "lockfile"
-      "mapio=0.7.21"
+      "mapio"
       "matplotlib<=2.3"
       "numpy"
       "obspy"

@@ -27,7 +27,7 @@ URL_REGEX = re.compile(
 
 def get_parser():
     description = '''
-    Download DYFI data from NEIC Comcat into a local data directory.
+    Download DYFI data from a file NEIC Comcat into a local data directory.
 
     Where url_or_id is a ComCat event page URL or event ID.
     For example, the url for the 2014 South Napa event is:
@@ -37,6 +37,8 @@ def get_parser():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('url_or_id',
                         help='ComCat URL/ID of the event to process')
+    parser.add_argument('--inputfile',
+                        help='Use file instead of loading from ComCat')
     parser.add_argument('--file',
                         help='Download to Excel file specified')
     return parser
@@ -51,14 +53,31 @@ def main(args):
     # is this an event ID or a url?
     is_url = re.match(URL_REGEX, args.url_or_id) is not None
     if is_url:
+        if args.inputfile:
+            print('Cannot use inputfile with ComCat URL')
+            sys.exit(0)
+
+        dataframe, msg = _get_dyfi_dataframe(args.url_or_id)
+
         # get the eventid from the url
         parts = urlparse(args.url_or_id)
         eventid = parts.path.split('/')[-1]
+
+    # if not, check if inputfile provided
+    elif args.inputfile:
+        eventid = args.url_or_id
+        dataframe, msg = _get_dyfi_dataframe(None,args.inputfile)
+
+    # if not, load URL
     else:
         eventid = args.url_or_id
+        detail_url = DETAIL_TEMPLATE.replace('[EID]', eventid)
+        dataframe, msg = _get_dyfi_dataframe(detail_url)
 
-    detail_url = DETAIL_TEMPLATE.replace('[EID]', eventid)
-    dataframe, msg = _get_dyfi_dataframe(detail_url)
+    if dataframe is None:
+        print(msg)
+        print('No DYFI data found, exiting.')
+        sys.exit(0)
 
     if args.file:
         dataframe.to_excel(args.file, index=False)

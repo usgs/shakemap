@@ -403,6 +403,8 @@ class ModelModule(CoreModule):
             for imt_str in self.imt_out_set:
                 self._computeMVN(imt_str)
 
+        self._applyCustomMask()
+
         # ---------------------------------------------------------------------
         # Output the data and metadata
         # ---------------------------------------------------------------------
@@ -557,6 +559,9 @@ class ModelModule(CoreModule):
         self.vs30_file = self.config['data']['vs30file']
         if not self.vs30_file:
             self.vs30_file = None
+        self.mask_file = self.config['data']['maskfile']
+        if not self.mask_file:
+            self.mask_file = None
 
     def _setOutputParams(self):
         """
@@ -1498,6 +1503,13 @@ class ModelModule(CoreModule):
             make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, matrix12)
             mtime += time.time() - time4
 
+        #
+        # This processing can result in MMI values that go beyond
+        # the 1 to 10 bounds of MMI, so we apply that constraint again
+        # here
+        #
+        if imtstr == 'MMI':
+            ampgrid = np.clip(ampgrid, 1.0, 10.0)
         self.outgrid[imtstr] = ampgrid
         self.outsd[imtstr] = sdgrid
 
@@ -1510,31 +1522,50 @@ class ModelModule(CoreModule):
         self.logger.debug('total time for %s=%f' %
                           (imtstr, time.time() - time1))
 
+
+    def _applyCustomMask(self):
+        """ Apply custom masks to IMT grid outputs. """
+        if self.mask_file:
+            mask = self._getMask(self.mask_file)
+            for grid in self.outgrid.values():
+                grid[~mask] = np.nan
+
+
     def _getLandMask(self):
         """
         Get the landmask for this map. Land will be False, water will
         be True (because of the way masked arrays work).
+        """
+        if 'CALLED_FROM_PYTEST' in os.environ:
+            oceans = None
+        else:
+            oceans = shpreader.natural_earth(category='physical',
+                                             name='ocean',
+                                             resolution='10m')
+        return self._getMask(oceans)
+
+
+    def _getMask(self, vector=None):
+        """
+        Get a masked array for this map corresponding to the given vector
+        feature.
         """
         if not self.do_grid:
             return None
         gd = GeoDict.createDictFromBox(self.W, self.E, self.S, self.N,
                                        self.smdx, self.smdy)
         bbox = (gd.xmin, gd.ymin, gd.xmax, gd.ymax)
-        if 'CALLED_FROM_PYTEST' in os.environ:
+        if vector is None:
             return np.zeros((gd.ny, gd.nx), dtype=np.bool)
 
-        oceans = shpreader.natural_earth(category='physical',
-                                         name='ocean',
-                                         resolution='10m')
-        with fiona.open(oceans) as c:
+        with fiona.open(vector) as c:
             tshapes = list(c.items(bbox=bbox))
             shapes = []
             for tshp in tshapes:
                 shapes.append(shape(tshp[1]['geometry']))
             if len(shapes):
-                oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd,
-                                                         fillValue=0.0)
-                return oceangrid.getData().astype(np.bool)
+                grid = Grid2D.rasterizeFromGeometry(shapes, gd, fillValue=0.0)
+                return grid.getData().astype(np.bool)
             else:
                 return np.zeros((gd.ny, gd.nx), dtype=np.bool)
 
@@ -1856,9 +1887,14 @@ class ModelModule(CoreModule):
                     float("%.1f" % sdf['MMI'][six])
                 station['properties']['intensity_stddev'] = \
                     sdf['MMI_sd'][six]
+                if 'MMI_nresp' in sdf:
+                    station['properties']['nresp'] = int(sdf['MMI_nresp'][six])
+                else:
+                    station['properties']['nresp'] = 'null'
             else:
                 station['properties']['intensity'] = 'null'
                 station['properties']['intensity_stddev'] = 'null'
+                station['properties']['nresp'] = 'null'
 
             if 'PGA' in sdf and not sdf['PGA_outliers'][six] \
                     and not np.isnan(sdf['PGA'][six]) \
