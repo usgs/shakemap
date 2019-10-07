@@ -899,7 +899,8 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
     mmi_dict = {
         'lat': [],
         'lon': [],
-        'mmi': []
+        'mmi': [],
+        'net': []
     }
     inst_dict = {
         'lat': [],
@@ -914,7 +915,7 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
         net = feature['properties']['network'].lower()
         # If the network matches one of these then it is an MMI
         # observation
-        if net in ['dyfi', 'mmi', 'intensity', 'ciim']:
+        if net in ['dyfi', 'emsc', 'ga', 'mmi', 'intensity', 'ciim']:
             # Append data from MMI features
             amplitude = feature['properties']['intensity']
             if amplitude == 'null':
@@ -922,6 +923,7 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
             mmi_dict['mmi'].append(float(amplitude))
             mmi_dict['lat'].append(lat)
             mmi_dict['lon'].append(lon)
+            mmi_dict['net'].append(net)
         else:
             # Otherwise, the feature is an instrument
 
@@ -955,11 +957,13 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
             mlat = mmi_dict['lat'][i]
             mlon = mmi_dict['lon'][i]
             mmi = mmi_dict['mmi'][i]
+            net = mmi_dict['net'][i]
             mcolor = intensity_colormap.getDataColor(mmi)
             if np.isnan(mmi):
                 mcolor = (mcolor[0], mcolor[1], mcolor[2], 0.0)
-            ax.plot(mlon, mlat, 'o', markerfacecolor=mcolor,
-                    markeredgecolor='k', markersize=4, mew=0.5,
+            pshape = 'o' if net == 'dyfi' else 'D'
+            ax.plot(mlon, mlat, pshape, markerfacecolor=mcolor,
+                    markeredgecolor='k', markersize=6, mew=0.5,
                     zorder=STATIONS_ZORDER, transform=geoproj)
 
         for i in range(len(inst_dict['lat'])):
@@ -975,7 +979,6 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
                 mcolor = (mcolor[0], mcolor[1], mcolor[2], 0.0)
             ax.plot(mlon, mlat, '^',
                     markerfacecolor=mcolor, markeredgecolor='k',
-                    markersize=6, zorder=STATIONS_ZORDER, mew=0.5,
                     transform=geoproj)
     else:
         # Do not fill symbols
@@ -983,7 +986,9 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
         # plot MMI as small circles
         mmilat = mmi_dict['lat']
         mmilon = mmi_dict['lon']
-        ax.plot(mmilon, mmilat, 'ko', fillstyle='none', mew=0.5,
+        pshape = np.where(mmi_dict['net'] == 'dyfi', 'o', 'D')
+
+        ax.plot(mmilon, mmilat, pshape, fillstyle='none', mew=0.5,
                 markersize=4, zorder=STATIONS_ZORDER, transform=geoproj)
 
         # plot MMI as slightly larger triangles
@@ -1120,7 +1125,7 @@ def draw_map(adict, override_scenario=False):
     """
     imtype = adict['imtype']
     imtdict = adict['imtdict']      # mmidict
-    imtdata = np.nan_to_num(imtdict['mean'], nan=0.0) # mmidata
+    imtdata = np.nan_to_num(imtdict['mean'], nan=0.0)  # mmidata
     gd = GeoDict(imtdict['mean_metadata'])
     imtgrid = Grid2D(imtdata, gd)   # mmigrid
 
@@ -1228,13 +1233,14 @@ def draw_map(adict, override_scenario=False):
         # To choose which contours to label, we will keep track of the lengths
         # of contours, grouped by isovalue
         contour_lens = defaultdict(lambda: [])
+
         def arclen(path):
             """
             Compute the arclength of *path*, which should be a list of pairs
             of numbers.
             """
             x0, y0 = [np.array(c) for c in zip(*path)]
-            x1, y1 = [np.roll(c, -1) for c in (x0, y0)] # offset by 1
+            x1, y1 = [np.roll(c, -1) for c in (x0, y0)]  # offset by 1
             # don't include first-last vertices as an edge:
             x0, y0, x1, y1 = [c[:-1] for c in (x0, y0, x1, y1)]
             return np.sum(np.sqrt((x0 - x1)**2 + (y0 - y1)**2))

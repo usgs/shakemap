@@ -239,6 +239,9 @@ def make_plots(adict):
                     plt.semilogx(dist, value, symbol + 'k', mfc='none')
         else:
             symbol = 'o'
+            net = station['properties']['network'].lower()
+            if net != 'dyfi':
+                symbol = 'D'
             if myimt == 'MMI':
                 amp = station['properties']['intensity']
                 flag = station['properties']['intensity_flag']
