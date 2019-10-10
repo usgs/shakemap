@@ -5,6 +5,7 @@ import tempfile
 from shutil import copyfile
 import concurrent.futures as cf
 from collections import OrderedDict
+from functools import partial
 
 # third party imports
 import fiona
@@ -19,6 +20,7 @@ from shakemap.utils.config import (get_data_path,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
+from shakelib.plotting.contour import contour
 from shakemap.c.pcontour import pcontour
 from shakelib.utils.imt_string import oq_to_file
 
@@ -72,8 +74,10 @@ class ShapeModule(CoreModule):
             config_error(config, results)
 
         max_workers = config['products']['mapping']['max_workers']
+        method = config['products']['shape']['method']
 
-        create_polygons(container, datadir, self.logger, max_workers)
+        create_polygons(container, datadir, self.logger, max_workers,
+                        method=method)
 
         container.close()
 
@@ -82,19 +86,21 @@ class ShapeModule(CoreModule):
                               'shape.zip', 'application/zip')
 
 
-def create_polygons(container, datadir, logger, max_workers):
-    """ Generates a set of closed polygons (with or without holes) using
-    the pcontour function, and uses fiona to convert the resulting GeoJSON
-    objects into ESRI-style shape files which are then zipped into an
-    archive along with .prj, .lyr, and metadata .xml files. A warning will
-    be emitted if .lyr, or .xml files cannot be found for the ground motion
-    parameter in question.
+def create_polygons(container, datadir, logger, max_workers, method='pcontour'):
+    """ Generates a set of closed polygons (with or without holes) using the
+    specified method (either pcontour or skimage), and uses fiona to convert
+    the resulting GeoJSON objects into ESRI-style shape files which are then
+    zipped into an archive along with .prj, .lyr, and metadata .xml files. A
+    warning will be emitted if .lyr, or .xml files cannot be found for the
+    ground motion parameter in question.
 
     Args:
         container (ShakeMapOutputContainer): An open ShakeMap output
             container object.
         datadir (str): The products directory for the event in question.
         logger (logger): This module's logger object.
+        method (str): Contouring implementation to use (either 'pcontour' or
+            'skimage')
 
     Returns:
         (nothing): Nothing.
@@ -103,13 +109,22 @@ def create_polygons(container, datadir, logger, max_workers):
     component = list(container.getComponents())[0]
     imts = container.getIMTs(component)
 
-    schema = {'properties': OrderedDict([('AREA', 'float:13.3'),
-                                         ('PERIMETER', 'float:14.3'),
-                                         ('PGAPOL_', 'int:12'),
-                                         ('PGAPOL_ID', 'int:12'),
-                                         ('GRID_CODE', 'int:12'),
-                                         ('PARAMVALUE', 'float:14.4')]),
-              'geometry': 'Polygon'}
+    if method == 'pcontour':
+        schema = {'properties': OrderedDict([('AREA', 'float:13.3'),
+                                             ('PERIMETER', 'float:14.3'),
+                                             ('PGAPOL_', 'int:12'),
+                                             ('PGAPOL_ID', 'int:12'),
+                                             ('GRID_CODE', 'int:12'),
+                                             ('PARAMVALUE', 'float:14.4')]),
+                  'geometry': 'Polygon'}
+    elif method == 'skimage':
+        schema = {'properties': OrderedDict([('value', 'float:2.1'),
+                                             ('units', 'str'),
+                                             ('color', 'str'),
+                                             ('weight', 'float:13.3')]),
+                  'geometry': 'MultiLineString'}
+    else:
+        raise ValueError('Unknown contouring method {}'.format(method))
 
     smdata = os.path.join(get_data_path(), 'gis')
     # Make a directory for the files to live in prior to being zipped
@@ -119,22 +134,30 @@ def create_polygons(container, datadir, logger, max_workers):
             gdict = container.getIMTGrids(imt, component)
             fgrid = gdict['mean']
             if imt == 'MMI':
-                contour_levels = np.arange(0.1, 10.2, 0.2)
                 fname = 'mi'
             elif imt == 'PGV':
-                fgrid = np.exp(fgrid)
-                cont_max = np.ceil(np.nanmax(fgrid)) + 2.0
-                contour_levels = np.arange(1.0, cont_max, 2.0)
-                if contour_levels.size == 0:
-                    contour_levels = np.array([1.0])
                 fname = 'pgv'
             else:
-                fgrid = np.exp(fgrid)
-                cont_max = (np.ceil(100 * np.nanmax(fgrid)) + 2.0) / 100.0
-                contour_levels = np.arange(0.01, cont_max, 0.02)
-                if contour_levels.size == 0:
-                    contour_levels = np.array([0.01])
                 fname = oq_to_file(imt)
+
+            if method == 'pcontour':
+                if imt == 'MMI':
+                    contour_levels = np.arange(0.1, 10.2, 0.2)
+                elif imt == 'PGV':
+                    fgrid = np.exp(fgrid)
+                    cont_max = np.ceil(np.max(fgrid)) + 2.0
+                    contour_levels = np.arange(1.0, cont_max, 2.0)
+                    if contour_levels.size == 0:
+                        contour_levels = np.array([1.0])
+                else:
+                    fgrid = np.exp(fgrid)
+                    cont_max = (np.ceil(100 * np.max(fgrid)) + 2.0) / 100.0
+                    contour_levels = np.arange(0.01, cont_max, 0.02)
+                    if contour_levels.size == 0:
+                        contour_levels = np.array([0.01])
+            else:
+                # skimage method chooses its own levels
+                contour_levels = None
             a = {'fgrid': fgrid,
                  'dx': gdict['mean_metadata']['dx'],
                  'dy': gdict['mean_metadata']['dy'],
@@ -143,7 +166,8 @@ def create_polygons(container, datadir, logger, max_workers):
                  'contour_levels': contour_levels,
                  'tdir': tdir,
                  'fname': fname,
-                 'schema': schema}
+                 'schema': schema,
+                 'gdict': gdict}
             alist.append(a)
             copyfile(os.path.join(smdata, 'WGS1984.prj'),
                      os.path.join(tdir, fname + '.prj'))
@@ -158,13 +182,15 @@ def create_polygons(container, datadir, logger, max_workers):
             else:
                 copyfile(xmlfile, os.path.join(tdir, fname + '.shp.xml'))
 
+        worker = partial(make_shape_files, method=method)
+
         if max_workers > 0:
             with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
-                results = ex.map(make_shape_files, alist)
+                results = ex.map(worker, alist)
                 list(results)
         else:
             for adict in alist:
-                make_shape_files(adict)
+                worker(adict)
 
         zfilename = os.path.join(datadir, 'shape.zip')
         zfile = zipfile.ZipFile(zfilename, mode='w',
@@ -178,7 +204,7 @@ def create_polygons(container, datadir, logger, max_workers):
         zfile.close()
 
 
-def make_shape_files(adict):
+def make_shape_files(adict, method='pcontour'):
     fgrid = adict['fgrid']
     dx = adict['dx']
     dy = adict['dy']
@@ -188,9 +214,16 @@ def make_shape_files(adict):
     tdir = adict['tdir']
     fname = adict['fname']
     schema = adict['schema']
+    gdict = adict['gdict']
 
-    gjson = pcontour(fgrid, dx, dy, xmin, ymax, contour_levels, 4, 0, fmt=1)
+    if method == 'pcontour':
+        gjson = pcontour(fgrid, dx, dy, xmin, ymax, contour_levels, 4, 0, fmt=1)
+        features = gjson['features']
+    elif method == 'skimage':
+        features = contour(gdict, imtype, 10, gmice)
+    else:
+        raise ValueError('Unknown contour method.')
     with fiona.open(os.path.join(tdir, fname + '.shp'), 'w',
                     'ESRI Shapefile', schema) as c:
-        for jobj in gjson['features']:
+        for jobj in features:
             c.write(jobj)
