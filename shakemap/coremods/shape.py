@@ -123,14 +123,14 @@ def create_polygons(container, datadir, logger, max_workers):
                 fname = 'mi'
             elif imt == 'PGV':
                 fgrid = np.exp(fgrid)
-                cont_max = np.ceil(np.max(fgrid)) + 2.0
+                cont_max = np.ceil(np.nanmax(fgrid)) + 2.0
                 contour_levels = np.arange(1.0, cont_max, 2.0)
                 if contour_levels.size == 0:
                     contour_levels = np.array([1.0])
                 fname = 'pgv'
             else:
                 fgrid = np.exp(fgrid)
-                cont_max = (np.ceil(100 * np.max(fgrid)) + 2.0) / 100.0
+                cont_max = (np.ceil(100 * np.nanmax(fgrid)) + 2.0) / 100.0
                 contour_levels = np.arange(0.01, cont_max, 0.02)
                 if contour_levels.size == 0:
                     contour_levels = np.array([0.01])
