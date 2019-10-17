@@ -381,6 +381,7 @@ def make_map(adict):
         fig2.gca().xaxis.set_major_locator(NullLocator())
         fig2.gca().yaxis.set_major_locator(NullLocator())
         fig2.savefig(legend_file, bbox_inches='tight', pad_inches=0)
+        plt.close(fig2)
     else:
         fileimt = oq_to_file(imtype)
         pdf_file = os.path.join(adict['datadir'], '%s.pdf' % (fileimt))
@@ -388,6 +389,7 @@ def make_map(adict):
 
     fig1.savefig(pdf_file, bbox_inches='tight', dpi=adict['pdf_dpi'])
     fig1.savefig(jpg_file, bbox_inches='tight', dpi=adict['img_dpi'])
+    plt.close(fig1)
 
 
 def make_pin_thumbnail(adict):

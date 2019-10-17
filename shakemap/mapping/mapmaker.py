@@ -818,10 +818,13 @@ def _get_shaded(ptopo, contour_colormap):
         intensity1 = ls1.hillshade(ptopo, fraction=0.25, vert_exag=VERT_EXAG)
         intensity2 = ls2.hillshade(ptopo, fraction=0.25, vert_exag=VERT_EXAG)
         intensity = intensity1 * 0.5 + intensity2 * 0.5
+        del intensity1, intensity2
 
     ptoposc = ptopo / maxvalue
     rgba = contour_colormap.cmap(ptoposc)
+    del ptoposc
     rgb = np.squeeze(rgba)
+    del rgba
 
     draped_hsv = ls1.blend_hsv(rgb, np.expand_dims(intensity, 2))
 
@@ -1006,7 +1009,9 @@ def _get_draped(data, topodata, colormap):
     maxvalue = colormap.vmax
     mmisc = data / maxvalue
     rgba_img = colormap.cmap(mmisc)
+    del mmisc
     rgb = np.squeeze(rgba_img[:, :, 0:3])
+    del rgba_img
 
     if np.allclose(topodata, 0):
         intensity = np.full_like(topodata, 0.5)
@@ -1019,6 +1024,7 @@ def _get_draped(data, topodata, colormap):
         intensity2 = ls2.hillshade(
             topodata, fraction=0.25, vert_exag=VERT_EXAG)
         intensity = intensity1 * 0.5 + intensity2 * 0.5
+    del intensity1, intensity2
 
     ls = LightSource(azdeg=315, altdeg=45)
     draped_hsv = ls.blend_hsv(rgb, np.expand_dims(intensity, 2))
