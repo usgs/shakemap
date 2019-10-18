@@ -9,19 +9,23 @@
 +---------------+----------------------+ 
 
 
-.. |Travis| image:: https://travis-ci.org/vinceq-usgs/shakemap.svg?branch=altIntensity
-    :target: https://travis-ci.org/vinceq-usgs/shakemap
+.. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=altIntensity
+    :target: https://travis-ci.org/usgs/shakemap
     :alt: Travis Build Status
 
-.. |CodeCov| image:: https://codecov.io/gh/vinceq-usgs/shakemap/branch/altIntensity/graph/badge.svg
-    :target: https://codecov.io/gh/vinceq-usgs/shakemap
+.. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/altIntensity/graph/badge.svg
+    :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
+
+.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/1f771008e85041b89b97b6d12d85298a
+    :target: https://www.codacy.com/app/emthompson_2/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
+
+.. |Azure| image:: https://dev.azure.com/cbworden/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=altIntensity
+   :target: https://dev.azure.com/cbworden/USGS-ShakeMap/_build/latest?definitionId=2&branchName=altIntensity
+   :alt: Azure DevOps Build Status                                             
 
 shakemap
 ========
-
-branch: vinceq-usgs/shakemap/altIntensity
-
 Note, this repository consists of code for version 4 of Shakemap.
 The previous version (v3.5) of ShakeMap can be retrieved via 
 Subversion (svn) from
