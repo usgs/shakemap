@@ -81,7 +81,7 @@ class Origin(object):
         # ---------------------------------------------------------------------
         # Check some types, ranges, and defaults
         # ---------------------------------------------------------------------
-        if not type(event['id']) is str:
+        if not type(event['id']) is str and event['id'] is not None:
             raise TypeError('event id  must be a string.')
 
         if float(event['lat']) > 90 or float(event['lat']) < -90:
