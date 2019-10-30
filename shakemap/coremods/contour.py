@@ -6,6 +6,7 @@ import shutil
 
 # third party imports
 import fiona
+from fiona.crs import from_epsg
 from openquake.hazardlib import imt
 from configobj import ConfigObj
 
@@ -128,12 +129,7 @@ def contour_to_files(container, output_dir, logger, contents,
             'weight': 'int'
         }
     }
-    crs = {
-        'no_defs': True,
-        'ellps': 'WGS84',
-        'datum': 'WGS84',
-        'proj': 'longlat'
-    }
+    crs = from_epsg(4326)
 
     config = container.getConfig()
     gmice = get_object_from_config('gmice', 'modeling', config)
