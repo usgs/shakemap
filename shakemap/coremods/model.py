@@ -1522,14 +1522,12 @@ class ModelModule(CoreModule):
         self.logger.debug('total time for %s=%f' %
                           (imtstr, time.time() - time1))
 
-
     def _applyCustomMask(self):
         """ Apply custom masks to IMT grid outputs. """
         if self.mask_file:
             mask = self._getMask(self.mask_file)
             for grid in self.outgrid.values():
                 grid[~mask] = np.nan
-
 
     def _getLandMask(self):
         """
@@ -1543,7 +1541,6 @@ class ModelModule(CoreModule):
                                              name='ocean',
                                              resolution='10m')
         return self._getMask(oceans)
-
 
     def _getMask(self, vector=None):
         """
@@ -1813,10 +1810,12 @@ class ModelModule(CoreModule):
             sdf = getattr(self, ndf).df
             imts = getattr(self, ndf).imts
             for myimt in imts:
-                mybias = self.bias_num[myimt] / \
+                mybias_var = 1.0 / \
                     ((1.0 / sdf[myimt + '_pred_tau']**2) +
                      self.bias_den[myimt])
+                mybias = self.bias_num[myimt] * mybias_var
                 sdf[myimt + '_bias'] = mybias.ravel()
+                sdf[myimt + '_bias_sigma'] = np.sqrt(mybias_var.ravel())
 
         # ---------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
@@ -1931,6 +1930,7 @@ class ModelModule(CoreModule):
                 sigma_str_rock = 'ln_sigma_rock'
                 sigma_str_soil = 'ln_sigma_soil'
                 bias_str = 'ln_bias'
+                bias_sigma_str = 'ln_bias_sigma'
                 if key.startswith('PGV'):
                     value = np.exp(myamp)
                     value_rock = np.exp(myamp_rock)
@@ -1947,6 +1947,7 @@ class ModelModule(CoreModule):
                     sigma_str_rock = 'sigma_rock'
                     sigma_str_soil = 'sigma_soil'
                     bias_str = 'bias'
+                    bias_sigma_str = 'bias_sigma'
                 else:
                     value = np.exp(myamp) * 100
                     value_rock = np.exp(myamp_rock) * 100
@@ -1962,6 +1963,7 @@ class ModelModule(CoreModule):
                 mysigma_soil = sdf[key + '_sigma_soil'][six]
                 imt_name = key.lower().replace('_pred', '')
                 mybias = sdf[imt_name.upper() + '_bias'][six]
+                mybias_sigma = sdf[imt_name.upper() + '_bias_sigma'][six]
                 station['properties']['predictions'].append({
                     'name': imt_name,
                     'value': _round_float(value, 4),
@@ -1974,6 +1976,7 @@ class ModelModule(CoreModule):
                     sigma_str_rock: _round_float(mysigma_rock, 4),
                     sigma_str_soil: _round_float(mysigma_soil, 4),
                     bias_str: _round_float(mybias, 4),
+                    bias_sigma_str: _round_float(mybias_sigma, 4),
                 })
             #
             # For df1 stations, add the MMIs comverted from PGM
