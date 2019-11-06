@@ -1024,7 +1024,7 @@ def _get_draped(data, topodata, colormap):
         intensity2 = ls2.hillshade(
             topodata, fraction=0.25, vert_exag=VERT_EXAG)
         intensity = intensity1 * 0.5 + intensity2 * 0.5
-    del intensity1, intensity2
+        del intensity1, intensity2
 
     ls = LightSource(azdeg=315, altdeg=45)
     draped_hsv = ls.blend_hsv(rgb, np.expand_dims(intensity, 2))
@@ -1126,7 +1126,7 @@ def draw_map(adict, override_scenario=False):
     """
     imtype = adict['imtype']
     imtdict = adict['imtdict']      # mmidict
-    imtdata = np.nan_to_num(imtdict['mean']) # mmidata
+    imtdata = np.nan_to_num(imtdict['mean'])  # mmidata
     gd = GeoDict(imtdict['mean_metadata'])
     imtgrid = Grid2D(imtdata, gd)   # mmigrid
 
@@ -1238,13 +1238,14 @@ def draw_map(adict, override_scenario=False):
         # To choose which contours to label, we will keep track of the lengths
         # of contours, grouped by isovalue
         contour_lens = defaultdict(lambda: [])
+
         def arclen(path):
             """
             Compute the arclength of *path*, which should be a list of pairs
             of numbers.
             """
             x0, y0 = [np.array(c) for c in zip(*path)]
-            x1, y1 = [np.roll(c, -1) for c in (x0, y0)] # offset by 1
+            x1, y1 = [np.roll(c, -1) for c in (x0, y0)]  # offset by 1
             # don't include first-last vertices as an edge:
             x0, y0, x1, y1 = [c[:-1] for c in (x0, y0, x1, y1)]
             return np.sum(np.sqrt((x0 - x1)**2 + (y0 - y1)**2))
