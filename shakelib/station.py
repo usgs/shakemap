@@ -267,7 +267,8 @@ class StationList(object):
                         amplitude = np.nan
                     try:
                         stddev = float(
-                            feature['properties'].get('intensity_stddev', np.nan))
+                            feature['properties'].get('intensity_stddev',
+                                                      np.nan))
                     except ValueError:
                         stddev = np.nan
                     try:
@@ -290,7 +291,13 @@ class StationList(object):
                 chan_names = []
                 for comp in feature['properties']['channels']:
                     chan_names.append(comp['name'])
-                orients = _getOrientationSet(chan_names)
+                # Some legacy data stupidly names the channel the same as the
+                # station name. If there is only one channel, and its name
+                # is the station name, we assume it's horizontal and move on.
+                if len(chan_names) == 1 and chan_names[0] == name:
+                    orients = ['H']
+                else:
+                    orients = _getOrientationSet(chan_names)
                 #
                 # Now insert the amps into the database
                 #
@@ -568,8 +575,13 @@ class StationList(object):
                                not in CIIM_TUPLE)
             for original_channel, cdict in comp_dict.items():
                 pgm_dict = cdict['amps']
-                orientation = cdict['attrs'].get('orientation', None)
-                orientation = _getOrientation(original_channel, orientation)
+                if len(comp_dict) == 1 and original_channel == \
+                        station_attributes.get('name', ''):
+                    orientation = 'H'
+                else:
+                    orientation = cdict['attrs'].get('orientation', None)
+                    orientation = _getOrientation(original_channel,
+                                                  orientation)
                 for imt_type, imt_dict in pgm_dict.items():
                     if (instrumented == 0) and (imt_type != 'MMI'):
                         continue
