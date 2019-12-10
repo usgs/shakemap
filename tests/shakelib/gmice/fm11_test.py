@@ -114,19 +114,18 @@ def test_fm11():
     assert((set(dadm) - dadm_target[PGA()]) == set())
 
     sdd1 = gmice.getGM2MIsd()
-    assert sdd1[PGA()] == 0.35
-    assert sdd1[PGV()] == 0.26
-    assert sdd1[SA(0.3)] == 0.53
-    assert sdd1[SA(1.0)] == 0.36
-    assert sdd1[SA(3.0)] == 0.29
+    assert sdd1[PGA()] == 0.18
+    assert sdd1[PGV()] == 0.14
+    assert sdd1[SA(0.3)] == 0.3
+    assert sdd1[SA(1.0)] == 0.21
+    assert sdd1[SA(3.0)] == 0.14
 
     sdd2 = gmice.getMI2GMsd()
-    lnten = np.log(10.0)
-    np.testing.assert_allclose(sdd2[PGA()], sdd1[PGA()] * lnten)
-    np.testing.assert_allclose(sdd2[PGV()], sdd1[PGV()] * lnten)
-    np.testing.assert_allclose(sdd2[SA(0.3)], sdd1[SA(0.3)] * lnten)
-    np.testing.assert_allclose(sdd2[SA(1.0)], sdd1[SA(1.0)] * lnten)
-    np.testing.assert_allclose(sdd2[SA(3.0)], sdd1[SA(3.0)] * lnten)
+    np.testing.assert_allclose(sdd2[PGA()], 0.7138013788281542)
+    np.testing.assert_allclose(sdd2[PGV()], 0.5065687204586901)
+    np.testing.assert_allclose(sdd2[SA(0.3)], 0.9670857390574993)
+    np.testing.assert_allclose(sdd2[SA(1.0)], 0.7138013788281542)
+    np.testing.assert_allclose(sdd2[SA(3.0)], 0.598672124178452)
 
     nm = gmice.getName()
     assert nm == 'Faenza and Michelini (2010, 2011)'
