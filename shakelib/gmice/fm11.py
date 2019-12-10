@@ -23,27 +23,28 @@ class FM11(GMICE):
     # -----------------------------------------------------------------------
     # MMI = C1 + C2 * log10 (Y)
     #
-    # Magnitude and distance not used in this GMICE.
+    # Limit the distance residuals to between 0 and 160 km.
+    # Limit the magnitude residuals to between M3.0 and M6.9.
+    # These are the default in the other gmice
+    #      Limit the distance residuals to between 10 and 300 km.
+    #      Limit the magnitude residuals to between M3.0 and M7.3.
     #
-    # These are calculated on the basis of the maximum horizontal component.
-    # Note the reference gives psa at period 2.0 s, that relation is used
-    # for 3.0 s in this module.
+    # These are calcualted on the basis of the maximum horizontal component.
     # For psa 03, 10 and 30 the regression for the geometrical mean are
-    # available in FM11 but not implemented here since PGA
-    # and PGV geometric means are not available.
+    # available but not implemented in this modeles since the one for PGA
+    # and PGV are not available.
     # -----------------------------------------------------------------------
-
     def __init__(self):
         super().__init__()
         self.min_max = (1.0, 10.0)
         self.name = 'Faenza and Michelini (2010, 2011)'
         self.scale = 'scale_fm11.ps'
         self._constants = {
-            self._pga: {'C1':  1.68, 'C2':  2.58, 'SMMI': 0.35},
-            self._pgv: {'C1':  5.11, 'C2':  2.35, 'SMMI': 0.26},
-            self._sa03: {'C1':  1.24, 'C2':  2.47, 'SMMI': 0.53},
-            self._sa10: {'C1':  3.12, 'C2':  2.05, 'SMMI': 0.36},
-            self._sa30: {'C1':  4.31, 'C2':  2.00, 'SMMI': 0.29}
+            self._pga: {'C1':  1.68, 'C2':  2.58, 'SMMI': 0.18, 'SPGM': 0.31},
+            self._pgv: {'C1':  5.11, 'C2':  2.35, 'SMMI': 0.14, 'SPGM': 0.22},
+            self._sa03: {'C1':  1.24, 'C2':  2.47, 'SMMI': 0.30, 'SPGM': 0.42},
+            self._sa10: {'C1':  3.12, 'C2':  2.05, 'SMMI': 0.21, 'SPGM': 0.31},
+            self._sa30: {'C1':  4.31, 'C2':  2.00, 'SMMI': 0.14, 'SPGM': 0.26}
         }
 
         self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
@@ -65,21 +66,19 @@ class FM11(GMICE):
                 Ground motion amplitude; natural log units; g for PGA and
                 PSA, cm/s for PGV.
             imt (OpenQuake IMT):
-                Type of the input amps (must be one of PGA, PGV, or SA).
+                Type the input amps (must be one of PGA, PGV, or SA).
                 Supported SA periods are 0.3, 1.0, and 3.0 sec.
                 `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
             dists (ndarray):
-                Numpy array of distances from rupture (km).
-                Ignored, since this GMICE has no distance terms.
+                Not used
             mag (float):
-                Earthquake magnitude. Ignored, since this GMICE has no mag terms.
+                Not used
 
         Returns:
             ndarray of Modified Mercalli Intensity and ndarray of
             dMMI / dln(amp) (i.e., the slope of the relationship at the
             point in question).
         """  # noqa
-
         lfact = np.log10(np.e)
         c = self._getConsts(imt)
 
@@ -120,17 +119,15 @@ class FM11(GMICE):
                 one of PGA, PGV, or SA).
                 `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
             dists (ndarray):
-                Rupture distances (km) to the corresponding MMIs.
-                Ignored, since this GMICE has no distance terms.
+                Not used
             mag (float):
-                Earthquake magnitude. Ignored, since this GMICE has no mag term.
+                Not used
 
         Returns:
             Ndarray of ground motion intensity in natural log of g for PGA
             and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI
             (i.e., the slope of the relationship at the point in question).
         """  # noqa
-
         lfact = np.log10(np.e)
         c = self._getConsts(imt)
         mmi = mmi.copy()
@@ -190,11 +187,11 @@ class FM11(GMICE):
         # Need to convert log10 to ln units
         #
         lfact = np.log(10.0)
-        return {self._pga: lfact * self._constants[self._pga]['SMMI'],
-                self._pgv: lfact * self._constants[self._pgv]['SMMI'],
-                self._sa03: lfact * self._constants[self._sa03]['SMMI'],
-                self._sa10: lfact * self._constants[self._sa10]['SMMI'],
-                self._sa30: lfact * self._constants[self._sa30]['SMMI']}
+        return {self._pga: lfact * self._constants[self._pga]['SPGM'],
+                self._pgv: lfact * self._constants[self._pgv]['SPGM'],
+                self._sa03: lfact * self._constants[self._sa03]['SPGM'],
+                self._sa10: lfact * self._constants[self._sa10]['SPGM'],
+                self._sa30: lfact * self._constants[self._sa30]['SPGM']}
 
     def _getConsts(self, imt):
         """
