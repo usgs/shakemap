@@ -400,7 +400,7 @@ def make_pin_thumbnail(adict):
     """Make the artsy-thumbnail for the pin on the USGS webpages.
     """
     imtdict = adict['imtdict']
-    grid = np.nan_to_num(imtdict['mean'], nan=0.0)
+    grid = np.nan_to_num(imtdict['mean'])
     metadata = imtdict['mean_metadata']
     num_pixels = 300
     randx = np.random.rand(num_pixels)
@@ -475,7 +475,7 @@ def make_overlay(adict):
         nothing: Nothing.
     """
     mmidict = adict['imtdict']
-    mmi_array = np.nan_to_num(mmidict['mean'], nan=0.0)
+    mmi_array = np.nan_to_num(mmidict['mean'])
     geodict = GeoDict(mmidict['mean_metadata'])
     palette = ColorPalette.fromPreset('mmi')
     mmi_rgb = palette.getDataColor(mmi_array, color_format='array')
