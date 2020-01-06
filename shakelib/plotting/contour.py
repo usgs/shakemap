@@ -57,12 +57,15 @@ def contour(imtdict, imtype, filter_size, gmice):
     if imtype == 'MMI':
         interval_type = 'linear'
 
-    grid_min = np.nanmin(fgrid)
-    grid_max = np.nanmax(fgrid)
-    if grid_max - grid_min:
-        intervals = getContourLevels(grid_min, grid_max, itype=interval_type)
-    else:
+    if np.all(np.isnan(fgrid)): # data is totally empty; no contours
         intervals = np.array([])
+    else:
+        grid_min = np.nanmin(fgrid)
+        grid_max = np.nanmax(fgrid)
+        if grid_max - grid_min:
+            intervals = getContourLevels(grid_min, grid_max, itype=interval_type)
+        else: # data is totally flat; don't draw any contours
+            intervals = np.array([])
 
     lonstart = metadata['xmin']
     latstart = metadata['ymin']
