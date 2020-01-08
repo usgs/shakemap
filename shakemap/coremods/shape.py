@@ -12,6 +12,7 @@ import fiona
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 import numpy as np
 from configobj import ConfigObj
+from openquake.hazardlib import imt as OQIMT
 
 # local imports
 from .base import CoreModule, Contents
@@ -20,6 +21,7 @@ from shakemap.utils.config import (get_data_path,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
+from shakemap.utils.utils import get_object_from_config
 from shakelib.plotting.contour import contour
 from shakemap.c.pcontour import pcontour
 from shakelib.utils.imt_string import oq_to_file
@@ -106,6 +108,12 @@ def create_polygons(container, datadir, logger, max_workers, method='pcontour'):
         (nothing): Nothing.
     """
 
+    # gmice info for shakelib.plotting.contour
+    config = container.getConfig()
+    gmice = get_object_from_config('gmice', 'modeling', config)
+    gmice_imts = gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+    gmice_pers = gmice.DEFINED_FOR_SA_PERIODS
+
     component = list(container.getComponents())[0]
     imts = container.getIMTs(component)
 
@@ -141,6 +149,7 @@ def create_polygons(container, datadir, logger, max_workers, method='pcontour'):
                 fname = oq_to_file(imt)
 
             if method == 'pcontour':
+                my_gmice = None
                 if imt == 'MMI':
                     contour_levels = np.arange(0.1, 10.2, 0.2)
                 elif imt == 'PGV':
@@ -158,6 +167,13 @@ def create_polygons(container, datadir, logger, max_workers, method='pcontour'):
             else:
                 # skimage method chooses its own levels
                 contour_levels = None
+                # but wants gmice info
+                oqimt = OQIMT.from_string(imt)
+                if imt == 'MMI' or not isinstance(oqimt, tuple(gmice_imts)) or \
+                   (isinstance(oqimt, OQIMT.SA) and oqimt.period not in gmice_pers):
+                    my_gmice = None
+                else:
+                    my_gmice = gmice
             a = {'fgrid': fgrid,
                  'dx': gdict['mean_metadata']['dx'],
                  'dy': gdict['mean_metadata']['dy'],
@@ -167,6 +183,8 @@ def create_polygons(container, datadir, logger, max_workers, method='pcontour'):
                  'tdir': tdir,
                  'fname': fname,
                  'schema': schema,
+                 'imt': imt,
+                 'gmice': my_gmice,
                  'gdict': gdict}
             alist.append(a)
             copyfile(os.path.join(smdata, 'WGS1984.prj'),
@@ -215,12 +233,14 @@ def make_shape_files(adict, method='pcontour'):
     fname = adict['fname']
     schema = adict['schema']
     gdict = adict['gdict']
+    imt = adict['imt']
+    gmice = adict['gmice']
 
     if method == 'pcontour':
         gjson = pcontour(fgrid, dx, dy, xmin, ymax, contour_levels, 4, 0, fmt=1)
         features = gjson['features']
     elif method == 'skimage':
-        features = contour(gdict, imtype, 10, gmice)
+        features = contour(gdict, imt, 10, gmice)
     else:
         raise ValueError('Unknown contour method.')
     with fiona.open(os.path.join(tdir, fname + '.shp'), 'w',
