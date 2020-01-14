@@ -116,7 +116,6 @@ class StationList(object):
         Returns:
             :class:`Stationlist` object.
         """
-
         db = sqlite3.connect(dbfile, timeout=15)
         self = cls(db)
         self.cursor.executescript(sql)
@@ -321,7 +320,9 @@ class StationList(object):
                             stddev = 0
                         flag = amp['flag']
                         units = amp['units']
-                        if amplitude == 'null' or np.isnan(float(amplitude)):
+                        if (amplitude == 'null' or
+                                np.isnan(float(amplitude)) or
+                                amplitude <= 0):
                             amplitude = 'NULL'
                             flag = 'G'
                         elif imt_type == 'MMI':
