@@ -21,6 +21,8 @@ import fiona
 import cartopy.io.shapereader as shpreader
 from shapely.geometry import shape
 
+import concurrent.futures as cf
+
 # local imports
 from mapio.geodict import GeoDict
 from mapio.grid2d import Grid2D
@@ -393,8 +395,13 @@ class ModelModule(CoreModule):
         self.atten_soil_sd = {}
 
         self.logger.debug('Doing MVN...')
-        for imt_str in self.imt_out_set:
-            self._computeMVN(imt_str)
+        if self.max_workers > 0:
+            with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
+                results = ex.map(self._computeMVN, self.imt_out_set)
+                list(results)  # Check threads for possible exceptions, etc.
+        else:
+            for imt_str in self.imt_out_set:
+                self._computeMVN(imt_str)
 
         self._applyCustomMask()
 
