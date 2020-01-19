@@ -179,7 +179,7 @@ conda create -y -n $VENV -c conda-forge \
 # Clean up zip files we've downloaded
 if [ $? -ne 0 ]; then
     echo "Failed to create conda environment.  Resolve any conflicts, then try again."
-    exit
+    exit 1
 fi
 
 
