@@ -244,9 +244,7 @@ class MultiGMPE(GMPE):
                         lsd[j] = bk17.convertSigmas(imt, lsd[j])
 
             # End: if GMPE is not MultiGMPE
-            else:
-                for a in list(lsd):
-                    lsd.append(a)
+
             #
             # At this point lsd will have 2 * len(stddev_types) entries, the
             # first group will have the point-source to finite rupture
@@ -255,7 +253,7 @@ class MultiGMPE(GMPE):
             #
 
             # -----------------------------------------------------------------
-            # Compute weighted mean and sd
+            # Compute weighted mean and collect the elements to compute sd
             # -----------------------------------------------------------------
 
             lnmu = lnmu + wts[i] * lmean
