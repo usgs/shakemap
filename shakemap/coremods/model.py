@@ -1998,10 +1998,17 @@ class ModelModule(CoreModule):
                     if np.isnan(myamp):
                         myamp = 'null'
                         mysd = 'null'
+                        flag = '0'
+                    else:
+                        if sdf[myimt + "_outliers"][six] == 1:
+                            flag = "Outlier"
+                        else:
+                            flag = "0"
                     station['properties']['mmi_from_pgm'].append({
                         'name': imt_name,
                         'value': _round_float(myamp, 2),
                         'sigma': _round_float(mysd, 2),
+                        'flag': flag
                     })
 
             #
@@ -2024,11 +2031,18 @@ class ModelModule(CoreModule):
                     if np.isnan(value):
                         value = 'null'
                         mysd = 'null'
+                        flag = '0'
+                    else:
+                        if sdf[myimt + "_outliers"][six] == 1:
+                            flag = "Outlier"
+                        else:
+                            flag = "0"
                     station['properties']['pgm_from_mmi'].append({
                         'name': imt_name,
                         'value': _round_float(value, 4),
                         'units': units,
                         'ln_sigma': _round_float(mysd, 4),
+                        'flag': flag
                     })
             #
             # Set the generic distance property (this is rrup)
