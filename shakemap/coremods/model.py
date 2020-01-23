@@ -1027,6 +1027,7 @@ class ModelModule(CoreModule):
                     df2[imtstr + '_pred_phi'] = pstddev[2]
                 df2[imtstr + '_residual'] = df2[imtstr] - pmean
                 df2[imtstr + '_outliers'] = np.isnan(df2[imtstr + '_residual'])
+                df2[imtstr + '_outliers'] |= df2['MMI_outliers']
 
     def _deriveMMIFromIMTs(self):
         """
@@ -1068,12 +1069,14 @@ class ModelModule(CoreModule):
         if(df1['MMI'] is None):
             df1['MMI'] = np.full_like(df1['lon'], np.nan)
             df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
+        df1['MMI_outliers'] = np.full_like(df1['lon'], 0, dtype=np.bool)
         for imtstr in preferred_imts:
             if 'derived_MMI_from_' + imtstr in df1:
                 ixx = np.isnan(df1['MMI'])
                 df1['MMI'][ixx] = df1['derived_MMI_from_' + imtstr][ixx]
                 df1['MMI_sd'][ixx] = \
                     df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
+                df1['MMI_outliers'][ixx] |= df1[imtstr + '_outliers'][ixx]
         self.df1.imts.add('MMI')
         #
         # Get the prediction and stddevs
@@ -1103,7 +1106,7 @@ class ModelModule(CoreModule):
             df1['MMI' + '_pred_tau'] = pstddev[1]
             df1['MMI' + '_pred_phi'] = pstddev[2]
         df1['MMI' + '_residual'] = df1['MMI'] - pmean
-        df1['MMI' + '_outliers'] = np.isnan(df1['MMI' + '_residual'])
+        df1['MMI' + '_outliers'] |= np.isnan(df1['MMI' + '_residual'])
 
     def _fillDataArrays(self):
         """

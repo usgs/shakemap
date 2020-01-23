@@ -278,7 +278,10 @@ class MultiGMPE(GMPE):
             cc = np.full((nwts, nwts), 0.95)
             np.fill_diagonal(cc, 1.0)
         else:
-            cc = np.corrcoef(lnmu_list)
+            np.seterr(divide='ignore', invalid='ignore')
+            cc = np.reshape(np.corrcoef(lnmu_list), (nwts, nwts))
+            np.seterr(divide='warn', invalid='warn')
+            cc[np.isnan(cc)] = 1.0
         # Multiply the correlation coefficients by the weights matrix
         # (this is cheaper than multiplying all of elements of each
         # stddev array by their weights since we have to multiply
