@@ -151,10 +151,10 @@ class AssembleModule(CoreModule):
         config = global_config.dict()
 
         self.logger.debug('Looking for data files...')
-        datafiles = glob.glob(os.path.join(datadir, '*_dat.xml'))
+        datafiles = sorted(glob.glob(os.path.join(datadir, '*_dat.xml')))
         if os.path.isfile(os.path.join(datadir, 'stationlist.xml')):
             datafiles.append(os.path.join(datadir, 'stationlist.xml'))
-        datafiles += glob.glob(os.path.join(datadir, '*_dat.json'))
+        datafiles += sorted(glob.glob(os.path.join(datadir, '*_dat.json')))
         if os.path.isfile(os.path.join(datadir, 'stationlist.json')):
             datafiles.append(os.path.join(datadir, 'stationlist.json'))
 
@@ -163,7 +163,8 @@ class AssembleModule(CoreModule):
         rupturefile = os.path.join(datadir, 'rupture.json')
         if not os.path.isfile(rupturefile):
             # failing any of those, look for text file versions
-            rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
+            rupturefiles = sorted(glob.glob(os.path.join(datadir,
+                                                         '*_fault.txt')))
             rupturefile = None
             if len(rupturefiles):
                 rupturefile = rupturefiles[0]

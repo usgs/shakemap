@@ -21,6 +21,8 @@ import fiona
 import cartopy.io.shapereader as shpreader
 from shapely.geometry import shape
 
+import concurrent.futures as cf
+
 # local imports
 from mapio.geodict import GeoDict
 from mapio.grid2d import Grid2D
@@ -393,8 +395,13 @@ class ModelModule(CoreModule):
         self.atten_soil_sd = {}
 
         self.logger.debug('Doing MVN...')
-        for imt_str in self.imt_out_set:
-            self._computeMVN(imt_str)
+        if self.max_workers > 0:
+            with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
+                results = ex.map(self._computeMVN, self.imt_out_set)
+                list(results)  # Check threads for possible exceptions, etc.
+        else:
+            for imt_str in self.imt_out_set:
+                self._computeMVN(imt_str)
 
         self._applyCustomMask()
 
@@ -1020,6 +1027,7 @@ class ModelModule(CoreModule):
                     df2[imtstr + '_pred_phi'] = pstddev[2]
                 df2[imtstr + '_residual'] = df2[imtstr] - pmean
                 df2[imtstr + '_outliers'] = np.isnan(df2[imtstr + '_residual'])
+                df2[imtstr + '_outliers'] |= df2['MMI_outliers']
 
     def _deriveMMIFromIMTs(self):
         """
@@ -1061,12 +1069,14 @@ class ModelModule(CoreModule):
         if(df1['MMI'] is None):
             df1['MMI'] = np.full_like(df1['lon'], np.nan)
             df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
+        df1['MMI_outliers'] = np.full_like(df1['lon'], 0, dtype=np.bool)
         for imtstr in preferred_imts:
             if 'derived_MMI_from_' + imtstr in df1:
                 ixx = np.isnan(df1['MMI'])
                 df1['MMI'][ixx] = df1['derived_MMI_from_' + imtstr][ixx]
                 df1['MMI_sd'][ixx] = \
                     df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
+                df1['MMI_outliers'][ixx] |= df1[imtstr + '_outliers'][ixx]
         self.df1.imts.add('MMI')
         #
         # Get the prediction and stddevs
@@ -1096,7 +1106,7 @@ class ModelModule(CoreModule):
             df1['MMI' + '_pred_tau'] = pstddev[1]
             df1['MMI' + '_pred_phi'] = pstddev[2]
         df1['MMI' + '_residual'] = df1['MMI'] - pmean
-        df1['MMI' + '_outliers'] = np.isnan(df1['MMI' + '_residual'])
+        df1['MMI' + '_outliers'] |= np.isnan(df1['MMI' + '_residual'])
 
     def _fillDataArrays(self):
         """
@@ -1988,10 +1998,17 @@ class ModelModule(CoreModule):
                     if np.isnan(myamp):
                         myamp = 'null'
                         mysd = 'null'
+                        flag = '0'
+                    else:
+                        if sdf[myimt + "_outliers"][six] == 1:
+                            flag = "Outlier"
+                        else:
+                            flag = "0"
                     station['properties']['mmi_from_pgm'].append({
                         'name': imt_name,
                         'value': _round_float(myamp, 2),
                         'sigma': _round_float(mysd, 2),
+                        'flag': flag
                     })
 
             #
@@ -2014,11 +2031,18 @@ class ModelModule(CoreModule):
                     if np.isnan(value):
                         value = 'null'
                         mysd = 'null'
+                        flag = '0'
+                    else:
+                        if sdf[myimt + "_outliers"][six] == 1:
+                            flag = "Outlier"
+                        else:
+                            flag = "0"
                     station['properties']['pgm_from_mmi'].append({
                         'name': imt_name,
                         'value': _round_float(value, 4),
                         'units': units,
                         'ln_sigma': _round_float(mysd, 4),
+                        'flag': flag
                     })
             #
             # Set the generic distance property (this is rrup)
