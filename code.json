@@ -23,7 +23,7 @@
         "homepageURL": "https://usgs.github.io/shakemap/sm4_index.html",
         "downloadURL": "https://github.com/usgs/shakemap/archive/master.zip",
         "disclaimerURL": "https://github.com/usgs/shakemap/blob/master/LICENSE.md",
-        "repositoryUrl": "https://github.com/usgs/shakemap.git",
+        "repositoryURL": "https://github.com/usgs/shakemap.git",
         "vcs": "git",
 
         "laborHours": null,
