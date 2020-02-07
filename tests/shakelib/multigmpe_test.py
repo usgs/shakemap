@@ -35,6 +35,7 @@ from shakelib.multigmpe import filter_gmpe_list
 from shakelib.multigmpe import MultiGMPE
 from shakelib.rupture.origin import Origin
 from shakelib.rupture.quad_rupture import QuadRupture
+from shakelib.rupture.point_rupture import PointRupture
 import shakelib.sites as sites
 from shakelib.sites import Sites
 
@@ -1234,6 +1235,56 @@ def test_multigmpe_get_sites_depth_parameters():
             [293.80330679,  225.506479,    178.86520526,  176.91538893,
              179.91677656,  182.42922842,  184.01934871]])
     np.testing.assert_allclose(sx2.z1pt0, z1pt0d, atol=1e-2)
+
+
+def test_point_source_stddev_inflation():
+    gmpe = ChiouYoungs2014()
+    wts = [1.0]
+
+    iimt = imt.SA(1.0)
+    stddev_types = [
+        const.StdDev.TOTAL,
+        const.StdDev.INTER_EVENT,
+        const.StdDev.INTRA_EVENT
+    ]
+
+    rctx = RuptureContext()
+    dctx = DistancesContext()
+    sctx = SitesContext()
+    sctx.lats = np.array([34.1, 34.1])
+    sctx.lons = np.array([-118.15, -117.8])
+    depths = np.array([0, 0])
+
+    event = {
+        'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
+        'id': '', 'locstring': '', 'mech': 'RS',
+        'rake': 90, 'netid': '', 'network': '',
+        'time': ''
+    }
+    origin = Origin(event)
+    rupture = PointRupture(origin)
+    dists = Distance(gmpe, sctx.lons, sctx.lats, depths, rupture)
+    dctx = dists.getDistanceContext()
+
+    rctx = rupture.getRuptureContext(gmpe)
+
+    sctx.vs30 = np.ones_like(dctx.rjb) * 275.0
+    sctx.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
+    sctx = MultiGMPE.set_sites_depth_parameters(sctx, gmpe)
+    mgmpe = MultiGMPE.from_list([gmpe], wts)
+    lnmu, lnsd = mgmpe.get_mean_and_stddevs(
+        sctx, rctx, dctx, iimt, stddev_types)
+    # First three stds include the point-source inflation, the second three
+    # do not. Check the last three to see that they sum correctly:
+    np.testing.assert_allclose(
+        lnsd[4]**2 + lnsd[5]**2,
+        lnsd[3]**2
+    )
+    # Now for the first (with PS inflation)
+    np.testing.assert_allclose(
+        lnsd[1]**2 + lnsd[2]**2,
+        lnsd[0]**2
+    )
 
 
 def test_multigmpe_get_mean_stddevs():

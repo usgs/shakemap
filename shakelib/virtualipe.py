@@ -35,7 +35,9 @@ class VirtualIPE(GMPE):
     DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([MMI])
     #: The OpenQuake standard deviation types that may be produced (will
     #: depend on the GMPE provided).
-    DEFINED_FOR_STANDARD_DEVIATION_TYPES = None
+    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
+        const.StdDev.TOTAL
+    ])
     #: Distance measures required (will depend on the GMPE provided).
     REQUIRES_DISTANCES = None
     #: OpenQuake IMC used (will depend on the GMPE, but "Larger" is

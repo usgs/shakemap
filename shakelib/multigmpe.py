@@ -32,7 +32,9 @@ class MultiGMPE(GMPE):
     DEFINED_FOR_TECTONIC_REGION_TYPE = None
     DEFINED_FOR_INTENSITY_MEASURE_TYPES = None
     DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = None
-    DEFINED_FOR_STANDARD_DEVIATION_TYPES = None
+    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
+        const.StdDev.TOTAL
+    ])
     REQUIRES_SITES_PARAMETERS = None
     REQUIRES_RUPTURE_PARAMETERS = None
     REQUIRES_DISTANCES = None
@@ -67,13 +69,13 @@ class MultiGMPE(GMPE):
         for k, v in sites.__dict__.items():
             if k == '_slots_':
                 continue
-            if (k is not 'lons') and (k is not 'lats'):
+            if (k != 'lons') and (k != 'lats'):
                 shapes.append(v.shape)
                 sites.__dict__[k] = np.reshape(sites.__dict__[k], (-1,))
         for k, v in dists.__dict__.items():
             if k == '_slots_':
                 continue
-            if (k is not 'lons') and (k is not 'lats') and v is not None:
+            if (k != 'lons') and (k != 'lats') and v is not None:
                 shapes.append(v.shape)
                 dists.__dict__[k] = np.reshape(dists.__dict__[k], (-1,))
         shapeset = set(shapes)
@@ -106,12 +108,12 @@ class MultiGMPE(GMPE):
         for k, v in dists.__dict__.items():
             if k == '_slots_':
                 continue
-            if (k is not 'lons') and (k is not 'lats') and v is not None:
+            if (k != 'lons') and (k != 'lats') and v is not None:
                 dists.__dict__[k] = np.reshape(dists.__dict__[k], orig_shape)
         for k, v in sites.__dict__.items():
             if k == '_slots_':
                 continue
-            if (k is not 'lons') and (k is not 'lats'):
+            if (k != 'lons') and (k != 'lats'):
                 sites.__dict__[k] = np.reshape(sites.__dict__[k], orig_shape)
 
         # Reshape output
@@ -177,7 +179,7 @@ class MultiGMPE(GMPE):
             # -----------------------------------------------------------------
             if hasattr(gmpe, 'GMPE_LIMITS'):
                 gmpes_with_limits = list(gmpe.GMPE_LIMITS.keys())
-                gmpe_class_str = str(gmpe).replace('()', '')
+                gmpe_class_str = str(gmpe).replace('[', '').replace(']', '')
                 if gmpe_class_str in gmpes_with_limits:
                     limit_dict = gmpe.GMPE_LIMITS[gmpe_class_str]
                     for k, v in limit_dict.items():
@@ -786,34 +788,34 @@ class MultiGMPE(GMPE):
             An OQ sites context with the depth parameters set for the
             requested GMPE.
         """
-        if gmpe == 'MultiGMPE()':
+        if gmpe == '[MultiGMPE]':
             return sites
 
         sites = Sites._addDepthParameters(sites)
 
-        if gmpe == 'AbrahamsonEtAl2014()' or \
-           gmpe == 'AbrahamsonEtAl2014RegTWN()' or \
-           gmpe == 'AbrahamsonEtAl2014RegCHN()':
+        if gmpe == '[AbrahamsonEtAl2014]' or \
+           gmpe == '[AbrahamsonEtAl2014RegTWN]' or \
+           gmpe == '[AbrahamsonEtAl2014RegCHN]':
             sites.z1pt0 = sites.z1pt0_ask14_cal
-        if gmpe == 'AbrahamsonEtAl2014RegJPN()':
+        if gmpe == '[AbrahamsonEtAl2014RegJPN]':
             sites.z1pt0 = sites.z1pt0_ask14_jpn
-        if gmpe == 'ChiouYoungs2014()' or \
+        if gmpe == '[ChiouYoungs2014]' or \
            isinstance(gmpe, BooreEtAl2014):
             sites.z1pt0 = sites.z1pt0_cy14_cal
         if isinstance(gmpe, CampbellBozorgnia2014):
-            if gmpe == 'CampbellBozorgnia2014JapanSite()' or \
-               gmpe == 'CampbellBozorgnia2014HighQJapanSite()' or \
-               gmpe == 'CampbellBozorgnia2014LowQJapanSite()':
+            if gmpe == '[CampbellBozorgnia2014JapanSite]' or \
+               gmpe == '[CampbellBozorgnia2014HighQJapanSite]' or \
+               gmpe == '[CampbellBozorgnia2014LowQJapanSite]':
                 sites.z2pt5 = sites.z2pt5_cb14_jpn
             else:
                 sites.z2pt5 = sites.z2pt5_cb14_cal
-        if gmpe == 'ChiouYoungs2008()' or \
-           gmpe == 'Bradley2013()' or \
-           gmpe == 'Bradley2013Volc()':
+        if gmpe == '[ChiouYoungs2008]' or \
+           gmpe == '[Bradley2013]' or \
+           gmpe == '[Bradley2013Volc]':
             sites.z1pt0 = sites.z1pt0_cy08
-        if gmpe == 'CampbellBozorgnia2008()':
+        if gmpe == '[CampbellBozorgnia2008]':
             sites.z2pt5 = sites.z2pt5_cb07
-        if gmpe == 'AbrahamsonSilva2008()':
+        if gmpe == '[AbrahamsonSilva2008]':
             sites.z1pt0 = gmpe._compute_median_z1pt0(sites.vs30)
 
         return sites

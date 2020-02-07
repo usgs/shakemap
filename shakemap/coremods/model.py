@@ -195,7 +195,11 @@ class ModelModule(CoreModule):
         else:
             ipe = get_object_from_config('ipe', 'modeling', self.config)
             if 'vs30' not in ipe.REQUIRES_SITES_PARAMETERS:
-                ipe.REQUIRES_SITES_PARAMETERS.add('vs30')
+                # REQUIRES_SITES_PARAMETERS is now a frozen set so we have to
+                # work around it
+                tmpset = set(ipe.REQUIRES_SITES_PARAMETERS)
+                tmpset.add('vs30')
+                ipe.REQUIRES_SITES_PARAMETERS = frozenset(tmpset)
             ipe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
                 oqconst.IMC.GREATER_OF_TWO_HORIZONTAL
             self.ipe = MultiGMPE.from_list([ipe], [1.0])
