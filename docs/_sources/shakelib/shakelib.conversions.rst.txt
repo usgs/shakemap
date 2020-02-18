@@ -4,8 +4,8 @@ shakelib.conversions
 
 .. toctree::
 
-    shakelib.conversions.imc
-    shakelib.conversions.imt
+   shakelib.conversions.imc
+   shakelib.conversions.imt
 
 Submodules
 
@@ -17,6 +17,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.conversions
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

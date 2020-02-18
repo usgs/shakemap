@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakemap.coremods.transfer_base &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -125,7 +122,7 @@
                 <span class="n">tnow</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Saved </span><span class="si">%s</span><span class="s1"> by </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tnow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">command_name</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="TransferBaseModule.getProperties"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.transfer_base.html#shakemap.coremods.transfer_base.TransferBaseModule.getProperties">[docs]</a>    <span class="k">def</span> <span class="nf">getProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+<div class="viewcode-block" id="TransferBaseModule.getProperties"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.transfer_base.html#shakemap.coremods.transfer_base.TransferBaseModule.getProperties">[docs]</a>    <span class="k">def</span> <span class="nf">getProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">props</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">properties</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">product_properties</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># origin info</span>
@@ -136,8 +133,8 @@
         <span class="c1"># This fix should already be done by the time we get here, but this</span>
         <span class="c1"># is just an insurance check</span>
         <span class="k">if</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]):</span>
-            <span class="n">eventsourcecode</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">],</span>
-                                                                <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">eventsourcecode</span> <span class="o">=</span> \
+                <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">eventsourcecode</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
         <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eventsourcecode</span>
@@ -200,17 +197,23 @@
         <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;process-timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vinfo</span><span class="p">[</span><span class="s1">&#39;process_time&#39;</span><span class="p">]</span>
         <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vinfo</span><span class="p">[</span><span class="s1">&#39;map_version&#39;</span><span class="p">]</span>
         <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;map-status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vinfo</span><span class="p">[</span><span class="s1">&#39;map_status&#39;</span><span class="p">]</span>
-        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;shakemap-code-version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vinfo</span><span class="p">[</span><span class="s1">&#39;shakemap_revision&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;shakemap-code-version&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">vinfo</span><span class="p">[</span><span class="s1">&#39;shakemap_revision&#39;</span><span class="p">]</span>
 
         <span class="c1"># if this process is being run manually, set the review-status property</span>
         <span class="c1"># to &quot;reviewed&quot;. If automatic, then set to &quot;automatic&quot;.</span>
-        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;review-status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;automatic&#39;</span>
-        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
-            <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;review-status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reviewed&#39;</span>
+        <span class="k">if</span> <span class="n">props</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s1">&#39;review-status&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
+            <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;review-status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;automatic&#39;</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
+                <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;review-status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reviewed&#39;</span>
 
         <span class="c1"># what gmice was used for the model calculations</span>
         <span class="n">gmice</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motion_modules&#39;</span><span class="p">][</span><span class="s1">&#39;gmice&#39;</span><span class="p">][</span><span class="s1">&#39;module&#39;</span><span class="p">]</span>
         <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;gmice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmice</span>
+
+        <span class="k">if</span> <span class="n">props</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">this_prop</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">product_properties</span><span class="p">[</span><span class="n">this_prop</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">properties</span><span class="p">,</span> <span class="n">product_properties</span><span class="p">)</span></div>
 
@@ -283,19 +286,19 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

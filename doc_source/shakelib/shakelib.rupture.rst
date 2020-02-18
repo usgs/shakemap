@@ -17,6 +17,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.rupture
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

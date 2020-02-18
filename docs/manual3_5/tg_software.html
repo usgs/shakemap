@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>2.1. ShakeMap Software Overview &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="2.2. Philosophy of Estimating and Interpolating Ground Motions" href="tg_philosophy.html" />
@@ -34,14 +31,19 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="shakemap-software-overview">
-<span id="sec-software-overview"></span><h1>2.1. ShakeMap Software Overview<a class="headerlink" href="#shakemap-software-overview" title="Permalink to this headline">¶</a></h1>
+  <div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This ShakeMap 3.5 Manual is deprecated. Please see the <a class="reference external" href="http://usgs.github.io/shakemap/index.html">ShakeMap 4
+Manual</a>.</p>
+</div>
+<div class="section" id="shakemap-software-overview">
+<span id="sec-software-overview"></span><h1><span class="section-number">2.1. </span>ShakeMap Software Overview<a class="headerlink" href="#shakemap-software-overview" title="Permalink to this headline">¶</a></h1>
 <p>ShakeMap is a collection of modules written in PERL and C.  PERL is a powerful, freely
 available scripting language that runs on all computer platforms.  The collection of PERL
 modules allows the processing to flow in discrete steps that can be run collectively or
 individually.  Within the PERL scripts, other software packages are called, specifically
 packages that enable the graphics and much of the heavy grid-based computation.  For
-instance, maps are made using the Generic Mapping Tool (GMT; <a class="reference internal" href="../manual4_0/references.html#gmt-ref"><span class="std std-ref">Wessel and Smith,
+instance, maps are made using the Generic Mapping Tool (GMT; <a class="reference internal" href="../manual4_0/sm4_references.html#gmt-ref"><span class="std std-ref">Wessel and Smith,
 1991)</span></a>, and the Postscript output from GMT is converted to JPEG format using
 <a class="reference external" href="http://www.imagemagick.org/script/index.php">ImageMagick</a> or
 <a class="reference external" href="http://www.graphicsmagick.org/">GraphicsMagick</a>.  In the design of ShakeMap,
@@ -91,7 +93,10 @@ number of GIS product formats for that widespread user group as described in the
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual (Deprecated)</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">2.1. ShakeMap Software Overview</a></li>
@@ -112,18 +117,15 @@ number of GIS product formats for that widespread user group as described in the
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakelib.multigmpe &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -168,11 +165,15 @@
             <span class="n">wts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">WEIGHTS_LARGE_DISTANCE</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="c1"># These are arrays to hold the weighted combination of the GMPEs</span>
+        <span class="c1"># This is the array to hold the weighted combination of the GMPEs</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="n">lnmu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
-        <span class="n">lnsd2</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
-                 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">))]</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Hold on to the individual means and stddevs so we can compute the</span>
+        <span class="c1"># combined stddev</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">lnmu_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lnsd_list</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gmpe</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">):</span>
             <span class="c1"># -----------------------------------------------------------------</span>
@@ -186,7 +187,7 @@
             <span class="c1"># -----------------------------------------------------------------</span>
 
             <span class="n">gmpe_imts</span> <span class="o">=</span> <span class="p">[</span><span class="n">imt</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span>
-                         <span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">]</span>
+                         <span class="nb">list</span><span class="p">(</span><span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">)]</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">MultiGMPE</span><span class="p">)</span> <span class="ow">and</span> \
                     <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">PGV</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;PGV&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmpe_imts</span><span class="p">):</span>
@@ -275,9 +276,7 @@
                         <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">bk17</span><span class="o">.</span><span class="n">convertSigmas</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
             <span class="c1"># End: if GMPE is not MultiGMPE</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">lsd</span><span class="p">):</span>
-                    <span class="n">lsd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
             <span class="c1">#</span>
             <span class="c1"># At this point lsd will have 2 * len(stddev_types) entries, the</span>
             <span class="c1"># first group will have the point-source to finite rupture</span>
@@ -286,24 +285,52 @@
             <span class="c1">#</span>
 
             <span class="c1"># -----------------------------------------------------------------</span>
-            <span class="c1"># Compute weighted mean and sd</span>
+            <span class="c1"># Compute weighted mean and collect the elements to compute sd</span>
             <span class="c1"># -----------------------------------------------------------------</span>
 
             <span class="n">lnmu</span> <span class="o">=</span> <span class="n">lnmu</span> <span class="o">+</span> <span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">lmean</span>
+            <span class="n">lnmu_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lmean</span><span class="p">)</span>
+            <span class="n">lnsd_list</span> <span class="o">=</span> <span class="n">lnsd_list</span> <span class="o">+</span> <span class="n">lsd</span>
 
-            <span class="c1"># Note: the lnsd2 calculation isn&#39;t complete until we drop out of</span>
-            <span class="c1"># this loop and subtract lnmu**2</span>
-            <span class="c1"># For an explanation of this method, see:</span>
-            <span class="c1"># https://stats.stackexchange.com/questions/16608/what-is-the-variance-of-the-weighted-mixture-of-two-gaussians  # noqa</span>
-            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sd2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">):</span>
-                <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd2</span> <span class="o">+</span> <span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">lmean</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># The mean is a weighted sum of random variables, so the stddev</span>
+        <span class="c1"># is the weighted sum of of their covariances (effectively). See:</span>
+        <span class="c1"># https://en.wikipedia.org/wiki/Variance#Weighted_sum_of_variables</span>
+        <span class="c1"># for an explanation. Also see:</span>
+        <span class="c1"># http://usgs.github.io/shakemap/manual4_0/tg_processing.html#ground-motion-prediction</span>
+        <span class="c1"># for a discussion on the way this is implemented here.</span>
+        <span class="c1"># -------------------------------------------------------------- # noqa</span>
+        <span class="n">nwts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wts</span><span class="p">)</span>
+        <span class="n">npwts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wts</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">nsites</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lnmu</span><span class="p">)</span>
+        <span class="c1"># Find the correlation coefficients among the gmpes; if there are</span>
+        <span class="c1"># fewer than 10 points, just use an approximation (noting that the</span>
+        <span class="c1"># correlation among GMPEs tends to be quite high).</span>
+        <span class="k">if</span> <span class="n">nsites</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">cc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">nwts</span><span class="p">,</span> <span class="n">nwts</span><span class="p">),</span> <span class="mf">0.95</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">cc</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+            <span class="n">cc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">lnmu_list</span><span class="p">),</span> <span class="p">(</span><span class="n">nwts</span><span class="p">,</span> <span class="n">nwts</span><span class="p">))</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
+            <span class="n">cc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">cc</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="c1"># Multiply the correlation coefficients by the weights matrix</span>
+        <span class="c1"># (this is cheaper than multiplying all of elements of each</span>
+        <span class="c1"># stddev array by their weights since we have to multiply</span>
+        <span class="c1"># everything by the correlation coefficient matrix anyway))</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="p">((</span><span class="n">npwts</span> <span class="o">*</span> <span class="n">npwts</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">cc</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nwts</span><span class="p">,</span> <span class="n">nwts</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">nstds</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">)</span>
+        <span class="n">lnsd_new</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstds</span> <span class="o">*</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">sdlist</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nwts</span><span class="p">):</span>
+                <span class="n">sdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lnsd_list</span><span class="p">[</span><span class="n">j</span> <span class="o">*</span> <span class="n">nstds</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="n">sdstack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">sdlist</span><span class="p">)</span>
+            <span class="n">wcov</span> <span class="o">=</span> <span class="p">(</span><span class="n">sdstack</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">sdstack</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span> <span class="o">*</span> <span class="n">cc</span>
+            <span class="c1"># This sums the weighted covariance as each point in the output</span>
+            <span class="n">lnsd_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">wcov</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
 
-        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sd2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">):</span>
-            <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd2</span> <span class="o">-</span> <span class="n">lnmu</span><span class="o">**</span><span class="mi">2</span>
-
-        <span class="n">lnsd</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">lnsd2</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">lnmu</span><span class="p">,</span> <span class="n">lnsd</span>
+        <span class="k">return</span> <span class="n">lnmu</span><span class="p">,</span> <span class="n">lnsd_new</span>
 
 <div class="viewcode-block" id="MultiGMPE.from_config"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE.from_config">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -607,7 +634,7 @@
         <span class="c1">#     to get the missing imts later in get_mean_and_stddevs.</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
 
-        <span class="n">imts</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
+        <span class="n">imts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="n">imts</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
@@ -615,7 +642,8 @@
         <span class="c1"># defined for PGV, in which case we will convert from PGV to MI,</span>
         <span class="c1"># otherwise use PGA or Sa.</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="n">haspgv</span> <span class="o">=</span> <span class="p">[</span><span class="n">PGV</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
+        <span class="n">haspgv</span> <span class="o">=</span> <span class="p">[</span><span class="n">PGV</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ALL_GMPES_HAVE_PGV</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">haspgv</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
@@ -639,7 +667,7 @@
         <span class="c1"># Need union of site parameters, but it is complicated by the</span>
         <span class="c1"># different depth parameter flavors.</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="n">sitepars</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
+        <span class="n">sitepars</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="n">sitepars</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
@@ -696,7 +724,7 @@
         <span class="c1">#       default site term. So if the site checks have passed to this</span>
         <span class="c1">#       point, we should add Vs30 to the set of required site pars:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span><span class="p">,</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;vs30&#39;</span><span class="p">]))</span>
+            <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span><span class="p">),</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;vs30&#39;</span><span class="p">]))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_GMPES_FOR_SITE</span> <span class="o">=</span> <span class="n">default_gmpes_for_site</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_GMPES_FOR_SITE_WEIGHTS</span> <span class="o">=</span> <span class="n">default_gmpes_for_site_weights</span>
@@ -705,13 +733,13 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Union of rupture parameters</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="n">ruppars</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">REQUIRES_RUPTURE_PARAMETERS</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
+        <span class="n">ruppars</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">REQUIRES_RUPTURE_PARAMETERS</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_RUPTURE_PARAMETERS</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="n">ruppars</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Union of distance parameters</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="n">distpars</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">REQUIRES_DISTANCES</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
+        <span class="n">distpars</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">REQUIRES_DISTANCES</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="n">distpars</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -1045,19 +1073,19 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

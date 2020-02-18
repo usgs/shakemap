@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakelib.rupture.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,11 +13,8 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakelib.utils" href="shakelib.utils.html" />
-    <link rel="prev" title="shakelib.rupture.quad_rupture" href="shakelib.rupture.quad_rupture.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -38,367 +33,333 @@
 <span id="shakelib-rupture-utils"></span><h1>shakelib.rupture.utils<a class="headerlink" href="#module-shakelib.rupture.utils" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="shakelib.rupture.utils.is_quad">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">is_quad</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#is_quad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.is_quad" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">is_quad</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#is_quad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.is_quad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that an individual quad is coplanar.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four OQ Points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Bool for whether or not the points are planar within tolerance;</dt>
-<dd>and also the corrected quad where p2 is adjusted to be on the same
-plane as the other points.</dd>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four OQ Points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Bool for whether or not the points are planar within tolerance;</dt><dd><p>and also the corrected quad where p2 is adjusted to be on the same
+plane as the other points.</p>
+</dd>
 </dl>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_quad_width">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_quad_width</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_width"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_width" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_quad_width</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_width"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_width" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return width of an individual planar trapezoid, where the p0-p1 distance
 represents the long side.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Width of planar trapezoid in km.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Width of planar trapezoid in km.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_quad_mesh">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_quad_mesh</code><span class="sig-paren">(</span><em>q</em>, <em>dx</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_mesh" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_quad_mesh</code><span class="sig-paren">(</span><em class="sig-param">q</em>, <em class="sig-param">dx</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_mesh" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a mesh from a quadrilateal.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</li>
-<li><strong>dx</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Target dx in km; used to get nx and ny of mesh, but mesh
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p></li>
+<li><p><strong>dx</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Target dx in km; used to get nx and ny of mesh, but mesh
 snaps to edges of rupture so actual dx/dy will not actually equal
-this value in general.</li>
+this value in general.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>Mesh dictionary, which includes numpy arrays:</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Mesh dictionary, which includes numpy arrays:</p>
 <ul class="simple">
-<li>llx: lower left x coordinate in ECEF coords.</li>
-<li>lly: lower left y coordinate in ECEF coords.</li>
-<li>llz: lower left z coordinate in ECEF coords.</li>
-<li>ulx: upper left x coordinate in ECEF coords.</li>
-<li>etc.</li>
+<li><p>llx: lower left x coordinate in ECEF coords.</p></li>
+<li><p>lly: lower left y coordinate in ECEF coords.</p></li>
+<li><p>llz: lower left z coordinate in ECEF coords.</p></li>
+<li><p>ulx: upper left x coordinate in ECEF coords.</p></li>
+<li><p>etc.</p></li>
 </ul>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_local_unit_slip_vector">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_local_unit_slip_vector</code><span class="sig-paren">(</span><em>strike</em>, <em>dip</em>, <em>rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_local_unit_slip_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_local_unit_slip_vector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_local_unit_slip_vector</code><span class="sig-paren">(</span><em class="sig-param">strike</em>, <em class="sig-param">dip</em>, <em class="sig-param">rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_local_unit_slip_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_local_unit_slip_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the components of a unit slip vector.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>strike</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Clockwise angle (deg) from north of the line at the
-intersection of the rupture plane and the horizontal plane.</li>
-<li><strong>dip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Angle (deg) between rupture plane and the horizontal plane
-normal to the strike (0-90 using right hand rule).</li>
-<li><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Direction of motion of the hanging wall relative to the
-foot wall, as measured by the angle (deg) from the strike vector.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strike</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Clockwise angle (deg) from north of the line at the
+intersection of the rupture plane and the horizontal plane.</p></li>
+<li><p><strong>dip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Angle (deg) between rupture plane and the horizontal plane
+normal to the strike (0-90 using right hand rule).</p></li>
+<li><p><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Direction of motion of the hanging wall relative to the
+foot wall, as measured by the angle (deg) from the strike vector.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Unit slip vector in ‘local’ N-S, E-W, U-D coordinates.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Vector</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Unit slip vector in ‘local’ N-S, E-W, U-D coordinates.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_local_unit_slip_vector_DS">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_local_unit_slip_vector_DS</code><span class="sig-paren">(</span><em>strike</em>, <em>dip</em>, <em>rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_local_unit_slip_vector_DS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_local_unit_slip_vector_DS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_local_unit_slip_vector_DS</code><span class="sig-paren">(</span><em class="sig-param">strike</em>, <em class="sig-param">dip</em>, <em class="sig-param">rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_local_unit_slip_vector_DS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_local_unit_slip_vector_DS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the DIP SLIP components of a unit slip vector.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>strike</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Clockwise angle (deg) from north of the line at the
-intersection of the rupture plane and the horizontal plane.</li>
-<li><strong>dip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Angle (degrees) between rupture plane and the horizontal
-plane normal to the strike (0-90 using right hand rule).</li>
-<li><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Direction of motion of the hanging wall relative to the
-foot wall, as measured by the angle (deg) from the strike vector.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strike</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Clockwise angle (deg) from north of the line at the
+intersection of the rupture plane and the horizontal plane.</p></li>
+<li><p><strong>dip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Angle (degrees) between rupture plane and the horizontal
+plane normal to the strike (0-90 using right hand rule).</p></li>
+<li><p><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Direction of motion of the hanging wall relative to the
+foot wall, as measured by the angle (deg) from the strike vector.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Unit slip vector in ‘local’ N-S, E-W, U-D coordinates.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Vector</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Unit slip vector in ‘local’ N-S, E-W, U-D coordinates.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_local_unit_slip_vector_SS">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_local_unit_slip_vector_SS</code><span class="sig-paren">(</span><em>strike</em>, <em>dip</em>, <em>rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_local_unit_slip_vector_SS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_local_unit_slip_vector_SS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_local_unit_slip_vector_SS</code><span class="sig-paren">(</span><em class="sig-param">strike</em>, <em class="sig-param">dip</em>, <em class="sig-param">rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_local_unit_slip_vector_SS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_local_unit_slip_vector_SS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the STRIKE SLIP components of a unit slip vector.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>strike</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Clockwise angle (deg) from north of the line at the
-intersection of the rupture plane and the horizontal plane.</li>
-<li><strong>dip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Angle (degrees) between rupture plane and the horizontal
-plane normal to the strike (0-90 using right hand rule).</li>
-<li><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Direction of motion of the hanging wall relative to the
-foot wall, as measured by the angle (deg) from the strike vector.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strike</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Clockwise angle (deg) from north of the line at the
+intersection of the rupture plane and the horizontal plane.</p></li>
+<li><p><strong>dip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Angle (degrees) between rupture plane and the horizontal
+plane normal to the strike (0-90 using right hand rule).</p></li>
+<li><p><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Direction of motion of the hanging wall relative to the
+foot wall, as measured by the angle (deg) from the strike vector.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Unit slip vector in ‘local’ N-S, E-W, U-D coordinates.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Vector</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Unit slip vector in ‘local’ N-S, E-W, U-D coordinates.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.reverse_quad">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">reverse_quad</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#reverse_quad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.reverse_quad" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">reverse_quad</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#reverse_quad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.reverse_quad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reverse the verticies of a quad in the sense that the strike direction
 is flipped.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Reversed quadrilateral.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Reversed quadrilateral.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_quad_slip">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_quad_slip</code><span class="sig-paren">(</span><em>q</em>, <em>rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_slip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_slip" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_quad_slip</code><span class="sig-paren">(</span><em class="sig-param">q</em>, <em class="sig-param">rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_slip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_slip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the unit slip vector in ECEF space for a quad and rake angle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</li>
-<li><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Direction of motion of the hanging wall relative to</li>
-<li><strong>foot wall</strong><strong>, </strong><strong>as measured by the angle</strong> (<em>the</em>) – </li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p></li>
+<li><p><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Direction of motion of the hanging wall relative to</p></li>
+<li><p><strong>foot wall</strong><strong>, </strong><strong>as measured by the angle</strong> (<em>the</em>) – </p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Unit slip vector in ECEF space.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Vector</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Unit slip vector in ECEF space.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_quad_length">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_quad_length</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_length" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_quad_length</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Length of top eduge of a quadrilateral.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Length of quadrilateral in km.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Length of quadrilateral in km.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_quad_dip">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_quad_dip</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_dip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_dip" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_quad_dip</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_dip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_dip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dip of a quadrilateral.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dip in degrees.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dip in degrees.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_quad_normal">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_quad_normal</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_normal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_quad_normal</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_normal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the unit normal vector for a quadrilateral in
 ECEF coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Normalized normal vector for the quadrilateral in ECEF coords.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Vector</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Normalized normal vector for the quadrilateral in ECEF coords.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_quad_strike_vector">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_quad_strike_vector</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_strike_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_strike_vector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_quad_strike_vector</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_strike_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_strike_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the unit vector pointing in the direction of strike for a
 quadrilateral in ECEF coordinates. Top edge assumed to be horizontal.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The unit vector pointing in strike direction in ECEF coords.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Vector</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The unit vector pointing in strike direction in ECEF coords.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_quad_down_dip_vector">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_quad_down_dip_vector</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_down_dip_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_down_dip_vector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_quad_down_dip_vector</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_quad_down_dip_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_quad_down_dip_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the unit vector pointing down dip for a quadrilateral in
 ECEF coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The unit vector pointing down dip in ECEF coords.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Vector</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The unit vector pointing down dip in ECEF coords.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_vertical_vector">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_vertical_vector</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_vertical_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_vertical_vector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_vertical_vector</code><span class="sig-paren">(</span><em class="sig-param">q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_vertical_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_vertical_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the vertical unit vector for a quadrilateral
 in ECEF coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Normalized vertical vector for the quadrilateral in ECEF</dt>
-<dd>coords.</dd>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A quadrilateral; list of four points.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Normalized vertical vector for the quadrilateral in ECEF</dt><dd><p>coords.</p>
+</dd>
 </dl>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Vector</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Vector</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.get_distance_to_plane">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">get_distance_to_plane</code><span class="sig-paren">(</span><em>planepoints</em>, <em>otherpoint</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_distance_to_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_distance_to_plane" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">get_distance_to_plane</code><span class="sig-paren">(</span><em class="sig-param">planepoints</em>, <em class="sig-param">otherpoint</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#get_distance_to_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.get_distance_to_plane" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate a point’s distance to a plane.  Used to figure out if a
 quadrilateral points are all co-planar.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>planepoints</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of three points (from Vector class) defining a
-plane.</li>
-<li><strong>otherpoint</strong> (<em>Vector</em>) – 4th Vector to compare to points defining the
-plane.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>planepoints</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of three points (from Vector class) defining a
+plane.</p></li>
+<li><p><strong>otherpoint</strong> (<em>Vector</em>) – 4th Vector to compare to points defining the
+plane.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Distance (in meters) from otherpoint to plane.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Distance (in meters) from otherpoint to plane.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakelib.rupture.utils.rake_to_mech">
-<code class="descclassname">shakelib.rupture.utils.</code><code class="descname">rake_to_mech</code><span class="sig-paren">(</span><em>rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#rake_to_mech"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.rake_to_mech" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.utils.</code><code class="sig-name descname">rake_to_mech</code><span class="sig-paren">(</span><em class="sig-param">rake</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/utils.html#rake_to_mech"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.utils.rake_to_mech" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert rake to mechanism.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Rake angle in degrees.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Mechanism.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Rake angle in degrees.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mechanism.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -426,51 +387,20 @@ plane.</li>
 
 
 <h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.base.html">shakelib.rupture.base</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.constants.html">shakelib.rupture.constants</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.edge_rupture.html">shakelib.rupture.edge_rupture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.factory.html">shakelib.rupture.factory</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.origin.html">shakelib.rupture.origin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.point_rupture.html">shakelib.rupture.point_rupture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.quad_rupture.html">shakelib.rupture.quad_rupture</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">shakelib.rupture.utils</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

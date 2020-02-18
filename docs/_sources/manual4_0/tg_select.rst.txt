@@ -15,7 +15,8 @@ significant impact on the estimated ground motion intensities. The revised
 ground motion selection algorithm provides a probability that the earthquake
 occurred in all possible seismotectonic classifications. These
 classifications are configured to be associated with an appropriate GMPE
-(or weighted set of GMPEs) and the GMPEs associated with each classification
+(or weighted set of GMPEs, see :ref:`subsec-ground-motion-prediction-4`)
+and the GMPEs associated with each classification
 are then combined based on the probability associated with each
 classification.
 
@@ -52,8 +53,8 @@ Tectonic Regions
 :num:`Figure #select-regions` shows a global map of the first layer of
 information, which is a set of four mutually exclusive and globally
 exhaustive classes, which we refer to as **tectonic regions**: active
-crustal region (ACR), stable continental region (SCR), subduction, and
-volcanic. 
+crustal region (ACR), stable continental region (SCR), subduction (SUB), and
+volcanic (VOL). 
 
 .. _select-regions:
 

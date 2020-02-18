@@ -2,6 +2,6 @@ shakelib.distance
 ========================
 
 .. automodule:: shakelib.distance
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

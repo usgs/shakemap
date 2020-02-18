@@ -3,6 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. important::
+   This ShakeMap 3.5 Manual is deprecated. Please see the `ShakeMap 4
+   Manual <http://usgs.github.io/shakemap/index.html>`__.
+
 ShakeMap 3.5 Manual
 ===========================================
 

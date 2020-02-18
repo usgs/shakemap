@@ -12,6 +12,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.correlation
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

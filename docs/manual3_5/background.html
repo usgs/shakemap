@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>3.1. Background &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="3.2. Products and Formats" href="products.html" />
@@ -34,8 +31,13 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="background">
-<span id="sec-background"></span><h1>3.1. Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+  <div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This ShakeMap 3.5 Manual is deprecated. Please see the <a class="reference external" href="http://usgs.github.io/shakemap/index.html">ShakeMap 4
+Manual</a>.</p>
+</div>
+<div class="section" id="background">
+<span id="sec-background"></span><h1><span class="section-number">3.1. </span>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
 <p>Until the development of ShakeMap, the most common information available
 immediately following a significant earthquake was typically its magnitude and
 epicenter.  However, the damage pattern is not a simple function of these two
@@ -48,7 +50,7 @@ earthquakes that were either distant from
 the epicentral region or out of the immediate media limelight were not fully
 appreciated until long after the initial reports of damage. The full extent of
 damage from the 1995 M6.9 Kobe, Japan, earthquake was not recognized by
-the central government in Tokyo until many hours later (e.g., <a class="reference internal" href="../manual4_0/references.html#yamakawa1998"><span class="std std-ref">Yamakawa, 1998</span></a>),
+the central government in Tokyo until many hours later (e.g., <a class="reference internal" href="../manual4_0/sm4_references.html#yamakawa1998"><span class="std std-ref">Yamakawa, 1998</span></a>),
 seriously delaying rescue and recovery efforts.</p>
 <p>In contrast, a ShakeMap is a representation of actual
 ground shaking produced by an earthquake. The
@@ -82,8 +84,8 @@ the recorded and estimated ground motions to the expected felt and damage
 distributions. Intensities are estimated from ground shaking
 using equations based on analyses
 of intensities reported near recorded seismic stations for past
-earthquakes, e.g., <a class="reference internal" href="../manual4_0/references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> or
-<a class="reference internal" href="../manual4_0/references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>. The
+earthquakes, e.g., <a class="reference internal" href="../manual4_0/sm4_references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> or
+<a class="reference internal" href="../manual4_0/sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>. The
 legend on the ShakeMap indicates which relationship was used to estimate
 intensities from ground motions and vice versa (see the ShakeMap
 <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a> for more details).</p>
@@ -126,7 +128,10 @@ and 3.0 sec.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual (Deprecated)</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul class="current">
@@ -146,18 +151,15 @@ and 3.0 sec.</p>
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

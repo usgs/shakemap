@@ -11,6 +11,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.directivity
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

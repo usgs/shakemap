@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakemap.utils.generic_amp &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap.utils.layers" href="shakemap.utils.layers.html" />
@@ -38,12 +35,12 @@
 <span id="shakemap-utils-generic-amp"></span><h1>shakemap.utils.generic_amp<a class="headerlink" href="#module-shakemap.utils.generic_amp" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="shakemap.utils.generic_amp.get_period_from_imt">
-<code class="descclassname">shakemap.utils.generic_amp.</code><code class="descname">get_period_from_imt</code><span class="sig-paren">(</span><em>imtstr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/generic_amp.html#get_period_from_imt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.generic_amp.get_period_from_imt" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.generic_amp.</code><code class="sig-name descname">get_period_from_imt</code><span class="sig-paren">(</span><em class="sig-param">imtstr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/generic_amp.html#get_period_from_imt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.generic_amp.get_period_from_imt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="shakemap.utils.generic_amp.get_generic_amp_factors">
-<code class="descclassname">shakemap.utils.generic_amp.</code><code class="descname">get_generic_amp_factors</code><span class="sig-paren">(</span><em>sx</em>, <em>myimt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/generic_amp.html#get_generic_amp_factors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.generic_amp.get_generic_amp_factors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.generic_amp.</code><code class="sig-name descname">get_generic_amp_factors</code><span class="sig-paren">(</span><em class="sig-param">sx</em>, <em class="sig-param">myimt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/generic_amp.html#get_generic_amp_factors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.generic_amp.get_generic_amp_factors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of generic amplification factors the same shape
 as the lons and lats members of sx. The amplification factors are
 pulled from the grids in the operator’s configured directory:
@@ -59,11 +56,11 @@ to ensure the proper behavior is observed for the selected output
 IMTs considering:</p>
 <blockquote>
 <div><ul class="simple">
-<li>If ‘myimt’ is ‘PGA’ and there is no PGA grid in the HDF
-file, the ‘myimt’ will be set to ‘SA(0.01)’ for that file.</li>
-<li>If ‘myimt’ is ‘PGV’ and there is no PGV grid in the HDF
-file, the ‘myimt’ will be set to ‘SA(1.0)’ for that file.</li>
-<li>If ‘myimt’ is spectral acceleration (i.e., ‘SA(x)’ where
+<li><p>If ‘myimt’ is ‘PGA’ and there is no PGA grid in the HDF
+file, the ‘myimt’ will be set to ‘SA(0.01)’ for that file.</p></li>
+<li><p>If ‘myimt’ is ‘PGV’ and there is no PGV grid in the HDF
+file, the ‘myimt’ will be set to ‘SA(1.0)’ for that file.</p></li>
+<li><p>If ‘myimt’ is spectral acceleration (i.e., ‘SA(x)’ where
 ‘x’ is the period), and SA of that period is not found in the
 HDF file, the function will first attempt to interpolate the
 grids of the next lower and next greater periods found in
@@ -73,32 +70,28 @@ the log difference in periods. If the period of ‘myimt’ is
 less that the shortest period in the file, the grid for
 the shortest period is used. If the period of ‘myimt’ is
 greater that the longest period in the file, the grid for
-the longest period is used.</li>
-<li>Interpolation in geographic space is nearest neighbor.</li>
-<li>Coordinates that fall outside the grid bounds of any
-given file are assigned an amplification factor of zero.</li>
+the longest period is used.</p></li>
+<li><p>Interpolation in geographic space is nearest neighbor.</p></li>
+<li><p>Coordinates that fall outside the grid bounds of any
+given file are assigned an amplification factor of zero.</p></li>
 </ul>
 </div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sx</strong> (<em>Sites Context</em>) – An OpenQuake sites context specifying the
-coordinates of interest.</li>
-<li><strong>myimt</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing an OpenQuake IMT.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sx</strong> (<em>Sites Context</em>) – An OpenQuake sites context specifying the
+coordinates of interest.</p></li>
+<li><p><strong>myimt</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing an OpenQuake IMT.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An array of generic amplification factors corresponding
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array of generic amplification factors corresponding
 to the coordinates specified by sx.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -127,42 +120,36 @@ to the coordinates specified by sx.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.exception.html">shakemap.utils.exception</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">shakemap.utils.generic_amp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.exception.html">shakemap.utils.exception</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.generic_amp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

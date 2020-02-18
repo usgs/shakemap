@@ -31,7 +31,7 @@ def main(args):
     # -------------------------------------------------------------
     SHAKEMAP_PACKAGE = "ShakeMap 4.0a API"
     SHAKELIB_PACKAGE = "ShakeLib API"
-    AUTHORS = 'Bruce Worden, Eric Thompson, Mike Hearne'
+    AUTHORS = 'Bruce Worden, Eric Thompson, Mike Hearne, David Wald'
 
     # -------------------------------------------------------------
     # run the api doc command; this creates the .rst files
@@ -62,7 +62,7 @@ def main(args):
 
     sys.stderr.write('Building shakelib API documentation (REST)...\n')
     sphinx_cmd = 'sphinx-apidoc -o %s -f -e -d 12 -H "%s" -A "%s"'\
-                 ' -V %s -T %s shakelib/rupture/gc2\.py' % \
+                 ' -V %s -T %s shakelib/rupture/gc2.py' % \
                  (SHAKELIB_API_DIR, SHAKELIB_PACKAGE, AUTHORS, verstr,
                   SHAKELIB_PACKAGE_DIR)
     res, stdout, stderr = get_command_output(sphinx_cmd)

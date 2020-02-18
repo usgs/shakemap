@@ -151,13 +151,16 @@ class PlotRegr(CoreModule):
             for myimt in imtlist:
                 jdict['gmpe'][site][myimt] = {}
                 jdict['gmpe'][site][myimt]['mean'] = oc.getArray(
-                    ['attenuation', site, myimt], 'mean')[0].tolist()
+                    ['attenuation', site, myimt], 'mean')[0].round(
+                        decimals=5).tolist()
                 jdict['gmpe'][site][myimt]['stddev'] = oc.getArray(
-                    ['attenuation', site, myimt], 'std')[0].tolist()
+                    ['attenuation', site, myimt], 'std')[0].round(
+                        decimals=5).tolist()
         jdict['distances'] = {}
         for dtype in ['repi', 'rhypo', 'rjb', 'rrup']:
             jdict['distances'][dtype] = oc.getArray(
-                ['attenuation', 'distances'], dtype)[0].tolist()
+                ['attenuation', 'distances'], dtype)[0].round(
+                    decimals=5).tolist()
         jdict['mean_bias'] = {}
         info = oc.getMetadata()
         for myimt in imtlist:

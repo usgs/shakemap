@@ -2,6 +2,6 @@ shakemap.utils.dependencies
 ==================================
 
 .. automodule:: shakemap.utils.dependencies
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

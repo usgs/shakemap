@@ -2,6 +2,6 @@ shakemap.utils.queue
 ===========================
 
 .. automodule:: shakemap.utils.queue
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

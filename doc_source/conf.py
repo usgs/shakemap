@@ -58,7 +58,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ShakeMap Documentation'
-copyright = u'2017, C. Bruce Worden, Eric Thompson, Mike Hearne, David Wald'
+copyright = u'2017-2020, C. Bruce Worden, Eric Thompson, Mike Hearne, David Wald'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

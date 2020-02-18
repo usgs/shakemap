@@ -20,6 +20,6 @@ Submodules
 Module contents
 
 .. automodule:: shakemap.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
