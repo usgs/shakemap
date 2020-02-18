@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>4. Software &amp; Implementation Guide &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="5. Regional Operations" href="regionals.html" />
@@ -34,16 +31,21 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="software-implementation-guide">
-<span id="software-guide"></span><h1>4. Software &amp; Implementation Guide<a class="headerlink" href="#software-implementation-guide" title="Permalink to this headline">¶</a></h1>
+  <div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This ShakeMap 3.5 Manual is deprecated. Please see the <a class="reference external" href="http://usgs.github.io/shakemap/index.html">ShakeMap 4
+Manual</a>.</p>
+</div>
+<div class="section" id="software-implementation-guide">
+<span id="software-guide"></span><h1><span class="section-number">4. </span>Software &amp; Implementation Guide<a class="headerlink" href="#software-implementation-guide" title="Permalink to this headline">¶</a></h1>
 <p>Installing and operating a ShakeMap system is a non-trivial endeavor. While the software
 can be easily obtained, and installed and configured with a few hours work, there are a
 great many issues that need to be addressed when an organization considers deploying a
 ShakeMap system. In this section, we will discuss a number of these issues.</p>
 <div class="section" id="implementation-considerations">
-<h2>4.1. Implementation Considerations<a class="headerlink" href="#implementation-considerations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.1. </span>Implementation Considerations<a class="headerlink" href="#implementation-considerations" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="seismic-network">
-<h3>4.1.1. Seismic Network<a class="headerlink" href="#seismic-network" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.1.1. </span>Seismic Network<a class="headerlink" href="#seismic-network" title="Permalink to this headline">¶</a></h3>
 <p>The single most important prerequisite for operating a ShakeMap system is the existence
 of a seismic network capable of determining the location and magnitude of significant
 earthquakes within minutes of their occurrence. This network must also produce
@@ -72,7 +74,7 @@ products can be delivered via ShakeCast for local consumption. Please contact us
 are interested in this kind of arrangement.</p>
 </div>
 <div class="section" id="seismic-stations-and-parametric-data">
-<h3>4.1.2. Seismic Stations and Parametric Data<a class="headerlink" href="#seismic-stations-and-parametric-data" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.1.2. </span>Seismic Stations and Parametric Data<a class="headerlink" href="#seismic-stations-and-parametric-data" title="Permalink to this headline">¶</a></h3>
 <p>As mentioned above, seismic waveform or parametric data must be communicated to the
 processing center in real-time or near—real–time. The sensors must be “free field” (i.e., not
 located in, or adjacent to, large structures) and installed in accordance with modern standard
@@ -97,7 +99,7 @@ should be exercised with international DYFI data, as it is often aggregated by c
 therefore may be too coarse-grained for large-scale maps.</p>
 </div>
 <div class="section" id="triggering-shakemap">
-<h3>4.1.3. Triggering ShakeMap<a class="headerlink" href="#triggering-shakemap" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.1.3. </span>Triggering ShakeMap<a class="headerlink" href="#triggering-shakemap" title="Permalink to this headline">¶</a></h3>
 <p>The operator must give careful consideration to the way ShakeMap will be triggered.
 Unless an operator is constantly standing by to run ShakeMap, the system must be
 automatic to be useful. The operator must select the boundaries of the region ShakeMap
@@ -116,7 +118,7 @@ files. Again, example programs are distributed with ShakeMap, but operators shou
 anticipate that some coding may be necessary.</p>
 </div>
 <div class="section" id="system-configuration">
-<h3>4.1.4. System Configuration<a class="headerlink" href="#system-configuration" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.1.4. </span>System Configuration<a class="headerlink" href="#system-configuration" title="Permalink to this headline">¶</a></h3>
 <p>While it is relatively easy to install and run the ShakeMap software, a great deal of
 consideration is needed to properly configure the system for a particular region.
 ShakeMap presents the operator with a large number of configuration options, and these
@@ -126,7 +128,7 @@ conditions they will be used. An appropriate Ground-Motion–Intensity Conversio
 Equation (GMICE) must likewise be chosen. The operator may also elect to use an Intensity
 Prediction Equation (IPE) or to use the default virtual IPE. For best results, the operator
 will need to provide a Vs30 grid, and while the <a class="reference external" href="http://earthquake.usgs.gov/hazards/apps/vs30/">USGS’s Vs30 server</a> can supply such a
-grid based on topographic slope, a grid based on regional geology is preferable <a class="footnote-reference" href="#id2" id="id1">[1]</a>. The
+grid based on topographic slope, a grid based on regional geology is preferable <a class="footnote-reference brackets" href="#id2" id="id1">1</a>. The
 user must also decide whether to use GMPE-native or Borcherdt-style site correction
 factors. This is just a partial list of configuration choices. There are numerous other
 configurable parameters, all of which must be carefully chosen.</p>
@@ -140,7 +142,7 @@ more difficult to update the software.</p>
 ShakeMap configuration files themselves.</p>
 </div>
 <div class="section" id="operations">
-<h3>4.1.5. Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.1.5. </span>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h3>
 <p>Once an organization begins producing and distributing ShakeMaps, end users will begin
 to depend upon them and develop systems that incorporate ShakeMap products into their
 response and recovery operations. This means that it essentially becomes mandatory to
@@ -185,7 +187,7 @@ for network and ShakeMap operations. It is highly recommended that regional netw
 considering the implementation of ShakeMap develop a detailed outreach plan.</p>
 </div>
 <div class="section" id="scenarios">
-<h3>4.1.6. Scenarios<a class="headerlink" href="#scenarios" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.1.6. </span>Scenarios<a class="headerlink" href="#scenarios" title="Permalink to this headline">¶</a></h3>
 <p>One important use of ShakeMap is the generation of earthquake scenarios. Scenarios are
 predictive maps of the potential shaking resulting from hypothetical future (or past) earthquakes.
 Scenarios can be used for planning exercises, public information, or research. Some
@@ -200,7 +202,7 @@ earthquakes represented should be credible in terms of both the causative fault 
 magnitude. In most cases, one of the disaggregated hazard scenarios should suffice.</p>
 </div>
 <div class="section" id="backup">
-<h3>4.1.7. Backup<a class="headerlink" href="#backup" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.1.7. </span>Backup<a class="headerlink" href="#backup" title="Permalink to this headline">¶</a></h3>
 <p>Because of the importance of ShakeMap, it is advisable to run redundant systems. Most
 ShakeMap operations have a primary and backup machine. The backup machine runs
 events as if it were the primary, except it does not transfer its products to the web or other
@@ -218,147 +220,156 @@ backup for your ShakeMap system, please contact us.</p>
 </div>
 </div>
 <div class="section" id="shakemap-implementation-checklist">
-<h2>4.2. ShakeMap Implementation Checklist<a class="headerlink" href="#shakemap-implementation-checklist" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.2. </span>ShakeMap Implementation Checklist<a class="headerlink" href="#shakemap-implementation-checklist" title="Permalink to this headline">¶</a></h2>
 <p>The checklist below is based on the one we use when discussing ShakeMap operations with active or
 potential producers within the USGS’s Advanced National Seismic System (ANSS).
 While some of the issues are ANSS-specific, there may be analogous considerations for
 other regional or national networks.</p>
 <ol class="arabic simple">
-<li><strong>Triggering</strong><ol class="upperalpha">
-<li>Automatic Triggering System.  How is ShakeMap triggered and how does it
+<li><p><strong>Triggering</strong></p>
+<ol class="upperalpha simple">
+<li><p>Automatic Triggering System.  How is ShakeMap triggered and how does it
 access or receive parametric data?  How is robustness of this approach
-achieved?</li>
-<li>Location &amp; Magnitude Reliability.  Are there limitations to location and
+achieved?</p></li>
+<li><p>Location &amp; Magnitude Reliability.  Are there limitations to location and
 magnitude determination by the regional network that would adversely affect
-automatic ShakeMap products?</li>
-<li>Regional Coverage.  What are the boundaries of the area within which the
-local network will generate ShakeMaps?</li>
-<li>Alarm Region.  For events outside ShakeMap boundaries, is a ShakeMap run
-initiated?  Under what conditions?</li>
-<li>ShakeMap ID.  Does the naming of ShakeMap ID follow the ANSS
-convention?  If not, can they be easily associated with the authoritative ID?</li>
+automatic ShakeMap products?</p></li>
+<li><p>Regional Coverage.  What are the boundaries of the area within which the
+local network will generate ShakeMaps?</p></li>
+<li><p>Alarm Region.  For events outside ShakeMap boundaries, is a ShakeMap run
+initiated?  Under what conditions?</p></li>
+<li><p>ShakeMap ID.  Does the naming of ShakeMap ID follow the ANSS
+convention?  If not, can they be easily associated with the authoritative ID?</p></li>
 </ol>
 </li>
-<li><strong>Station Coverage and Parametric Data</strong><ol class="upperalpha">
-<li>Real-time or near–real-time data flow.  What are the types and distribution of
-stations contributing to ShakeMap? Are all stations “ShakeMap-quality”?</li>
-<li>Parametric Data.  How are the parametric data computed? (Five parameters:
-PGA, PGV, and three periods of PSA.)</li>
-<li>Are parametric data imported from other sources (NSMP-triggered stations,
+<li><p><strong>Station Coverage and Parametric Data</strong></p>
+<ol class="upperalpha simple">
+<li><p>Real-time or near–real-time data flow.  What are the types and distribution of
+stations contributing to ShakeMap? Are all stations “ShakeMap-quality”?</p></li>
+<li><p>Parametric Data.  How are the parametric data computed? (Five parameters:
+PGA, PGV, and three periods of PSA.)</p></li>
+<li><p>Are parametric data imported from other sources (NSMP-triggered stations,
 state or commercial agencies, neighboring networks, etc.)? How are these
-integrated with the ShakeMap input?</li>
-<li>Are “Did You Feel It?” data used as input?</li>
-<li>Co-location of different sensor types, priorities, and preventing redundant
+integrated with the ShakeMap input?</p></li>
+<li><p>Are “Did You Feel It?” data used as input?</p></li>
+<li><p>Co-location of different sensor types, priorities, and preventing redundant
 input data. How are co-located instruments resolved by the network to
-produce only a single (best) set of amplitudes for ShakeMap?</li>
+produce only a single (best) set of amplitudes for ShakeMap?</p></li>
 </ol>
 </li>
-<li><strong>System Specifications</strong><ol class="upperalpha">
-<li>Grind parameters. Review the parameters in <em>grind.conf</em>. How were they
-determined?<ol class="loweralpha">
-<li>GMPEs. Which Ground-Motion Prediction Equations are used, and
-under what conditions?</li>
-<li>IPEs. Which Intensity Prediction Equations are used, and under what
-circumstances?</li>
-<li>GMICEs. Which Ground-Motion–Intensity Conversion Equations are
-used?</li>
-<li>Site Amplification.  How are site conditions established and what
-amplifications are used (GMPE-native, Borcherdt-style)?</li>
-<li>Other parameters. Grid spacing, map area, outlier levels, bias
+<li><p><strong>System Specifications</strong></p>
+<ol class="upperalpha simple">
+<li><p>Grind parameters. Review the parameters in <em>grind.conf</em>. How were they
+determined?</p>
+<ol class="loweralpha simple">
+<li><p>GMPEs. Which Ground-Motion Prediction Equations are used, and
+under what conditions?</p></li>
+<li><p>IPEs. Which Intensity Prediction Equations are used, and under what
+circumstances?</p></li>
+<li><p>GMICEs. Which Ground-Motion–Intensity Conversion Equations are
+used?</p></li>
+<li><p>Site Amplification.  How are site conditions established and what
+amplifications are used (GMPE-native, Borcherdt-style)?</p></li>
+<li><p>Other parameters. Grid spacing, map area, outlier levels, bias
 parameters. Have all parameters been evaluated for optimal
-performance?</li>
-<li><em>Shake.conf</em>. When is map size increased, PSA and HAZUS output
-produced, etc.?</li>
+performance?</p></li>
+<li><p><em>Shake.conf</em>. When is map size increased, PSA and HAZUS output
+produced, etc.?</p></li>
 </ol>
 </li>
-<li>Spatial Correlation Function. Which spatial correlation function is used?</li>
-<li>Basin response. Is a basin response applied in any areas? If so, how was the
+<li><p>Spatial Correlation Function. Which spatial correlation function is used?</p></li>
+<li><p>Basin response. Is a basin response applied in any areas? If so, how was the
 basin depth file produced, and are predicted ground motions consistent with
-reality?</li>
+reality?</p></li>
 </ol>
 </li>
-<li><strong>Operations</strong><ol class="upperalpha">
-<li>Which version of ShakeMap is operational? Who is responsible for updating
-the software when updates are released? When and how are the updates performed?</li>
-<li>Who is responsible for routine scientific review of ShakeMaps produced by
-the network? Do these people receive alarms when ShakeMaps are produced?</li>
-<li>Who is responsible for routine operational review of the ShakeMap system
+<li><p><strong>Operations</strong></p>
+<ol class="upperalpha simple">
+<li><p>Which version of ShakeMap is operational? Who is responsible for updating
+the software when updates are released? When and how are the updates performed?</p></li>
+<li><p>Who is responsible for routine scientific review of ShakeMaps produced by
+the network? Do these people receive alarms when ShakeMaps are produced?</p></li>
+<li><p>Who is responsible for routine operational review of the ShakeMap system
 (checking logs, process and database monitoring, etc.)? When are reviews
-performed?</li>
-<li>Reprocessing. Under what circumstances are events reprocessed (new data,
+performed?</p></li>
+<li><p>Reprocessing. Under what circumstances are events reprocessed (new data,
 change in source parameters, etc.)? What about in the longer term (ShakeMap
-software updates, changes in operational parameters)?</li>
-<li>Finite faults. For larger earthquakes, who is responsible for producing a finite
+software updates, changes in operational parameters)?</p></li>
+<li><p>Finite faults. For larger earthquakes, who is responsible for producing a finite
 fault model for inclusion in ShakeMap? What procedures are in place for
-assuring this is done?</li>
-<li>Aftershock exclusion. How will you change the triggering threshold
-immediately after a major earthquake in your region?</li>
-<li>Version history. Under what circumstances are maps (and their input data)
-preserved using ShakeMap versioning?</li>
-<li>Have there been any local changes to the ShakeMap software that will hinder
+assuring this is done?</p></li>
+<li><p>Aftershock exclusion. How will you change the triggering threshold
+immediately after a major earthquake in your region?</p></li>
+<li><p>Version history. Under what circumstances are maps (and their input data)
+preserved using ShakeMap versioning?</p></li>
+<li><p>Have there been any local changes to the ShakeMap software that will hinder
 upgrades? Can these customizations be incorporated into the ShakeMap
 distribution for easier upgrades? If not, how can they be structured to
-accommodate easy upgrades of ShakeMap?</li>
-<li>What is the hardware for ShakeMap processing and for local web service?</li>
-<li>How is hardware redundancy achieved?</li>
-<li>Are the hardware and software systems automatically monitored? Do they
-generate alerts when problems are detected?</li>
+accommodate easy upgrades of ShakeMap?</p></li>
+<li><p>What is the hardware for ShakeMap processing and for local web service?</p></li>
+<li><p>How is hardware redundancy achieved?</p></li>
+<li><p>Are the hardware and software systems automatically monitored? Do they
+generate alerts when problems are detected?</p></li>
 </ol>
 </li>
-<li><strong>Product Distribution and Uniformity</strong><ol class="upperalpha">
-<li>Are products delivered to Earthquake Program Web Servers via PDL?</li>
-<li>Are local webpages produced? Where do they reside? How is ShakeMap
-transferred? Are redundant web servers and 24/7 support available?</li>
-<li>Are regional ShakeMap webpages customized to reflect regional
-configurations and implementation specifics?</li>
+<li><p><strong>Product Distribution and Uniformity</strong></p>
+<ol class="upperalpha simple">
+<li><p>Are products delivered to Earthquake Program Web Servers via PDL?</p></li>
+<li><p>Are local webpages produced? Where do they reside? How is ShakeMap
+transferred? Are redundant web servers and 24/7 support available?</p></li>
+<li><p>Are regional ShakeMap webpages customized to reflect regional
+configurations and implementation specifics?</p></li>
 </ol>
 </li>
-<li><strong>ANSS Coordination</strong><ol class="upperalpha">
-<li>Provide Software/Feedback to ANSS.  To benefit current operators and to
+<li><p><strong>ANSS Coordination</strong></p>
+<ol class="upperalpha simple">
+<li><p>Provide Software/Feedback to ANSS.  To benefit current operators and to
 ensure compatibility and ease of installing new ShakeMap software releases,
 changes to ShakeMap software (above and beyond configuration changes)
 should be provided to Bruce Worden for review, standardization, and
-inclusion in new releases.</li>
-<li>Provide contacts, their background, and roles in implementation, coordination,
-and operations.</li>
-<li>Are all responsible parties subscribed to the <em>shake-dev</em> mailing list?</li>
+inclusion in new releases.</p></li>
+<li><p>Provide contacts, their background, and roles in implementation, coordination,
+and operations.</p></li>
+<li><p>Are all responsible parties subscribed to the <em>shake-dev</em> mailing list?</p></li>
 </ol>
 </li>
-<li>User Coordination:
+<li><p>User Coordination:
 List significant users and outline any outreach efforts or plans. It is very useful to
 have a feeling for which users will rely on ShakeMap in each region, as well as to
 coordinate efforts for users of ShakeMaps for multiple regions (e.g., FEMA,
-DHS, Military).</li>
-<li><strong>Scenarios and Archives</strong><ol class="upperalpha">
-<li>Scenario earthquakes should be made to be consistent with USGS National
+DHS, Military).</p></li>
+<li><p><strong>Scenarios and Archives</strong></p>
+<ol class="upperalpha simple">
+<li><p>Scenario earthquakes should be made to be consistent with USGS National
 Hazard Maps, both with attenuation relations and in source parameterization.
-Coordination with the National Earthquake Information Center (NEIC) is essential.</li>
-<li>Is a copy of scenarios also available on the USGS web site?</li>
-<li>How and when will scenarios be reprocessed?</li>
-<li>Archive “final” ShakeMaps for significant events.  Many users want
+Coordination with the National Earthquake Information Center (NEIC) is essential.</p></li>
+<li><p>Is a copy of scenarios also available on the USGS web site?</p></li>
+<li><p>How and when will scenarios be reprocessed?</p></li>
+<li><p>Archive “final” ShakeMaps for significant events.  Many users want
 ShakeMaps for significant events “frozen in time”. Once a ShakeMap gets
 used as a reference for damage-loss modelers, insurance investigators, and
 researchers, there needs to be an archival version of these events. Once all the
 available ground-motion data have been collected and included in ShakeMap,
 that Version of the map needs to be kept available even if additional updates
-are made. (This process has not yet been fully vetted.)</li>
+are made. (This process has not yet been fully vetted.)</p></li>
 </ol>
 </li>
-<li><strong>Backup Strategy</strong><ol class="upperalpha">
-<li>If the primary system fails, what provisions exist for a backup system or
+<li><p><strong>Backup Strategy</strong></p>
+<ol class="upperalpha simple">
+<li><p>If the primary system fails, what provisions exist for a backup system or
 another network to take over ShakeMap operations? Is this backup automatic
-or manual?</li>
-<li>If the entire facility goes offline, is there an off-site backup?</li>
-<li>Are waveform or parametric data transmitted to NEIC for national-level
-backup?</li>
+or manual?</p></li>
+<li><p>If the entire facility goes offline, is there an off-site backup?</p></li>
+<li><p>Are waveform or parametric data transmitted to NEIC for national-level
+backup?</p></li>
 </ol>
 </li>
-<li><strong>Feedback</strong>:
-Do you have any recommendations for further support, software, features, etc.?</li>
+<li><p><strong>Feedback</strong>:
+Do you have any recommendations for further support, software, features, etc.?</p></li>
 </ol>
 </div>
 <div class="section" id="software-availability-software-guide">
-<span id="sm35-software-guide"></span><h2>4.3. Software Availability &amp; Software Guide<a class="headerlink" href="#software-availability-software-guide" title="Permalink to this headline">¶</a></h2>
+<span id="sm35-software-guide"></span><h2><span class="section-number">4.3. </span>Software Availability &amp; Software Guide<a class="headerlink" href="#software-availability-software-guide" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap requires the freely available PERL, MySQL, and GMT (Generic Mapping Tools),
 as well as a few other packages. PERL and GMT are used quite extensively, so any background
 with them is advantageous. You will need to assemble the basic GMT-formatted basemaps,
@@ -370,8 +381,8 @@ does not run on Windows. See the Software Guide for more information. The softwa
 is available as a <a class="reference external" href="http://subversion.apache.org/">SubVersion</a> checkout from:</p>
 <p><a class="reference external" href="https://vault.gps.caltech.edu/repos/products/shakemap/tags/release-3.5/">https://vault.gps.caltech.edu/repos/products/shakemap/tags/release-3.5/</a></p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Do not attempt to install ShakeMap on Ubuntu Linux. It has been nothing
+<p class="admonition-title">Note</p>
+<p>Do not attempt to install ShakeMap on Ubuntu Linux. It has been nothing
 but a problem for everyone who has tried it, and we will no longer provide
 support for this operating system.</p>
 </div>
@@ -386,17 +397,15 @@ distribution should be followed.</p>
 <p><a class="reference external" href="https://geohazards.usgs.gov/mailman/listinfo/shake-dev">https://geohazards.usgs.gov/mailman/listinfo/shake-dev</a></p>
 <p>We use this mailing list to communicate software updates, as well as provide support
 when users have problems, suggestions, etc.</p>
-<table class="docutils footnote" frame="void" id="id2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><p class="first">The VS30 server currently provides GMT <em>grd</em> files in pixel node registration and
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>The VS30 server currently provides GMT <em>grd</em> files in pixel node registration and
 ShakeMap works in gridline node registration. You can fix your Vs30 file by:</p>
 <p>grdsample your_vs30_grid.grd -Gnew_file_name.grd –T</p>
-<p class="last">You then configure <em>grind.conf</em> to look at <em>new_file_name.grd</em>.
+<p>You then configure <em>grind.conf</em> to look at <em>new_file_name.grd</em>.
 See <em>grind.conf</em> for details.</p>
-</td></tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -424,7 +433,10 @@ See <em>grind.conf</em> for details.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual (Deprecated)</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a></li>
@@ -450,18 +462,15 @@ See <em>grind.conf</em> for details.</p>
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

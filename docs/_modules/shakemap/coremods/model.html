@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakemap.coremods.model &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -95,17 +92,22 @@
 <span class="c1"># min_mmi_convert: the minimum MMI to convert to PGM -- low</span>
 <span class="c1">#                  intensities don&#39;t convert very accurately</span>
 <span class="c1"># default_stddev_inter: This is a stand-in for tau when the gmpe set</span>
-<span class="c1">#                       doesn&#39;t provide it. It is an educated guess</span>
-<span class="c1">#                       based on the NGA-east work and BC Hydro gmpe.</span>
+<span class="c1">#                       doesn&#39;t provide it. It is an educated guess based</span>
+<span class="c1">#                       on the NGA-west, Akkar et al, and BC Hydro gmpes.</span>
 <span class="c1">#                       It&#39;s not perfect, but probably isn&#39;t too far off.</span>
-<span class="c1">#                       It is only used when the GMPEs don&#39;t provide a</span>
-<span class="c1">#                       breakdown of the uncertainty terms.</span>
+<span class="c1">#                       It is only used when the GMPE(s) don&#39;t provide a</span>
+<span class="c1">#                       breakdown of the uncertainty terms. When used,</span>
+<span class="c1">#                       this value is multiplied by the total standard</span>
+<span class="c1">#                       deviation to get tau. The square of tau is then</span>
+<span class="c1">#                       subtracted from the squared total stddev and the</span>
+<span class="c1">#                       square root of the result is then used as the</span>
+<span class="c1">#                       within-event stddev (phi).</span>
 <span class="c1">#</span>
 <span class="n">SM_CONSTS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;default_mmi_stddev&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
     <span class="s1">&#39;min_mmi_convert&#39;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>
-    <span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">,</span>
-    <span class="s1">&#39;default_stddev_inter_mmi&#39;</span><span class="p">:</span> <span class="mf">0.4</span>
+    <span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">:</span> <span class="mf">0.55</span><span class="p">,</span>
+    <span class="s1">&#39;default_stddev_inter_mmi&#39;</span><span class="p">:</span> <span class="mf">0.55</span>
 <span class="p">}</span>
 
 
@@ -129,6 +131,7 @@
     <span class="n">no_seismic</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">no_macroseismic</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">no_rupture</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">use_simulations</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">rock_vs30</span> <span class="o">=</span> <span class="mf">760.0</span>
     <span class="n">soil_vs30</span> <span class="o">=</span> <span class="mf">180.0</span>
@@ -190,6 +193,11 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setInputContainer</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_imt_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">getArrays</span><span class="p">()</span>
+                              <span class="k">if</span> <span class="s1">&#39;simulations&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_imt_paths</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_simulations</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Clear away results from previous runs</span>
@@ -344,9 +352,22 @@
         <span class="c1"># Get the combined set of input and output IMTs, their periods,</span>
         <span class="c1"># and an index dictionary, then make the cross-correlation function</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">combined_imt_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imt_out_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">ndf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">combined_imt_set</span> <span class="o">|=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span><span class="o">.</span><span class="n">imts</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_simulations</span><span class="p">:</span>
+            <span class="c1">#</span>
+            <span class="c1"># Ignore what is in the configuration and make maps only for the</span>
+            <span class="c1"># IMTs that are in the set of simulations (and MMI).</span>
+            <span class="c1">#</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">combined_imt_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_imt_paths</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_df</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">combined_imt_set</span><span class="p">:</span>
+                <span class="n">dset</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s1">&#39;simulations&#39;</span><span class="p">],</span> <span class="n">imtstr</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">dset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">combined_imt_set</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;MMI&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">combined_imt_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imt_out_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">ndf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">combined_imt_set</span> <span class="o">|=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span><span class="o">.</span><span class="n">imts</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">imt_per</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imt_per_ix</span> <span class="o">=</span> <span class="n">_get_period_arrays</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">combined_imt_set</span><span class="p">)</span>
@@ -413,6 +434,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">imt_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">imt_out_set</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_computeMVN</span><span class="p">(</span><span class="n">imt_str</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_applyCustomMask</span><span class="p">()</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Output the data and metadata</span>
@@ -568,6 +591,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">vs30_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;vs30file&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">vs30_file</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vs30_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;maskfile&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask_file</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_setOutputParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -576,8 +602,41 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            nothing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="ow">and</span> \
-           <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_simulations</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_grid</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">imt_grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_imt_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">groups</span> <span class="o">=</span> <span class="n">imt_grp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="n">myimt</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">groups</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">geodict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">myimt</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">geodict</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="n">geodict</span><span class="p">[</span><span class="s1">&#39;xmax&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">geodict</span><span class="p">[</span><span class="s1">&#39;ymin&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">geodict</span><span class="p">[</span><span class="s1">&#39;ymax&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span> <span class="o">=</span> <span class="n">geodict</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span> <span class="o">=</span> <span class="n">geodict</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">fromBounds</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">,</span>
+                <span class="n">defaultVs30</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vs30default</span><span class="p">,</span>
+                <span class="n">vs30File</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vs30_file</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smny</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getNxNy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getSitesContext</span><span class="p">()</span>
+            <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lons</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lats</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lons</span> <span class="o">=</span> <span class="n">lons</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="o">.</span><span class="n">lats</span> <span class="o">=</span> <span class="n">lats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lons</span> <span class="o">=</span> <span class="n">lons</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lats</span> <span class="o">=</span> <span class="n">lats</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span>
+            <span class="n">dist_obj_out</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">fromSites</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_gmpe</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">sites_obj_out</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="ow">and</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span><span class="p">):</span>
             <span class="c1">#</span>
             <span class="c1"># FILE: Open the file and get the output points</span>
             <span class="c1">#</span>
@@ -585,7 +644,7 @@
             <span class="n">in_sites</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">],</span>
                 <span class="n">autostrip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="s1">&#39;&lt;U80&#39;</span><span class="p">])</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="s1">&#39;&lt;U80&#39;</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">in_sites</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Points file is empty; nothing to do&#39;</span><span class="p">)</span>
                 <span class="k">return</span>
@@ -845,10 +904,9 @@
                     <span class="n">total_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipe_total_sd_only</span>
                     <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter_mmi&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">total_only</span><span class="p">:</span>
-                    <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
-                        <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tau_guess</span> <span class="o">*</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
-                        <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                        <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
@@ -993,15 +1051,15 @@
                     <span class="n">total_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipe_total_sd_only</span>
                     <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter_mmi&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">total_only</span><span class="p">:</span>
-                    <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
-                        <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
-                    <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
-                                                        <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tau_guess</span> <span class="o">*</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                        <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
                 <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">-</span> <span class="n">pmean</span>
                 <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">])</span>
+                <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">|=</span> <span class="n">df2</span><span class="p">[</span><span class="s1">&#39;MMI_outliers&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_deriveMMIFromIMTs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1043,12 +1101,14 @@
         <span class="k">if</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_sd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">preferred_imts</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">df1</span><span class="p">:</span>
                 <span class="n">ixx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">])</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">=</span> <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_sd&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">=</span> \
                     <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span>
+                <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_outliers&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">|=</span> <span class="n">df1</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">imts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Get the prediction and stddevs</span>
@@ -1071,15 +1131,14 @@
         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma_soil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev_soil</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipe_total_sd_only</span><span class="p">:</span>
             <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter_mmi&#39;</span><span class="p">]</span>
-            <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
-                <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
+            <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tau_guess</span> <span class="o">*</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
-                <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">pmean</span>
-        <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">])</span>
+        <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">|=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_fillDataArrays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1229,7 +1288,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nominal_bias</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">nom_variance</span>
             <span class="n">bias_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time1</span>
             <span class="c1">#</span>
-            <span class="c1"># Print the nominal values of the bias and its stddev</span>
+            <span class="c1"># Write the nominal values of the bias and its stddev to log</span>
             <span class="c1">#</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: nom bias </span><span class="si">%f</span><span class="s1"> nom stddev </span><span class="si">%f</span><span class="s1">; </span><span class="si">%d</span><span class="s1"> stations (time=</span><span class="si">%f</span><span class="s1"> sec)&#39;</span>
@@ -1299,6 +1358,14 @@
         <span class="n">pout_mean</span><span class="p">,</span> <span class="n">pout_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
             <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_simulations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                <span class="n">pout_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gmice</span><span class="o">.</span><span class="n">getPreferredMI</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_df</span><span class="p">,</span>
+                                                      <span class="n">dists</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="o">.</span><span class="n">rrup</span><span class="p">,</span>
+                                                      <span class="n">mag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pout_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
+
         <span class="c1">#</span>
         <span class="c1"># While we have the gmpe for this IMT, we should make</span>
         <span class="c1"># the attenuation curves</span>
@@ -1336,9 +1403,9 @@
             <span class="n">total_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipe_total_sd_only</span>
             <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter_mmi&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">total_only</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pout_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">psd_raw</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pout_sd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">tau_guess</span> <span class="o">*</span> <span class="n">pout_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pout_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psd_raw</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pout_sd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pout_sd</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">psd_raw</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pout_sd</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
@@ -1471,6 +1538,13 @@
             <span class="n">make_sd_array</span><span class="p">(</span><span class="n">sdgrid</span><span class="p">,</span> <span class="n">pout_sd2</span><span class="p">,</span> <span class="n">iy</span><span class="p">,</span> <span class="n">rcmatrix</span><span class="p">,</span> <span class="n">matrix12</span><span class="p">)</span>
             <span class="n">mtime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
 
+        <span class="c1">#</span>
+        <span class="c1"># This processing can result in MMI values that go beyond</span>
+        <span class="c1"># the 1 to 10 bounds of MMI, so we apply that constraint again</span>
+        <span class="c1"># here</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+            <span class="n">ampgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ampgrid</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampgrid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">sdgrid</span>
 
@@ -1483,31 +1557,47 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;total time for </span><span class="si">%s</span><span class="s1">=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time1</span><span class="p">))</span>
 
+    <span class="k">def</span> <span class="nf">_applyCustomMask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Apply custom masks to IMT grid outputs. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_file</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask_file</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgrid</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">grid</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
     <span class="k">def</span> <span class="nf">_getLandMask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the landmask for this map. Land will be False, water will</span>
 <span class="sd">        be True (because of the way masked arrays work).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">oceans</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">oceans</span> <span class="o">=</span> <span class="n">shpreader</span><span class="o">.</span><span class="n">natural_earth</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;physical&#39;</span><span class="p">,</span>
+                                             <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ocean&#39;</span><span class="p">,</span>
+                                             <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getMask</span><span class="p">(</span><span class="n">oceans</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a masked array for this map corresponding to the given vector</span>
+<span class="sd">        feature.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grid</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">gd</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromBox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span>
                                        <span class="bp">self</span><span class="o">.</span><span class="n">smdx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smdy</span><span class="p">)</span>
         <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">vector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">gd</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">nx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
 
-        <span class="n">oceans</span> <span class="o">=</span> <span class="n">shpreader</span><span class="o">.</span><span class="n">natural_earth</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;physical&#39;</span><span class="p">,</span>
-                                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ocean&#39;</span><span class="p">,</span>
-                                         <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">oceans</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
             <span class="n">tshapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">))</span>
             <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">tshp</span> <span class="ow">in</span> <span class="n">tshapes</span><span class="p">:</span>
                 <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">tshp</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">):</span>
-                <span class="n">oceangrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">rasterizeFromGeometry</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span>
-                                                         <span class="n">fillValue</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">oceangrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+                <span class="n">grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">rasterizeFromGeometry</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span> <span class="n">fillValue</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">gd</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">nx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
 
@@ -1598,8 +1688,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;seismic_stations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;src_mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mech</span>
-        <span class="c1"># This AND locaction?</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">locstring</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_description&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_description&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">locstring</span>
         <span class="c1"># This AND src_mech?</span>
         <span class="c1"># look at the origin information for indications that this</span>
         <span class="c1"># event is a scenario</span>
@@ -1752,10 +1845,12 @@
             <span class="n">sdf</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span><span class="o">.</span><span class="n">df</span>
             <span class="n">imts</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span><span class="o">.</span><span class="n">imts</span>
             <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imts</span><span class="p">:</span>
-                <span class="n">mybias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">/</span> \
+                <span class="n">mybias_var</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> \
                     <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
                      <span class="bp">self</span><span class="o">.</span><span class="n">bias_den</span><span class="p">[</span><span class="n">myimt</span><span class="p">])</span>
+                <span class="n">mybias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">*</span> <span class="n">mybias_var</span>
                 <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_bias&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mybias</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+                <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_bias_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mybias_var</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Add the station data. The stationlist object has the original</span>
@@ -1826,9 +1921,14 @@
                     <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">])</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">]</span> <span class="o">=</span> \
                     <span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;MMI_sd&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;MMI_nresp&#39;</span> <span class="ow">in</span> <span class="n">sdf</span><span class="p">:</span>
+                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;MMI_nresp&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
+                <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
 
             <span class="k">if</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">in</span> <span class="n">sdf</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;PGA_outliers&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span> \
                     <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">])</span> \
@@ -1865,6 +1965,7 @@
                 <span class="n">sigma_str_rock</span> <span class="o">=</span> <span class="s1">&#39;ln_sigma_rock&#39;</span>
                 <span class="n">sigma_str_soil</span> <span class="o">=</span> <span class="s1">&#39;ln_sigma_soil&#39;</span>
                 <span class="n">bias_str</span> <span class="o">=</span> <span class="s1">&#39;ln_bias&#39;</span>
+                <span class="n">bias_sigma_str</span> <span class="o">=</span> <span class="s1">&#39;ln_bias_sigma&#39;</span>
                 <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PGV&#39;</span><span class="p">):</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp</span><span class="p">)</span>
                     <span class="n">value_rock</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp_rock</span><span class="p">)</span>
@@ -1881,6 +1982,7 @@
                     <span class="n">sigma_str_rock</span> <span class="o">=</span> <span class="s1">&#39;sigma_rock&#39;</span>
                     <span class="n">sigma_str_soil</span> <span class="o">=</span> <span class="s1">&#39;sigma_soil&#39;</span>
                     <span class="n">bias_str</span> <span class="o">=</span> <span class="s1">&#39;bias&#39;</span>
+                    <span class="n">bias_sigma_str</span> <span class="o">=</span> <span class="s1">&#39;bias_sigma&#39;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
                     <span class="n">value_rock</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp_rock</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
@@ -1896,6 +1998,7 @@
                 <span class="n">mysigma_soil</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_sigma_soil&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                 <span class="n">imt_name</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_pred&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
                 <span class="n">mybias</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">imt_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;_bias&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
+                <span class="n">mybias_sigma</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">imt_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;_bias_sigma&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
                     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">imt_name</span><span class="p">,</span>
                     <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
@@ -1908,6 +2011,7 @@
                     <span class="n">sigma_str_rock</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysigma_rock</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="n">sigma_str_soil</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysigma_soil</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="n">bias_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mybias</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                    <span class="n">bias_sigma_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mybias_sigma</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                 <span class="p">})</span>
             <span class="c1">#</span>
             <span class="c1"># For df1 stations, add the MMIs comverted from PGM</span>
@@ -1926,10 +2030,17 @@
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">myamp</span><span class="p">):</span>
                         <span class="n">myamp</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
                         <span class="n">mysd</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
+                        <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s2">&quot;_outliers&quot;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;Outlier&quot;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
                     <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;mmi_from_pgm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
                         <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">imt_name</span><span class="p">,</span>
                         <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">myamp</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
                         <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysd</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                        <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="n">flag</span>
                     <span class="p">})</span>
 
             <span class="c1">#</span>
@@ -1952,11 +2063,18 @@
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
                         <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
                         <span class="n">mysd</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
+                        <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s2">&quot;_outliers&quot;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;Outlier&quot;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">flag</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
                     <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgm_from_mmi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
                         <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">imt_name</span><span class="p">,</span>
                         <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                         <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
                         <span class="s1">&#39;ln_sigma&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysd</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                        <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="n">flag</span>
                     <span class="p">})</span>
             <span class="c1">#</span>
             <span class="c1"># Set the generic distance property (this is rrup)</span>
@@ -2619,19 +2737,19 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

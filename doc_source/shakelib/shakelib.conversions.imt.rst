@@ -11,6 +11,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.conversions.imt
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

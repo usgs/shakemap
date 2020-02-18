@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakemap.utils.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,10 +13,9 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakelib" href="../shakelib/shakelib.html" />
+    <link rel="next" title="ShakeMap 3.5 Manual" href="../manual3_5/index.html" />
     <link rel="prev" title="shakemap.utils.queue" href="shakemap.utils.queue.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -38,115 +35,101 @@
 <span id="shakemap-utils-utils"></span><h1>shakemap.utils.utils<a class="headerlink" href="#module-shakemap.utils.utils" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="shakemap.utils.utils.migrate_gmpe">
-<code class="descclassname">shakemap.utils.utils.</code><code class="descname">migrate_gmpe</code><span class="sig-paren">(</span><em>old_gmpe</em>, <em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#migrate_gmpe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.migrate_gmpe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.utils.</code><code class="sig-name descname">migrate_gmpe</code><span class="sig-paren">(</span><em class="sig-param">old_gmpe</em>, <em class="sig-param">config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#migrate_gmpe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.migrate_gmpe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the GMPE that should be used to replace SM3.5 GMPE</p>
 <p>By default, this uses the migrate.conf file found in the ShakeMap
 repository. Users can optionally pass in their own config.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>old_gmpe</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – ShakeMap 3.5 GMPE string</li>
-<li><strong>config</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Input configobj dict or None.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_gmpe</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – ShakeMap 3.5 GMPE string</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Input configobj dict or None.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New GMPE string, and GMPE reference string.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New GMPE string, and GMPE reference string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakemap.utils.utils.set_gmpe">
-<code class="descclassname">shakemap.utils.utils.</code><code class="descname">set_gmpe</code><span class="sig-paren">(</span><em>gmpe</em>, <em>config</em>, <em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#set_gmpe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.set_gmpe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.utils.</code><code class="sig-name descname">set_gmpe</code><span class="sig-paren">(</span><em class="sig-param">gmpe</em>, <em class="sig-param">config</em>, <em class="sig-param">eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#set_gmpe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.set_gmpe" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="shakemap.utils.utils.get_network_name">
-<code class="descclassname">shakemap.utils.utils.</code><code class="descname">get_network_name</code><span class="sig-paren">(</span><em>netid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_network_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.get_network_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.utils.</code><code class="sig-name descname">get_network_name</code><span class="sig-paren">(</span><em class="sig-param">netid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_network_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.get_network_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a string representing a name of a network given its ID.</p>
 <p>Note: Uses an internet connection to ComCat.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>netid</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Usually two-character network ID (us,ci, etc.)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Network name, or “unknown” if input netid is invalid.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>netid</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Usually two-character network ID (us,ci, etc.)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Network name, or “unknown” if input netid is invalid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakemap.utils.utils.get_object_from_config">
-<code class="descclassname">shakemap.utils.utils.</code><code class="descname">get_object_from_config</code><span class="sig-paren">(</span><em>obj</em>, <em>section</em>, <em>cfg</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_object_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.get_object_from_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.utils.</code><code class="sig-name descname">get_object_from_config</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">section</em>, <em class="sig-param">cfg</em>, <em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_object_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.get_object_from_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function for things (ipe, gmice, ccf) that don’t have a
 fromConfig() constructor yet. Instantiates an instance of a
 class from config entry, ‘name’, that has a corresponding
 ‘name’_module dictionary of class name, module path.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>obj</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the parameter in the config file that specifies
-the object to be instantiated.</li>
-<li><strong>section</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The section of the config in which ‘obj’ resides.</li>
-<li><strong>cfg</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The configuration file in which ‘obj’ and the
-module definitions reside.</li>
-<li><strong>args</strong> – Additional arguments that will be passed to the constructor
-of the thing being instantiated.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the parameter in the config file that specifies
+the object to be instantiated.</p></li>
+<li><p><strong>section</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The section of the config in which ‘obj’ resides.</p></li>
+<li><p><strong>cfg</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The configuration file in which ‘obj’ and the
+module definitions reside.</p></li>
+<li><p><strong>args</strong> – Additional arguments that will be passed to the constructor
+of the thing being instantiated.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>An instance of the object specified by the ‘obj’ parameter</dt>
-<dd><p class="first last">in the config file..</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>An instance of the object specified by the ‘obj’ parameter</dt><dd><p>in the config file..</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)">object</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)">object</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="shakemap.utils.utils.query_yes_no">
-<code class="descclassname">shakemap.utils.utils.</code><code class="descname">query_yes_no</code><span class="sig-paren">(</span><em>question</em>, <em>default='yes'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#query_yes_no"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.query_yes_no" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.utils.</code><code class="sig-name descname">query_yes_no</code><span class="sig-paren">(</span><em class="sig-param">question</em>, <em class="sig-param">default='yes'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#query_yes_no"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.query_yes_no" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ask a yes/no question via raw_input() and return their answer.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>question</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – a string that is presented to the user.</li>
-<li><strong>default</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the presumed answer if the user just hits &lt;Enter&gt;.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – a string that is presented to the user.</p></li>
+<li><p><strong>default</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the presumed answer if the user just hits &lt;Enter&gt;.
 It must be “yes” (the default), “no” or None (meaning
-an answer is required of the user).</li>
+an answer is required of the user).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The “answer” return value is True for “yes” or False for “no”.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The “answer” return value is True for “yes” or False for “no”.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -175,42 +158,36 @@ an answer is required of the user).</li>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.exception.html">shakemap.utils.exception</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.generic_amp.html">shakemap.utils.generic_amp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">shakemap.utils.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.exception.html">shakemap.utils.exception</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.generic_amp.html">shakemap.utils.generic_amp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.utils</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

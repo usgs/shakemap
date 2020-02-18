@@ -10,6 +10,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.gmpe
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

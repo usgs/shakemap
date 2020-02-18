@@ -1,19 +1,34 @@
+.. _manual_4_title_page:
+
 .. ShakeMap Manual documentation master file, created by
    sphinx-quickstart on Thu Nov 12 12:58:36 2015.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-ShakeMap Documentation
-======================
+=================
+ShakeMap 4 Manual
+=================
 
 .. toctree::
    :hidden:
 
-   manual3_5/index.rst
-   sm4_index.rst
+   ShakeMap 4.0 Manual <manual4_0/index>
+   ShakeMap 4.0 Command Line Interface <programs/programs>
+   ShakeMap 4.0 API  <apidoc/shakemap>
+   ShakeMap 3.5 Manual (Deprecated) <manual3_5/index>
 
-* :doc:`ShakeMap 3.5 Manual <manual3_5/index>`
-* :doc:`ShakeMap v4 Documentation <sm4_index>`
+
+.. rubric:: :ref:`Table of Contents <index-4>`                                 
+                                                                               
+.. image::  manual4_0/_static/northridge_logo_light.*                                    
+   :alt: ShakeMap Northridge                                                   
+   :scale: 100 %                                                               
+   :align: left                                                                
+                                                                               
+**written by: C. Bruce Worden, Eric M. Thompson, Michael G. Hearne,            
+and David J. Wald**                                                            
+
+
 
 .. Indices and tables
 .. ==================

@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>2.7. Discussion of Chosen Map Parameters (Intensity Measures) &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="3. User’s Guide" href="users_guide.html" />
@@ -34,10 +31,15 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="discussion-of-chosen-map-parameters-intensity-measures">
-<span id="tg-sec-choice-of-parameters"></span><h1>2.7. Discussion of Chosen Map Parameters (Intensity Measures)<a class="headerlink" href="#discussion-of-chosen-map-parameters-intensity-measures" title="Permalink to this headline">¶</a></h1>
+  <div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This ShakeMap 3.5 Manual is deprecated. Please see the <a class="reference external" href="http://usgs.github.io/shakemap/index.html">ShakeMap 4
+Manual</a>.</p>
+</div>
+<div class="section" id="discussion-of-chosen-map-parameters-intensity-measures">
+<span id="tg-sec-choice-of-parameters"></span><h1><span class="section-number">2.7. </span>Discussion of Chosen Map Parameters (Intensity Measures)<a class="headerlink" href="#discussion-of-chosen-map-parameters-intensity-measures" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="use-of-peak-values-rather-than-mean">
-<span id="peak-values-vs-mean"></span><h2>2.7.1. Use of Peak Values Rather than Mean<a class="headerlink" href="#use-of-peak-values-rather-than-mean" title="Permalink to this headline">¶</a></h2>
+<span id="peak-values-vs-mean"></span><h2><span class="section-number">2.7.1. </span>Use of Peak Values Rather than Mean<a class="headerlink" href="#use-of-peak-values-rather-than-mean" title="Permalink to this headline">¶</a></h2>
 <p>With ShakeMap, we chose to represent peak ground motions as recorded. We depict the
 larger of the two horizontal components, rather than as either a vector sum, or as a
 geometric mean value. The initial choice of peak values was necessitated by the fact that
@@ -49,9 +51,9 @@ values or median of the peak values—determining vector sums of the two horizon
 components was not an option, because the peak values on each component do not
 necessarily occur at the same time.  A useful strategy going forward may be to employ
 the 50th percentile of the response spectra over all non-redundant rotation angles
-(RotD50; <a class="reference internal" href="../manual4_0/references.html#boore2010"><span class="std std-ref">Boore, 2010</span></a>), which is becoming a standard
+(RotD50; <a class="reference internal" href="../manual4_0/sm4_references.html#boore2010"><span class="std std-ref">Boore, 2010</span></a>), which is becoming a standard
 for “next-generation”
-GMPEs (<a class="reference internal" href="../manual4_0/references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al., 2014</span></a>), or on another
+GMPEs (<a class="reference internal" href="../manual4_0/sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al., 2014</span></a>), or on another
 agreed-upon vector-component
 calculation. (See <a class="reference internal" href="future_directions.html#future-directions"><span class="std std-ref">Future Directions</span></a>). However, such changes would
 require adoption of these
@@ -66,7 +68,7 @@ such motions (particularly when determined in logarithmic space) can seriously u
 the largest motion that a building may have experienced, and these pulse-like motions are
 typically associated with the regions of greatest damage. Thus, we chose peak ground
 motions as the parameters to be mapped.</p>
-<p><a class="reference internal" href="../manual4_0/references.html#beyer2006"><span class="std std-ref">Beyer and Bommer (2006)</span></a> provide statistical relationships
+<p><a class="reference internal" href="../manual4_0/sm4_references.html#beyer2006"><span class="std std-ref">Beyer and Bommer (2006)</span></a> provide statistical relationships
 to convert among median and
 peak parameters and between aleatory variability for different definitions of the
 horizontal component of motion. This is useful when approximating alternative
@@ -75,19 +77,19 @@ these statistics may or may not be representative.</p>
 <p>Initially, our use of PGA and PGV for estimating intensities was also simply practical.
 We were retrieving only peak values from a large subset of the network, so it was
 impractical to compute more specific ground-motion parameters, such as average-
-response spectral values, kinetic energy, cumulative absolute velocities (CAV, <a class="reference internal" href="../manual4_0/references.html#epri1991"><span class="std std-ref">EPRI,
-1991</span></a>), or the JMA intensity algorithm (<a class="reference internal" href="../manual4_0/references.html#jma1996"><span class="std std-ref">JMA, 1996</span></a>). However, because
+response spectral values, kinetic energy, cumulative absolute velocities (CAV, <a class="reference internal" href="../manual4_0/sm4_references.html#epri1991"><span class="std std-ref">EPRI,
+1991</span></a>), or the JMA intensity algorithm (<a class="reference internal" href="../manual4_0/sm4_references.html#jma1996"><span class="std std-ref">JMA, 1996</span></a>). However, because
 near-source strong ground motions are often dominated by short-duration, pulse-like
 ground motions (usually associated with source directivity), PGV appears to be a robust measure
 of intensity for strong shaking. In other words, the kinetic energy (proportional to
 velocity squared) available for damage is well characterized by PGV. In addition, the
 close correspondence of the JMA intensities and peak ground velocity
 indicates that our use of peak ground velocities for higher intensities was
-consistent with the algorithm used by JMA. Work by <a class="reference internal" href="../manual4_0/references.html#wu2003"><span class="std std-ref">Wu et al. (2003)</span></a> indicates a very
+consistent with the algorithm used by JMA. Work by <a class="reference internal" href="../manual4_0/sm4_references.html#wu2003"><span class="std std-ref">Wu et al. (2003)</span></a> indicates a very
 good correspondence between PGV and damage for data collected on the island of Taiwan,
 which included high-quality loss data and densely sampled strong-motion observations
 for the 1999 Chi-Chi earthquake. More recent work on Ground-Motion/Intensity
-Conversion Equations (GMICEs) (e.g., <a class="reference internal" href="../manual4_0/references.html#atkinson2007"><span class="std std-ref">Atkinson and Kaka, 2007</span></a>; <a class="reference internal" href="../manual4_0/references.html#worden2012"><span class="std std-ref">Worden, et al., 2012</span></a>) has also
+Conversion Equations (GMICEs) (e.g., <a class="reference internal" href="../manual4_0/sm4_references.html#atkinson2007"><span class="std std-ref">Atkinson and Kaka, 2007</span></a>; <a class="reference internal" href="../manual4_0/sm4_references.html#worden2012"><span class="std std-ref">Worden, et al., 2012</span></a>) has also
 confirmed the strong relationship between PGV and intensity.</p>
 <p>Nonetheless, for large, distant earthquakes, peak motions may be less informative, and
 spectral content and perhaps duration become key parameters.  Although we may eventually
@@ -133,7 +135,10 @@ people involved with the initial emergency response.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual (Deprecated)</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="tg_software.html">2.1. ShakeMap Software Overview</a></li>
@@ -157,18 +162,15 @@ people involved with the initial emergency response.</p>
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

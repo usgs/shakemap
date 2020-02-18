@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakemap.coremods.contour &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -41,6 +38,7 @@
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
+<span class="kn">from</span> <span class="nn">fiona.crs</span> <span class="k">import</span> <span class="n">from_epsg</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
@@ -163,12 +161,7 @@
             <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span>
         <span class="p">}</span>
     <span class="p">}</span>
-    <span class="n">crs</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;no_defs&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s1">&#39;ellps&#39;</span><span class="p">:</span> <span class="s1">&#39;WGS84&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;datum&#39;</span><span class="p">:</span> <span class="s1">&#39;WGS84&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;proj&#39;</span><span class="p">:</span> <span class="s1">&#39;longlat&#39;</span>
-    <span class="p">}</span>
+    <span class="n">crs</span> <span class="o">=</span> <span class="n">from_epsg</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
 
     <span class="n">config</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
     <span class="n">gmice</span> <span class="o">=</span> <span class="n">get_object_from_config</span><span class="p">(</span><span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="s1">&#39;modeling&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
@@ -308,19 +301,19 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakemap.utils.config &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -113,7 +110,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find a profile file: &quot;</span>
                                     <span class="s2">&quot;have you run sm_profile?&quot;</span><span class="p">)</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8-sig&#39;</span><span class="p">)</span>
 
         <span class="n">config</span> <span class="o">=</span> <span class="n">check_profile_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
@@ -126,6 +123,54 @@
         <span class="n">install</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;install_path&#39;</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;data_path&#39;</span><span class="p">]</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">install</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_model_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_model_config">[docs]</a><span class="k">def</span> <span class="nf">get_model_config</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+    <span class="c1">#</span>
+    <span class="c1"># Look for global configs in install_path/config</span>
+    <span class="c1">#</span>
+    <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">()</span>
+    <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for configuration files...&#39;</span><span class="p">)</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;modules.conf&#39;</span><span class="p">),</span>
+        <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+    <span class="n">gmpe_sets</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;gmpe_sets.conf&#39;</span><span class="p">),</span>
+        <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+    <span class="n">global_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">),</span>
+        <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># this is the event specific model.conf (may not be present)</span>
+    <span class="c1"># prefer model.conf to model_select.conf</span>
+    <span class="c1">#</span>
+    <span class="n">event_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">)</span>
+    <span class="n">event_config_zc_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model_select.conf&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">):</span>
+        <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">,</span>
+                                 <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_zc_file</span><span class="p">):</span>
+        <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_zc_file</span><span class="p">,</span>
+                                 <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">()</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># start merging event_config</span>
+    <span class="c1">#</span>
+    <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">event_config</span><span class="p">)</span>
+    <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+    <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">gmpe_sets</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="n">global_config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">config_error</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+    <span class="n">check_config</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">global_config</span></div>
 
 
 <div class="viewcode-block" id="path_macro_sub"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.path_macro_sub">[docs]</a><span class="k">def</span> <span class="nf">path_macro_sub</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">gp</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">ei</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
@@ -743,19 +788,19 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

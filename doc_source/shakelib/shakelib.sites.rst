@@ -2,6 +2,6 @@ shakelib.sites
 =====================
 
 .. automodule:: shakelib.sites
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

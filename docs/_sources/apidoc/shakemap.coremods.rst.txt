@@ -10,6 +10,7 @@ Submodules
    shakemap.coremods.augment
    shakemap.coremods.base
    shakemap.coremods.contour
+   shakemap.coremods.coverage
    shakemap.coremods.dyfi
    shakemap.coremods.exception
    shakemap.coremods.gridxml
@@ -38,6 +39,6 @@ Submodules
 Module contents
 
 .. automodule:: shakemap.coremods
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

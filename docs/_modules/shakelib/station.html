@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakelib.station &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -78,6 +75,7 @@
          <span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;amp&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;stddev&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;nresp&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;flag&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span>
      <span class="p">))</span>
      <span class="p">)</span>
@@ -150,7 +148,6 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            :class:`Stationlist` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
         <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executescript</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
@@ -265,6 +262,10 @@
             <span class="n">jfp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">jfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
             <span class="n">stas</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">jfp</span><span class="p">)</span>
             <span class="n">jfp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stas</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> appears to contain no stations, skipping&#39;</span>
+                             <span class="o">%</span> <span class="n">jfile</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="k">if</span> <span class="n">stas</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;FeatureCollection&#39;</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a ShakeMap JSON stationlist, skipping&#39;</span>
                              <span class="o">%</span> <span class="n">jfile</span><span class="p">)</span>
@@ -290,15 +291,26 @@
                                      <span class="n">elev</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">instrumented</span><span class="p">))</span>
 
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumented</span><span class="p">:</span>
-                    <span class="n">amplitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-                        <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intensity&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
-                    <span class="n">stddev</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-                        <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">amplitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                            <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intensity&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">stddev</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                            <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">,</span>
+                                                      <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">stddev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">nresp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nresp&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">nresp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_flag&#39;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span> <span class="ow">or</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                         <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
                     <span class="n">amp_rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sta_id</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="s1">&#39;mmi&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span>
-                                     <span class="n">amplitude</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">])</span>
+                                     <span class="n">amplitude</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">,</span> <span class="n">nresp</span><span class="p">])</span>
                     <span class="n">imt_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
                     <span class="k">continue</span>
 
@@ -310,7 +322,13 @@
                 <span class="n">chan_names</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
                     <span class="n">chan_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
-                <span class="n">orients</span> <span class="o">=</span> <span class="n">_getOrientationSet</span><span class="p">(</span><span class="n">chan_names</span><span class="p">)</span>
+                <span class="c1"># Some legacy data stupidly names the channel the same as the</span>
+                <span class="c1"># station name. If there is only one channel, and its name</span>
+                <span class="c1"># is the station name, we assume it&#39;s horizontal and move on.</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chan_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">chan_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                    <span class="n">orients</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">orients</span> <span class="o">=</span> <span class="n">_getOrientationSet</span><span class="p">(</span><span class="n">chan_names</span><span class="p">)</span>
                 <span class="c1">#</span>
                 <span class="c1"># Now insert the amps into the database</span>
                 <span class="c1">#</span>
@@ -334,7 +352,9 @@
                             <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
                         <span class="n">flag</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span>
                         <span class="n">units</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="n">amplitude</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">amplitude</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">amplitude</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span> <span class="ow">or</span>
+                                <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">amplitude</span><span class="p">))</span> <span class="ow">or</span>
+                                <span class="n">amplitude</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
                             <span class="n">amplitude</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
                             <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
                         <span class="k">elif</span> <span class="n">imt_type</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
@@ -356,7 +376,8 @@
                                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown units </span><span class="si">%s</span><span class="s1"> in input&#39;</span>
                                                  <span class="o">%</span> <span class="n">units</span><span class="p">)</span>
                         <span class="n">amp_rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sta_id</span><span class="p">,</span> <span class="n">imt_type</span><span class="p">,</span> <span class="n">original_channel</span><span class="p">,</span>
-                                         <span class="n">orientation</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">])</span>
+                                         <span class="n">orientation</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span>
+                                         <span class="n">flag</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="n">new_imts</span> <span class="o">=</span> <span class="n">imt_set</span> <span class="o">-</span> <span class="n">orig_imt_set</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">new_imts</span><span class="p">):</span>
@@ -372,7 +393,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
             <span class="s1">&#39;INSERT INTO amp (station_id, imt_id, original_channel, &#39;</span>
-            <span class="s1">&#39;orientation, amp, stddev, flag) VALUES (?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;orientation, amp, stddev, flag, nresp) VALUES &#39;</span>
+            <span class="s1">&#39;(?, ?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span>
             <span class="n">amp_rows</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -424,7 +446,7 @@
             <span class="p">}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
                 <span class="s1">&#39;SELECT a.amp, i.imt_type, a.original_channel, &#39;</span>
-                <span class="s1">&#39;a.flag, a.stddev, a.orientation &#39;</span>
+                <span class="s1">&#39;a.flag, a.stddev, a.orientation, a.nresp &#39;</span>
                 <span class="s1">&#39;FROM amp a, imt i &#39;</span>
                 <span class="s1">&#39;WHERE a.station_id = &quot;</span><span class="si">%s</span><span class="s1">&quot; &#39;</span>
                 <span class="s1">&#39;AND a.imt_id = i.id&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
@@ -437,6 +459,7 @@
                 <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
                 <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+                <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">6</span><span class="p">]</span>
                 <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
                 <span class="k">continue</span>
@@ -585,8 +608,13 @@
                                <span class="ow">not</span> <span class="ow">in</span> <span class="n">CIIM_TUPLE</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">original_channel</span><span class="p">,</span> <span class="n">cdict</span> <span class="ow">in</span> <span class="n">comp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">pgm_dict</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;amps&#39;</span><span class="p">]</span>
-                <span class="n">orientation</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;attrs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="n">orientation</span> <span class="o">=</span> <span class="n">_getOrientation</span><span class="p">(</span><span class="n">original_channel</span><span class="p">,</span> <span class="n">orientation</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comp_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">original_channel</span> <span class="o">==</span> \
+                        <span class="n">station_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+                    <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">orientation</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;attrs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">orientation</span> <span class="o">=</span> <span class="n">_getOrientation</span><span class="p">(</span><span class="n">original_channel</span><span class="p">,</span>
+                                                  <span class="n">orientation</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">imt_type</span><span class="p">,</span> <span class="n">imt_dict</span> <span class="ow">in</span> <span class="n">pgm_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">instrumented</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">imt_type</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">):</span>
                         <span class="k">continue</span>
@@ -601,6 +629,7 @@
                     <span class="n">units</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
                     <span class="n">stddev</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;stddev&#39;</span><span class="p">]</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span>
+                    <span class="n">nresp</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nresp&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">amp</span><span class="p">):</span>
                         <span class="n">amp</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
                         <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
@@ -636,11 +665,12 @@
                                              <span class="o">%</span> <span class="n">units</span><span class="p">)</span>
 
                     <span class="n">amp_rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sta_id</span><span class="p">,</span> <span class="n">imtid</span><span class="p">,</span> <span class="n">original_channel</span><span class="p">,</span>
-                                     <span class="n">orientation</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">))</span>
+                                     <span class="n">orientation</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">,</span> <span class="n">nresp</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
             <span class="s1">&#39;INSERT INTO amp (station_id, imt_id, original_channel, &#39;</span>
-            <span class="s1">&#39;orientation, amp, stddev, flag) VALUES (?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;orientation, amp, stddev, flag, nresp) VALUES &#39;</span>
+            <span class="s1">&#39;(?, ?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span>
             <span class="n">amp_rows</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -676,7 +706,7 @@
 <span class="sd">        For the non-instrumented dictionary, the keys would be:</span>
 
 <span class="sd">        &#39;id&#39;, &#39;network&#39;, &#39;code&#39;, &#39;name&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;elev&#39;, &#39;vs30&#39;,</span>
-<span class="sd">        &#39;stddev&#39;, &#39;instrumented&#39;, &#39;MMI&#39;, &#39;MMI_sd&#39;</span>
+<span class="sd">        &#39;stddev&#39;, &#39;instrumented&#39;, &#39;MMI&#39;, &#39;MMI_sd&#39;, &#39;nresp&#39;</span>
 
 <span class="sd">        The **id** column is **network** and **code** concatenated with a</span>
 <span class="sd">        period (&quot;.&quot;) between them.</span>
@@ -723,6 +753,8 @@
                 <span class="k">continue</span>
             <span class="n">df</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">nstation_rows</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">df</span><span class="p">[</span><span class="n">imt</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">nstation_rows</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">instrumented</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">imt</span> <span class="o">+</span> <span class="s1">&#39;_nresp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">nstation_rows</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
             <span class="n">myimts</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">imt</span><span class="p">])</span>
 
         <span class="n">id_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstation_rows</span><span class="p">)))</span>
@@ -731,7 +763,7 @@
         <span class="c1"># Get all of the unflagged amps with the proper orientation</span>
         <span class="c1">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="s1">&#39;SELECT a.amp, i.imt_type, a.station_id, a.stddev FROM &#39;</span>
+            <span class="s1">&#39;SELECT a.amp, i.imt_type, a.station_id, a.stddev, a.nresp  FROM &#39;</span>
             <span class="s1">&#39;amp a, station s, imt i WHERE a.flag = &quot;0&quot; &#39;</span>
             <span class="s1">&#39;AND s.id = a.station_id &#39;</span>
             <span class="s1">&#39;AND a.imt_id = i.id &#39;</span>
@@ -751,9 +783,12 @@
             <span class="n">cval</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">this_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">rowidx</span><span class="p">]</span>
             <span class="n">amp</span> <span class="o">=</span> <span class="n">this_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">stddev</span> <span class="o">=</span> <span class="n">this_row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">nresp</span> <span class="o">=</span> <span class="n">this_row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">cval</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">cval</span> <span class="o">&lt;</span> <span class="n">amp</span><span class="p">):</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">this_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">rowidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">this_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">][</span><span class="n">rowidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">stddev</span>
+                <span class="k">if</span> <span class="n">instrumented</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">this_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_nresp&#39;</span><span class="p">][</span><span class="n">rowidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">nresp</span>
 
         <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">myimts</span></div>
 
@@ -943,9 +978,14 @@
                         <span class="n">stddev</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">])</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">if</span> <span class="s1">&#39;nresp&#39;</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+                        <span class="n">nresp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;nresp&#39;</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">nresp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
                     <span class="n">compdict</span><span class="p">[</span><span class="s1">&#39;mmi&#39;</span><span class="p">][</span><span class="s1">&#39;amps&#39;</span><span class="p">][</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;intensity&#39;</span><span class="p">]),</span>
                          <span class="s1">&#39;stddev&#39;</span><span class="p">:</span> <span class="n">stddev</span><span class="p">,</span>
+                         <span class="s1">&#39;nresp&#39;</span><span class="p">:</span> <span class="n">nresp</span><span class="p">,</span>
                          <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity&#39;</span><span class="p">}</span>
                     <span class="n">imtset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
@@ -1062,19 +1102,19 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

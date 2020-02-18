@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shakemap.coremods.assemble &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -46,23 +43,36 @@
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
+<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">Validator</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
+<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapInputContainer</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
-                                   <span class="n">get_custom_validator</span><span class="p">,</span>
-                                   <span class="n">config_error</span><span class="p">,</span>
-                                   <span class="n">check_config</span><span class="p">,</span>
                                    <span class="n">get_configspec</span><span class="p">,</span>
+                                   <span class="n">config_error</span><span class="p">,</span>
+                                   <span class="n">get_model_config</span><span class="p">,</span>
                                    <span class="n">path_macro_sub</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.logging</span> <span class="k">import</span> <span class="n">get_logging_config</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.amps</span> <span class="k">import</span> <span class="n">AmplitudeHandler</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
+
+<span class="n">LATLON_COLS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;LAT&#39;</span><span class="p">,</span> <span class="s1">&#39;LON&#39;</span><span class="p">])</span>
+<span class="n">XY_COLS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">])</span>
+
+<span class="n">GEO_PROJ_STR</span> <span class="o">=</span> <span class="s1">&#39;+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs&#39;</span>
+
+<span class="n">IMT_MATCHES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;PGA&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;PGV&#39;</span><span class="p">,</span>
+               <span class="sa">r</span><span class="s1">&#39;SA\([-+]?[0-9]*\.?[0-9]+\)&#39;</span><span class="p">]</span>
 
 <span class="n">SAVE_FILE</span> <span class="o">=</span> <span class="s1">&#39;.saved&#39;</span>
 
@@ -147,48 +157,9 @@
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">save_file</span><span class="p">)</span>
 
         <span class="c1">#</span>
-        <span class="c1"># Look for global configs in install_path/config</span>
+        <span class="c1"># Get the combined model config file</span>
         <span class="c1">#</span>
-        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">()</span>
-        <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for configuration files...&#39;</span><span class="p">)</span>
-        <span class="n">modules</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;modules.conf&#39;</span><span class="p">),</span>
-            <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
-        <span class="n">gmpe_sets</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;gmpe_sets.conf&#39;</span><span class="p">),</span>
-            <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
-        <span class="n">global_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">),</span>
-            <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
-
-        <span class="c1">#</span>
-        <span class="c1"># this is the event specific model.conf (may not be present)</span>
-        <span class="c1"># prefer model.conf to model_select.conf</span>
-        <span class="c1">#</span>
-        <span class="n">event_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">)</span>
-        <span class="n">event_config_zc_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model_select.conf&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">):</span>
-            <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">,</span>
-                                     <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_zc_file</span><span class="p">):</span>
-            <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_zc_file</span><span class="p">,</span>
-                                     <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">()</span>
-
-        <span class="c1">#</span>
-        <span class="c1"># start merging event_config</span>
-        <span class="c1">#</span>
-        <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">event_config</span><span class="p">)</span>
-        <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
-        <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">gmpe_sets</span><span class="p">)</span>
-
-        <span class="n">results</span> <span class="o">=</span> <span class="n">global_config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
-            <span class="n">config_error</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
-
-        <span class="n">check_config</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="n">global_config</span> <span class="o">=</span> <span class="n">get_model_config</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
 
         <span class="n">global_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
                                         <span class="s1">&#39;shakemap_data&#39;</span><span class="p">)</span>
@@ -212,10 +183,10 @@
         <span class="n">config</span> <span class="o">=</span> <span class="n">global_config</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for data files...&#39;</span><span class="p">)</span>
-        <span class="n">datafiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_dat.xml&#39;</span><span class="p">))</span>
+        <span class="n">datafiles</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_dat.xml&#39;</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.xml&#39;</span><span class="p">)):</span>
             <span class="n">datafiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.xml&#39;</span><span class="p">))</span>
-        <span class="n">datafiles</span> <span class="o">+=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_dat.json&#39;</span><span class="p">))</span>
+        <span class="n">datafiles</span> <span class="o">+=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_dat.json&#39;</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.json&#39;</span><span class="p">)):</span>
             <span class="n">datafiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.json&#39;</span><span class="p">))</span>
 
@@ -224,7 +195,8 @@
         <span class="n">rupturefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;rupture.json&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">rupturefile</span><span class="p">):</span>
             <span class="c1"># failing any of those, look for text file versions</span>
-            <span class="n">rupturefiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_fault.txt&#39;</span><span class="p">))</span>
+            <span class="n">rupturefiles</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span>
+                                                         <span class="s1">&#39;*_fault.txt&#39;</span><span class="p">)))</span>
             <span class="n">rupturefile</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rupturefiles</span><span class="p">):</span>
                 <span class="n">rupturefile</span> <span class="o">=</span> <span class="n">rupturefiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -308,6 +280,34 @@
                      <span class="s1">&#39;mag&#39;</span><span class="p">:</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span><span class="p">,</span>
                      <span class="s1">&#39;locstring&#39;</span><span class="p">:</span> <span class="n">origin</span><span class="o">.</span><span class="n">locstring</span><span class="p">}</span>
             <span class="n">ah</span><span class="o">.</span><span class="n">insertEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="c1"># Look for grids of simulated data</span>
+        <span class="n">simfiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;simulation_*.csv&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simfiles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="s1">&#39;Too many simulation data files found.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">simfiles</span><span class="p">):</span>
+            <span class="c1"># load the simulation.conf file</span>
+            <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;simulation.conf&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                    <span class="s1">&#39;Could not find simulation config file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">config_file</span><span class="p">)</span>
+
+            <span class="c1"># find the spec file for simulation.conf</span>
+            <span class="n">sim_config_spec</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s1">&#39;simulation&#39;</span><span class="p">)</span>
+            <span class="n">sim_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">infile</span><span class="o">=</span><span class="n">config_file</span><span class="p">,</span>
+                                   <span class="n">configspec</span><span class="o">=</span><span class="n">sim_config_spec</span><span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">sim_config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">Validator</span><span class="p">())</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+                <span class="n">config_error</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+            <span class="n">simfile</span> <span class="o">=</span> <span class="n">simfiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">imtgrids</span> <span class="o">=</span> <span class="n">_get_grids</span><span class="p">(</span><span class="n">sim_config</span><span class="p">,</span> <span class="n">simfile</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">imtgrids</span><span class="p">:</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="n">imtgrids</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+                <span class="n">datagrid</span> <span class="o">=</span> <span class="n">imtgrids</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+                <span class="n">shake_data</span><span class="o">.</span><span class="n">setArray</span><span class="p">([</span><span class="s1">&#39;simulations&#39;</span><span class="p">],</span> <span class="n">imtstr</span><span class="p">,</span> <span class="n">datagrid</span><span class="p">,</span>
+                                    <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+
         <span class="n">shake_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AssembleModule.parseArgs"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule.parseArgs">[docs]</a>    <span class="k">def</span> <span class="nf">parseArgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arglist</span><span class="p">):</span>
@@ -334,6 +334,207 @@
         <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">arglist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">comment</span>
         <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">rem</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_get_grids</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">simfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a dictionary of Grid2D objects for each IMT in input CSV file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigObj): Dictionary containing fields:</span>
+<span class="sd">                            - simulation: (dict)</span>
+<span class="sd">                              - order = (required) &quot;rows&quot; or &quot;cols&quot;</span>
+<span class="sd">                              - projection = (optional) Proj4 string</span>
+<span class="sd">                                defining input X/Y data projection.</span>
+<span class="sd">                              - nx Number of columns in input grid.</span>
+<span class="sd">                              - ny Number of rows in input grid.</span>
+<span class="sd">                              - dx Resolution of columns (if XY, whatever</span>
+<span class="sd">                                those units are, otherwise decimal degrees).</span>
+<span class="sd">                              - dy Resolution of rows (if XY, whatever those</span>
+<span class="sd">                                units are, otherwise decimal degrees).</span>
+<span class="sd">        simfile (str): Path to a CSV file with columns:</span>
+<span class="sd">                       - LAT Latitudes for each cell. If irregular, X/Y data</span>
+<span class="sd">                         will be used.</span>
+<span class="sd">                       - LON Longitudes for each cell. If irregular, X/Y data</span>
+<span class="sd">                         will be used.</span>
+<span class="sd">                       - X Regularized X coordinates for each cell.</span>
+<span class="sd">                       - Y Regularized Y coordinates for each cell.</span>
+<span class="sd">                       - H1_&lt;IMT&gt; First horizontal channel for given IMT.</span>
+<span class="sd">                         Supported IMTs are: PGA, PGV, SA(period).</span>
+<span class="sd">                       - H2_&lt;IMT&gt; Second horizontal channel for given IMT.</span>
+<span class="sd">                         Supported IMTs are: PGA, PGV, SA(period).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of IMTs (PGA, PGV, SA(1.0), etc.) and Grid2D</span>
+<span class="sd">        objects. If XY data was used, these grids are the result of a</span>
+<span class="sd">        projection/resampling of that XY data back to a regular lat/lon grid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row_order</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;simulation&#39;</span><span class="p">][</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;rows&#39;</span><span class="p">:</span>
+        <span class="n">row_order</span> <span class="o">=</span> <span class="s1">&#39;F&#39;</span>
+    <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">simfile</span><span class="p">)</span>
+
+    <span class="c1"># construct a geodict</span>
+    <span class="n">geodict</span><span class="p">,</span> <span class="n">top_down</span> <span class="o">=</span> <span class="n">_get_geodict</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># figure out which IMTs we have...</span>
+    <span class="n">column_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">imtmatch</span> <span class="ow">in</span> <span class="n">IMT_MATCHES</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">imtmatch</span><span class="p">,</span> <span class="n">column</span><span class="p">):</span>
+                <span class="n">column_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+
+    <span class="c1"># gather up all &quot;channels&quot; for each IMT</span>
+    <span class="n">imtdict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dictionary of imts and a list of columns</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">column_list</span><span class="p">:</span>
+        <span class="n">channel</span><span class="p">,</span> <span class="n">imt</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">imtdict</span><span class="p">:</span>
+            <span class="n">imtdict</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">imtdict</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span><span class="p">]</span>
+
+    <span class="c1"># make a dictionary of Grid2D objects containing max of two &quot;channels&quot;</span>
+    <span class="c1"># for each IMT</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="n">geodict</span><span class="o">.</span><span class="n">ny</span>
+    <span class="n">ncols</span> <span class="o">=</span> <span class="n">geodict</span><span class="o">.</span><span class="n">nx</span>
+    <span class="n">imtgrids</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">imt</span><span class="p">,</span> <span class="n">imtcols</span> <span class="ow">in</span> <span class="n">imtdict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">icount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">imtcols</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">icount</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="s1">&#39;Incorrect number of channels for IMT </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span>
+        <span class="n">channel1</span><span class="p">,</span> <span class="n">channel2</span> <span class="o">=</span> <span class="n">imtcols</span>
+        <span class="n">maximt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[[</span><span class="n">channel1</span><span class="p">,</span> <span class="n">channel2</span><span class="p">]]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">maximt</span><span class="p">,</span> <span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">row_order</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">top_down</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">geodict</span><span class="p">)</span>
+
+        <span class="c1"># if we need to project data back to geographic, do that here</span>
+        <span class="k">if</span> <span class="n">geodict</span><span class="o">.</span><span class="n">projection</span> <span class="o">!=</span> <span class="n">GEO_PROJ_STR</span><span class="p">:</span>
+            <span class="n">grid2</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">GEO_PROJ_STR</span><span class="p">)</span>
+
+        <span class="c1"># remove any nan&#39;s, maximizing the resulting area of good data</span>
+        <span class="n">grid3</span> <span class="o">=</span> <span class="n">_trim_grid</span><span class="p">(</span><span class="n">grid2</span><span class="p">)</span>
+
+        <span class="n">imtgrids</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid3</span>
+
+    <span class="k">return</span> <span class="n">imtgrids</span>
+
+
+<span class="k">def</span> <span class="nf">_trim_grid</span><span class="p">(</span><span class="n">ingrid</span><span class="p">):</span>
+    <span class="n">outgrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">copyFromGrid</span><span class="p">(</span><span class="n">ingrid</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ftop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">top</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">ncols</span>
+        <span class="n">fbottom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">bottom</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">ncols</span>
+        <span class="n">fleft</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">left</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">nrows</span>
+        <span class="n">fright</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">nrows</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">([</span><span class="n">ftop</span><span class="p">,</span> <span class="n">fbottom</span><span class="p">,</span> <span class="n">fleft</span><span class="p">,</span> <span class="n">fright</span><span class="p">])</span>
+        <span class="n">gdict</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># removing top row</span>
+            <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span>
+            <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;ymax&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">]</span>
+            <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">side</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># removing bottom row</span>
+            <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;ymin&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">]</span>
+            <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">side</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># removing left column</span>
+            <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+            <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span>
+            <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;nx&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">side</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># removing right column</span>
+            <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;xmax&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span>
+            <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;nx&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">geodict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">gdict</span><span class="p">)</span>
+        <span class="n">outgrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">outgrid</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="n">geodict</span><span class="o">=</span><span class="n">geodict</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">outgrid</span>
+
+
+<span class="k">def</span> <span class="nf">_get_geodict</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a GeoDict object from input dataframe and simulation config.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas DataFrame): Input CSV file as a data structure.</span>
+<span class="sd">        config (ConfigObj): Dictionary with spatial information about CSV file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        GeoDict: Upper left corner, cell dimensions, rows/cols, and projection.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nx</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;simulation&#39;</span><span class="p">][</span><span class="s1">&#39;nx&#39;</span><span class="p">]</span>
+    <span class="n">ny</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;simulation&#39;</span><span class="p">][</span><span class="s1">&#39;ny&#39;</span><span class="p">]</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;simulation&#39;</span><span class="p">][</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;simulation&#39;</span><span class="p">][</span><span class="s1">&#39;dy&#39;</span><span class="p">]</span>
+    <span class="n">row_order</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;simulation&#39;</span><span class="p">][</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;rows&#39;</span>
+
+    <span class="n">has_latlon</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">LATLON_COLS</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">has_latlon</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">has_xy</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">XY_COLS</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">has_xy</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># check for lat/lon regularity</span>
+    <span class="n">is_regular</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># this lets the user know whether the data starts at the top or the bottom</span>
+    <span class="n">top_down</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">has_latlon</span><span class="p">:</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;LAT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;LON&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="n">lon</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="n">lon</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">projection</span> <span class="o">=</span> <span class="n">GEO_PROJ_STR</span>
+        <span class="k">if</span> <span class="n">row_order</span><span class="p">:</span>
+            <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lat</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">lat</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">top_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">lat</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">lat</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">is_regular</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_regular</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_xy</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="s1">&#39;Input simulation files must have *regular* projected X/Y &#39;</span>
+                <span class="s1">&#39;or lat/lon coordinates.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_regular</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">y2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y2</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">y2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">top_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">projection</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;simulation&#39;</span><span class="p">][</span><span class="s1">&#39;projection&#39;</span><span class="p">]</span>
+
+    <span class="n">gd</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;xmin&#39;</span><span class="p">:</span> <span class="n">xmin</span><span class="p">,</span>
+          <span class="s1">&#39;xmax&#39;</span><span class="p">:</span> <span class="n">xmax</span><span class="p">,</span>
+          <span class="s1">&#39;ymin&#39;</span><span class="p">:</span> <span class="n">ymin</span><span class="p">,</span>
+          <span class="s1">&#39;ymax&#39;</span><span class="p">:</span> <span class="n">ymax</span><span class="p">,</span>
+          <span class="s1">&#39;nx&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="p">,</span>
+          <span class="s1">&#39;ny&#39;</span><span class="p">:</span> <span class="n">ny</span><span class="p">,</span>
+          <span class="s1">&#39;dx&#39;</span><span class="p">:</span> <span class="n">dx</span><span class="p">,</span>
+          <span class="s1">&#39;dy&#39;</span><span class="p">:</span> <span class="n">dy</span><span class="p">,</span>
+          <span class="s1">&#39;projection&#39;</span><span class="p">:</span> <span class="n">projection</span><span class="p">}</span>
+    <span class="n">geodict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">gd</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">geodict</span><span class="p">,</span> <span class="n">top_down</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -359,19 +560,19 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

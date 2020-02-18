@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>shake &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +13,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sm_compare" href="sm_compare.html" />
@@ -37,102 +34,95 @@
   <div class="section" id="shake">
 <span id="id1"></span><h1>shake<a class="headerlink" href="#shake" title="Permalink to this headline">¶</a></h1>
 <p><blockquote>
-<div>Run specified ShakeMap modules.</div></blockquote>
+<div><p>Run specified ShakeMap modules.</p>
+</div></blockquote>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">shake</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="o">|</span> <span class="o">-</span><span class="n">q</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="n">eventid</span> <span class="o">...</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
 <h2>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h2>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>eventid</kbd></td>
-<td>The id of the event to process.</td></tr>
-<tr><td class="option-group">
-<kbd>cmds</kbd></td>
-<td>The modules to run.</td></tr>
-</tbody>
-</table>
+<dl class="option-list">
+<dt><kbd>eventid</kbd></dt>
+<dd><p>The id of the event to process.</p>
+</dd>
+<dt><kbd>cmds</kbd></dt>
+<dd><p>The modules to run.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="Named Arguments">
 <h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>-d, --debug</kbd></td>
-<td>Print all informational messages.</td></tr>
-<tr><td class="option-group">
-<kbd>-q, --quiet</kbd></td>
-<td>Print only errors.</td></tr>
-<tr><td class="option-group">
-<kbd>-l, --log</kbd></td>
-<td>Log all output.</td></tr>
-<tr><td class="option-group">
-<kbd>-f, --force</kbd></td>
-<td>Force the command(s) to run regardless of out of date dependencies.</td></tr>
-<tr><td class="option-group">
-<kbd>-c, --cancel</kbd></td>
-<td>Cancel shakemap; execute cancel_modules list in shake.conf.</td></tr>
-<tr><td class="option-group">
-<kbd>-a, --autorun</kbd></td>
-<td>No-op; we are keeping this argument for backward compatibility but it no longer does anything. It is now the default behavior to use the autorun_modules in shake.conf when no modules are sepcified.</td></tr>
-<tr><td class="option-group">
-<kbd>-v, --version</kbd></td>
-<td>Print the version of ShakeMap and quit.</td></tr>
-</tbody>
-</table>
+<dl class="option-list">
+<dt><kbd>-d, --debug</kbd></dt>
+<dd><p>Print all informational messages.</p>
+</dd>
+<dt><kbd>-q, --quiet</kbd></dt>
+<dd><p>Print only errors.</p>
+</dd>
+<dt><kbd>-l, --log</kbd></dt>
+<dd><p>Log all output.</p>
+</dd>
+<dt><kbd>-f, --force</kbd></dt>
+<dd><p>Force the command(s) to run regardless of out of date dependencies.</p>
+</dd>
+<dt><kbd>-c, --cancel</kbd></dt>
+<dd><p>Cancel shakemap; execute cancel_modules list in shake.conf.</p>
+</dd>
+<dt><kbd>-a, --autorun</kbd></dt>
+<dd><p>No-op; we are keeping this argument for backward compatibility but it no longer does anything. It is now the default behavior to use the autorun_modules in shake.conf when no modules are sepcified.</p>
+</dd>
+<dt><kbd>-v, --version</kbd></dt>
+<dd><p>Print the version of ShakeMap and quit.</p>
+</dd>
+</dl>
 </div>
-<p><dl class="docutils">
-<dt>Available modules:</dt>
-<dd><ul class="first last simple">
-<li><dl class="first docutils">
-<dt>assemble – Assemble ShakeMap input data into the shake_data.hdf input</dt>
-<dd>file.</dd>
+<p><dl class="simple">
+<dt>Available modules:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>assemble – Assemble ShakeMap input data into the shake_data.hdf input</dt><dd><p>file.</p>
+</dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt>associate – Associate amps in the database with the event, and write</dt>
-<dd>XML data file to the event’s current directory.</dd>
+<li><dl class="simple">
+<dt>associate – Associate amps in the database with the event, and write</dt><dd><p>XML data file to the event’s current directory.</p>
+</dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt>augment – Incorporate additional content into the shake_data.hdf input</dt>
-<dd>file.</dd>
+<li><dl class="simple">
+<dt>augment – Incorporate additional content into the shake_data.hdf input</dt><dd><p>file.</p>
+</dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt>contour – Generate contours of all IMT values from the</dt>
-<dd>shake_result.hdf output file.</dd>
+<li><dl class="simple">
+<dt>contour – Generate contours of all IMT values from the</dt><dd><p>shake_result.hdf output file.</p>
+</dd>
 </dl>
 </li>
-<li>dyfi – Search ComCat for DYFI data and turn it into a ShakeMap data file.</li>
-<li>Module to raise an exception for testing purposes.</li>
-<li>gridxml – Create grid.xml and uncertainty.xml files from shake_result.hdf.</li>
-<li>history – Output the version history of an event.</li>
-<li>info – Extract info.json from shake_result.hdf and write it as a file.</li>
-<li>kml – Generate KML/KMZ files for ShakeMap.</li>
-<li>mapping – Generate maps of the IMTs found in shake_result.hdf.</li>
-<li>model – Interpolate ground motions to a grid or list of locations.</li>
-<li>plotregr – Plot the regression curves from a data file</li>
-<li><dl class="first docutils">
-<dt>raster – Generate GIS raster files of all IMT values from</dt>
-<dd>shake_result.hdf.</dd>
+<li><p>coverage – Create JSON coverage(s) of the ground motion layers.</p></li>
+<li><p>dyfi – Search ComCat for DYFI data and turn it into a ShakeMap data file.</p></li>
+<li><p>Module to raise an exception for testing purposes.</p></li>
+<li><p>gridxml – Create grid.xml and uncertainty.xml files from shake_result.hdf.</p></li>
+<li><p>history – Output the version history of an event.</p></li>
+<li><p>info – Extract info.json from shake_result.hdf and write it as a file.</p></li>
+<li><p>kml – Generate KML/KMZ files for ShakeMap.</p></li>
+<li><p>mapping – Generate maps of the IMTs found in shake_result.hdf.</p></li>
+<li><p>model – Interpolate ground motions to a grid or list of locations.</p></li>
+<li><p>plotregr – Plot the regression curves from a data file</p></li>
+<li><dl class="simple">
+<dt>raster – Generate GIS raster files of all IMT values from</dt><dd><p>shake_result.hdf.</p>
+</dd>
 </dl>
 </li>
-<li>rupture – Generate rupture.json from shake_result.hdf.</li>
-<li>save - Create backup directory and prep for next ShakeMap map version.</li>
-<li>select - Parse STREC output, make a GMPE set, create model_select.conf.</li>
-<li>shape – Generate shape files of the ground motion parameters</li>
-<li>sleep – Sleep for a number of seconds.</li>
-<li>stations – Generate stationlist.json from shake_result.hdf.</li>
-<li>transfer_email - Transfer content via Email.</li>
-<li>transfer_pdl - Transfer content via PDL to a remote server.</li>
-<li>transfer_pdl - Transfer content via SCP to a remote server.</li>
+<li><p>rupture – Generate rupture.json from shake_result.hdf.</p></li>
+<li><p>save - Create backup directory and prep for next ShakeMap map version.</p></li>
+<li><p>select - Parse STREC output, make a GMPE set, create model_select.conf.</p></li>
+<li><p>shape – Generate shape files of the ground motion parameters</p></li>
+<li><p>sleep – Sleep for a number of seconds.</p></li>
+<li><p>stations – Generate stationlist.json from shake_result.hdf.</p></li>
+<li><p>transfer_email - Transfer content via Email.</p></li>
+<li><p>transfer_pdl - Transfer content via PDL to a remote server.</p></li>
+<li><p>transfer_pdl - Transfer content via SCP to a remote server.</p></li>
 </ul>
 </dd>
 </dl>
@@ -164,38 +154,32 @@
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="programs.html">ShakeMap 4.0a Command Line Interface</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shake</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="programs.html">ShakeMap 4.0 Command Line Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">shake</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="sm_compare.html">sm_compare</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sm_create.html">sm_create</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sm_profile.html">sm_profile</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sm_queue.html">sm_queue</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getdyfi.html">getdyfi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_compare.html">sm_compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_create.html">sm_create</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_profile.html">sm_profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_queue.html">sm_queue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getdyfi.html">getdyfi</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
