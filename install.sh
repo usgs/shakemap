@@ -171,7 +171,7 @@ fi
 
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
-conda create -y -n $VENV -c conda-forge \
+conda create -y -n $VENV -c defaults \
       --channel-priority ${package_list[*]}
 
 
