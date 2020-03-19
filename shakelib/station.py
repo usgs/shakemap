@@ -1000,6 +1000,10 @@ def _getOrientation(orig_channel, orient):
         Character representing the channel orientation. One of 'N',
         'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
     """
+    if not len(orig_channel.strip()):
+        orientation = 'U'  # default when we don't know anything about the channel
+        return orientation
+
     if orig_channel == 'mmi' or orig_channel == 'DERIVED':
         orientation = 'H'           # mmi is arbitrarily horizontal
     elif orig_channel[-1] in ('N', 'E', 'Z'):
@@ -1017,6 +1021,7 @@ def _getOrientation(orig_channel, orient):
             orientation = 'U'
     else:
         orientation = 'U'  # this is unknown
+
     return orientation
 
 
