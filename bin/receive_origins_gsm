@@ -23,7 +23,7 @@ from impactutils.mapping.compass import get_compass_dir_azimuth
 
 # local imports
 from shakemap.utils.config import get_config_paths
-# import shakemap.utils.queue as queue
+import shakemap.utils.queue as queue
 from shakemap.utils.logging import get_generic_logger
 from shakemap.utils.utils import get_network_name
 from shakelib.rupture import constants
@@ -76,7 +76,7 @@ def main(args):
         print('%s is not a valid directory.' % data_path)
         sys.exit(1)
 
-#    config = queue.get_config(install_path)
+    config = queue.get_config(install_path)
 
     # set up a daily rotating file handler logger
     logfile = os.path.join(install_path, 'logs', LOGFILE)
@@ -116,8 +116,7 @@ def main(args):
         event = {'id': eventid,
                  'netid': args.property_origin_source,
                  'alt_eventids': eventid}
-        print("Canceling: ", event)
-#        queue.send_queue('cancel', event, config['port'])
+        queue.send_queue('cancel', event, config['port'])
         logger.info('Sending cancel event %s to queue.' % eventid)
         sys.exit(0)
 
@@ -239,8 +238,7 @@ def main(args):
     logger.info('Sending event %s to queue.' % eventid)
 
     # Poke the queue to run shake on this event.
-    print("Sending: ", event)
-#    queue.send_queue('origin', event, config['port'])
+    queue.send_queue('origin', event, config['port'])
 
 
 if __name__ == '__main__':
