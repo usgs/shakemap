@@ -13,9 +13,45 @@ interest in order to re-create or customize the maps or
 user-specific products. In this section, we further describe
 these ShakeMap component products and the variety of maps and formats.
 
+.. _subsec-comcat:
+
+Accessing ShakeMap Products
+===========================
+
 For each earthquake, all maps and associated products for that event are
 available via the “Downloads” link on each earthquake-specific ShakeMap
-webpage. 
+webpage. For more systematics uses of ShakeMap products, use the USGS
+`Comprehensive Catalog (ComCat)
+Earthquake database <http://earthquake.usgs.gov/earthquakes/search/>`_.
+
+Interactive Searches for ShakeMap Products
+------------------------------------------
+
+Interactive searches for ShakeMap products is easily accomplished by
+searching ComCat. Be sure to select “ShakeMap” as the “Product Type”
+from the “Advanced Options” dropdown menu. One can set spatial, temporal,
+magntidue and other thresholds for any search. In addition, one can
+select ShakeMap intensity ranges using the “Impact” dropdown menu.
+Also see section :ref:`sec_shakemap-archives-4`.
+
+
+.. _subsec-getproduct:
+
+Scripted, automated, or command line access ShakeMap products
+-------------------------------------------------------------
+
+Scripted or command line access to multiple events or specific product,
+specific versions, sources, regions, time windows, etc., is best
+accomplished by employing Python tools build with the NEIC’s 
+`libcomcat <https://github.com/usgs/libcomcat>`_. In particular,
+users are encouraged to use *getproduct*, which relies on libcomcat to
+allow simple or complex queries for any ComCat products and formats.
+
+For example, to download all of the versions of, say, the raster.zip
+(or shapefiles) files by running this command on a Mac or Linux system::
+
+  getproduct shakemap raster.zip -i us1000chhc --get-version all -o ~/tmp/taiwan/
+
 
 Output Files and Products
 ==========================
@@ -949,11 +985,32 @@ http://earthquake.usgs.gov/earthquakes/eventpage/us10003zgz#impact_shakemap).
 Regression (GMPE and Distance Attenuation) Plots
 ------------------------------------------------
 
-ShakeMap can also (optionally) produce graphs of the observational data
+ShakeMap regression plots are best visualized interactively online.
+Each ShakeMap page has an “Analysis” tab that allows comparison of any
+intensity measure against all data (both seismic and macroseismic) on
+the map, and users can select the IM, residual views, log or linear
+scales, different choices of distance measures (Rrup, hypocentral, Rjb),
+and either rock or soil site conditions. See :num:`Figure #regression-plot`.
+
+If the GMM prediction curve is missing, it is likely that the RSN
+producing the ShakeMap is running an older version of ShakeMap than V4.0.
+
+.. _regression-plot:
+
+.. figure:: _static/regression_plot.*
+   :width: 650px
+   :align: left
+
+   Interactive data and prediction curve found under the *Analysis* tab
+   of the ShakeMap page for an event.
+
+ShakeMap also produces static graphs of the observational data
 plotted with the biased and unbiased GMPE. For example,
 :num:`Figure #northridge-mi-regr-w-dyfi` shows the 1994 M6.7 Northridge
 earthquake MMI data, and :num:`Figure #northridge-pga-regr-w-dyfi` shows the
 PGA data and GMPE.
+
+
 
 .. _northridge-mi-regr-w-dyfi:
 .. figure:: _static/northridge_mi_regr_w_dyfi.*
@@ -1065,10 +1122,10 @@ Pin Thumbnail
 
 A thumbnail of a stylized ShakeMap MMI map is produced by the mapping 
 process. This PNG file (*pin-thumbnail.png*) may be used as a placeholder,
-entry point, part of an index, or as a visual identifier of ShakeMap
-:num:`Figure #pin-thumbnail` is an example.
+entry point, part of an index, or as a visual identifier of
+ShakeMap. :num:`Figure #example-pin-thumbnail` is an example.
 
-.. _pin-thumbnail:
+.. _example-pin-thumbnail:
 .. figure:: _static/pin-thumbnail.png
    :width: 200px
    :align: left
@@ -1553,8 +1610,8 @@ estimation and mapping tools, coupled with sophisticated tools to notify
 responsible parties within an organization on a per-facility basis. See
 :ref:`sec_related-systems-4` for more details. Complete background on ShakeCast
 can be found on the ShakeCast `homepage
-<http://earthquake.usgs.gov/research/software/shakecast.php>`_ and `Wiki
-<https://my.usgs.gov/confluence/display/ShakeCast/Home>`_ and the documentation provided therein. 
+<http://earthquake.usgs.gov/research/software/shakecast.php>`_ and the
+documentation provided therein. 
 
 Product Distribution Layer (PDL) Client
 -----------------------------------
@@ -1569,12 +1626,14 @@ Web Mapping (GIS) Services
 --------------------------
 
 In addition to the downloadable GIS-formatted ShakeMaps (including shapefiles) that are
-readily available for each ShakeMap event, USGS also hosts a real-time `30-day
-Signficant `Earthquake GIS ShakeMap Feed
-<http://earthquake.usgs.gov/arcgis/rest/services/eq/sm_ShakeMap30DaySignificant/MapServer>`_.
-`ESRI`_ provides a separate `Disaster Response ArcGIS service
-<http://www.esri.com/>`_, providing `live feeds
-<https://tmservices1.esri.com/arcgis/rest/services/LiveFeeds/USGS_Seismic_Data/MapServer>`_
+readily available for each ShakeMap event, USGS also hosts a real-time
+`30-day Signficant Earthquake GIS ShakeMap Feed
+<https://earthquake.usgs.gov/arcgis/rest/services/eq/sm_ShakeMap30DaySignificant/MapServer>`_.
+`ESRI <http://www.esri.com/>`_ provides a separate
+`Disaster Response ArcGIS service
+<https://www.esri.com/en-us/disaster-response/disasters/earthquakes>`_,
+providing `live feeds
+<https://www.arcgis.com/home/item.html?id=f6fc7166a7454f01a9bc6d106eae8d78>`_
 to several USGS post-earthquake products. 
 
 .. sidebar:: Related GIS Service Interactions

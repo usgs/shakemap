@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -64,7 +64,9 @@
     <span class="n">DEFINED_FOR_TECTONIC_REGION_TYPE</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span>
+    <span class="p">])</span>
     <span class="n">REQUIRES_SITES_PARAMETERS</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">REQUIRES_RUPTURE_PARAMETERS</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="kc">None</span>
@@ -99,13 +101,13 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
                 <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
                 <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;lats&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
                 <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
         <span class="n">shapeset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span>
@@ -138,12 +140,12 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;lats&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
                 <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
 
         <span class="c1"># Reshape output</span>
@@ -209,7 +211,7 @@
             <span class="c1"># -----------------------------------------------------------------</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="s1">&#39;GMPE_LIMITS&#39;</span><span class="p">):</span>
                 <span class="n">gmpes_with_limits</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">gmpe</span><span class="o">.</span><span class="n">GMPE_LIMITS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-                <span class="n">gmpe_class_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gmpe</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">gmpe_class_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gmpe</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">gmpe_class_str</span> <span class="ow">in</span> <span class="n">gmpes_with_limits</span><span class="p">:</span>
                     <span class="n">limit_dict</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">GMPE_LIMITS</span><span class="p">[</span><span class="n">gmpe_class_str</span><span class="p">]</span>
                     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">limit_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -818,34 +820,34 @@
 <span class="sd">            An OQ sites context with the depth parameters set for the</span>
 <span class="sd">            requested GMPE.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;MultiGMPE()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[MultiGMPE]&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sites</span>
 
         <span class="n">sites</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_addDepthParameters</span><span class="p">(</span><span class="n">sites</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014()&#39;</span> <span class="ow">or</span> \
-           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014RegTWN()&#39;</span> <span class="ow">or</span> \
-           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014RegCHN()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[AbrahamsonEtAl2014]&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[AbrahamsonEtAl2014RegTWN]&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[AbrahamsonEtAl2014RegCHN]&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_ask14_cal</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014RegJPN()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[AbrahamsonEtAl2014RegJPN]&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_ask14_jpn</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2014()&#39;</span> <span class="ow">or</span> \
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[ChiouYoungs2014]&#39;</span> <span class="ow">or</span> \
            <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">BooreEtAl2014</span><span class="p">):</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_cy14_cal</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">CampbellBozorgnia2014</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014JapanSite()&#39;</span> <span class="ow">or</span> \
-               <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014HighQJapanSite()&#39;</span> <span class="ow">or</span> \
-               <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014LowQJapanSite()&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[CampbellBozorgnia2014JapanSite]&#39;</span> <span class="ow">or</span> \
+               <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[CampbellBozorgnia2014HighQJapanSite]&#39;</span> <span class="ow">or</span> \
+               <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[CampbellBozorgnia2014LowQJapanSite]&#39;</span><span class="p">:</span>
                 <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb14_jpn</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb14_cal</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2008()&#39;</span> <span class="ow">or</span> \
-           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;Bradley2013()&#39;</span> <span class="ow">or</span> \
-           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;Bradley2013Volc()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[ChiouYoungs2008]&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[Bradley2013]&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[Bradley2013Volc]&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_cy08</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2008()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[CampbellBozorgnia2008]&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb07</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonSilva2008()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[AbrahamsonSilva2008]&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">_compute_median_z1pt0</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">sites</span></div>
@@ -1089,7 +1091,7 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

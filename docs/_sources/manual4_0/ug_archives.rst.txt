@@ -69,32 +69,39 @@ place with several other interested countries.
 
 
 ShakeMap Atlas
----------------------------------------------------
-ShakeMap was designed with near--real-time earthquake response purposes in mind.
-However, many of the strategies for mapping the patterns of peak ground motions for
-real-time applications described above prove useful for re-creating the shaking from
-historic earthquakes.
+--------------
+ShakeMap was designed with near--real-time earthquake response purposes
+in mind.  However, many of the strategies for mapping the patterns of
+peak ground motions for real-time applications described above prove
+useful for re-creating the shaking from historic earthquakes.
 
 The ShakeMap Atlas (:ref:`Allen et al., 2008 <allen2008>`,
 :ref:`2009a <allen2009a>`) is a self-consistent, well-calibrated
-collection of historic earthquakes for which ShakeMaps were systematically generated.
-The Atlas constitutes an invaluable online resource for investigating near-source strong
-ground motion, as well as for seismic hazard, scenario, risk, and loss-model
-development.
+collection of historic earthquakes for which ShakeMaps were systematically
+generated.  The Atlas constitutes an invaluable online resource for
+investigating near-source strong ground motion, as well as for seismic
+hazard, scenario, risk, and loss-model development.
 
 .. sidebar:: **Finding Atlas ShakeMaps Online**
 
- * **Atlas Version 1.0** (:ref:`Allen et al., 2008 <allen2008>`) ShakeMaps
-   are available online on the
-   `ShakeMap homepage <http://earthquake.usgs.gov/earthquakes/shakemap/>`_,
-   which consists of all the standardized ShakeMap products and formats.
-   Output grids for the entire dataset can also be obtained at that site.
+ * **Atlas Version 4.0.** Version 4 is the latest, most comprehensive
+   Atlas, released in 2020. V4 Atlas is run with V4 ShakeMap software.
+   ShakeMaps are available by visiting the
+   `ShakeMap homepage <https://earthquake.usgs.gov/data/shakemap/>`_,
+   or by searching the USGS 
+   `Comprehensive Catalogue (ComCat) Earthquake database <http://earthquake.usgs.gov/earthquakes/search/>`_.
+   Be sure to select “ShakeMap Atlas” as the “Contributor”
+   from the “Advanced Options” dropdown menu. All of the standardized
+   ShakeMap products and formats can be downloaded from individual
+   ShakeMap event pages. For wide-ranging scripted downloads of ShakeMap
+   products see section :ref:`subsec-comcat`.
  * **Atlas Version 2.0** (:ref:`Garcia et al. \(2012a\) <garcia2012a>`
-   ShakeMaps are available by searching the USGS `Comprehensive Catalogue
-   (ComCat) Earthquake database
-   <http://earthquake.usgs.gov/earthquakes/search/>`_. Be sure to select
-   “ShakeMap Atlas” as the “Contributor” from the “Advanced Options”
-   dropdown menu.
+   ShakeMaps are still available online via ComCat queries, and are
+   designated by *catalog=Atlas* and *source=Atlas*.
+ * **Atlas Version 1.0** (:ref:`Allen et al., 2008 <allen2008>`) maps
+   have been demoted and are no longer available online. V1 ShakeMaps
+   were computed with a much earlier version of ShakeMap, the products
+   are not up-to-date, and metadata were not sufficiently comprehensive.
 
 The original (2009) Atlas is a compilation of nearly 5,000 ShakeMaps for
 the most significant global earthquakes between 1973 and 2007
@@ -278,16 +285,16 @@ exercises around the world.
 
 .. sidebar:: **Finding ShakeMap Scenarios Online**
 
- * **Scenarios 1.0**. ShakeMaps are available online on the
-   `ShakeMap homepage <http://earthquake.usgs.gov/earthquakes/shakemap/>`_,
-   which consists of all the standardized ShakeMap products and formats.
-   Output grids for the entire dataset can also be obtained at that site.
- * **Scenarios 2.0**. The Next Generation Scenarios (NGS) will be available by
+ * **Scenarios 2.0**. The Next Generation Scenarios (NGS) are available by
    searching the USGS `Comprehensive Catalogue (ComCat) Earthquake 
    database <http://earthquake.usgs.gov/earthquakes/search/>`_. Be sure
    to select “ShakeMap Scenarios”
    as the “Contributor” in the “Advanced Options” dropdown menu. The
    available catalogues of scenarios will change over time.
+ * **Scenarios 1.0**. ShakeMaps are available online on the
+   `ShakeMap homepage <http://earthquake.usgs.gov/earthquakes/shakemap/>`_,
+   which consists of all the standardized ShakeMap products and formats.
+   Output grids for the entire dataset can also be obtained at that site.
 
 
 Generating Earthquake Scenarios

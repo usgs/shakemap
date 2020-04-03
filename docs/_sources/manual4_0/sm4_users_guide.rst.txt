@@ -39,6 +39,7 @@ part of their post-earthquake decision making.
    :maxdepth: 1
 
    ug_background.rst
+   ug_shakemap_operations.rst
    ug_choice_of_parameters.rst
    ug_products.rst
    ug_intensity.rst

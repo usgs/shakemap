@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
    
@@ -33,7 +33,7 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># vim: tabstop=4 shiftwidth=4 softtabstop=4</span>
 <span class="c1">#</span>
-<span class="c1"># Copyright (C) 2012-2018 GEM Foundation</span>
+<span class="c1"># Copyright (C) 2012-2019 GEM Foundation</span>
 <span class="c1">#</span>
 <span class="c1"># OpenQuake is free software: you can redistribute it and/or modify it</span>
 <span class="c1"># under the terms of the GNU Affero General Public License as published</span>
@@ -57,21 +57,48 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">ndtr</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">ndtr</span>
 
 <span class="kn">from</span> <span class="nn">openquake.baselib.general</span> <span class="k">import</span> <span class="ne">DeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">imt_module</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.contexts</span> <span class="k">import</span> <span class="n">KNOWN_DISTANCES</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.contexts</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># for backward compatibility</span>
 
 
+<span class="n">ADMITTED_STR_PARAMETERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DEFINED_FOR_TECTONIC_REGION_TYPE&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;DEFINED_FOR_INTENSITY_MEASURE_COMPONENT&#39;</span><span class="p">]</span>
+<span class="n">ADMITTED_FLOAT_PARAMETERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DEFINED_FOR_REFERENCE_VELOCITY&#39;</span><span class="p">]</span>
+<span class="n">ADMITTED_TABLE_PARAMETERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;COEFFS_STRESS&#39;</span><span class="p">,</span> <span class="s1">&#39;COEFFS_HARD_ROCK&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;COEFFS_SITE_RESPONSE&#39;</span><span class="p">]</span>
+<span class="n">ADMITTED_SET_PARAMETERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DEFINED_FOR_INTENSITY_MEASURE_TYPES&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;DEFINED_FOR_STANDARD_DEVIATION_TYPES&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;REQUIRES_DISTANCES&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;REQUIRES_SITES_PARAMETERS&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;REQUIRES_RUPTURE_PARAMETERS&#39;</span><span class="p">]</span>
+
 <span class="n">registry</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># GSIM name -&gt; GSIM class</span>
+<span class="n">gsim_aliases</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># populated for instance in nbcc2015_AA13.py</span>
 
 
 <span class="k">class</span> <span class="nc">NotVerifiedWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raised when a non verified GSIM is instantiated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">ExperimentalWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised for GMPEs that are intended for experimental use or maybe subject</span>
+<span class="sd">    to changes in future version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">AdaptedWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised for GMPEs that are intended for experimental use or maybe subject</span>
+<span class="sd">    to changes in future version.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
@@ -88,32 +115,136 @@
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="nb">str</span><span class="p">(</span><span class="n">gsim</span><span class="p">),</span> <span class="n">imt_dt</span><span class="p">)</span> <span class="k">for</span> <span class="n">gsim</span> <span class="ow">in</span> <span class="n">sorted_gsims</span><span class="p">])</span>
 
 
+<span class="k">def</span> <span class="nf">get_mean_std</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imts</span><span class="p">,</span> <span class="n">gsims</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :returns: an array of shape (2, N, M, G) with means and stddevs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">sids</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">imts</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsims</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">G</span><span class="p">))</span>
+    <span class="n">num_tables</span> <span class="o">=</span> <span class="n">CoeffsTable</span><span class="o">.</span><span class="n">num_instances</span>
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">gsim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gsims</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">dctx</span><span class="o">.</span><span class="n">roundup</span><span class="p">(</span><span class="n">gsim</span><span class="o">.</span><span class="n">minimum_distance</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">imt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">imts</span><span class="p">):</span>
+            <span class="n">mean</span><span class="p">,</span> <span class="p">[</span><span class="n">std</span><span class="p">]</span> <span class="o">=</span> <span class="n">gsim</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
+                                                    <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">])</span>
+            <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="n">m</span><span class="p">,</span> <span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean</span>
+            <span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">m</span><span class="p">,</span> <span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="n">std</span>
+            <span class="k">if</span> <span class="n">CoeffsTable</span><span class="o">.</span><span class="n">num_instances</span> <span class="o">&gt;</span> <span class="n">num_tables</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Instantiating CoeffsTable inside &#39;</span>
+                                   <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.get_mean_and_stddevs&#39;</span> <span class="o">%</span>
+                                   <span class="n">gsim</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr</span>
+
+
+<span class="k">def</span> <span class="nf">get_poes</span><span class="p">(</span><span class="n">mean_std</span><span class="p">,</span> <span class="n">loglevels</span><span class="p">,</span> <span class="n">truncation_level</span><span class="p">,</span> <span class="n">gsims</span><span class="o">=</span><span class="p">()):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate and return probabilities of exceedance (PoEs) of one or more</span>
+<span class="sd">    intensity measure levels (IMLs) of one intensity measure type (IMT)</span>
+<span class="sd">    for one or more pairs &quot;site -- rupture&quot;.</span>
+
+<span class="sd">    :param mean_std:</span>
+<span class="sd">        An array of shape (2, N, M, G) with mean and standard deviation for</span>
+<span class="sd">        the current intensity measure type</span>
+<span class="sd">    :param loglevels:</span>
+<span class="sd">        A DictArray imt -&gt; logs of intensity measure levels</span>
+<span class="sd">    :param truncation_level:</span>
+<span class="sd">        Can be ``None``, which means that the distribution of intensity</span>
+<span class="sd">        is treated as Gaussian distribution with possible values ranging</span>
+<span class="sd">        from minus infinity to plus infinity.</span>
+
+<span class="sd">        When set to zero, the mean intensity is treated as an exact</span>
+<span class="sd">        value (standard deviation is not even computed for that case)</span>
+<span class="sd">        and resulting array contains 0 in places where IMT is strictly</span>
+<span class="sd">        lower than the mean value of intensity and 1.0 where IMT is equal</span>
+<span class="sd">        or greater.</span>
+
+<span class="sd">        When truncation level is positive number, the intensity</span>
+<span class="sd">        distribution is processed as symmetric truncated Gaussian with</span>
+<span class="sd">        range borders being ``mean - truncation_level * stddev`` and</span>
+<span class="sd">        ``mean + truncation_level * stddev``. That is, the truncation</span>
+<span class="sd">        level expresses how far the range borders are from the mean</span>
+<span class="sd">        value and is defined in units of sigmas. The resulting PoEs</span>
+<span class="sd">        for that mode are values of complementary cumulative distribution</span>
+<span class="sd">        function of that truncated Gaussian applied to IMLs.</span>
+
+<span class="sd">    :returns:</span>
+<span class="sd">        A dictionary of the same structure as parameter ``imts`` (see</span>
+<span class="sd">        above). Instead of lists of IMLs values of the dictionaries</span>
+<span class="sd">        have 2d numpy arrays of corresponding PoEs, first dimension</span>
+<span class="sd">        represents sites and the second represents IMLs.</span>
+
+<span class="sd">    :raises ValueError:</span>
+<span class="sd">        If truncation level is not ``None`` and neither non-negative</span>
+<span class="sd">        float number, and if ``imts`` dictionary contain wrong or</span>
+<span class="sd">        unsupported IMTs (see :attr:`DEFINED_FOR_INTENSITY_MEASURE_TYPES`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">truncation_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">truncation_level</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;truncation level must be zero, positive number &#39;</span>
+                         <span class="s1">&#39;or None&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsims</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">mean_std</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsims</span><span class="p">)</span>
+    <span class="n">tl</span> <span class="o">=</span> <span class="n">truncation_level</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">gsim</span><span class="p">,</span> <span class="s1">&#39;weights_signs&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">gsim</span> <span class="ow">in</span> <span class="n">gsims</span><span class="p">):</span>
+        <span class="c1"># implement average get_poes for the nshmp_2014 model</span>
+        <span class="n">shp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mean_std</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># (N, M, G)</span>
+        <span class="n">shp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loglevels</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>  <span class="c1"># L</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shp</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">gsim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gsims</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gsim</span><span class="p">,</span> <span class="s1">&#39;weights_signs&#39;</span><span class="p">):</span>
+                <span class="n">outs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">weights</span><span class="p">,</span> <span class="n">signs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">gsim</span><span class="o">.</span><span class="n">weights_signs</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">signs</span><span class="p">:</span>
+                    <span class="n">ms</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mean_std</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">g</span><span class="p">])</span>  <span class="c1"># make a copy</span>
+                    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">loglevels</span><span class="p">)):</span>
+                        <span class="n">ms</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">gsim</span><span class="o">.</span><span class="n">adjustment</span>
+                    <span class="n">outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_get_poes</span><span class="p">(</span><span class="n">ms</span><span class="p">,</span> <span class="n">loglevels</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">squeeze</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">arr</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">outs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ms</span> <span class="o">=</span> <span class="n">mean_std</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">g</span><span class="p">]</span>
+                <span class="n">arr</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_poes</span><span class="p">(</span><span class="n">ms</span><span class="p">,</span> <span class="n">loglevels</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="n">squeeze</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">arr</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># regular case</span>
+        <span class="k">return</span> <span class="n">_get_poes</span><span class="p">(</span><span class="n">mean_std</span><span class="p">,</span> <span class="n">loglevels</span><span class="p">,</span> <span class="n">truncation_level</span><span class="p">)</span>
+
+
+<span class="c1"># this is the critical function for the performance of the classical calculator</span>
+<span class="c1"># it is dominated by memory allocations (i.e. _truncnorm_sf is ultra-fast)</span>
+<span class="c1"># the only way to speedup is to reduce the maximum_distance, then the array</span>
+<span class="c1"># will become shorted in the N dimension (number of affected sites)</span>
+<span class="k">def</span> <span class="nf">_get_poes</span><span class="p">(</span><span class="n">mean_std</span><span class="p">,</span> <span class="n">loglevels</span><span class="p">,</span> <span class="n">truncation_level</span><span class="p">,</span> <span class="n">squeeze</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">mean</span><span class="p">,</span> <span class="n">stddev</span> <span class="o">=</span> <span class="n">mean_std</span>  <span class="c1"># shape (N, M, G) each</span>
+    <span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mean</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">loglevels</span><span class="o">.</span><span class="n">array</span><span class="p">),</span> <span class="n">mean</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span> <span class="k">if</span> <span class="n">squeeze</span> <span class="k">else</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">G</span><span class="p">))</span>
+    <span class="n">lvl</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">imt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loglevels</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">iml</span> <span class="ow">in</span> <span class="n">loglevels</span><span class="p">[</span><span class="n">imt</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">truncation_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># just compare imls to mean</span>
+                <span class="n">out</span><span class="p">[:,</span> <span class="n">lvl</span><span class="p">]</span> <span class="o">=</span> <span class="n">iml</span> <span class="o">&lt;=</span> <span class="n">mean</span><span class="p">[:,</span> <span class="n">m</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[:,</span> <span class="n">lvl</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">iml</span> <span class="o">-</span> <span class="n">mean</span><span class="p">[:,</span> <span class="n">m</span><span class="p">])</span> <span class="o">/</span> <span class="n">stddev</span><span class="p">[:,</span> <span class="n">m</span><span class="p">]</span>
+            <span class="n">lvl</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">_truncnorm_sf</span><span class="p">(</span><span class="n">truncation_level</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+
+
 <span class="k">class</span> <span class="nc">MetaGSIM</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Metaclass controlling the instantiation mechanism.</span>
-<span class="sd">    A GroundShakingIntensityModel subclass with an</span>
-<span class="sd">    attribute deprecated=True will print a deprecation warning when</span>
-<span class="sd">    instantiated. A subclass with an attribute non_verified=True will</span>
-<span class="sd">    print a UserWarning.</span>
+<span class="sd">    A metaclass converting set class attributes into frozensets, to avoid</span>
+<span class="sd">    mutability bugs without having to change already written GSIMs. Moreover</span>
+<span class="sd">    it performs some checks against typos.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">superseded_by</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">non_verified</span> <span class="o">=</span> <span class="kc">False</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
-        <span class="n">registry</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
-
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">superseded_by</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is deprecated - use </span><span class="si">%s</span><span class="s1"> instead&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">superseded_by</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">non_verified</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not independently verified - the user is liable &#39;</span>
-                   <span class="s1">&#39;for their application&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">NotVerifiedWarning</span><span class="p">)</span>
-        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
-        <span class="k">return</span> <span class="bp">self</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dic</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dic</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+                <span class="n">dic</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;REQUIRES_DISTANCES&#39;</span><span class="p">:</span>
+                    <span class="n">missing</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">KNOWN_DISTANCES</span>
+                    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown distance </span><span class="si">%s</span><span class="s1"> in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                         <span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dic</span><span class="p">)</span>
 
 
 <span class="nd">@functools</span><span class="o">.</span><span class="n">total_ordering</span>
@@ -133,7 +264,6 @@
 <span class="sd">    and all the class attributes with names starting from ``DEFINED_FOR``</span>
 <span class="sd">    and ``REQUIRES``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1">#: Reference to a</span>
     <span class="c1">#: :class:`tectonic region type &lt;openquake.hazardlib.const.TRT&gt;` this GSIM</span>
     <span class="c1">#: is defined for. One GSIM can implement only one tectonic region type.</span>
@@ -209,7 +339,44 @@
     <span class="c1">#: object attributes with same names. Values are in kilometers.</span>
     <span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">abstractproperty</span><span class="p">()</span>
 
-    <span class="n">minimum_distance</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># can be set by the engine</span>
+    <span class="n">_toml</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># set by valid.gsim</span>
+    <span class="n">minimum_distance</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># set by valid.gsim</span>
+    <span class="n">superseded_by</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">non_verified</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">experimental</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">adapted</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">get_poes</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">get_poes</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">stddevtypes</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stddevtypes</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">abstractproperty</span><span class="p">):</span>  <span class="c1"># concrete class</span>
+            <span class="k">if</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stddevtypes</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.DEFINED_FOR_STANDARD_DEVIATION_TYPES is &#39;</span>
+                                 <span class="s1">&#39;not defined for const.StdDev.TOTAL&#39;</span> <span class="o">%</span>
+                                 <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">registry</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">superseded_by</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is deprecated - use </span><span class="si">%s</span><span class="s1"> instead&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">superseded_by</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">non_verified</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not independently verified - the user is liable &#39;</span>
+                   <span class="s1">&#39;for their application&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">NotVerifiedWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">experimental</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is experimental and may change in future versions - &#39;</span>
+                   <span class="s1">&#39;the user is liable for their application&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ExperimentalWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">adapted</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not intended for general use and the behaviour &#39;</span>
+                   <span class="s1">&#39;may not be as expected - &#39;</span>
+                   <span class="s1">&#39;the user is liable for their application&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">AdaptedWarning</span><span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_mean_and_stddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">):</span>
@@ -266,139 +433,6 @@
 <span class="sd">        compute interim steps).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">get_poes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">imls</span><span class="p">,</span> <span class="n">truncation_level</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculate and return probabilities of exceedance (PoEs) of one or more</span>
-<span class="sd">        intensity measure levels (IMLs) of one intensity measure type (IMT)</span>
-<span class="sd">        for one or more pairs &quot;site -- rupture&quot;.</span>
-
-<span class="sd">        :param sctx:</span>
-<span class="sd">            An instance of :class:`SitesContext` with sites information</span>
-<span class="sd">            to calculate PoEs on.</span>
-<span class="sd">        :param rctx:</span>
-<span class="sd">            An instance of :class:`RuptureContext` with a single rupture</span>
-<span class="sd">            information.</span>
-<span class="sd">        :param dctx:</span>
-<span class="sd">            An instance of :class:`DistancesContext` with information about</span>
-<span class="sd">            the distances between sites and a rupture.</span>
-
-<span class="sd">            All three contexts (``sctx``, ``rctx`` and ``dctx``) must conform</span>
-<span class="sd">            to each other. The easiest way to get them is to call</span>
-<span class="sd">            ContextMaker.make_contexts.</span>
-<span class="sd">        :param imt:</span>
-<span class="sd">            An intensity measure type object (that is, an instance of one</span>
-<span class="sd">            of classes from :mod:`openquake.hazardlib.imt`).</span>
-<span class="sd">        :param imls:</span>
-<span class="sd">            List of interested intensity measure levels (of type ``imt``).</span>
-<span class="sd">        :param truncation_level:</span>
-<span class="sd">            Can be ``None``, which means that the distribution of intensity</span>
-<span class="sd">            is treated as Gaussian distribution with possible values ranging</span>
-<span class="sd">            from minus infinity to plus infinity.</span>
-
-<span class="sd">            When set to zero, the mean intensity is treated as an exact</span>
-<span class="sd">            value (standard deviation is not even computed for that case)</span>
-<span class="sd">            and resulting array contains 0 in places where IMT is strictly</span>
-<span class="sd">            lower than the mean value of intensity and 1.0 where IMT is equal</span>
-<span class="sd">            or greater.</span>
-
-<span class="sd">            When truncation level is positive number, the intensity</span>
-<span class="sd">            distribution is processed as symmetric truncated Gaussian with</span>
-<span class="sd">            range borders being ``mean - truncation_level * stddev`` and</span>
-<span class="sd">            ``mean + truncation_level * stddev``. That is, the truncation</span>
-<span class="sd">            level expresses how far the range borders are from the mean</span>
-<span class="sd">            value and is defined in units of sigmas. The resulting PoEs</span>
-<span class="sd">            for that mode are values of complementary cumulative distribution</span>
-<span class="sd">            function of that truncated Gaussian applied to IMLs.</span>
-
-<span class="sd">        :returns:</span>
-<span class="sd">            A dictionary of the same structure as parameter ``imts`` (see</span>
-<span class="sd">            above). Instead of lists of IMLs values of the dictionaries</span>
-<span class="sd">            have 2d numpy arrays of corresponding PoEs, first dimension</span>
-<span class="sd">            represents sites and the second represents IMLs.</span>
-
-<span class="sd">        :raises ValueError:</span>
-<span class="sd">            If truncation level is not ``None`` and neither non-negative</span>
-<span class="sd">            float number, and if ``imts`` dictionary contain wrong or</span>
-<span class="sd">            unsupported IMTs (see :attr:`DEFINED_FOR_INTENSITY_MEASURE_TYPES`).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">truncation_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">truncation_level</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;truncation level must be zero, positive number &#39;</span>
-                             <span class="s1">&#39;or None&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_imt</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">truncation_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># zero truncation mode, just compare imls to mean</span>
-            <span class="n">imls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_distribution_values</span><span class="p">(</span><span class="n">imls</span><span class="p">)</span>
-            <span class="n">mean</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mean</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">))</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">imls</span> <span class="o">&lt;=</span> <span class="n">mean</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># use real normal distribution</span>
-            <span class="k">assert</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span>
-                    <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span><span class="p">)</span>
-            <span class="n">imls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_distribution_values</span><span class="p">(</span><span class="n">imls</span><span class="p">)</span>
-            <span class="n">mean</span><span class="p">,</span> <span class="p">[</span><span class="n">stddev</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
-                                                       <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">])</span>
-            <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mean</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">))</span>
-            <span class="n">stddev</span> <span class="o">=</span> <span class="n">stddev</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">stddev</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">))</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="p">(</span><span class="n">imls</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">stddev</span>
-            <span class="k">if</span> <span class="n">truncation_level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_norm_sf</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_truncnorm_sf</span><span class="p">(</span><span class="n">truncation_level</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">disaggregate_pne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">sctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">iml</span><span class="p">,</span>
-                         <span class="n">truncnorm</span><span class="p">,</span> <span class="n">epsilons</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Disaggregate (separate) PoE of ``iml`` in different contributions</span>
-<span class="sd">        each coming from ``epsilons`` distribution bins.</span>
-
-<span class="sd">        Other parameters are the same as for :meth:`get_poes`, with</span>
-<span class="sd">        differences that ``truncation_level`` is required to be positive.</span>
-
-<span class="sd">        :returns:</span>
-<span class="sd">            Contribution to probability of exceedance of ``iml`` coming</span>
-<span class="sd">            from different sigma bands in the form of a 2d numpy array of</span>
-<span class="sd">            probabilities with shape (n_sites, n_epsilons)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># compute mean and standard deviations</span>
-        <span class="n">mean</span><span class="p">,</span> <span class="p">[</span><span class="n">stddev</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
-                                                   <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">])</span>
-
-        <span class="c1"># compute iml value with respect to standard (mean=0, std=1)</span>
-        <span class="c1"># normal distributions</span>
-        <span class="n">standard_imls</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_distribution_values</span><span class="p">(</span><span class="n">iml</span><span class="p">)</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">stddev</span>
-
-        <span class="c1"># compute epsilon bins contributions</span>
-        <span class="n">contribution_by_bands</span> <span class="o">=</span> <span class="p">(</span><span class="n">truncnorm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span>
-                                 <span class="n">truncnorm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-
-        <span class="c1"># take the minimum epsilon larger than standard_iml</span>
-        <span class="n">bins</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">epsilons</span><span class="p">,</span> <span class="n">standard_imls</span><span class="p">)</span>
-        <span class="n">poe_by_site</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">n_epsilons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">epsilons</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="k">for</span> <span class="n">lvl</span><span class="p">,</span> <span class="nb">bin</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">standard_imls</span><span class="p">,</span> <span class="n">bins</span><span class="p">):</span>  <span class="c1"># one per site</span>
-            <span class="k">if</span> <span class="nb">bin</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contribution_by_bands</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">bin</span> <span class="o">&gt;</span> <span class="n">n_epsilons</span><span class="p">:</span>
-                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_epsilons</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># for other cases (when ``lvl`` falls somewhere in the</span>
-                <span class="c1"># histogram):</span>
-                <span class="n">poe</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
-                    <span class="c1"># take zeros for bins that are on the left hand side</span>
-                    <span class="c1"># from the bin ``lvl`` falls into,</span>
-                    <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">bin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
-                    <span class="c1"># ... area of the portion of the bin containing ``lvl``</span>
-                    <span class="c1"># (the portion is limited on the left hand side by</span>
-                    <span class="c1"># ``lvl`` and on the right hand side by the bin edge),</span>
-                    <span class="p">[</span><span class="n">truncnorm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span> <span class="o">-</span> <span class="n">contribution_by_bands</span><span class="p">[</span><span class="nb">bin</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
-                    <span class="c1"># ... and all bins on the right go unchanged.</span>
-                    <span class="n">contribution_by_bands</span><span class="p">[</span><span class="nb">bin</span><span class="p">:]])</span>
-                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poe</span><span class="p">)</span>
-        <span class="n">poes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poe_by_site</span><span class="p">)</span>  <span class="c1"># shape (n_sites, n_epsilons)</span>
-        <span class="k">return</span> <span class="n">rupture</span><span class="o">.</span><span class="n">get_probability_no_exceedance</span><span class="p">(</span><span class="n">poes</span><span class="p">)</span>
-
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_distribution_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -451,16 +485,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kv</span> <span class="k">for</span> <span class="n">kv</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Default string representation for GSIM instances. It contains</span>
-<span class="sd">        the name and values of the arguments, if any.</span>
+<span class="sd">        String representation for GSIM instances in TOML format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_toml</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_toml</span>
+        <span class="k">return</span> <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
 
 <span class="k">def</span> <span class="nf">_truncnorm_sf</span><span class="p">(</span><span class="n">truncation_level</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
@@ -472,7 +503,7 @@
 
 <span class="sd">    :param truncation_level:</span>
 <span class="sd">        Positive float number representing the truncation on both sides</span>
-<span class="sd">        around the mean, in units of sigma.</span>
+<span class="sd">        around the mean, in units of sigma, or None, for non-truncation</span>
 <span class="sd">    :param values:</span>
 <span class="sd">        Numpy array of values as input to a survival function for the given</span>
 <span class="sd">        distribution.</span>
@@ -482,7 +513,16 @@
 <span class="sd">    &gt;&gt;&gt; from scipy.stats import truncnorm</span>
 <span class="sd">    &gt;&gt;&gt; truncnorm(-3, 3).sf(0.12345) == _truncnorm_sf(3, 0.12345)</span>
 <span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; from scipy.stats import norm</span>
+<span class="sd">    &gt;&gt;&gt; norm.sf(0.12345) == _truncnorm_sf(None, 0.12345)</span>
+<span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">truncation_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="k">if</span> <span class="n">truncation_level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ndtr</span><span class="p">(</span><span class="o">-</span> <span class="n">values</span><span class="p">)</span>
+
     <span class="c1"># notation from http://en.wikipedia.org/wiki/Truncated_normal_distribution.</span>
     <span class="c1"># given that mu = 0 and sigma = 1, we have alpha = a and beta = b.</span>
 
@@ -510,28 +550,6 @@
     <span class="k">return</span> <span class="p">((</span><span class="n">phi_b</span> <span class="o">-</span> <span class="n">ndtr</span><span class="p">(</span><span class="n">values</span><span class="p">))</span> <span class="o">/</span> <span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_norm_sf</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Survival function for normal distribution.</span>
-
-<span class="sd">    Assumes zero mean and standard deviation equal to one.</span>
-
-<span class="sd">    ``values`` parameter and the return value are the same</span>
-<span class="sd">    as in :func:`_truncnorm_sf`.</span>
-
-<span class="sd">    &gt;&gt;&gt; from scipy.stats import norm</span>
-<span class="sd">    &gt;&gt;&gt; norm.sf(0.12345) == _norm_sf(0.12345)</span>
-<span class="sd">    True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># survival function by definition is ``SF(x) = 1 - CDF(x)``,</span>
-    <span class="c1"># which is equivalent to ``SF(x) = CDF(- x)``, since (given</span>
-    <span class="c1"># that the normal distribution is symmetric with respect to 0)</span>
-    <span class="c1"># the integral between ``[x, +infinity]`` (that is the survival</span>
-    <span class="c1"># function) is equal to the integral between ``[-infinity, -x]``</span>
-    <span class="c1"># (that is the CDF at ``- x``).</span>
-    <span class="k">return</span> <span class="n">ndtr</span><span class="p">(</span><span class="o">-</span> <span class="n">values</span><span class="p">)</span>
-
-
 <span class="k">class</span> <span class="nc">GMPE</span><span class="p">(</span><span class="n">GroundShakingIntensityModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Ground-Motion Prediction Equation is a subclass of generic</span>
@@ -556,6 +574,29 @@
 <span class="sd">        Returns numpy array of exponents of ``values``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname_or_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param fname_or_file: filename or filelike object</span>
+<span class="sd">        :returns: the file object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fname_or_file</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">fname_or_file</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname_or_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines the parameters of the GMPE provided at the construction level</span>
+<span class="sd">        with the ones originally assigned to the backbone modified GMPE.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ADMITTED_STR_PARAMETERS</span> <span class="o">+</span> <span class="n">ADMITTED_FLOAT_PARAMETERS</span> <span class="o">+</span>
+                    <span class="n">ADMITTED_SET_PARAMETERS</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">IPE</span><span class="p">(</span><span class="n">GroundShakingIntensityModel</span><span class="p">):</span>
@@ -692,9 +733,12 @@
 <span class="sd">    ...           imt.PGV(): {&quot;a&quot;: 0.5, &quot;b&quot;: 10.0}}</span>
 <span class="sd">    &gt;&gt;&gt; ct = CoeffsTable(sa_damping=5, table=coeffs)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_instances</span> <span class="o">=</span> <span class="mi">0</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;table&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;CoeffsTable requires &quot;table&quot; kwarg&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># cache</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
@@ -712,6 +756,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;CoeffsTable cannot be constructed with inputs &quot;</span>
                             <span class="s2">&quot;of the form &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">table</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">num_instances</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">_setup_table_from_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">sa_damping</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -755,11 +800,16 @@
 <span class="sd">            If ``imt`` is not available in the table and no interpolation</span>
 <span class="sd">            can be done.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">imt</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;SA&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
-
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">imt</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;SA&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">c</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">c</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
 
@@ -783,9 +833,10 @@
                  <span class="o">/</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">min_above</span><span class="o">.</span><span class="n">period</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">max_below</span><span class="o">.</span><span class="n">period</span><span class="p">)))</span>
         <span class="n">max_below</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">max_below</span><span class="p">]</span>
         <span class="n">min_above</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">min_above</span><span class="p">]</span>
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="p">(</span><span class="n">min_above</span><span class="p">[</span><span class="n">co</span><span class="p">]</span> <span class="o">-</span> <span class="n">max_below</span><span class="p">[</span><span class="n">co</span><span class="p">])</span> <span class="o">*</span> <span class="n">ratio</span> <span class="o">+</span> <span class="n">max_below</span><span class="p">[</span><span class="n">co</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">co</span> <span class="ow">in</span> <span class="n">max_below</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">co</span><span class="p">:</span> <span class="p">(</span><span class="n">min_above</span><span class="p">[</span><span class="n">co</span><span class="p">]</span> <span class="o">-</span> <span class="n">max_below</span><span class="p">[</span><span class="n">co</span><span class="p">])</span> <span class="o">*</span> <span class="n">ratio</span> <span class="o">+</span> <span class="n">max_below</span><span class="p">[</span><span class="n">co</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">co</span> <span class="ow">in</span> <span class="n">max_below</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">c</span>
 </pre></div>
 
           </div>
@@ -827,7 +878,7 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
