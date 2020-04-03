@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -67,7 +67,9 @@
     <span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">MMI</span><span class="p">])</span>
     <span class="c1">#: The OpenQuake standard deviation types that may be produced (will</span>
     <span class="c1">#: depend on the GMPE provided).</span>
-    <span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span>
+    <span class="p">])</span>
     <span class="c1">#: Distance measures required (will depend on the GMPE provided).</span>
     <span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1">#: OpenQuake IMC used (will depend on the GMPE, but &quot;Larger&quot; is</span>
@@ -233,7 +235,7 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
