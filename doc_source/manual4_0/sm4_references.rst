@@ -860,8 +860,9 @@ Spatial and Spectral Interpolation of Ground Motion Intensity Measure Observatio
 .. _worden2020:
 
 Worden, C.B., E.M. Thompson, M. Hearne, and D.J. Wald (2020). ShakeMap 
-V4 Manual: technical guide, user's guide, and software guide, 
-U. S. Geological Survey. http:usgs.github.io/shakemap/index.html DOI: XXX
+Manual Online: technical manual, user’s guide, and software guide,
+U. S. Geological Survey. http://usgs.github.io/shakemap/.
+DOI: https://doi.org/10.5066/F7D21VPQ.
 
 Wu, Y.M., W.H.K. Lee, C.C. Chen, T.C. Shin, T.L. Teng, and Y.B. Tsai (2000). Performance of the 
 Taiwain Rapid Earthquake Information Release System (RTD) during the 1999 Chi-Chi (Taiwan) 

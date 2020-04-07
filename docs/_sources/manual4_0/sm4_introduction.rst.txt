@@ -37,3 +37,9 @@ want to use ShakeMap products and understand their varied forms can jump to the
 the software architecture, installation and configuration, and operational
 considerations for those wishing to run a regional ShakeMap system.
 
+To cite this manual:
+
+Worden, C.B., E. M. Thompson, M. Hearne, and D.J. Wald (2020). ShakeMap
+Manual Online: technical manual, user’s guide, and software guide,
+U. S. Geological Survey. http://usgs.github.io/shakemap/.
+DOI: https://doi.org/10.5066/F7D21VPQ.
