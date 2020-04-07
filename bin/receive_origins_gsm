@@ -44,14 +44,11 @@ def get_parser():
     parser.add_argument('--type', help='Product type')
     parser.add_argument('--status', help='Event status')
     parser.add_argument('--action', help='Event action type')
-    parser.add_argument('--property-origin-source',
-                        help='The source of the product')
+    parser.add_argument('--source',
+                        help='Product source ("us", "nc", etc.)')
     parser.add_argument('--property-title', nargs='*', help='Event location')
     parser.add_argument('--property-event-type', nargs='*',
                         help='Event type (earthquake, explosion, etc.)')
-
-    parser.add_argument('--property-eventsource',
-                        help='Event source ("us", "nc", etc.)')
     parser.add_argument('--property-eventsourcecode',
                         help='Event source code (i.e., 2008abcd')
     parser.add_argument('--property-magnitude', type=float,
@@ -62,7 +59,6 @@ def get_parser():
                         help='Event longitude')
     parser.add_argument('--property-depth', type=float, help='Event depth')
     parser.add_argument('--property-eventtime', help='Event time')
-    parser.add_argument('--eventids', type=str, help='Alternate event IDs')
 
     return parser
 
@@ -106,15 +102,15 @@ def main(args):
         logger.info('No event ID, skipping')
         sys.exit(0)
 
-    if args.property_origin_source != 'us':
-        logger.info('Undesirable eventsource: %s' %
-                    args.property_origin_source)
+    if args.source != 'us':
+        logger.info('Undesirable product source: %s' %
+                    args.source)
         sys.exit(0)
 
-    eventid = args.property_origin_source + args.property_eventsourcecode
+    eventid = args.source + args.property_eventsourcecode
     if args.status == 'DELETE':
         event = {'id': eventid,
-                 'netid': args.property_origin_source,
+                 'netid': args.source,
                  'alt_eventids': eventid}
         queue.send_queue('cancel', event, config['port'])
         logger.info('Sending cancel event %s to queue.' % eventid)
@@ -157,10 +153,9 @@ def main(args):
             # Let's run the event
             pass
     else:
-        if detail.id != eventid:
-            logger.info('Event id %s is not authoritative; (authoritative=%s)'
-                        % (eventid, detail.id))
-            sys.exit(0)
+        # This used to check if the event was authoritative, but we
+        # don't do that anymore.
+        pass
 
     # We've weeded out the messages we don't want, so construct an event
     # dictionary and send it to the queue
