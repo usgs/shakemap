@@ -22,11 +22,11 @@ jobs:
       Linux_Python37:
         imageName: 'ubuntu-latest'
         python.version: '3.7'
-      MacOS_10_13_Python36:
-        imageName: 'macOS-10.13'
+      MacOS_10_15_Python36:
+        imageName: 'macOS-10.15'
         python.version: '3.6'
-      MacOS_10_13_Python37:
-        imageName: 'macOS-10.13'
+      MacOS_10_15_Python37:
+        imageName: 'macOS-10.15'
         python.version: '3.7'
       MacOS_10_14_Python36:
         imageName: 'macOS-10.14'
@@ -54,6 +54,11 @@ jobs:
       echo `test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" &&
       sudo installer -allowUntrusted -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /`
     displayName: Install SDK stuff (for Mac 10.14)
+
+  - bash: |
+      echo `test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.15.pkg" &&
+      sudo installer -allowUntrusted -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.15.pkg -target /`
+    displayName: Install SDK stuff (for Mac 10.15)
 
   - bash: |
       bash install.sh                       
