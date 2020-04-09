@@ -38,9 +38,6 @@ jobs:
   pool:
     vmImage: $(imageName)
 
-  parameters:
-    osImage: $(imageName)
-
   steps:                                                                      
   - task: UsePythonVersion@0
     inputs:
@@ -56,12 +53,14 @@ jobs:
   - bash: |
       echo `test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" &&
       sudo installer -allowUntrusted -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /`
-    condition: eq('${{ parameters.osImage }}', "macOS-10.14")
+      #    condition: eq('$(imageName)', "macOS-10.14")
+      echo '$(imageName)'
     displayName: Install SDK stuff (for Mac 10.14)
 
   - bash: |
       export CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
-    condition: eq('${{ parameters.osImage }}', "macOS-10.15")
+      echo '$(imageName)'
+      #    condition: eq('$(imangName)', "macOS-10.15")
     displayName: Install SDK stuff (for Mac 10.15)
 
   - bash: |
