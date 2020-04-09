@@ -208,11 +208,11 @@ def main(args):
     else:
         location = ' '.join(args.property_title)
 
-    if not args.property_eventsource:
-        args.property_eventsource = ''
+    if not args.source:
+        args.source = ''
         network = ''
     else:
-        network = get_network_name(args.property_eventsource)
+        network = get_network_name(args.source)
         if network == 'unknown':
             network = ''
     if args.action == 'EVENT_ADDED':
@@ -220,7 +220,7 @@ def main(args):
     else:
         action = "Origin updated"
     event = {'id': eventid,
-             'netid': args.property_eventsource,
+             'netid': args.source,
              'network': network,
              'time': args.property_eventtime,
              'lat': args.property_latitude,
