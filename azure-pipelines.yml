@@ -39,7 +39,7 @@ jobs:
     vmImage: $(imageName)
 
   variables:
-      - osImage: $(imageName)
+      osImage: $(imageName)
 
   steps:                                                                      
   - task: UsePythonVersion@0
