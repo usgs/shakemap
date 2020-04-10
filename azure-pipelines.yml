@@ -50,14 +50,14 @@ jobs:
     displayName: Add conda to path
 
   - bash: |
-      if [[ $(Agent.OS)" = 'Darwin']]
+      if [ $(Agent.OS)" = 'Darwin']
       then
         sudo chown -R $USER $CONDA
-        if [[ -e "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" ]]
+        if [ -e "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" ]
         then
           sudo installer -allowUntrusted -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
         else
-          export CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include 
+          export CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
         fi
       fi
       echo '$(Agent.NAME)'
