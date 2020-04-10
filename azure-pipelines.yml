@@ -50,21 +50,18 @@ jobs:
     displayName: Add conda to path
 
   - bash: |
-      echo `test "$(Agent.OS)" = 'Darwin' && sudo chown -R $USER $CONDA`
+      if [[ $(Agent.OS)" = 'Darwin']]
+      then
+        sudo chown -R $USER $CONDA`
+        if [[ -e "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" ]]
+        then
+          sudo installer -allowUntrusted -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+        else
+          export CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include 
+        fi
+      fi
+      echo '$(Agent.NAME)'
     displayName: Take ownership of conda installation (for Mac)
-
-  - bash: |
-      echo `test -f "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg" &&
-      sudo installer -allowUntrusted -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /`
-      echo '$(imageName)'
-    condition: eq(variables.osImage, 'macOS-10.14')
-    displayName: Install SDK stuff (for Mac 10.14)
-
-  - bash: |
-      export CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
-      echo '$(imageName)'
-    condition: eq(variables.osImage, 'macOS-10.15')
-    displayName: Install SDK stuff (for Mac 10.15)
 
   - bash: |
       bash install.sh                       
