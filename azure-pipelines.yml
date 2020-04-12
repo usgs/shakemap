@@ -56,14 +56,13 @@ jobs:
         if [[ -e '/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg' ]]
         then
           sudo installer -allowUntrusted -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+          echo "MacOS 10.14"
         else
           export CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+          echo "MacOS 10.15"
         fi
       fi
       echo '$(Agent.NAME)'
-    displayName: Take ownership of conda installation (for Mac)
-
-  - bash: |
       bash install.sh                       
     displayName: Create environment
 
