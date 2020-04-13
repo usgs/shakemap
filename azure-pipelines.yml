@@ -62,9 +62,9 @@ jobs:
           echo "MacOS 10.15"
         fi
       fi
-      echo '$(Agent.NAME)'
-      echo '$[versionSpec]'
-      bash install.sh -p $[versionSpec]
+      echo $(Agent.NAME)
+      echo $[inputs.versionSpec]
+      bash install.sh -p $[inputs.versionSpec]
     displayName: Create environment
 
   - bash: conda init bash                            
