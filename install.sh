@@ -72,7 +72,7 @@ if [ $? -ne 0 ]; then
 
     command -v curl >/dev/null 2>&1 || { echo >&2 "Script requires curl but it's not installed. Aborting."; exit 1; }
 
-    curl $mini_conda_url -o miniconda.sh;
+    curl -L $mini_conda_url -o miniconda.sh;
 
     # if curl fails, bow out gracefully
     if [ $? -ne 0 ];then

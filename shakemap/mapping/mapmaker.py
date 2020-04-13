@@ -938,7 +938,7 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
                 inst_dict[dimt].append(mmi_conv)
                 inst_dict['lat'].append(lat)
                 inst_dict['lon'].append(lon)
-            else:
+            elif len(feature['properties']['channels']) > 0:
                 # Other IMTs are given in the channel for instruments
                 channel = feature['properties']['channels'][0]
                 for amplitude in channel['amplitudes']:
