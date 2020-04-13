@@ -126,6 +126,9 @@ def test_profile():
         except PermissionError:
             # Normal system privileges -- run the tests
             run_mkdir_tests = True
+        except OSError:
+            # Normal system privileges -- run the tests
+            run_mkdir_tests = True
         else:
             # Godlike system privileges -- the tests will pass even if they
             # shouldn't, so don't run them since success is failure
