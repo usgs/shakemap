@@ -392,7 +392,7 @@ class StationList(object):
                 'properties': {
                     'code': str(sta[2]),
                     'name': sta[3],
-                    'instrumentType': 'UNK' if sta[8] is 1 else 'OBSERVED',
+                    'instrumentType': 'UNK' if sta[8] == 1 else 'OBSERVED',
                     'source': sta[1],
                     'network': sta[1],
                     'commType': 'UNK',
@@ -420,7 +420,7 @@ class StationList(object):
                 'AND a.imt_id = i.id' % (str(sta[0]))
             )
             amp_rows = self.cursor.fetchall()
-            if sta[8] is 0:
+            if sta[8] == 0:
                 if len(amp_rows) != 1:
                     logging.warn("Couldn't find intensity for MMI station.")
                     continue
@@ -1001,7 +1001,7 @@ def _getOrientation(orig_channel, orient):
         'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
     """
     if not len(orig_channel.strip()):
-        orientation = 'U'  # default when we don't know anything about the channel
+        orientation = 'U'  # default when we don't know anything about channel
         return orientation
 
     if orig_channel == 'mmi' or orig_channel == 'DERIVED':
