@@ -379,11 +379,14 @@ class MultiGMPE(GMPE):
         # name here since the conf is not available within the MultiGMPE class.
         mods = conf['gmpe_modules']
         mod_keys = mods.keys()
+        new_gmpe_lims = {}
         for k, v in gmpe_lims.items():
             if k in mod_keys:
-                gmpe_lims[mods[k][0]] = gmpe_lims.pop(k)
+                new_gmpe_lims[mods[k][0]] = v
+            else:
+                new_gmpe_lims[k] = v
 
-        out.GMPE_LIMITS = gmpe_lims
+        out.GMPE_LIMITS = new_gmpe_lims
 
         return out
 
