@@ -63,7 +63,8 @@ jobs:
         fi
       fi
       echo '$(Agent.NAME)'
-      bash install.sh                       
+      echo '$[versionSpec]'
+      bash install.sh -p $[versionSpec]
     displayName: Create environment
 
   - bash: conda init bash                            
