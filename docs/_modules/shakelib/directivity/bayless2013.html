@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -36,10 +36,10 @@
 <span class="kn">import</span> <span class="nn">openquake.hazardlib.geo</span> <span class="k">as</span> <span class="nn">geo</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 
-<span class="kn">from</span> <span class="nn">shakelib.distance</span> <span class="k">import</span> <span class="n">get_distance</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.utils</span> <span class="k">import</span> <span class="n">_distance_sq_to_segment</span>
+<span class="kn">from</span> <span class="nn">shakelib.distance</span> <span class="kn">import</span> <span class="n">get_distance</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.utils</span> <span class="kn">import</span> <span class="n">_distance_sq_to_segment</span>
 <span class="kn">import</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="k">as</span> <span class="nn">ecef</span>
-<span class="kn">from</span> <span class="nn">impactutils.vectorutils.vector</span> <span class="k">import</span> <span class="n">Vector</span>
+<span class="kn">from</span> <span class="nn">impactutils.vectorutils.vector</span> <span class="kn">import</span> <span class="n">Vector</span>
 
 
 <div class="viewcode-block" id="Bayless2013"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.bayless2013.html#shakelib.directivity.bayless2013.Bayless2013">[docs]</a><span class="k">class</span> <span class="nc">Bayless2013</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -115,7 +115,7 @@
     <span class="n">__c1ds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.034</span><span class="p">,</span> <span class="mf">0.093</span><span class="p">,</span> <span class="mf">0.128</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span>
                        <span class="mf">0.165</span><span class="p">,</span> <span class="mf">0.179</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor for bayless2013.</span>
 
@@ -528,7 +528,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
