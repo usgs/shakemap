@@ -147,7 +147,6 @@ package_list=(
       "numpy"
       "obspy"
       "openmp"
-      "openquake.engine"
       "pandas"
       "ps2ff"
       "psutil"
@@ -178,6 +177,8 @@ conda config --set channel_priority flexible
 echo "Creating the $VENV virtual environment:"
 conda create -y -n $VENV ${package_list[*]}
 
+# Install OQ from github to get NGA East since it isn't in a release yet.
+pip install git+https://github.com/gem/oq-engine
 
 # Bail out at this point if the conda create command fails.
 # Clean up zip files we've downloaded
