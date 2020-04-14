@@ -266,37 +266,36 @@ class MultiGMPE(GMPE):
         # for a discussion on the way this is implemented here.
         # -------------------------------------------------------------- # noqa
 
-        if False:
-            nwts = len(wts)
-            npwts = np.array(wts).reshape((1, -1))
-            nsites = len(lnmu)
-            # Find the correlation coefficients among the gmpes; if there are
-            # fewer than 10 points, just use an approximation (noting that the
-            # correlation among GMPEs tends to be quite high).
-            if nsites < 10:
-                cc = np.full((nwts, nwts), 0.95)
-                np.fill_diagonal(cc, 1.0)
-            else:
-                np.seterr(divide='ignore', invalid='ignore')
-                cc = np.reshape(np.corrcoef(lnmu_list), (nwts, nwts))
-                np.seterr(divide='warn', invalid='warn')
-                cc[np.isnan(cc)] = 1.0
-            # Multiply the correlation coefficients by the weights matrix
-            # (this is cheaper than multiplying all of elements of each
-            # stddev array by their weights since we have to multiply
-            # everything by the correlation coefficient matrix anyway))
-            cc = ((npwts * npwts.T) * cc).reshape((nwts, nwts, 1))
-            nstds = len(stddev_types)
-            lnsd_new = []
-            for i in range(nstds * 2):
-                sdlist = []
-                for j in range(nwts):
-                    sdlist.append(
-                        lnsd_list[j * nstds * 2 + i].reshape((1, 1, -1)))
-                sdstack = np.hstack(sdlist)
-                wcov = (sdstack * np.transpose(sdstack, axes=(1, 0, 2))) * cc
-                # This sums the weighted covariance as each point in the output
-                lnsd_new.append(np.sqrt(wcov.sum((0, 1))))
+        nwts = len(wts)
+        npwts = np.array(wts).reshape((1, -1))
+        nsites = len(lnmu)
+        # Find the correlation coefficients among the gmpes; if there are
+        # fewer than 10 points, just use an approximation (noting that the
+        # correlation among GMPEs tends to be quite high).
+        if nsites < 10:
+            cc = np.full((nwts, nwts), 0.95)
+            np.fill_diagonal(cc, 1.0)
+        else:
+            np.seterr(divide='ignore', invalid='ignore')
+            cc = np.reshape(np.corrcoef(lnmu_list), (nwts, nwts))
+            np.seterr(divide='warn', invalid='warn')
+            cc[np.isnan(cc)] = 1.0
+        # Multiply the correlation coefficients by the weights matrix
+        # (this is cheaper than multiplying all of elements of each
+        # stddev array by their weights since we have to multiply
+        # everything by the correlation coefficient matrix anyway))
+        cc = ((npwts * npwts.T) * cc).reshape((nwts, nwts, 1))
+        nstds = len(stddev_types)
+        lnsd_new = []
+        for i in range(nstds * 2):
+            sdlist = []
+            for j in range(nwts):
+                sdlist.append(
+                    lnsd_list[j * nstds * 2 + i].reshape((1, 1, -1)))
+            sdstack = np.hstack(sdlist)
+            wcov = (sdstack * np.transpose(sdstack, axes=(1, 0, 2))) * cc
+            # This sums the weighted covariance as each point in the output
+            lnsd_new.append(np.sqrt(wcov.sum((0, 1))))
         lnsd_new = lnsd_list
 
         return lnmu, lnsd_new
