@@ -280,6 +280,7 @@ class MultiGMPE(GMPE):
             cc = np.reshape(np.corrcoef(lnmu_list), (nwts, nwts))
             np.seterr(divide='warn', invalid='warn')
             cc[np.isnan(cc)] = 1.0
+
         # Multiply the correlation coefficients by the weights matrix
         # (this is cheaper than multiplying all of elements of each
         # stddev array by their weights since we have to multiply
@@ -296,7 +297,6 @@ class MultiGMPE(GMPE):
             wcov = (sdstack * np.transpose(sdstack, axes=(1, 0, 2))) * cc
             # This sums the weighted covariance as each point in the output
             lnsd_new.append(np.sqrt(wcov.sum((0, 1))))
-        lnsd_new = lnsd_list
 
         return lnmu, lnsd_new
 
