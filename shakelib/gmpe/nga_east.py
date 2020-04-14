@@ -48,11 +48,11 @@ class NGAEast(GMPE):
         NGA_BASE_PATH, 'nga-east-seed-weights.dat'))
 
     # Sigma models and their weights
-    # SIGMA_MODS = ["EPRI", "PANEL"]
+    # SIGMA_MODS = ["EPRI", "PANEL", "COLLAPSED"]
     # SIGMA_WEIGHTS = [0.8, 0.2]
 
-    # To simplify, lets ignore the PANEL branch
-    SIGMA_MODS = ["EPRI"]
+    # To simplify, use the COLLAPSED branch
+    SIGMA_MODS = ["COLLAPSED"]
     SIGMA_WEIGHTS = [1.0]
 
     # Parse the periods of the columns

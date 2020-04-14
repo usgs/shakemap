@@ -6,7 +6,7 @@ import logging
 
 import numpy as np
 
-from openquake.hazardlib.gsim.base import GMPE, IPE
+from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
     CampbellBozorgnia2014)
@@ -589,8 +589,8 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
 
         for g in gmpes:
-            if not isinstance(g, GMPE) and not isinstance(g, IPE):
-                raise Exception("\"%s\" is not a GMPE or IPE instance." % g)
+            if not isinstance(g, GMPE):
+                raise Exception("\"%s\" is not a GMPE instance." % g)
 
         self = cls()
         self.GMPES = gmpes
