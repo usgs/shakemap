@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -33,21 +33,21 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">GMPE</span><span class="p">,</span> <span class="n">IPE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_2014</span> <span class="k">import</span> <span class="n">BooreEtAl2014</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">GMPE</span><span class="p">,</span> <span class="n">IPE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_2014</span> <span class="kn">import</span> <span class="n">BooreEtAl2014</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CampbellBozorgnia2014</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span><span class="p">,</span> <span class="n">SA</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="kn">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span><span class="p">,</span> <span class="n">SA</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">const</span>
 
-<span class="kn">from</span> <span class="nn">shakelib.conversions.imt.newmark_hall_1982</span> <span class="k">import</span> <span class="n">NewmarkHall1982</span>
-<span class="kn">from</span> <span class="nn">shakelib.conversions.imc.boore_kishida_2017</span> <span class="k">import</span> <span class="n">BooreKishida2017</span>
-<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="k">import</span> <span class="n">Sites</span>
+<span class="kn">from</span> <span class="nn">shakelib.conversions.imt.newmark_hall_1982</span> <span class="kn">import</span> <span class="n">NewmarkHall1982</span>
+<span class="kn">from</span> <span class="nn">shakelib.conversions.imc.boore_kishida_2017</span> <span class="kn">import</span> <span class="n">BooreKishida2017</span>
+<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="kn">import</span> <span class="n">Sites</span>
 
 
 <div class="viewcode-block" id="MultiGMPE"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE">[docs]</a><span class="k">class</span> <span class="nc">MultiGMPE</span><span class="p">(</span><span class="n">GMPE</span><span class="p">):</span>
@@ -411,11 +411,14 @@
         <span class="c1"># name here since the conf is not available within the MultiGMPE class.</span>
         <span class="n">mods</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_modules&#39;</span><span class="p">]</span>
         <span class="n">mod_keys</span> <span class="o">=</span> <span class="n">mods</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">new_gmpe_lims</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">gmpe_lims</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mod_keys</span><span class="p">:</span>
-                <span class="n">gmpe_lims</span><span class="p">[</span><span class="n">mods</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">gmpe_lims</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">new_gmpe_lims</span><span class="p">[</span><span class="n">mods</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_gmpe_lims</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
-        <span class="n">out</span><span class="o">.</span><span class="n">GMPE_LIMITS</span> <span class="o">=</span> <span class="n">gmpe_lims</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">GMPE_LIMITS</span> <span class="o">=</span> <span class="n">new_gmpe_lims</span>
 
         <span class="k">return</span> <span class="n">out</span></div>
 
@@ -1091,7 +1094,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

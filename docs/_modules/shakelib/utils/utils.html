@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -33,44 +33,44 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="k">import</span> <span class="n">OrthographicProjection</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">SitesContext</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">DistancesContext</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">RuptureContext</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="kn">import</span> <span class="n">OrthographicProjection</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">SitesContext</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">DistancesContext</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">RuptureContext</span>
 
-<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="k">import</span> <span class="n">EdgeRupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="k">import</span> <span class="n">QuadRupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="k">import</span> <span class="n">Rupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="k">import</span> <span class="n">MultiGMPE</span>
-<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="k">import</span> <span class="n">Sites</span>
-<span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="k">import</span> <span class="n">StationList</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="kn">import</span> <span class="n">get_object_from_config</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="kn">import</span> <span class="n">EdgeRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="kn">import</span> <span class="n">QuadRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="kn">import</span> <span class="n">Rupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="kn">import</span> <span class="n">MultiGMPE</span>
+<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="kn">import</span> <span class="n">Sites</span>
+<span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="kn">import</span> <span class="n">StationList</span>
 
-<span class="kn">from</span> <span class="nn">strec.gmreg</span> <span class="k">import</span> <span class="n">Regionalizer</span>
+<span class="kn">from</span> <span class="nn">strec.gmreg</span> <span class="kn">import</span> <span class="n">Regionalizer</span>
 
 <span class="c1"># ACR GMPE/GMICE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.abrahamson_2014</span> <span class="k">import</span> <span class="n">AbrahamsonEtAl2014</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.abrahamson_2014</span> <span class="kn">import</span> <span class="n">AbrahamsonEtAl2014</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CampbellBozorgnia2014</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.chiou_youngs_2014</span> <span class="k">import</span> <span class="n">ChiouYoungs2014</span>
-<span class="kn">from</span> <span class="nn">shakelib.gmice.wgrw12</span> <span class="k">import</span> <span class="n">WGRW12</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.chiou_youngs_2014</span> <span class="kn">import</span> <span class="n">ChiouYoungs2014</span>
+<span class="kn">from</span> <span class="nn">shakelib.gmice.wgrw12</span> <span class="kn">import</span> <span class="n">WGRW12</span>
 
 <span class="c1"># SCR GMPE/GMICE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.frankel_1996</span> <span class="k">import</span> <span class="n">FrankelEtAl1996MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.toro_1997</span> <span class="k">import</span> <span class="n">ToroEtAl1997MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.silva_2002</span> <span class="k">import</span> <span class="n">SilvaEtAl2002MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_2003</span> <span class="k">import</span> <span class="n">Campbell2003MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.tavakoli_pezeshk_2005</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.frankel_1996</span> <span class="kn">import</span> <span class="n">FrankelEtAl1996MwNSHMP2008</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.toro_1997</span> <span class="kn">import</span> <span class="n">ToroEtAl1997MwNSHMP2008</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.silva_2002</span> <span class="kn">import</span> <span class="n">SilvaEtAl2002MwNSHMP2008</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_2003</span> <span class="kn">import</span> <span class="n">Campbell2003MwNSHMP2008</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.tavakoli_pezeshk_2005</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TavakoliPezeshk2005MwNSHMP2008</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.atkinson_boore_2006</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.atkinson_boore_2006</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AtkinsonBoore2006Modified2011</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.pezeshk_2011</span> <span class="k">import</span> <span class="n">PezeshkEtAl2011</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_atkinson_2011</span> <span class="k">import</span> <span class="n">Atkinson2008prime</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.somerville_2001</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.pezeshk_2011</span> <span class="kn">import</span> <span class="n">PezeshkEtAl2011</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_atkinson_2011</span> <span class="kn">import</span> <span class="n">Atkinson2008prime</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.somerville_2001</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SomervilleEtAl2001NSHMP2008</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">shakelib.gmice.ak07</span> <span class="k">import</span> <span class="n">AK07</span>
+<span class="kn">from</span> <span class="nn">shakelib.gmice.ak07</span> <span class="kn">import</span> <span class="n">AK07</span>
 
 
 <span class="n">DEFAULT_ACTIVE_COEFFS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">27.24</span><span class="p">,</span> <span class="mf">250.4</span><span class="p">,</span> <span class="mf">579.1</span><span class="p">]</span>
@@ -466,7 +466,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

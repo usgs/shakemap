@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -32,20 +32,20 @@
   <h1>Source code for shakemap.utils.layers</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">pyproj</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span>
-<span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="k">import</span> <span class="n">transform</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span>
+<span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="kn">import</span> <span class="n">transform</span>
 <span class="kn">import</span> <span class="nn">shapely.wkt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">min_distance_to_segment</span>
-<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">ValidateError</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="kn">import</span> <span class="n">min_distance_to_segment</span>
+<span class="kn">from</span> <span class="nn">validate</span> <span class="kn">import</span> <span class="n">ValidateError</span>
 
 <span class="kn">import</span> <span class="nn">shakemap.utils.config</span> <span class="k">as</span> <span class="nn">config</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="n">path_macro_sub</span>
 
 
 <span class="c1"># ##########################################################################</span>
@@ -268,7 +268,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

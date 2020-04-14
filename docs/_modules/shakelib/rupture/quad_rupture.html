@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -34,23 +34,23 @@
 
 <span class="c1"># stdlib modules</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.mesh</span> <span class="k">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">point_at</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.point</span> <span class="k">import</span> <span class="n">Point</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="k">import</span> <span class="n">OrthographicProjection</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.mesh</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="kn">import</span> <span class="n">point_at</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.point</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="kn">import</span> <span class="n">OrthographicProjection</span>
 
-<span class="kn">from</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="k">import</span> <span class="n">latlon2ecef</span>
-<span class="kn">from</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="k">import</span> <span class="n">ecef2latlon</span>
-<span class="kn">from</span> <span class="nn">impactutils.vectorutils.vector</span> <span class="k">import</span> <span class="n">Vector</span>
-<span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="k">import</span> <span class="n">ShakeLibException</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="k">import</span> <span class="n">Rupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">gc2</span>
+<span class="kn">from</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="kn">import</span> <span class="n">latlon2ecef</span>
+<span class="kn">from</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="kn">import</span> <span class="n">ecef2latlon</span>
+<span class="kn">from</span> <span class="nn">impactutils.vectorutils.vector</span> <span class="kn">import</span> <span class="n">Vector</span>
+<span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="kn">import</span> <span class="n">HistoricTime</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="kn">import</span> <span class="n">ShakeLibException</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="kn">import</span> <span class="n">Rupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="kn">import</span> <span class="n">gc2</span>
 <span class="kn">import</span> <span class="nn">shakelib.rupture.constants</span> <span class="k">as</span> <span class="nn">constants</span>
 
 
@@ -63,7 +63,7 @@
 <span class="sd">    must match the number of points in the bottom edge.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a QuadRupture instance from a GeoJSON dictionary and an Origin.</span>
 
@@ -1199,7 +1199,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

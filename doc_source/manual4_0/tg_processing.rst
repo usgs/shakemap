@@ -90,7 +90,7 @@ variation is due to the heteroscedastic nature of the GMPEs.
 
 .. _gmpe-test-mean:
 
-.. figure:: _static/gmpe_test_psa3p0.*
+.. figure:: _static/gmpe_test_PSA3p0.*
    :width: 700
    :align: left
 
@@ -101,7 +101,7 @@ variation is due to the heteroscedastic nature of the GMPEs.
 
 .. _gmpe-test-sd:
 
-.. figure:: _static/gmpe_test_psa3p0_sd.*
+.. figure:: _static/gmpe_test_PSA3p0_sd.*
    :width: 700
    :align: left
 
@@ -307,7 +307,7 @@ consequence of the bilinear form of the GMICE.
 
 .. _gmice-test-mean:
 
-.. figure:: _static/gmpe_test_mmi.*
+.. figure:: _static/gmpe_test_MMI.*
    :width: 700
    :align: left
 
@@ -320,7 +320,7 @@ consequence of the bilinear form of the GMICE.
 
 .. _gmice-test-sd:
 
-.. figure:: _static/gmpe_test_mmi_sd.*
+.. figure:: _static/gmpe_test_MMI_sd.*
    :width: 700
    :align: left
 
