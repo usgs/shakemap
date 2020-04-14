@@ -1,0 +1,15 @@
+model,        weight
+B_bca10d,     0.06633
+B_ab95,       0.02211
+B_bs11,       0.02211
+2CCSP,        0.055275
+2CVSP,        0.055275
+Graizer16,    0.05445
+Graizer17,    0.05445
+PZCT15_M1SS,  0.05445
+PZCT15_M2ES,  0.05445
+SP15,         0.1089
+YA15,         0.1122
+HA15,         0.1122
+Frankel,      0.1122
+PEER_GP,      0.1156
