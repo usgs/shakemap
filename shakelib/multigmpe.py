@@ -22,11 +22,6 @@ class MultiGMPE(GMPE):
     """
     Implements a GMPE that is the combination of multiple GMPEs.
 
-    To do
-
-        * Allow site to be based on a model that isn't a GMPE (e.g.,
-          Borcherdt).
-
     """
 
     DEFINED_FOR_TECTONIC_REGION_TYPE = None
@@ -270,35 +265,39 @@ class MultiGMPE(GMPE):
         # http://usgs.github.io/shakemap/manual4_0/tg_processing.html#ground-motion-prediction
         # for a discussion on the way this is implemented here.
         # -------------------------------------------------------------- # noqa
-        nwts = len(wts)
-        npwts = np.array(wts).reshape((1, -1))
-        nsites = len(lnmu)
-        # Find the correlation coefficients among the gmpes; if there are
-        # fewer than 10 points, just use an approximation (noting that the
-        # correlation among GMPEs tends to be quite high).
-        if nsites < 10:
-            cc = np.full((nwts, nwts), 0.95)
-            np.fill_diagonal(cc, 1.0)
-        else:
-            np.seterr(divide='ignore', invalid='ignore')
-            cc = np.reshape(np.corrcoef(lnmu_list), (nwts, nwts))
-            np.seterr(divide='warn', invalid='warn')
-            cc[np.isnan(cc)] = 1.0
-        # Multiply the correlation coefficients by the weights matrix
-        # (this is cheaper than multiplying all of elements of each
-        # stddev array by their weights since we have to multiply
-        # everything by the correlation coefficient matrix anyway))
-        cc = ((npwts * npwts.T) * cc).reshape((nwts, nwts, 1))
-        nstds = len(stddev_types)
-        lnsd_new = []
-        for i in range(nstds * 2):
-            sdlist = []
-            for j in range(nwts):
-                sdlist.append(lnsd_list[j * nstds * 2 + i].reshape((1, 1, -1)))
-            sdstack = np.hstack(sdlist)
-            wcov = (sdstack * np.transpose(sdstack, axes=(1, 0, 2))) * cc
-            # This sums the weighted covariance as each point in the output
-            lnsd_new.append(np.sqrt(wcov.sum((0, 1))))
+
+        if False:
+            nwts = len(wts)
+            npwts = np.array(wts).reshape((1, -1))
+            nsites = len(lnmu)
+            # Find the correlation coefficients among the gmpes; if there are
+            # fewer than 10 points, just use an approximation (noting that the
+            # correlation among GMPEs tends to be quite high).
+            if nsites < 10:
+                cc = np.full((nwts, nwts), 0.95)
+                np.fill_diagonal(cc, 1.0)
+            else:
+                np.seterr(divide='ignore', invalid='ignore')
+                cc = np.reshape(np.corrcoef(lnmu_list), (nwts, nwts))
+                np.seterr(divide='warn', invalid='warn')
+                cc[np.isnan(cc)] = 1.0
+            # Multiply the correlation coefficients by the weights matrix
+            # (this is cheaper than multiplying all of elements of each
+            # stddev array by their weights since we have to multiply
+            # everything by the correlation coefficient matrix anyway))
+            cc = ((npwts * npwts.T) * cc).reshape((nwts, nwts, 1))
+            nstds = len(stddev_types)
+            lnsd_new = []
+            for i in range(nstds * 2):
+                sdlist = []
+                for j in range(nwts):
+                    sdlist.append(
+                        lnsd_list[j * nstds * 2 + i].reshape((1, 1, -1)))
+                sdstack = np.hstack(sdlist)
+                wcov = (sdstack * np.transpose(sdstack, axes=(1, 0, 2))) * cc
+                # This sums the weighted covariance as each point in the output
+                lnsd_new.append(np.sqrt(wcov.sum((0, 1))))
+        lnsd_new = lnsd_list
 
         return lnmu, lnsd_new
 
@@ -561,7 +560,7 @@ class MultiGMPE(GMPE):
 
             default_gmpes_for_site_weights: Weights for default_gmpes_for_site.
                 Must sum to one and be same length as default_gmpes_for_site.
-                If None, then weights are set to be equal.
+                If None, then weights are set to be equal.b /Users/emthompson/src/python/shakemap/shakelib/multigmpe.py:570
 
             reference_vs30:
                 Reference rock Vs30 in m/s. We do not check that this matches
@@ -946,15 +945,15 @@ def filter_gmpe_list(gmpes, wts, imt):
     per_max = [np.max(get_gmpe_sa_periods(g)) for g in gmpes]
     per_min = [np.min(get_gmpe_sa_periods(g)) for g in gmpes]
     if imt == PGA():
-        sgmpe = [g for g in gmpes if imt in
-                 get_gmpe_coef_table(g).non_sa_coeffs]
-        swts = [w for g, w in zip(gmpes, wts) if imt in
-                get_gmpe_coef_table(g).non_sa_coeffs]
+        sgmpe = [g for g in gmpes if PGA in
+                 g.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
+        swts = [w for g, w in zip(gmpes, wts) if PGA in
+                g.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
     elif imt == PGV():
         sgmpe = []
         swts = []
         for i in range(len(gmpes)):
-            if (imt in get_gmpe_coef_table(gmpes[i]).non_sa_coeffs) or\
+            if (PGV in gmpes[i].DEFINED_FOR_INTENSITY_MEASURE_TYPES) or\
                (per_max[i] >= 1.0 and per_min[i] <= 1.0):
                 sgmpe.append(gmpes[i])
                 swts.append(wts[i])
@@ -988,9 +987,12 @@ def get_gmpe_sa_periods(gmpe):
         list: List of periods.
 
     """
-    ctab = get_gmpe_coef_table(gmpe).sa_coeffs
-    ilist = list(ctab.keys())
-    per = [i.period for i in ilist]
+    if gmpe == '[NGAEast]':
+        per = gmpe.per_array
+    else:
+        ctab = get_gmpe_coef_table(gmpe).sa_coeffs
+        ilist = list(ctab.keys())
+        per = [i.period for i in ilist]
     return per
 
 
