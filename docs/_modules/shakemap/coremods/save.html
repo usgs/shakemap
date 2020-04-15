@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -32,15 +32,15 @@
   <h1>Source code for shakemap.coremods.save</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1"># third party imports</span>
-<span class="kn">from</span> <span class="nn">impactutils.transfer.securesender</span> <span class="kn">import</span> <span class="n">SecureSender</span>
+<span class="kn">from</span> <span class="nn">impactutils.transfer.securesender</span> <span class="k">import</span> <span class="n">SecureSender</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">.transfer_base</span> <span class="kn">import</span> <span class="n">TransferBaseModule</span>
+<span class="kn">from</span> <span class="nn">.transfer_base</span> <span class="k">import</span> <span class="n">TransferBaseModule</span>
 
 
 <div class="viewcode-block" id="SaveTransfer"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.save.html#shakemap.coremods.save.SaveTransfer">[docs]</a><span class="k">class</span> <span class="nc">SaveTransfer</span><span class="p">(</span><span class="n">TransferBaseModule</span><span class="p">):</span>
@@ -50,7 +50,7 @@
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;save&#39;</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/*&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
         <span class="c1"># call the parent constructor</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SaveTransfer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
 
@@ -99,7 +99,7 @@
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

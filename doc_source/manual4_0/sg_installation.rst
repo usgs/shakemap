@@ -16,7 +16,7 @@ The Wiki does a pretty good job of explaining the installation process,
 which is fairly automated. Here we will just reiterate that things will
 go most smoothly if you use the bash shell and conda virtual environment.
 Taking a more manual approach will likely lead to conflicts with system
-software (ShakeMap runs on Python 3.6 or 3.7, while many systems still
+software (ShakeMap runs on Python 3.7 or 3.8, while many systems still
 use 2.7 as a default) and dependency headaches.
 
 Configuration

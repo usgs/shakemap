@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="4.5. Output Data Formats" href="sg_output_formats.html" />
@@ -837,10 +837,10 @@ grids for PGA, SA(0.3), SA(1.0), and SA(3.0). The grids are derived from
 GMT <strong>.grd</strong> files residing in the local directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env python</span>
 
-<span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="kn">import</span> <span class="n">GMTGrid</span>
-<span class="kn">from</span> <span class="nn">mapio.gridcontainer</span> <span class="kn">import</span> <span class="n">GridHDFContainer</span>
+<span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
+<span class="kn">from</span> <span class="nn">mapio.gridcontainer</span> <span class="k">import</span> <span class="n">GridHDFContainer</span>
 
-<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="kn">import</span> <span class="n">file_to_oq</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">file_to_oq</span>
 
 
 <span class="n">gc</span> <span class="o">=</span> <span class="n">GridHDFContainer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;Test.hdf&#39;</span><span class="p">)</span>
@@ -971,7 +971,7 @@ provided. Etc.</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
