@@ -24,7 +24,7 @@ source $prof
 VENV=shakemap
 
 developer=0
-py_ver=3.7
+py_ver=3.8
 while getopts p:d FLAG; do
   case $FLAG in
     p)
