@@ -13,23 +13,29 @@ from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib import const
 from openquake.hazardlib import imt as IMT
 from openquake.hazardlib.gsim.usgs_ceus_2019 import NGAEastUSGSGMPE
-from shakelib.multigmpe import MultiGMPE
 
 
 class NGAEast(GMPE):
     """
-    Returns NGA East MultiGMPE
+    Returns NGA East GMPE that combines all of the individual NGAEastUSGSGMPE
+    GMPEs.
     """
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.STABLE_CONTINENTAL
     DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = const.IMC.RotD50
     DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
         IMT.PGA,
-        IMT.PGV,
+        # IMT.PGV,
         IMT.SA
     ])
-    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set((const.StdDev.TOTAL,
-                                                const.StdDev.INTER_EVENT,
-                                                const.StdDev.INTRA_EVENT))
+    # DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
+    #     const.StdDev.TOTAL,
+    # ])
+
+    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
+        const.StdDev.TOTAL,
+        const.StdDev.INTER_EVENT,
+        const.StdDev.INTRA_EVENT
+    ])
     REQUIRES_SITES_PARAMETERS = set(('vs30', ))
     REQUIRES_RUPTURE_PARAMETERS = set(('mag', ))
     REQUIRES_DISTANCES = set(('rrup', ))
@@ -48,12 +54,14 @@ class NGAEast(GMPE):
         NGA_BASE_PATH, 'nga-east-seed-weights.dat'))
 
     # Sigma models and their weights
-    # SIGMA_MODS = ["EPRI", "PANEL", "COLLAPSED"]
-    # SIGMA_WEIGHTS = [0.8, 0.2]
+    SIGMA_MODS = ["EPRI", "PANEL"]
+    SIGMA_WEIGHTS = [0.8, 0.2]
 
-    # To simplify, use the COLLAPSED branch
-    SIGMA_MODS = ["COLLAPSED"]
-    SIGMA_WEIGHTS = [1.0]
+    # -------------------------------------------------------------------------
+    # To simplify, use the COLLAPSED branch, but cannot get inter and intra
+    # event standard deviations in this case.
+    # SIGMA_MODS = ["COLLAPSED"]
+    # SIGMA_WEIGHTS = [1.0]
 
     # Parse the periods of the columns
     per_idx_start = 1
@@ -127,8 +135,21 @@ class NGAEast(GMPE):
                     iweight = self.NGA_EAST_SEEDS[
                         self.NGA_EAST_SEEDS['model'] == str_match].iloc[0, 1]
                     wts[i] = self.NGA_EAST_SEED_WEIGHT * iweight
+
         total_gmpe_weights = self.sigma_weights * wts
-        mgmpe = MultiGMPE.from_list(self.gmpes, total_gmpe_weights)
-        mean, stddevs = mgmpe.get_mean_and_stddevs(
-            sites, rup, dists, imt, stddev_types)
+
+        if not np.allclose(np.sum(total_gmpe_weights), 1.0):
+            raise ValueError('Weights must sum to 1.0.')
+
+        mean = np.full_like(sites.vs30, 0)
+        stddevs = []
+        for i in range(len(stddev_types)):
+            stddevs.append(np.full_like(sites.vs30, 0))
+        for i, gm in enumerate(self.gmpes):
+            tmean, tstddevs = gm.get_mean_and_stddevs(
+                sites, rup, dists, imt, stddev_types)
+            mean += tmean * total_gmpe_weights[i]
+            for j, sd in enumerate(tstddevs):
+                stddevs[j] += sd * total_gmpe_weights[i]
+
         return mean, stddevs
