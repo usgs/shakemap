@@ -1,5 +1,6 @@
 *.pyc
 build
+default.profraw
 *~
 .DS_Store
 .ipynb_checkpoints/
