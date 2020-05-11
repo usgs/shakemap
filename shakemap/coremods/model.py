@@ -1723,12 +1723,20 @@ class ModelModule(CoreModule):
             _string_round(self.N - self.S, 3)
         info[op][mi]['grid_span']['units'] = 'degrees'
         info[op][mi]['min'] = {}
-        info[op][mi]['min']['longitude'] = _string_round(self.W, 3)
-        info[op][mi]['min']['latitude'] = _string_round(self.S, 3)
-        info[op][mi]['min']['units'] = 'degrees'
         info[op][mi]['max'] = {}
-        info[op][mi]['max']['longitude'] = _string_round(self.E, 3)
+        min_long = self.W
+        max_long = self.E
+        if self.rx.hypo_lon < 0:
+            if min_long > 0:  # Crossing the 180 from the negative side
+                min_long = min_long - 360
+        else:
+            if max_long < 0:  # Crossing the 180 from the positive side
+                max_long = max_long + 360
+        info[op][mi]['min']['longitude'] = _string_round(min_long, 3)
+        info[op][mi]['max']['longitude'] = _string_round(max_long, 3)
+        info[op][mi]['min']['latitude'] = _string_round(self.S, 3)
         info[op][mi]['max']['latitude'] = _string_round(self.N, 3)
+        info[op][mi]['min']['units'] = 'degrees'
         info[op][mi]['max']['units'] = 'degrees'
         info[op][un] = {}
         info[op][un]['grade'] = mygrade
@@ -2088,8 +2096,16 @@ class ModelModule(CoreModule):
         Store gridded data in the output container.
         """
         metadata = {}
-        metadata['xmin'] = self.W
-        metadata['xmax'] = self.E
+        min_long = self.W
+        max_long = self.E
+        if self.rx.hypo_lon < 0:
+            if min_long > 0:  # Crossing the 180 from the negative side
+                min_long = min_long - 360
+        else:
+            if max_long < 0:  # Crossing the 180 from the positive side
+                max_long = max_long + 360
+        metadata['xmin'] = min_long
+        metadata['xmax'] = max_long
         metadata['ymin'] = self.S
         metadata['ymax'] = self.N
         metadata['nx'] = self.smnx
