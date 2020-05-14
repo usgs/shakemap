@@ -5,6 +5,8 @@ NGA-East GMPE suite.
 
 import os
 import re
+import sys
+import logging
 
 import pandas as pd
 import numpy as np
@@ -24,7 +26,7 @@ class NGAEast(GMPE):
     DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = const.IMC.RotD50
     DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
         IMT.PGA,
-        # IMT.PGV,
+        IMT.PGV,
         IMT.SA
     ])
     # DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
@@ -105,6 +107,10 @@ class NGAEast(GMPE):
         #
         wts = [0] * len(self.gmpes)
 
+        # Is IMT PGA or PGV?
+        is_pga = imt == IMT.PGA()
+        is_pgv = imt == IMT.PGV()
+
         for i, tp in enumerate(self.ALL_TABLE_PATHS):
             if 'usgs' in tp:
                 # Get model number from i-th path using regex
@@ -113,9 +119,9 @@ class NGAEast(GMPE):
                     self.NGA_EAST_USGS.iloc[mod_num - 1]
                 )
                 # Is the IMT PGA, PGA, or SA?
-                if imt == IMT.PGA():
+                if is_pga:
                     iweight = coefs[-2]
-                elif imt == IMT.PGV():
+                elif is_pgv:
                     iweight = coefs[-1]
                 else:
                     # For SA, need to interpolate; we'll use log-period and
@@ -145,11 +151,34 @@ class NGAEast(GMPE):
         stddevs = []
         for i in range(len(stddev_types)):
             stddevs.append(np.full_like(sites.vs30, 0))
+
+        # Since we will be dropping the models that don't have PGV,
+        # we now also need to track the total sum of weights for when
+        # the imt is PGV so that we can re-distribute the weights.
+        if is_pgv:
+            twts = []
+
+        # Loop over gmpes
         for i, gm in enumerate(self.gmpes):
+            if is_pgv:
+                # Is PGV and also not available for gm?
+                try:
+                    gm._return_tables(rup.mag, imt, "IMLs")
+                except KeyError:
+                    continue
+                except:
+                    logging.error("Unexpected error:", sys.exc_info()[0])
             tmean, tstddevs = gm.get_mean_and_stddevs(
                 sites, rup, dists, imt, stddev_types)
             mean += tmean * total_gmpe_weights[i]
             for j, sd in enumerate(tstddevs):
                 stddevs[j] += sd * total_gmpe_weights[i]
+            if is_pgv:
+                twts.append(total_gmpe_weights[i])
+
+        print(imt)
+        if is_pgv:
+            print(np.sum(twts))
+        print('')
 
         return mean, stddevs
