@@ -63,6 +63,7 @@ setup(name='shakemap',
       },
       scripts=[
           'bin/associate_amps',
+          'bin/mmi2json',
           'bin/getdyfi',
           'bin/receive_amps',
           'bin/receive_origins',
