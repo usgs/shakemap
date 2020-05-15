@@ -119,7 +119,7 @@ def to_precision(x, p):
     x = float(x)
 
     if x == 0.:
-        return "0." + "0"*(p-1)
+        return "0." + "0" * (p - 1)
 
     out = []
 
@@ -129,11 +129,11 @@ def to_precision(x, p):
 
     e = int(np.log10(x))
     tens = np.power(10, e - p + 1)
-    n = np.floor(x/tens)
+    n = np.floor(x / tens)
 
     if n < np.power(10, p - 1):
         e = e - 1
-        tens = np.power(10, e - p+1)
+        tens = np.power(10, e - p + 1)
         n = np.floor(x / tens)
 
     if abs((n + 1.) * tens - x) <= abs(n * tens - x):
@@ -157,13 +157,13 @@ def to_precision(x, p):
     elif e == (p - 1):
         out.append(m)
     elif e >= 0:
-        out.append(m[:e+1])
-        if e+1 < len(m):
+        out.append(m[:e + 1])
+        if e + 1 < len(m):
             out.append(".")
-            out.extend(m[e+1:])
+            out.extend(m[e + 1:])
     else:
         out.append("0.")
-        out.extend(["0"]*-(e+1))
+        out.extend(["0"] * -(e + 1))
         out.append(m)
 
     return "".join(out)
@@ -186,8 +186,8 @@ def _create_palette(imtype, levels):
         z0 = np.linspace(np.log(levels[0]), np.log(levels[-2]), nsteps)
         z1 = np.linspace(np.log(levels[1]), np.log(levels[-1]), nsteps)
     else:
-        z0 = np.array([levels[0], levels[0]*10])
-        z1 = np.array([levels[0], levels[0]*10])
+        z0 = np.array([levels[0], levels[0] * 10])
+        z1 = np.array([levels[0], levels[0] * 10])
     cmap = plt.get_cmap(IMT_CMAP)
     palette = ColorPalette.fromColorMap(imtype, z0, z1, cmap, is_log=True)
     return palette
@@ -244,7 +244,7 @@ def _get_map_info(gd):
     if xmin > xmax:
         xmax = xmax + 360
 
-    center_lon = (xmin + xmax)/2.0
+    center_lon = (xmin + xmax) / 2.0
 
     proj = ccrs.Mercator(central_longitude=center_lon,
                          min_latitude=ymin,
@@ -259,7 +259,7 @@ def _get_map_info(gd):
     bounds = (xmin, xmax, ymin, ymax)
 
     # Map aspect
-    aspect = pwidth/pheight
+    aspect = pwidth / pheight
     # This all seems unnecessary
     # fig_aspect = 1.0/(0.19 + 0.8/aspect)
     # figheight = FIGWIDTH / fig_aspect
@@ -306,7 +306,7 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
     }
     font0.set_weight('bold')
 
-    xloc = firstcol_width/2
+    xloc = firstcol_width / 2
     plt.text(xloc, 0.5, imtlabel,
              fontproperties=font0, **alignment)
     # draw top/bottom edges of table
@@ -325,7 +325,7 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
     if imtype != 'PGV':
         divisor = 100
     dmin, dmax = IMT_RANGES[imtype]
-    imt_values = np.log(getContourLevels(dmin, dmax, itype=itype)/divisor)
+    imt_values = np.log(getContourLevels(dmin, dmax, itype=itype) / divisor)
     if gmice.supports(imtype):
         mmi_values, _ = gmice.getMIfromGM(imt_values, imt.from_string(imtype))
     else:
@@ -340,7 +340,7 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
             new_imts.append(imtv)
             new_mmi_colors.append(mmic)
 
-    width = (1 - firstcol_width)/len(new_imts)
+    width = (1 - firstcol_width) / len(new_imts)
     left = firstcol_width
     for mmic, imtv in zip(new_mmi_colors, imt_values):
         right = left + width
@@ -348,8 +348,8 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
         py = [top, top, bottom, bottom, top]
         plt.plot([right, right], [bottom, top], 'k')
         plt.fill(px, py, mmic, ec=mmic)
-        xloc = left + width/2.0
-        imtstr = "{0:.3g}".format(np.exp(imtv)*divisor)
+        xloc = left + width / 2.0
+        imtstr = "{0:.3g}".format(np.exp(imtv) * divisor)
         th = plt.text(xloc, 0.5, imtstr, fontproperties=font0, **alignment)
         th.set_path_effects(
             [path_effects.Stroke(linewidth=2.0,
@@ -420,7 +420,7 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
         rheight = 0.05
         rup = patches.Rectangle(
             xy=(rup_marker_x - rwidth,
-                yloc_seventh_row-0.5*rheight),
+                yloc_seventh_row - 0.5 * rheight),
             width=rwidth,
             height=rheight,
             linewidth=2,
@@ -479,36 +479,36 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
     mmi_centers = np.array([1.0, 2.5, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
     pga_values, _ = gmice.getGMfromMI(mmi_centers, imt.from_string('PGA'))
     pgv_values, _ = gmice.getGMfromMI(mmi_centers, imt.from_string('PGV'))
-    pga_values = np.exp(pga_values)*100
+    pga_values = np.exp(pga_values) * 100
     pgv_values = np.exp(pgv_values)
     pga_labels = ["{0:.3g}".format(set_num_precision(
         pga, 3, mode='float')) for pga in pga_values]
     pgv_labels = ["{0:.3g}".format(set_num_precision(
         pgv, 3, mode='float')) for pgv in pgv_values]
 
-    pga_labels[0] = '<'+pga_labels[0]
-    pga_labels[-1] = '>'+pga_labels[-1]
-    pgv_labels[0] = '<'+pgv_labels[0]
-    pgv_labels[-1] = '>'+pgv_labels[-1]
+    pga_labels[0] = '<' + pga_labels[0]
+    pga_labels[-1] = '>' + pga_labels[-1]
+    pgv_labels[0] = '<' + pgv_labels[0]
+    pgv_labels[-1] = '>' + pgv_labels[-1]
 
     acceleration += pga_labels
     velocity += pgv_labels
 
-    yloc_first_row = 13/14
-    yloc_second_row = 11/14
-    yloc_third_row = 9/14
-    yloc_fourth_row = 7/14
-    yloc_fifth_row = 5/14
-    yloc_sixth_row = 3/14
-    yloc_seventh_row = 1.5/14
+    yloc_first_row = 13 / 14
+    yloc_second_row = 11 / 14
+    yloc_third_row = 9 / 14
+    yloc_fourth_row = 7 / 14
+    yloc_fifth_row = 5 / 14
+    yloc_sixth_row = 3 / 14
+    yloc_seventh_row = 1.5 / 14
 
-    yloc_first_line = 12/14
-    yloc_second_line = 10/14
-    yloc_third_line = 8/14
-    yloc_fourth_line = 6/14
+    yloc_first_line = 12 / 14
+    yloc_second_line = 10 / 14
+    yloc_third_line = 8 / 14
+    yloc_fourth_line = 6 / 14
     # yloc_fifth_line = 4/14
 
-    bottom = 4/14
+    bottom = 4 / 14
 
     font0 = FontProperties()
     alignment = {
@@ -590,7 +590,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
         rheight = 0.05
         rup = patches.Rectangle(
             xy=(rup_marker_x - rwidth,
-                yloc_seventh_row-0.5*rheight),
+                yloc_seventh_row - 0.5 * rheight),
             width=rwidth,
             height=rheight,
             linewidth=2,
@@ -621,7 +621,7 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
     nsteps = 10
     for i, width in enumerate(tdict['mmi_scale']['box_widths']):
         width /= 100
-        textleft = sumwidth + width/2
+        textleft = sumwidth + width / 2
         sumwidth += width
         plt.text(textleft, yloc_first_row,
                  tdict['mmi_scale']['shaking_labels'][i],
@@ -646,17 +646,17 @@ def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
                              path_effects.Normal()])
 
         # draw right edge of cell
-        plt.plot([gridleft+width, gridleft+width],
+        plt.plot([gridleft + width, gridleft + width],
                  [bottom, top], 'k', clip_on=False)  # right
 
         # draw little colored rectangles inside the MMI cells
         if i > 0:
             left = gridleft
             ptop = yloc_fourth_line
-            imt_min = imt_edges[i-1]
+            imt_min = imt_edges[i - 1]
             imt_max = imt_edges[i]
             imts = np.linspace(imt_min, imt_max, nsteps)
-            rights = np.linspace(gridleft, gridleft+width, nsteps)
+            rights = np.linspace(gridleft, gridleft + width, nsteps)
             for mmi, right in zip(imts, rights):
                 px = [left, right, right, left, left]
                 py = [ptop, ptop, bottom, bottom, ptop]
@@ -686,7 +686,7 @@ def _draw_colorbar(fig, mmimap, tdict):
     plt.ylim(bottom, top)
     nsteps = 200
     left = 0
-    rights = np.arange(1/nsteps, 1+(1/nsteps), 1/nsteps)
+    rights = np.arange(1 / nsteps, 1 + (1 / nsteps), 1 / nsteps)
     mmis = np.linspace(1, 10, nsteps)
     for mmi, right in zip(mmis, rights):
         px = [left, right, right, left, left]
@@ -695,8 +695,8 @@ def _draw_colorbar(fig, mmimap, tdict):
         left = right
         plt.fill(px, py, mmicolor, ec=mmicolor)
 
-    start_loc = (1/nsteps) - (1/nsteps)/2
-    end_loc = 1 - (1/nsteps)/2
+    start_loc = (1 / nsteps) - (1 / nsteps) / 2
+    end_loc = 1 - (1 / nsteps) / 2
     locs = np.linspace(start_loc, end_loc, 10)
 
     plt.xticks(locs, tdict['mmi_scale']['mmi_colorbar_labels'])
@@ -725,8 +725,8 @@ def _label_close_to_edge(x, y, xmin, xmax, ymin, ymax):
     dright = xmax - x
     dtop = ymax - y
     dbottom = y - ymin
-    return (dleft < width/MAP_FRAC or dright < width/MAP_FRAC or
-            dtop < height/MAP_FRAC or dbottom < height/MAP_FRAC)
+    return (dleft < width / MAP_FRAC or dright < width / MAP_FRAC or
+            dtop < height / MAP_FRAC or dbottom < height / MAP_FRAC)
 
 
 def _draw_graticules(ax, xmin, xmax, ymin, ymax):
@@ -759,10 +759,10 @@ def _draw_graticules(ax, xmin, xmax, ymin, ymax):
 
     span_keys = np.array(sorted(list(spans.keys())))
 
-    nearest_xspan_idx = np.argmin(np.abs(int((xmax-xmin)) - span_keys))
+    nearest_xspan_idx = np.argmin(np.abs(int((xmax - xmin)) - span_keys))
     x_interval = spans[span_keys[nearest_xspan_idx]]
 
-    nearest_yspan_idx = np.argmin(np.abs(int((ymax-ymin)) - span_keys))
+    nearest_yspan_idx = np.argmin(np.abs(int((ymax - ymin)) - span_keys))
     y_interval = spans[span_keys[nearest_yspan_idx]]
 
     # let's floor/ceil the edges to nearest 1/interval
@@ -770,10 +770,10 @@ def _draw_graticules(ax, xmin, xmax, ymin, ymax):
     # gxmax = np.ceil(xmax * interval) / interval
     # gymin = np.floor(ymin * interval) / interval
     # gymax = np.ceil(ymax * interval) / interval
-    gxmin = x_interval*np.floor(xmin/x_interval)
-    gxmax = x_interval*np.ceil(xmax/x_interval)
-    gymin = y_interval*np.floor(ymin/y_interval)
-    gymax = y_interval*np.ceil(ymax/y_interval)
+    gxmin = x_interval * np.floor(xmin / x_interval)
+    gxmax = x_interval * np.ceil(xmax / x_interval)
+    gymin = y_interval * np.floor(ymin / y_interval)
+    gymax = y_interval * np.ceil(ymax / y_interval)
 
     # check for meridian crossing
     crosses = False
@@ -784,8 +784,8 @@ def _draw_graticules(ax, xmin, xmax, ymin, ymax):
     # shakemap way
     # ylocs = np.arange(np.floor(gymin), np.ceil(gymax) + interval, interval)
     # xlocs = np.arange(np.floor(gxmin), np.ceil(gxmax) + interval, interval)
-    ylocs = np.arange(gymin, gymax+y_interval, y_interval)
-    xlocs = np.arange(gxmin, gxmax+x_interval, x_interval)
+    ylocs = np.arange(gymin, gymax + y_interval, y_interval)
+    xlocs = np.arange(gxmin, gxmax + x_interval, x_interval)
 
     if crosses:
         xlocs[xlocs > 180] -= 360
@@ -914,10 +914,10 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
     # observations.
     for feature in stations['features']:
         lon, lat = feature['geometry']['coordinates']
-        net = feature['properties']['network'].lower()
+        itype = feature['properties']['instrumentType'].lower()
         # If the network matches one of these then it is an MMI
         # observation
-        if net in ['dyfi', 'mmi', 'intensity', 'ciim']:
+        if itype == 'observed':
             # Append data from MMI features
             amplitude = feature['properties']['intensity']
             if amplitude == 'null':
@@ -1073,7 +1073,7 @@ def _draw_license(fig, adict):
         if logo_path:
             logo = image.imread(logo_path)
             h, w, colors = logo.shape
-            ratio = w/h
+            ratio = w / h
             lax.imshow(logo, aspect='equal', extent=(0, ratio, 0, 1),
                        interpolation='bilinear')
             xpos = ratio + 0.25
@@ -1149,7 +1149,7 @@ def draw_map(adict, override_scenario=False):
     dim_left = 0.1
     dim_bottom = 0.19
     dim_width = 0.8
-    dim_height = dim_width/aspect
+    dim_height = dim_width / aspect
     if dim_height > 0.8:
         dim_height = 0.8
         dim_width = 0.8 * aspect
@@ -1290,8 +1290,8 @@ def draw_map(adict, override_scenario=False):
                         zorder=CONTOUR_ZORDER)
                 if arclen(pmulti_line) >= min_len:
                     # try to label each segment with black text in a white box
-                    xc = x[int(len(x)/3)]
-                    yc = y[int(len(y)/3)]
+                    xc = x[int(len(x) / 3)]
+                    yc = y[int(len(y) / 3)]
                     if _label_close_to_edge(
                             xc, yc, proj_gd.xmin, proj_gd.xmax,
                             proj_gd.ymin, proj_gd.ymax):
@@ -1305,7 +1305,7 @@ def draw_map(adict, override_scenario=False):
                     fmt = '%.1g' if abs(value) < 0.1 else '%.1f'
                     ax.text(xc, yc, fmt % value, size=8,
                             ha="center", va="center",
-                            bbox=white_box, zorder=AXES_ZORDER-1)
+                            bbox=white_box, zorder=AXES_ZORDER - 1)
 
     # make the border thicker
     lw = 2.0
