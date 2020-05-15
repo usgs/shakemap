@@ -170,9 +170,11 @@ if [ $developer == 1 ]; then
 fi
 
 # Create a conda virtual environment
+conda config --add channels 'conda-forge'
+conda config --add channels 'defaults'
+conda config --set channel_priority flexible
 echo "Creating the $VENV virtual environment:"
-conda create -y -n $VENV -c conda-forge \
-      --channel-priority ${package_list[*]}
+conda create -y -n $VENV ${package_list[*]}
 
 
 # Bail out at this point if the conda create command fails.
