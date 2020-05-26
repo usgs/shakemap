@@ -5,18 +5,19 @@ if [ "$unamestr" == 'Linux' ]; then
     prof=~/.bashrc
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     matplotlibdir=~/.config/matplotlib
-    CC=gcc_linux-64
+    # CC=gcc_linux-64
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
-    #    CC=clangxx_osx-64
-    CC=gcc
+    # CC=cxx-compiler
 else
     echo "Unsupported environment. Exiting."
     exit
 fi
 
+CC_PKG = c-compiler
+CC = clang
 
 source $prof
 
@@ -135,7 +136,7 @@ package_list=(
       "docutils"
       "configobj"
       "fiona"
-      "$CC"
+      "$CC_PKG"
       "gdal"
       "h5py"
       "impactutils"

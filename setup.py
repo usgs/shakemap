@@ -19,12 +19,12 @@ ext_modules = [Extension("shakemap.c.pcontour",
                          sourcefiles,
                          libraries=["m"],
                          include_dirs=[numpy.get_include()],
-                         extra_compile_args=["-O3"]),
+                         extra_compile_args=[]),
                Extension("shakemap.c.clib",
                          clib_source,
                          libraries=['m'],
                          include_dirs=[numpy.get_include()],
-                         extra_compile_args=["-O3", "-fopenmp"],
+                         extra_compile_args=["-fopenmp"],
                          extra_link_args=["-fopenmp"])]
 
 cmdclass = versioneer.get_cmdclass()
