@@ -8,8 +8,8 @@ from Cython.Build import cythonize
 import numpy
 
 # This should be handled by conda when we install a platform-specific
-# compiler
-# os.environ['CC'] = 'clang'
+# compiler, but apparently isn't on macs (yet?)
+os.environ['CC'] = 'clang'
 
 sourcefiles = ["shakemap/c/pcontour.pyx", "shakemap/c/contour.c"]
 
@@ -24,8 +24,9 @@ ext_modules = [Extension("shakemap.c.pcontour",
                          clib_source,
                          libraries=['m'],
                          include_dirs=[numpy.get_include()],
-                         extra_link_args=["-fopenmp"])]
-#                         extra_compile_args=["-fopenmp"],
+                         extra_compile_args=["-fopenmp"]
+                         )]
+#                         extra_link_args=["-fopenmp"]
 
 cmdclass = versioneer.get_cmdclass()
 cmdclass['build_ext'] = build_ext
