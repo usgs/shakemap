@@ -85,11 +85,17 @@ def main(pparser, args):
     cbar1 = fig.colorbar(cs1, cax=ax_cbar1,
                          orientation='horizontal',
                          ticks=levels)
+    cbar1.ax.tick_params(labelsize=6)
     cbar1.ax.set_xlabel('%s Ratio' % args.imt)
     cbar1.ax.get_yaxis().labelpad = 15
 
     # Difference plot
-    levels = list(np.linspace(-10, 10, 11))
+    dif_min = np.min(dif)
+    dif_max = np.max(dif)
+    if dif_min != dif_max:
+        levels = list(np.linspace(dif_min, dif_max, 11))
+    else:
+        levels = list(np.linspace(-10, 10, 11))
     x1 = 0.55
 
     ax2 = plt.axes([x1, y1, wid, height], projection=ccrs.PlateCarree())
@@ -103,8 +109,15 @@ def main(pparser, args):
     cbar2 = fig.colorbar(cs2, cax=ax_cbar2,
                          orientation='horizontal',
                          ticks=levels)
+    cbar2.ax.tick_params(labelsize=6)
     if args.imt == 'pgv':
         cbar2.ax.set_xlabel('%s Difference (cm/s)' % args.imt)
+    elif args.imt == 'stdpgv':
+        cbar2.ax.set_xlabel('%s Difference (ln(cm/s))' % args.imt)
+    elif args.imt == 'mmi' or args.imt == 'stdmmi':
+        cbar2.ax.set_xlabel('%s Difference' % args.imt)
+    elif 'std' in args.imt:
+        cbar2.ax.set_xlabel('%s Difference (ln(g))' % args.imt)
     else:
         cbar2.ax.set_xlabel('%s Difference (percent g)' % args.imt)
     cbar2.ax.get_yaxis().labelpad = 15
