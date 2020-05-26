@@ -141,6 +141,7 @@ package_list=(
       "h5py"
       "impactutils"
       "libcomcat"
+      "llvm"
       "lockfile"
       "mapio"
       "matplotlib-base"
