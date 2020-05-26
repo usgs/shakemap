@@ -16,8 +16,8 @@ else
     exit
 fi
 
-CC_PKG = c-compiler
-CC = clang
+CC_PKG=c-compiler
+CC=clang
 
 source $prof
 
