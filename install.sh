@@ -16,7 +16,8 @@ else
     exit
 fi
 
-CC_PKG=c-compiler
+# CC_PKG=c-compiler
+CC_PKG=clang
 CC=clang
 
 source $prof
@@ -141,7 +142,6 @@ package_list=(
       "h5py"
       "impactutils"
       "libcomcat"
-      "llvm"
       "lockfile"
       "mapio"
       "matplotlib-base"
