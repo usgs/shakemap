@@ -16,8 +16,7 @@ else
     exit
 fi
 
-# CC_PKG=c-compiler
-CC_PKG=clang
+CC_PKG=c-compiler
 CC=clang
 
 source $prof
@@ -147,6 +146,7 @@ package_list=(
       "matplotlib-base"
       "numpy"
       "obspy"
+      "openmp"
       "openquake.engine"
       "pandas"
       "ps2ff"
