@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import pathlib
 from shakemap.utils.pgm_convert import get_stations_dict
 from numpy.testing import assert_almost_equal
