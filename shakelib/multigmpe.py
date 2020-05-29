@@ -559,7 +559,7 @@ class MultiGMPE(GMPE):
 
             default_gmpes_for_site_weights: Weights for default_gmpes_for_site.
                 Must sum to one and be same length as default_gmpes_for_site.
-                If None, then weights are set to be equal.b /Users/emthompson/src/python/shakemap/shakelib/multigmpe.py:570
+                If None, then weights are set to be equal.
 
             reference_vs30:
                 Reference rock Vs30 in m/s. We do not check that this matches
