@@ -6,7 +6,7 @@ import logging
 
 import numpy as np
 
-from openquake.hazardlib.gsim.base import GMPE, IPE
+from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
     CampbellBozorgnia2014)
@@ -21,11 +21,6 @@ from shakelib.sites import Sites
 class MultiGMPE(GMPE):
     """
     Implements a GMPE that is the combination of multiple GMPEs.
-
-    To do
-
-        * Allow site to be based on a model that isn't a GMPE (e.g.,
-          Borcherdt).
 
     """
 
@@ -270,6 +265,7 @@ class MultiGMPE(GMPE):
         # http://usgs.github.io/shakemap/manual4_0/tg_processing.html#ground-motion-prediction
         # for a discussion on the way this is implemented here.
         # -------------------------------------------------------------- # noqa
+
         nwts = len(wts)
         npwts = np.array(wts).reshape((1, -1))
         nsites = len(lnmu)
@@ -284,6 +280,7 @@ class MultiGMPE(GMPE):
             cc = np.reshape(np.corrcoef(lnmu_list), (nwts, nwts))
             np.seterr(divide='warn', invalid='warn')
             cc[np.isnan(cc)] = 1.0
+
         # Multiply the correlation coefficients by the weights matrix
         # (this is cheaper than multiplying all of elements of each
         # stddev array by their weights since we have to multiply
@@ -294,7 +291,8 @@ class MultiGMPE(GMPE):
         for i in range(nstds * 2):
             sdlist = []
             for j in range(nwts):
-                sdlist.append(lnsd_list[j * nstds * 2 + i].reshape((1, 1, -1)))
+                sdlist.append(
+                    lnsd_list[j * nstds * 2 + i].reshape((1, 1, -1)))
             sdstack = np.hstack(sdlist)
             wcov = (sdstack * np.transpose(sdstack, axes=(1, 0, 2))) * cc
             # This sums the weighted covariance as each point in the output
@@ -590,8 +588,8 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
 
         for g in gmpes:
-            if not isinstance(g, GMPE) and not isinstance(g, IPE):
-                raise Exception("\"%s\" is not a GMPE or IPE instance." % g)
+            if not isinstance(g, GMPE):
+                raise Exception("\"%s\" is not a GMPE instance." % g)
 
         self = cls()
         self.GMPES = gmpes
@@ -946,15 +944,15 @@ def filter_gmpe_list(gmpes, wts, imt):
     per_max = [np.max(get_gmpe_sa_periods(g)) for g in gmpes]
     per_min = [np.min(get_gmpe_sa_periods(g)) for g in gmpes]
     if imt == PGA():
-        sgmpe = [g for g in gmpes if imt in
-                 get_gmpe_coef_table(g).non_sa_coeffs]
-        swts = [w for g, w in zip(gmpes, wts) if imt in
-                get_gmpe_coef_table(g).non_sa_coeffs]
+        sgmpe = [g for g in gmpes if PGA in
+                 g.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
+        swts = [w for g, w in zip(gmpes, wts) if PGA in
+                g.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
     elif imt == PGV():
         sgmpe = []
         swts = []
         for i in range(len(gmpes)):
-            if (imt in get_gmpe_coef_table(gmpes[i]).non_sa_coeffs) or\
+            if (PGV in gmpes[i].DEFINED_FOR_INTENSITY_MEASURE_TYPES) or\
                (per_max[i] >= 1.0 and per_min[i] <= 1.0):
                 sgmpe.append(gmpes[i])
                 swts.append(wts[i])
@@ -988,9 +986,12 @@ def get_gmpe_sa_periods(gmpe):
         list: List of periods.
 
     """
-    ctab = get_gmpe_coef_table(gmpe).sa_coeffs
-    ilist = list(ctab.keys())
-    per = [i.period for i in ilist]
+    if gmpe == '[NGAEast]':
+        per = gmpe.per_array
+    else:
+        ctab = get_gmpe_coef_table(gmpe).sa_coeffs
+        ilist = list(ctab.keys())
+        per = [i.period for i in ilist]
     return per
 
 

@@ -147,7 +147,6 @@ package_list=(
       "numpy"
       "obspy"
       "openmp"
-      "openquake.engine"
       "pandas"
       "ps2ff"
       "psutil"
@@ -177,7 +176,6 @@ conda config --add channels 'defaults'
 conda config --set channel_priority flexible
 echo "Creating the $VENV virtual environment:"
 conda create -y -n $VENV ${package_list[*]}
-
 
 # Bail out at this point if the conda create command fails.
 # Clean up zip files we've downloaded
@@ -210,6 +208,15 @@ if [ $developer == 1 ]; then
     pip install sphinx-argparse
 fi
 
+# Install OQ from github to get NGA East since it isn't in a release yet.
+echo "Installing OpenQuake from github..."
+pip install --upgrade git+https://github.com/gem/oq-engine
+if [ $? -ne 0 ];then
+    echo "Failed to pip install OpenQuake. Exiting."
+    exit 1
+fi
+
+
 # This package
 echo "Installing ${VENV}..."
 pip install --no-deps -e .
@@ -219,6 +226,7 @@ if [ $? -ne 0 ];then
     echo "Failed to pip install this package. Exiting."
     exit 1
 fi
+
 
 # Tell the user they have to activate this environment
 echo "Type 'conda activate $VENV' to use this new virtual environment."

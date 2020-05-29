@@ -33,3 +33,4 @@ shakemap/c/clib.c
 shakemap/c/*.so
 strec_results.json
 test-output.xml
+**/default.profraw
