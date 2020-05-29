@@ -16,6 +16,15 @@ from openquake.hazardlib import const
 from openquake.hazardlib import imt as IMT
 from openquake.hazardlib.gsim.usgs_ceus_2019 import NGAEastUSGSGMPE
 
+# Max distance for evaluating NGAEast. This *should* be 1500, but due to what
+# appears to be a floating point precision issue, we get a division by zero
+# error at a value of 1500 returning nans. So we have to cap the distance at a
+# value slightly smaller.
+
+# This is also used to zero out the results at greater distances.
+
+MAX_RRUP = 1499.9
+
 
 class NGAEast(GMPE):
     """
@@ -29,9 +38,6 @@ class NGAEast(GMPE):
         IMT.PGV,
         IMT.SA
     ])
-    # DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
-    #     const.StdDev.TOTAL,
-    # ])
 
     DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
         const.StdDev.TOTAL,
@@ -152,6 +158,9 @@ class NGAEast(GMPE):
         for i in range(len(stddev_types)):
             stddevs.append(np.full_like(sites.vs30, 0))
 
+        # Apply max distance to dists.rrup
+        np.clip(dists.rrup, 0, MAX_RRUP)
+
         # Since we will be dropping the models that don't have PGV,
         # we now also need to track the total sum of weights for when
         # the imt is PGV so that we can re-distribute the weights.
@@ -176,9 +185,15 @@ class NGAEast(GMPE):
             if is_pgv:
                 twts.append(total_gmpe_weights[i])
 
-        print(imt)
         if is_pgv:
-            print(np.sum(twts))
-        print('')
+            # Rescale the PGV wieghts so that they sum to 1 after dropping
+            # the models that are not defined for PGV.
+            mean = mean / np.sum(twts)
+            for j, sd in enumerate(stddevs):
+                stddevs[j] = stddevs[j] / np.sum(twts)
+
+        # Zero out values at distances beyond the range for which NGA East
+        # was defined.
+        mean[dists.rrup > MAX_RRUP] = -999.0
 
         return mean, stddevs
