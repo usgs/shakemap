@@ -17,7 +17,7 @@ def test_get_stations_dict():
     instdict, instrows = get_stations_dict(instfile)
     assert len(instdict['features']) == 358
     channel1 = instdict['features'][0]['properties']['channels'][0]['name']
-    assert channel1 == 'T000012.H1'
+    assert channel1 == 'H1'
     value1 = (instdict['features'][0]['properties']['channels']
               [0]['amplitudes'][0]['value'])
 

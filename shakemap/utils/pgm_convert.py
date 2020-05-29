@@ -50,14 +50,15 @@ def get_station_feature(trow):
         station_properties['intensity'] = row['INTENSITY']
         station_properties['intensity_flag'] = row['FLAG']
         station_properties['intensity_stddev'] = 0.0
+        station_properties['station_type'] = 'macroseismic'
     else:
         station_properties['network'] = row['NETID']
+        # station_properties['station_type'] = 'seismic'
     if 'DISTANCE' in row:
         station_properties['distance'] = row['DISTANCE']
 
     # station_properties['source'] = stream[0].stats.standard['source']
     station_properties['source'] = row['SOURCE']
-    station_properties['station_type'] = 'macroseismic'
 
     coordinates = (row['LON'], row['LAT'])
     station_feature['geometry'] = {'type': 'Point',
@@ -70,7 +71,7 @@ def get_station_feature(trow):
         channels = []
         for component, imtdict in components.items():
             compdict = {}
-            compdict['name'] = f'{row["STATION"]}.{component}'
+            compdict['name'] = component
             amps = []
             for imtname, imtvalue in imtdict.items():
                 ampdict = {}
