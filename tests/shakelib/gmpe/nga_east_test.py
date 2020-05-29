@@ -74,9 +74,9 @@ def test_nga_east():
                 lmean, lsd = gmpe.get_mean_and_stddevs(
                     sx, rx, dx, i, stddev_types)
                 tmean = np.array(target[ikey][str(mag)][str(vs30)]['lmean'])
-                np.testing.assert_allclose(lmean, tmean)
+                np.testing.assert_allclose(lmean, tmean, rtol=1e-6, atol=1e-6)
                 tsd = np.array(target[ikey][str(mag)][str(vs30)]['lsd'])
-                np.testing.assert_allclose(lsd[0], tsd)
+                np.testing.assert_allclose(lsd[0], tsd, rtol=1e-6, atol=1e-6)
 
 
 if __name__ == '__main__':
