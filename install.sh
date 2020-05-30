@@ -5,19 +5,16 @@ if [ "$unamestr" == 'Linux' ]; then
     prof=~/.bashrc
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     matplotlibdir=~/.config/matplotlib
-    # CC=gcc_linux-64
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
-    # CC=cxx-compiler
 else
     echo "Unsupported environment. Exiting."
     exit
 fi
 
 CC_PKG=c-compiler
-CC=clang
 
 source $prof
 
@@ -49,6 +46,7 @@ if [ ! -d "$matplotlibdir" ]; then
         exit 1
     fi
 fi
+
 matplotlibrc=$matplotlibdir/matplotlibrc
 if [ ! -e "$matplotlibrc" ]; then
     echo "backend : Agg" > "$matplotlibrc"
@@ -92,6 +90,9 @@ if [ $? -ne 0 ]; then
     fi
     
     . $HOME/miniconda/etc/profile.d/conda.sh
+
+    # remove the shell script
+    rm miniconda.sh
 else
     echo "conda detected, installing $VENV environment..."
 fi
@@ -105,8 +106,6 @@ if [ $? -ne 0 ]; then
     echo ". $_CONDA_ROOT/etc/profile.d/conda.sh" >> $prof
 fi
 
-env_file=environment.yml
-
 
 # Start in conda base environment
 echo "Activate base virtual environment"
@@ -116,8 +115,8 @@ conda activate base
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
 
+# Extra packages to install with dev option
 dev_list=(
-    "ipython"
     "autopep8"
     "flake8"
     "pyflakes"
@@ -126,9 +125,10 @@ dev_list=(
     "sphinx"
 )
 
-# Package list:
+# Required package list:
 package_list=(
       "python=$py_ver"
+      "$CC_PKG"
       "cartopy"
       "cython"
       "defusedxml"
@@ -136,10 +136,10 @@ package_list=(
       "docutils"
       "configobj"
       "fiona"
-      "$CC_PKG"
       "gdal"
       "h5py"
       "impactutils"
+      "ipython"
       "libcomcat"
       "lockfile"
       "mapio"
@@ -174,6 +174,7 @@ fi
 conda config --add channels 'conda-forge'
 conda config --add channels 'defaults'
 conda config --set channel_priority flexible
+
 echo "Creating the $VENV virtual environment:"
 conda create -y -n $VENV ${package_list[*]}
 
@@ -202,6 +203,12 @@ pip install --upgrade pip
 if [ $? -ne 0 ];then
     echo "Failed to upgrade pip, trying to continue..."
     exit 1
+fi
+
+# The presence of a __pycache__ folder in bin/ can cause the pip
+# install to fail... just to be safe, we'll delete it here.
+if [ -d bin/__pycache__ ]; then
+    rm -rf bin/__pycache__
 fi
 
 if [ $developer == 1 ]; then
