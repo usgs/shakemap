@@ -744,10 +744,10 @@ def _draw_graticules(ax, xmin, xmax, ymin, ymax):
                       linewidth=0.5, color='k',
                       alpha=0.5, linestyle='-',
                       zorder=GRATICULE_ZORDER)
-    gl.xlabels_top = False
-    gl.xlabels_bottom = True
-    gl.ylabels_left = True
-    gl.ylabels_right = False
+    gl.top_labels = False
+    gl.bottom_labels = True
+    gl.left_labels = True
+    gl.right_labels = False
     gl.xlines = True
 
     # create a dictionary with the intervals we want for a span
