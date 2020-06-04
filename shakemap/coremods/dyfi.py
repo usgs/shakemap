@@ -97,7 +97,7 @@ class DYFIModule(CoreModule):
 def _get_dyfi_dataframe(detail_or_url, inputfile=None):
 
     if inputfile:
-        with open(inputfile,'rb') as f:
+        with open(inputfile, 'rb') as f:
             rawdata = f.read()
         if 'json' in inputfile:
             df = _parse_geocoded_json(rawdata)
@@ -125,7 +125,7 @@ def _get_dyfi_dataframe(detail_or_url, inputfile=None):
 
 
 def _parse_dyfi_detail(detail):
-    
+
     if not detail.hasProduct('dyfi'):
         msg = '%s has no DYFI product at this time.' % detail.url
         dataframe = None
@@ -162,7 +162,7 @@ def _parse_dyfi_detail(detail):
 
         bytes_geo, _ = dyfi.getContentBytes('cdi_geo.txt')
         df = _parse_geocoded_csv(bytes_geo)
-        
+
     return df, ''
 
 
@@ -174,7 +174,7 @@ def _parse_geocoded_csv(bytes_data):
     # Latitude, Longitude, Suspect?, City, State
 
     # download the text file, turn it into a dataframe
-    
+
     text_geo = bytes_data.decode('utf-8')
     lines = text_geo.split('\n')
     columns = lines[0].split(':')[1].split(',')
@@ -193,11 +193,11 @@ def _parse_geocoded_csv(bytes_data):
 
 
 def _parse_geocoded_json(bytes_data):
-    
+
     text_data = bytes_data.decode('utf-8')
     jdict = json.loads(text_data)
     if len(jdict['features']) == 0:
-        return None
+        return pd.DataFrame(data={})
     prop_columns = list(jdict['features'][0]['properties'].keys())
     columns = ['lat', 'lon'] + prop_columns
     arrays = [[] for col in columns]
