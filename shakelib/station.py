@@ -262,17 +262,17 @@ class StationList(object):
                     try:
                         amplitude = float(
                             feature['properties'].get('intensity', np.nan))
-                    except ValueError:
+                    except (ValueError, TypeError):
                         amplitude = np.nan
                     try:
                         stddev = float(
                             feature['properties'].get('intensity_stddev',
                                                       np.nan))
-                    except ValueError:
+                    except (ValueError, TypeError):
                         stddev = np.nan
                     try:
                         nresp = int(feature['properties'].get('nresp', -1))
-                    except ValueError:
+                    except (ValueError, TypeError):
                         nresp = -1
                     flag = feature['properties']['intensity_flag']
                     if not flag or flag == '':
@@ -827,7 +827,7 @@ class StationList(object):
             if 'value' in pgm.attrib:
                 try:
                     value = float(pgm.attrib['value'])
-                except ValueError:
+                except (ValueError, TypeError):
                     logging.warn('Unknown value in XML: %s for amp: %s' %
                                  (pgm.attrib['value'], pgm.tag))
                     continue
