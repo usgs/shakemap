@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.rupture.quad_rupture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.rupture.quad_rupture">
 <span id="shakelib-rupture-quad-rupture"></span><h1>shakelib.rupture.quad_rupture<a class="headerlink" href="#module-shakelib.rupture.quad_rupture" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.quad_rupture.</code><code class="sig-name descname">QuadRupture</code><span class="sig-paren">(</span><em class="sig-param">d</em>, <em class="sig-param">origin</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.quad_rupture.</code><code class="sig-name descname">QuadRupture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">origin</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.rupture.base.Rupture</span></code></a></p>
 <p>Rupture class that represents the rupture surface as a combination of
 quadrilaterals. Each quadrilateral must have horizontal top and bottom
@@ -52,12 +53,12 @@ must match the number of points in the bottom edge.</p>
 <dd class="field-even"><p>QuadRupture instance.</p>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getDepthAtPoint">
-<code class="sig-name descname">getDepthAtPoint</code><span class="sig-paren">(</span><em class="sig-param">lat</em>, <em class="sig-param">lon</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDepthAtPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDepthAtPoint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getDepthAtPoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDepthAtPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDepthAtPoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getLength">
 <code class="sig-name descname">getLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute length of rupture based on top edge in km.</p>
@@ -71,7 +72,7 @@ must match the number of points in the bottom edge.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getWidth">
 <code class="sig-name descname">getWidth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getWidth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getWidth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute average rupture width (km) for all quadrilaterals defined for
@@ -86,7 +87,7 @@ the rupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getArea">
 <code class="sig-name descname">getArea</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getArea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute area of rupture.</p>
@@ -100,9 +101,9 @@ the rupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.fromTrace">
-<em class="property">classmethod </em><code class="sig-name descname">fromTrace</code><span class="sig-paren">(</span><em class="sig-param">xp0</em>, <em class="sig-param">yp0</em>, <em class="sig-param">xp1</em>, <em class="sig-param">yp1</em>, <em class="sig-param">zp</em>, <em class="sig-param">widths</em>, <em class="sig-param">dips</em>, <em class="sig-param">origin</em>, <em class="sig-param">strike=None</em>, <em class="sig-param">group_index=None</em>, <em class="sig-param">reference=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromTrace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromTrace" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromTrace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xp0</span></em>, <em class="sig-param"><span class="n">yp0</span></em>, <em class="sig-param"><span class="n">xp1</span></em>, <em class="sig-param"><span class="n">yp1</span></em>, <em class="sig-param"><span class="n">zp</span></em>, <em class="sig-param"><span class="n">widths</span></em>, <em class="sig-param"><span class="n">dips</span></em>, <em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">strike</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">group_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromTrace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromTrace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a QuadRupture instance from a set of vertices that define the
 top of the rupture, and an array of widths/dips.</p>
 <p>Each rupture quadrilaterial is defined by specifying the latitude,
@@ -146,9 +147,9 @@ came from (publication style reference, etc.).</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.writeTextFile">
-<code class="sig-name descname">writeTextFile</code><span class="sig-paren">(</span><em class="sig-param">rupturefile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.writeTextFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.writeTextFile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">writeTextFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rupturefile</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.writeTextFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.writeTextFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write rupture data to rupture file format as defined in ShakeMap
 Software Guide.</p>
 <p>Note that this currently treats each quadrilateral as a separate
@@ -161,9 +162,9 @@ object.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.fromOrientation">
-<em class="property">classmethod </em><code class="sig-name descname">fromOrientation</code><span class="sig-paren">(</span><em class="sig-param">px</em>, <em class="sig-param">py</em>, <em class="sig-param">pz</em>, <em class="sig-param">dx</em>, <em class="sig-param">dy</em>, <em class="sig-param">length</em>, <em class="sig-param">width</em>, <em class="sig-param">strike</em>, <em class="sig-param">dip</em>, <em class="sig-param">origin</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromOrientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromOrientation" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromOrientation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">px</span></em>, <em class="sig-param"><span class="n">py</span></em>, <em class="sig-param"><span class="n">pz</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">dy</span></em>, <em class="sig-param"><span class="n">length</span></em>, <em class="sig-param"><span class="n">width</span></em>, <em class="sig-param"><span class="n">strike</span></em>, <em class="sig-param"><span class="n">dip</span></em>, <em class="sig-param"><span class="n">origin</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromOrientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromOrientation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a QuadRupture instance from a known point, shape, and
 orientation.</p>
 <p>A point is defined as a set of latitude, longitude, and depth, which
@@ -236,9 +237,9 @@ dip direction.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.fromVertices">
-<em class="property">classmethod </em><code class="sig-name descname">fromVertices</code><span class="sig-paren">(</span><em class="sig-param">xp0</em>, <em class="sig-param">yp0</em>, <em class="sig-param">zp0</em>, <em class="sig-param">xp1</em>, <em class="sig-param">yp1</em>, <em class="sig-param">zp1</em>, <em class="sig-param">xp2</em>, <em class="sig-param">yp2</em>, <em class="sig-param">zp2</em>, <em class="sig-param">xp3</em>, <em class="sig-param">yp3</em>, <em class="sig-param">zp3</em>, <em class="sig-param">origin</em>, <em class="sig-param">group_index=None</em>, <em class="sig-param">reference=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromVertices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromVertices" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromVertices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xp0</span></em>, <em class="sig-param"><span class="n">yp0</span></em>, <em class="sig-param"><span class="n">zp0</span></em>, <em class="sig-param"><span class="n">xp1</span></em>, <em class="sig-param"><span class="n">yp1</span></em>, <em class="sig-param"><span class="n">zp1</span></em>, <em class="sig-param"><span class="n">xp2</span></em>, <em class="sig-param"><span class="n">yp2</span></em>, <em class="sig-param"><span class="n">zp2</span></em>, <em class="sig-param"><span class="n">xp3</span></em>, <em class="sig-param"><span class="n">yp3</span></em>, <em class="sig-param"><span class="n">zp3</span></em>, <em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">group_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromVertices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromVertices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a QuadDrupture instance from the vector of vertices that fully
 define the quadrilaterals. The points p0, …, p3 are labeled below for
 a trapezoid:</p>
@@ -285,7 +286,7 @@ trapezoids.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getQuadrilaterals">
 <code class="sig-name descname">getQuadrilaterals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getQuadrilaterals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getQuadrilaterals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of quadrilaterals.</p>
@@ -304,7 +305,7 @@ objects.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getStrike">
 <code class="sig-name descname">getStrike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getStrike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getStrike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return strike angle. If rupture consists of multiple quadrilaterals,
@@ -322,7 +323,7 @@ by this algorithm.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getDepthToTop">
 <code class="sig-name descname">getDepthToTop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDepthToTop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDepthToTop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine shallowest vertex of entire rupture.</p>
@@ -333,7 +334,7 @@ by this algorithm.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getDip">
 <code class="sig-name descname">getDip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return average dip of all quadrilaterals in the rupture.</p>
@@ -347,7 +348,7 @@ by this algorithm.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getIndividualWidths">
 <code class="sig-name descname">getIndividualWidths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getIndividualWidths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getIndividualWidths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of rupture widths (km), one for each quadrilateral
@@ -359,7 +360,7 @@ defined for the rupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getIndividualTopLengths">
 <code class="sig-name descname">getIndividualTopLengths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getIndividualTopLengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getIndividualTopLengths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of rupture lengths along top edge (km),
@@ -371,7 +372,7 @@ one for each quadrilateral defined for the rupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.lats">
 <em class="property">property </em><code class="sig-name descname">lats</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.lats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of latitudes for the rupture verticies arranged for
@@ -391,7 +392,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.lons">
 <em class="property">property </em><code class="sig-name descname">lons</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.lons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of longitudes for the rupture verticies arranged for
@@ -411,7 +412,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.depths">
 <em class="property">property </em><code class="sig-name descname">depths</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.depths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of depths for the rupture verticies arranged for
@@ -431,7 +432,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getDeps">
 <code class="sig-name descname">getDeps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDeps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a copy of the array of depths for the rupture verticies.</p>
@@ -445,7 +446,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getNumGroups">
 <code class="sig-name descname">getNumGroups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getNumGroups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getNumGroups" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a count of the number of rupture groups.</p>
@@ -459,7 +460,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getNumQuads">
 <code class="sig-name descname">getNumQuads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getNumQuads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getNumQuads" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a count of the number of rupture quadrilaterals.</p>
@@ -473,7 +474,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsArrays">
 <code class="sig-name descname">getRuptureAsArrays</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getRuptureAsArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsArrays" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a 3-tuple of numpy arrays indicating X, Y, Z (lon,lat,depth)
@@ -492,7 +493,7 @@ coordinates. Rupture groups are separated by numpy.NaN values.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsMesh">
 <code class="sig-name descname">getRuptureAsMesh</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getRuptureAsMesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsMesh" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return rupture segments as a OQ-Hazardlib Mesh object.</p>
@@ -506,9 +507,9 @@ coordinates. Rupture groups are separated by numpy.NaN values.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.computeRjb">
-<code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing Joyner-Boore distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -527,9 +528,9 @@ coordinates. Rupture groups are separated by numpy.NaN values.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.computeRrup">
-<code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing rupture distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -548,9 +549,9 @@ coordinates. Rupture groups are separated by numpy.NaN values.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.computeGC2">
-<code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeGC2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeGC2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing version 2 of the Generalized Coordinate system
 (GC2) by Spudich and Chiou OFR 2015-1028.</p>
 <dl class="field-list simple">

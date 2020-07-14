@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.conversions.imc.boore_kishida_2017 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,9 +34,9 @@
 <span id="shakelib-conversions-imc-boore-kishida-2017"></span><h1>shakelib.conversions.imc.boore_kishida_2017<a class="headerlink" href="#module-shakelib.conversions.imc.boore_kishida_2017" title="Permalink to this headline">¶</a></h1>
 <p>Module implements BooreKishida2017 class to convert between various
 horizontal intensity measure components.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.conversions.imc.boore_kishida_2017.</code><code class="sig-name descname">BooreKishida2017</code><span class="sig-paren">(</span><em class="sig-param">imc_in</em>, <em class="sig-param">imc_out</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.conversions.imc.boore_kishida_2017.</code><code class="sig-name descname">BooreKishida2017</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imc_in</span></em>, <em class="sig-param"><span class="n">imc_out</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter" title="shakelib.conversions.convert_imc.ComponentConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.convert_imc.ComponentConverter</span></code></a></p>
 <p>This class implements the Boore and Kishida (2017) conversions for
 horizontal intensity measure components.</p>
@@ -73,9 +74,9 @@ and between aleatory variabilities for different definitions of the
 horizontal component of motion. Bulletin of the Seismological Society
 of America, 96(4A), 1512-1522.</p>
 </div></blockquote>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce">
-<code class="sig-name descname">convertAmpsOnce</code><span class="sig-paren">(</span><em class="sig-param">imt</em>, <em class="sig-param">amps</em>, <em class="sig-param">rrups=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">convertAmpsOnce</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">amps</span></em>, <em class="sig-param"><span class="n">rrups</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of amps converted from one IMC to another.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -104,9 +105,9 @@ containing the rupture distances of the ground motions.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertSigmasOnce">
-<code class="sig-name descname">convertSigmasOnce</code><span class="sig-paren">(</span><em class="sig-param">imt</em>, <em class="sig-param">sigmas</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertSigmasOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">convertSigmasOnce</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">sigmas</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertSigmasOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of standard deviations converted from one IMC
 to another.</p>
 <p>Note that the action of this method is to always increase the

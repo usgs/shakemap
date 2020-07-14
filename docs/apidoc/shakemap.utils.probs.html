@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakemap.utils.probs &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +17,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap.utils.queue" href="shakemap.utils.queue.html" />
-    <link rel="prev" title="shakemap.utils.macros" href="shakemap.utils.macros.html" />
+    <link rel="prev" title="shakemap.utils.pgm_convert" href="shakemap.utils.pgm_convert.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -33,9 +34,9 @@
             
   <div class="section" id="module-shakemap.utils.probs">
 <span id="shakemap-utils-probs"></span><h1>shakemap.utils.probs<a class="headerlink" href="#module-shakemap.utils.probs" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.probs.get_weights">
-<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_weights</code><span class="sig-paren">(</span><em class="sig-param">origin</em>, <em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_weights" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_weights</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get list of GMPEs and their weights for a given earthquake.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -64,9 +65,9 @@ earthquake.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.probs.get_probs">
-<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_probs</code><span class="sig-paren">(</span><em class="sig-param">origin</em>, <em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_probs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_probs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_probs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_probs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_probs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate probabilities for each earthquake type.</p>
 <dl class="simple">
 <dt>The results here contain probabilities that can be rolled up in many ways:</dt><dd><ul class="simple">
@@ -120,9 +121,9 @@ interface.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.probs.get_region_probs">
-<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_region_probs</code><span class="sig-paren">(</span><em class="sig-param">eid</em>, <em class="sig-param">depth</em>, <em class="sig-param">strec_results</em>, <em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_region_probs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_region_probs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_region_probs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eid</span></em>, <em class="sig-param"><span class="n">depth</span></em>, <em class="sig-param"><span class="n">strec_results</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_region_probs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_region_probs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the regional probabilities (not including subduction interface
 etc).</p>
 <dl class="field-list simple">
@@ -161,9 +162,9 @@ zone.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.probs.get_subduction_probs">
-<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_subduction_probs</code><span class="sig-paren">(</span><em class="sig-param">strec_results</em>, <em class="sig-param">depth</em>, <em class="sig-param">mag</em>, <em class="sig-param">config</em>, <em class="sig-param">above_slab</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_subduction_probs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_subduction_probs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_subduction_probs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">strec_results</span></em>, <em class="sig-param"><span class="n">depth</span></em>, <em class="sig-param"><span class="n">mag</span></em>, <em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">above_slab</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_subduction_probs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_subduction_probs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get probabilities of earthquake being crustal, interface or intraslab.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -195,9 +196,9 @@ interface.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.probs.get_probability">
-<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_probability</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">x1</em>, <em class="sig-param">p1</em>, <em class="sig-param">x2</em>, <em class="sig-param">p2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_probability" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.probs.</code><code class="sig-name descname">get_probability</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">x1</span></em>, <em class="sig-param"><span class="n">p1</span></em>, <em class="sig-param"><span class="n">x2</span></em>, <em class="sig-param"><span class="n">p2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/probs.html#get_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.probs.get_probability" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate probability using a ramped function.</p>
 <p>The subsections and parameters below reflect a series of ramp functions
 we use to calculate various probabilities.</p>
@@ -272,6 +273,7 @@ we use to calculate various probabilities.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.pgm_convert.html">shakemap.utils.pgm_convert</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.probs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>

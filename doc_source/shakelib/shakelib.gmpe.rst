@@ -4,7 +4,9 @@ shakelib.gmpe
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
+   shakelib.gmpe.nga_east
    shakelib.gmpe.nullgmpe
 
 Module contents

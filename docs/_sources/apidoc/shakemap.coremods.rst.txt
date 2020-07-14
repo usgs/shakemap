@@ -4,6 +4,7 @@ shakemap.coremods
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakemap.coremods.assemble
    shakemap.coremods.associate
@@ -14,6 +15,7 @@ Submodules
    shakemap.coremods.dyfi
    shakemap.coremods.exception
    shakemap.coremods.gridxml
+   shakemap.coremods.groundmotion
    shakemap.coremods.history
    shakemap.coremods.info
    shakemap.coremods.kml
@@ -31,6 +33,7 @@ Submodules
    shakemap.coremods.transfer_email
    shakemap.coremods.transfer_pdl
    shakemap.coremods.transfer_scp
+   shakemap.coremods.uncertaintymaps
    shakemap.coremods.xtestimage
    shakemap.coremods.xtestplot
    shakemap.coremods.xtestplot_multi

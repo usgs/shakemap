@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakemap.utils.layers &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,9 +34,9 @@
             
   <div class="section" id="module-shakemap.utils.layers">
 <span id="shakemap-utils-layers"></span><h1>shakemap.utils.layers<a class="headerlink" href="#module-shakemap.utils.layers" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.validate_config">
-<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">validate_config</code><span class="sig-paren">(</span><em class="sig-param">mydict</em>, <em class="sig-param">install_path</em>, <em class="sig-param">data_path</em>, <em class="sig-param">global_data_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#validate_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.validate_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">validate_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mydict</span></em>, <em class="sig-param"><span class="n">install_path</span></em>, <em class="sig-param"><span class="n">data_path</span></em>, <em class="sig-param"><span class="n">global_data_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#validate_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.validate_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively validate select.conf.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -47,9 +48,9 @@
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.nearest_edge">
-<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">nearest_edge</code><span class="sig-paren">(</span><em class="sig-param">elon</em>, <em class="sig-param">elat</em>, <em class="sig-param">poly</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#nearest_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.nearest_edge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">nearest_edge</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elon</span></em>, <em class="sig-param"><span class="n">elat</span></em>, <em class="sig-param"><span class="n">poly</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#nearest_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.nearest_edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distance from a point to the nearest edge of a
 polygon.</p>
 <dl class="field-list simple">
@@ -70,9 +71,9 @@ nearest edge (or vertex) of the polygon.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.dist_to_layer">
-<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">dist_to_layer</code><span class="sig-paren">(</span><em class="sig-param">elon</em>, <em class="sig-param">elat</em>, <em class="sig-param">geom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#dist_to_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.dist_to_layer" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">dist_to_layer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elon</span></em>, <em class="sig-param"><span class="n">elat</span></em>, <em class="sig-param"><span class="n">geom</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#dist_to_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.dist_to_layer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distance from a point to the polygon(s) in a layer; zero if
 the point is inside the polygon. If the nearest edge of the polygon is
 greater than 5000 km from the point, the point cannot be inside the
@@ -98,9 +99,9 @@ point lies inside the polygon.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.get_layer_distances">
-<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">get_layer_distances</code><span class="sig-paren">(</span><em class="sig-param">elon</em>, <em class="sig-param">elat</em>, <em class="sig-param">layer_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#get_layer_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.get_layer_distances" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">get_layer_distances</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elon</span></em>, <em class="sig-param"><span class="n">elat</span></em>, <em class="sig-param"><span class="n">layer_dir</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#get_layer_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.get_layer_distances" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distances from a point to the nearest polygon in each
 layer file found in ‘layer_dir’. The distance will be zero if
 the point is inside a polygon. If the nearest edge of a polygon is
@@ -131,9 +132,9 @@ point lies inside the polygon.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.update_config_regions">
-<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">update_config_regions</code><span class="sig-paren">(</span><em class="sig-param">lat</em>, <em class="sig-param">lon</em>, <em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#update_config_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.update_config_regions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">update_config_regions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#update_config_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.update_config_regions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -175,6 +176,7 @@ point lies inside the polygon.</p>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.layers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.pgm_convert.html">shakemap.utils.pgm_convert</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>

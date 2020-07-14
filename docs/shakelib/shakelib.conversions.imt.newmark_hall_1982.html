@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.conversions.imt.newmark_hall_1982 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,7 +32,7 @@
             
   <div class="section" id="module-shakelib.conversions.imt.newmark_hall_1982">
 <span id="shakelib-conversions-imt-newmark-hall-1982"></span><h1>shakelib.conversions.imt.newmark_hall_1982<a class="headerlink" href="#module-shakelib.conversions.imt.newmark_hall_1982" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982">
 <em class="property">class </em><code class="sig-prename descclassname">shakelib.conversions.imt.newmark_hall_1982.</code><code class="sig-name descname">NewmarkHall1982</code><a class="reference internal" href="../_modules/shakelib/conversions/imt/newmark_hall_1982.html#NewmarkHall1982"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.IMTConverter" title="shakelib.conversions.convert_imt.IMTConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.convert_imt.IMTConverter</span></code></a></p>
@@ -56,9 +57,9 @@ greater than or equal to 5.0.</p>
 <p class="rubric">References</p>
 <p>Newmark, N. M., &amp; Hall, W. J. (1982). Earthquake spectra and design.
 Earthquake Engineering Research Institute, El Cerrito, California.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertAmps">
-<code class="sig-name descname">convertAmps</code><span class="sig-paren">(</span><em class="sig-param">imt_in</em>, <em class="sig-param">imt_out</em>, <em class="sig-param">imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/newmark_hall_1982.html#NewmarkHall1982.convertAmps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertAmps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">convertAmps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt_in</span></em>, <em class="sig-param"><span class="n">imt_out</span></em>, <em class="sig-param"><span class="n">imt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/newmark_hall_1982.html#NewmarkHall1982.convertAmps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertAmps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of converted IMT amplitude values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -83,9 +84,9 @@ ground motions. Valid IMTs are PGV, and SA.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertSigmas">
-<code class="sig-name descname">convertSigmas</code><span class="sig-paren">(</span><em class="sig-param">imt_in</em>, <em class="sig-param">imt_out</em>, <em class="sig-param">sigma</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/newmark_hall_1982.html#NewmarkHall1982.convertSigmas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertSigmas" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">convertSigmas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt_in</span></em>, <em class="sig-param"><span class="n">imt_out</span></em>, <em class="sig-param"><span class="n">sigma</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/newmark_hall_1982.html#NewmarkHall1982.convertSigmas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertSigmas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert standard deviation to natural log units.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -107,7 +108,7 @@ units must be natural log.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getLnSigma">
 <code class="sig-name descname">getLnSigma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/newmark_hall_1982.html#NewmarkHall1982.getLnSigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getLnSigma" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">

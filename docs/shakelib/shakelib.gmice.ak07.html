@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.gmice.ak07 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,7 +32,7 @@
             
   <div class="section" id="module-shakelib.gmice.ak07">
 <span id="shakelib-gmice-ak07"></span><h1>shakelib.gmice.ak07<a class="headerlink" href="#module-shakelib.gmice.ak07" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.gmice.ak07.AK07">
 <em class="property">class </em><code class="sig-prename descclassname">shakelib.gmice.ak07.</code><code class="sig-name descname">AK07</code><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE" title="shakelib.gmice.gmice.GMICE"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.gmice.gmice.GMICE</span></code></a></p>
@@ -43,9 +44,9 @@ Felt Intensity and Instrumental Ground Motion in the Central
 United States and California. Bulletin of The Seismological
 Society of America - BULL SEISMOL SOC AMER.
 97. 497-510. 10.1785/0120060154.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.ak07.AK07.getMIfromGM">
-<code class="sig-name descname">getMIfromGM</code><span class="sig-paren">(</span><em class="sig-param">amps</em>, <em class="sig-param">imt</em>, <em class="sig-param">dists=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getMIfromGM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getMIfromGM" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getMIfromGM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">amps</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getMIfromGM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getMIfromGM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to compute macroseismic intensity from ground-motion
 intensity. Supported ground-motion IMTs are PGA, PGV and PSA
 at 0.3, 1.0, and 2.0 sec periods.</p>
@@ -69,9 +70,9 @@ point in question).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.ak07.AK07.getGMfromMI">
-<code class="sig-name descname">getGMfromMI</code><span class="sig-paren">(</span><em class="sig-param">mmi</em>, <em class="sig-param">imt</em>, <em class="sig-param">dists=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getGMfromMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getGMfromMI" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getGMfromMI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mmi</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getGMfromMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getGMfromMI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to tcompute ground-motion intensity from macroseismic
 intensity. Supported IMTs are PGA, PGV and PSA for 0.3, 1.0, and
 3.0 sec periods.</p>
@@ -94,7 +95,7 @@ and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.ak07.AK07.getGM2MIsd">
 <code class="sig-name descname">getGM2MIsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getGM2MIsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getGM2MIsd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of standard deviations for the ground-motion
@@ -106,7 +107,7 @@ to MMI conversion. The keys are the ground motion types.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.ak07.AK07.getMI2GMsd">
 <code class="sig-name descname">getMI2GMsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getMI2GMsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getMI2GMsd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of standard deviations for the MMI

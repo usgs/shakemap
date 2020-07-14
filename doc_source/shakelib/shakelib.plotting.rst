@@ -4,6 +4,7 @@ shakelib.plotting
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.plotting.contour
    shakelib.plotting.plotrupture

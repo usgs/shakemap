@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.gmice.gmice &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,21 +32,21 @@
             
   <div class="section" id="module-shakelib.gmice.gmice">
 <span id="shakelib-gmice-gmice"></span><h1>shakelib.gmice.gmice<a class="headerlink" href="#module-shakelib.gmice.gmice" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.gmice.gmice.GMICE">
 <em class="property">class </em><code class="sig-prename descclassname">shakelib.gmice.gmice.</code><code class="sig-name descname">GMICE</code><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
 <p>Base class called to implement ground motion intensity conversion
 equations (GMICE).</p>
 <p>Inherited by AK07, Wald99, WGRW12.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getDistanceType">
 <em class="property">static </em><code class="sig-name descname">getDistanceType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getDistanceType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getDistanceType" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.supports">
-<code class="sig-name descname">supports</code><span class="sig-paren">(</span><em class="sig-param">imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.supports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.supports" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">supports</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.supports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.supports" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine whether input IMT is supported by GMICE instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -60,7 +61,7 @@ equations (GMICE).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getMinMax">
 <code class="sig-name descname">getMinMax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getMinMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getMinMax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the minimum and maximum MMI values produced by this GMICE.</p>
@@ -71,7 +72,7 @@ equations (GMICE).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getName">
 <code class="sig-name descname">getName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getName" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the name of this GMICE.</p>
@@ -82,7 +83,7 @@ equations (GMICE).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getScale">
 <code class="sig-name descname">getScale</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getScale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getScale" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the name of the PostScript file containing this GMICE’s
@@ -94,9 +95,9 @@ scale.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getPreferredMI">
-<code class="sig-name descname">getPreferredMI</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">dists=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getPreferredMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getPreferredMI" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getPreferredMI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getPreferredMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getPreferredMI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to compute macroseismic intensity from the preferred
 ground-motion intensity. The function uses PGV by default, but
 this may be overridden by individual classes.</p>
@@ -117,7 +118,7 @@ point in question).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getPreferredSD">
 <code class="sig-name descname">getPreferredSD</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getPreferredSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getPreferredSD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of standard deviations for the preferred
@@ -133,9 +134,9 @@ IMT is not in the list of available IMTs for the GMICE.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getMIfromGM">
-<em class="property">abstract </em><code class="sig-name descname">getMIfromGM</code><span class="sig-paren">(</span><em class="sig-param">amps</em>, <em class="sig-param">imt</em>, <em class="sig-param">dists=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getMIfromGM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getMIfromGM" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">getMIfromGM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">amps</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getMIfromGM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getMIfromGM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to compute macroseismic intensity from ground-motion
 intensity. Supported ground-motion IMTs are PGA, PGV and PSA
 at 0.3, 1.0, and 2.0 sec periods.</p>
@@ -159,9 +160,9 @@ point in question).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getGMfromMI">
-<em class="property">abstract </em><code class="sig-name descname">getGMfromMI</code><span class="sig-paren">(</span><em class="sig-param">mmi</em>, <em class="sig-param">imt</em>, <em class="sig-param">dists=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getGMfromMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getGMfromMI" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">getGMfromMI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mmi</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getGMfromMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getGMfromMI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to tcompute ground-motion intensity from macroseismic
 intensity. Supported IMTs are PGA, PGV and PSA for 0.3, 1.0, and
 3.0 sec periods.</p>
@@ -184,7 +185,7 @@ and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getGM2MIsd">
 <em class="property">abstract </em><code class="sig-name descname">getGM2MIsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getGM2MIsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getGM2MIsd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of standard deviations for the ground-motion
@@ -196,7 +197,7 @@ to MMI conversion. The keys are the ground motion types.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.gmice.GMICE.getMI2GMsd">
 <em class="property">abstract </em><code class="sig-name descname">getMI2GMsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/gmice.html#GMICE.getMI2GMsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.gmice.GMICE.getMI2GMsd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of standard deviations for the MMI

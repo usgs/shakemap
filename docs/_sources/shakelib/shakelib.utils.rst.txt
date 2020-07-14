@@ -4,6 +4,7 @@ shakelib.utils
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.utils.containers
    shakelib.utils.exception

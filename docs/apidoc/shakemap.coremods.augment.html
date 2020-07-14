@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakemap.coremods.augment &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -35,21 +36,21 @@
 <span id="shakemap-coremods-augment"></span><h1>shakemap.coremods.augment<a class="headerlink" href="#module-shakemap.coremods.augment" title="Permalink to this headline">¶</a></h1>
 <p>Reads shake_data.hdf from the event’s current directory and adds local
 configs, data, etc., then writes a new shake_data.hdf.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="shakemap.coremods.augment.AugmentModule">
-<em class="property">class </em><code class="sig-prename descclassname">shakemap.coremods.augment.</code><code class="sig-name descname">AugmentModule</code><span class="sig-paren">(</span><em class="sig-param">eventid</em>, <em class="sig-param">comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakemap.coremods.augment.</code><code class="sig-name descname">AugmentModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventid</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <dl class="simple">
 <dt>augment – Incorporate additional content into the shake_data.hdf input</dt><dd><p>file.</p>
 </dd>
 </dl>
 <p>Instantiate a CoreModule class with an event ID.</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakemap.coremods.augment.AugmentModule.command_name">
 <code class="sig-name descname">command_name</code><em class="property"> = 'augment'</em><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.coremods.augment.AugmentModule.execute">
 <code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Augment a ShakeMap input data file with local configs, data, rupture,
@@ -70,9 +71,9 @@ differs from the originator in the previous line of the history.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.coremods.augment.AugmentModule.parseArgs">
-<code class="sig-name descname">parseArgs</code><span class="sig-paren">(</span><em class="sig-param">arglist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule.parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.parseArgs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parseArgs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arglist</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule.parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.parseArgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set up the object to accept the –comment flag.</p>
 </dd></dl>
 
@@ -117,6 +118,7 @@ differs from the originator in the previous line of the history.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.exception.html">shakemap.coremods.exception</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.groundmotion.html">shakemap.coremods.groundmotion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.kml.html">shakemap.coremods.kml</a></li>
@@ -134,6 +136,7 @@ differs from the originator in the previous line of the history.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer_email.html">shakemap.coremods.transfer_email</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer_pdl.html">shakemap.coremods.transfer_pdl</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer_scp.html">shakemap.coremods.transfer_scp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.uncertaintymaps.html">shakemap.coremods.uncertaintymaps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestimage.html">shakemap.coremods.xtestimage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot.html">shakemap.coremods.xtestplot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot_multi.html">shakemap.coremods.xtestplot_multi</a></li>

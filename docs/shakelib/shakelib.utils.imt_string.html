@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.utils.imt_string &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.utils.imt_string">
 <span id="shakelib-utils-imt-string"></span><h1>shakelib.utils.imt_string<a class="headerlink" href="#module-shakelib.utils.imt_string" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.utils.imt_string.oq_to_file">
-<code class="sig-prename descclassname">shakelib.utils.imt_string.</code><code class="sig-name descname">oq_to_file</code><span class="sig-paren">(</span><em class="sig-param">oqimt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/imt_string.html#oq_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.imt_string.oq_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.utils.imt_string.</code><code class="sig-name descname">oq_to_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oqimt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/imt_string.html#oq_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.imt_string.oq_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert openquake IMT nomenclature to filename friendly form.</p>
 <p>Examples:
 SA(1.0) (Spectral Acceleration at 1 second) -&gt; psa1p0
@@ -58,9 +59,9 @@ SA(.5) (Spectral Acceleration at 0.5 seconds) -&gt; psa0p5</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.utils.imt_string.file_to_oq">
-<code class="sig-prename descclassname">shakelib.utils.imt_string.</code><code class="sig-name descname">file_to_oq</code><span class="sig-paren">(</span><em class="sig-param">fileimt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/imt_string.html#file_to_oq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.imt_string.file_to_oq" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.utils.imt_string.</code><code class="sig-name descname">file_to_oq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fileimt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/imt_string.html#file_to_oq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.imt_string.file_to_oq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert filename friendly IMT form to openquake form.</p>
 <p>Examples:
 psa1p0 (Spectral Acceleration at 1 second) -&gt; SA(1.0)

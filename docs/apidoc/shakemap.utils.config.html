@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakemap.utils.config &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,7 +34,7 @@
             
   <div class="section" id="module-shakemap.utils.config">
 <span id="shakemap-utils-config"></span><h1>shakemap.utils.config<a class="headerlink" href="#module-shakemap.utils.config" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.get_data_path">
 <code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">get_data_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_data_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_data_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the path to the shakemap package data directory holding
@@ -49,9 +50,9 @@ files.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.get_configspec">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">get_configspec</code><span class="sig-paren">(</span><em class="sig-param">config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_configspec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_configspec" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">get_configspec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_configspec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_configspec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full path to a ShakeMap config spec file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -66,7 +67,7 @@ files.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.get_config_paths">
 <code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">get_config_paths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_config_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_config_paths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns two paths based on the currently selected profile in the
@@ -92,14 +93,14 @@ and the data directory.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.get_model_config">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">get_model_config</code><span class="sig-paren">(</span><em class="sig-param">install_path</em>, <em class="sig-param">datadir</em>, <em class="sig-param">logger</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_model_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_model_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">get_model_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">install_path</span></em>, <em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">logger</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_model_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_model_config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.path_macro_sub">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">path_macro_sub</code><span class="sig-paren">(</span><em class="sig-param">s</em>, <em class="sig-param">ip=''</em>, <em class="sig-param">dp=''</em>, <em class="sig-param">gp=''</em>, <em class="sig-param">ei=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#path_macro_sub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.path_macro_sub" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">path_macro_sub</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">ip</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">dp</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">gp</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">ei</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#path_macro_sub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.path_macro_sub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace macros with current paths:</p>
 <ul class="simple">
 <li><p>&lt;INSTALL_DIR&gt; is replaced with the contents of ip</p></li>
@@ -129,7 +130,7 @@ does not contain one or any of the substitution strings.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.get_custom_validator">
 <code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">get_custom_validator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_custom_validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_custom_validator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a validator suitable for validating the ShakeMap config
@@ -144,9 +145,9 @@ files.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.config_error">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">config_error</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#config_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.config_error" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">config_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">results</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#config_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.config_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the results of a ConfigObj validation and log the errors.
 Throws a RuntimeError exception  upon completion if any errors or
 missing sections are encountered.</p>
@@ -171,9 +172,9 @@ the ‘config’ arguments.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.check_extra_values">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">check_extra_values</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">logger</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_extra_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_extra_values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">check_extra_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">logger</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_extra_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_extra_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks the config and warns the user if there are any extra entries
 in their config file. This function is based on suggested usage in the
 ConfigObj manual.</p>
@@ -193,9 +194,9 @@ ConfigObj manual.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.check_config">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">check_config</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">logger</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">check_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">logger</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that the gmpe, gmice, ipe, and ccf parameters
 in config are defined in their respective sections. Raises a
 ValidateError exception if an error is encountered.</p>
@@ -215,14 +216,14 @@ ValidateError exception if an error is encountered.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.check_all_configs">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">check_all_configs</code><span class="sig-paren">(</span><em class="sig-param">configdir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_all_configs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_all_configs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">check_all_configs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">configdir</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_all_configs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_all_configs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.nanfloat_type">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">nanfloat_type</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#nanfloat_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.nanfloat_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">nanfloat_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#nanfloat_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.nanfloat_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a float, or NaN, nan, Inf, -Inf, etc.
 Raises a ValidateError exception on failure.</p>
 <dl class="field-list simple">
@@ -238,9 +239,9 @@ Raises a ValidateError exception on failure.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.annotatedfloat_type">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">annotatedfloat_type</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#annotatedfloat_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.annotatedfloat_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">annotatedfloat_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#annotatedfloat_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.annotatedfloat_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a float, or a float with a ‘c’, ‘m’, or ‘d’
 appended. Then converts the value to decimal degrees where an unadorned
 float or a float plus ‘d’ is interpreted as decimal degrees, ‘m’ is
@@ -260,9 +261,9 @@ with ‘d’, ‘m’, or ‘c’ (for degrees, minutes, seconds).</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.weight_list">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">weight_list</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">min</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#weight_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.weight_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">weight_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">min</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#weight_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.weight_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a list of floats at least min elements long,
 and whose values add up to 1.0.  Raises a ValidateError exception on
 failure.</p>
@@ -279,9 +280,9 @@ failure.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.nanfloat_list">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">nanfloat_list</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">min</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#nanfloat_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.nanfloat_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">nanfloat_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">min</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#nanfloat_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.nanfloat_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a list of floats, including NaN and Inf.
 Raises a ValidateError exception on failure.</p>
 <dl class="field-list simple">
@@ -297,9 +298,9 @@ Raises a ValidateError exception on failure.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.gmpe_list">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">gmpe_list</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">min</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#gmpe_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.gmpe_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">gmpe_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">min</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#gmpe_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.gmpe_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a list of strings at least min elements long.
 The entries are not checked for their validity as GMPEs. Raises a
 ValidateError exception on failure.</p>
@@ -316,9 +317,9 @@ ValidateError exception on failure.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.extent_list">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">extent_list</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#extent_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.extent_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">extent_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#extent_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.extent_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is an empty list or a list of four floats,
 whose values are valid coordinates in (longitude, longitude,
 latitude, latitude) order. Returns a list upon success; raises a
@@ -337,9 +338,9 @@ coordinates.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.file_type">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">file_type</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.file_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">file_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.file_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a valid file or an empty string.
 Raises a ValidateError exception on failure. Does macro substitution
 of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
@@ -356,9 +357,9 @@ of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.directory_type">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">directory_type</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#directory_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.directory_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">directory_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#directory_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.directory_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a valid directory or an empty string.
 Raises a ValidateError exception on failure. Does macro substitution
 of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
@@ -375,9 +376,9 @@ of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.status_string">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">status_string</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">min</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#status_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.status_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">status_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">min</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#status_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.status_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is one of the ShakeMap status string of
 ‘automatic’, ‘released’, or ‘reviewed.  Raises a ValidateError
 exception on failure.</p>
@@ -394,9 +395,9 @@ exception on failure.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.cfg_float_list">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">cfg_float_list</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#cfg_float_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.cfg_float_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">cfg_float_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#cfg_float_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.cfg_float_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts (if possible) the input list (or string) to a list
 of floats. Raises ValidateError if the input can’t be
 converted to a list of floats.</p>
@@ -417,9 +418,9 @@ converted to a list of floats.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.cfg_float">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">cfg_float</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#cfg_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.cfg_float" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">cfg_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#cfg_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.cfg_float" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts (if possible) the input string to a float. Raises
 ValidateError if the input can’t be converted to a float.</p>
 <dl class="field-list simple">
@@ -438,9 +439,9 @@ ValidateError if the input can’t be converted to a float.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.cfg_bool">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">cfg_bool</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#cfg_bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.cfg_bool" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">cfg_bool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#cfg_bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.cfg_bool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts (if possible) the input string to a bool. Raises
 ValidateError if the input can’t be converted to a bool.</p>
 <dl class="field-list simple">
@@ -459,9 +460,9 @@ ValidateError if the input can’t be converted to a bool.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.config.check_profile_config">
-<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">check_profile_config</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_profile_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_profile_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.config.</code><code class="sig-name descname">check_profile_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_profile_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_profile_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validation checks on the profile config. At least one profile must exist
 (otherwise exit) and the paths for each profile should exist, otherwise the
 profile entry is removed.</p>
@@ -511,6 +512,7 @@ profile entry is removed.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.pgm_convert.html">shakemap.utils.pgm_convert</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>

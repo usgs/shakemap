@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.rupture.factory &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.rupture.factory">
 <span id="shakelib-rupture-factory"></span><h1>shakelib.rupture.factory<a class="headerlink" href="#module-shakelib.rupture.factory" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.factory.get_rupture">
-<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">get_rupture</code><span class="sig-paren">(</span><em class="sig-param">origin</em>, <em class="sig-param">file=None</em>, <em class="sig-param">mesh_dx=0.5</em>, <em class="sig-param">new_format=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#get_rupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.get_rupture" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">get_rupture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mesh_dx</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">new_format</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#get_rupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.get_rupture" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a module-level function to read in a rupture file. This allows for
 the ShakeMap 3 text file specification or the ShakeMap 4 JSON rupture
 format. The ShakeMap 3 (“.txt” extension) only supports QuadRupture style
@@ -60,9 +61,9 @@ distances are computed from the Ruptureclass.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.factory.rupture_from_dict_and_origin">
-<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">rupture_from_dict_and_origin</code><span class="sig-paren">(</span><em class="sig-param">rupdict</em>, <em class="sig-param">origin</em>, <em class="sig-param">mesh_dx=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#rupture_from_dict_and_origin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.rupture_from_dict_and_origin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">rupture_from_dict_and_origin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rupdict</span></em>, <em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">mesh_dx</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#rupture_from_dict_and_origin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.rupture_from_dict_and_origin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method returns either a QuadRupture or EdgeRupture object based on a
 GeoJSON dictionary and an origin. Note that this is very similar to
 <a class="reference internal" href="#shakelib.rupture.factory.rupture_from_dict" title="shakelib.rupture.factory.rupture_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">rupture_from_dict()</span></code></a>, except that method is for
@@ -92,9 +93,9 @@ EdgeRupture.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.factory.rupture_from_dict">
-<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">rupture_from_dict</code><span class="sig-paren">(</span><em class="sig-param">d</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#rupture_from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.rupture_from_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">rupture_from_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#rupture_from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.rupture_from_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method returns either a Rupture subclass (QuadRupture, EdgeRupture, or
 PointRupture) object based on a GeoJSON dictionary.</p>
 <div class="admonition seealso">
@@ -112,9 +113,9 @@ information in the ‘metadata’ field.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.factory.text_to_json">
-<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">text_to_json</code><span class="sig-paren">(</span><em class="sig-param">file</em>, <em class="sig-param">new_format=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#text_to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.text_to_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">text_to_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">new_format</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#text_to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.text_to_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read in old or new ShakeMap 3 textfile rupture format and convert to
 GeoJSON.</p>
 <p>This will handle ShakeMap3.5-style fault text files, which can have the
@@ -159,9 +160,9 @@ edge and move back in the opposite direction.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.factory.validate_json">
-<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">validate_json</code><span class="sig-paren">(</span><em class="sig-param">d</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#validate_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.validate_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">validate_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#validate_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.validate_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that the JSON format is acceptable. This is only for requirements
 that are common to both QuadRupture and EdgeRupture.</p>
 <dl class="field-list simple">
@@ -171,9 +172,9 @@ that are common to both QuadRupture and EdgeRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.factory.is_quadrupture_class">
-<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">is_quadrupture_class</code><span class="sig-paren">(</span><em class="sig-param">d</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#is_quadrupture_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.is_quadrupture_class" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.factory.</code><code class="sig-name descname">is_quadrupture_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#is_quadrupture_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.is_quadrupture_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if JSON file fulfills QuadRupture class criteria:</p>
 <blockquote>
 <div><ul class="simple">

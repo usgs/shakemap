@@ -4,6 +4,7 @@ shakemap.utils
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakemap.utils.amps
    shakemap.utils.config
@@ -13,6 +14,7 @@ Submodules
    shakemap.utils.layers
    shakemap.utils.logging
    shakemap.utils.macros
+   shakemap.utils.pgm_convert
    shakemap.utils.probs
    shakemap.utils.queue
    shakemap.utils.utils

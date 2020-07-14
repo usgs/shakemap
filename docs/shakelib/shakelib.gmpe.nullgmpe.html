@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.gmpe.nullgmpe &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,9 +34,9 @@
 <span id="shakelib-gmpe-nullgmpe"></span><h1>shakelib.gmpe.nullgmpe<a class="headerlink" href="#module-shakelib.gmpe.nullgmpe" title="Permalink to this headline">¶</a></h1>
 <p>A GMPE that returns a constant everywhere. Useful for testing, but
 nothing else.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.gmpe.nullgmpe.</code><code class="sig-name descname">NullGMPE</code><span class="sig-paren">(</span><em class="sig-param">mean=0</em>, <em class="sig-param">phi=0.8</em>, <em class="sig-param">tau=0.6</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmpe/nullgmpe.html#NullGMPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.gmpe.nullgmpe.</code><code class="sig-name descname">NullGMPE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mean</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">phi</span><span class="o">=</span><span class="default_value">0.8</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">0.6</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmpe/nullgmpe.html#NullGMPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openquake.hazardlib.gsim.base.GMPE</span></code></p>
 <p>This is a GMPE for testing. It returns the mean and stddevs
 specified in the constructor.</p>
@@ -55,44 +56,44 @@ GMPE (default=0.6)</p></li>
 </dd>
 </dl>
 <p>The total standard deviation returned will be <code class="docutils literal notranslate"><span class="pre">sqrt(phi^2</span> <span class="pre">+</span> <span class="pre">tau^2)</span></code>.</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
 <code class="sig-name descname">DEFINED_FOR_TECTONIC_REGION_TYPE</code><em class="property"> = 'Active Shallow Crust'</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
-<code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = frozenset({&lt;class 'openquake.hazardlib.imt.SA'&gt;, &lt;class 'openquake.hazardlib.imt.PGA'&gt;, &lt;class 'openquake.hazardlib.imt.PGV'&gt;})</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = frozenset({&lt;class 'openquake.hazardlib.imt.PGV'&gt;, &lt;class 'openquake.hazardlib.imt.SA'&gt;, &lt;class 'openquake.hazardlib.imt.PGA'&gt;})</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
 <code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</code><em class="property"> = 'Greater of two horizontal'</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
 <code class="sig-name descname">DEFINED_FOR_STANDARD_DEVIATION_TYPES</code><em class="property"> = frozenset({'Inter event', 'Intra event', 'Total'})</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_SITES_PARAMETERS">
 <code class="sig-name descname">REQUIRES_SITES_PARAMETERS</code><em class="property"> = frozenset({'vs30'})</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_RUPTURE_PARAMETERS">
 <code class="sig-name descname">REQUIRES_RUPTURE_PARAMETERS</code><em class="property"> = frozenset({})</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_DISTANCES">
 <code class="sig-name descname">REQUIRES_DISTANCES</code><em class="property"> = frozenset({'rjb'})</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.get_mean_and_stddevs">
-<code class="sig-name descname">get_mean_and_stddevs</code><span class="sig-paren">(</span><em class="sig-param">sites</em>, <em class="sig-param">rup</em>, <em class="sig-param">dists</em>, <em class="sig-param">imt</em>, <em class="sig-param">stddev_types</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmpe/nullgmpe.html#NullGMPE.get_mean_and_stddevs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_mean_and_stddevs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sites</span></em>, <em class="sig-param"><span class="n">rup</span></em>, <em class="sig-param"><span class="n">dists</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">stddev_types</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmpe/nullgmpe.html#NullGMPE.get_mean_and_stddevs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements the OpenQuake GroundShakingIntensityModel
 get_mean_and_stddevs interface. See superclass
 <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs">method</a>.</p>
@@ -101,7 +102,7 @@ the dists.rbj array, regardless of the contents of that array or
 any of the other contexts. The imt is also ignored.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.COEFFS">
 <code class="sig-name descname">COEFFS</code><em class="property"> = &lt;openquake.hazardlib.gsim.base.CoeffsTable object&gt;</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.COEFFS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>

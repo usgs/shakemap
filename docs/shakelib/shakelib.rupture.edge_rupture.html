@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.rupture.edge_rupture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.rupture.edge_rupture">
 <span id="shakelib-rupture-edge-rupture"></span><h1>shakelib.rupture.edge_rupture<a class="headerlink" href="#module-shakelib.rupture.edge_rupture" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.edge_rupture.</code><code class="sig-name descname">EdgeRupture</code><span class="sig-paren">(</span><em class="sig-param">d</em>, <em class="sig-param">origin</em>, <em class="sig-param">mesh_dx=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.edge_rupture.</code><code class="sig-name descname">EdgeRupture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">mesh_dx</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.rupture.base.Rupture</span></code></a></p>
 <p>Rupture class that representst the rupture surface by specifying the top
 edge and the bottom edges. These edges do not need to be horizontal. The
@@ -57,9 +58,9 @@ EdgeRupture.</p></li>
 <dd class="field-even"><p>EdgeRupture instance.</p>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.fromArrays">
-<em class="property">classmethod </em><code class="sig-name descname">fromArrays</code><span class="sig-paren">(</span><em class="sig-param">toplons</em>, <em class="sig-param">toplats</em>, <em class="sig-param">topdeps</em>, <em class="sig-param">botlons</em>, <em class="sig-param">botlats</em>, <em class="sig-param">botdeps</em>, <em class="sig-param">origin</em>, <em class="sig-param">group_index=None</em>, <em class="sig-param">mesh_dx=0.5</em>, <em class="sig-param">reference=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.fromArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.fromArrays" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromArrays</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">toplons</span></em>, <em class="sig-param"><span class="n">toplats</span></em>, <em class="sig-param"><span class="n">topdeps</span></em>, <em class="sig-param"><span class="n">botlons</span></em>, <em class="sig-param"><span class="n">botlats</span></em>, <em class="sig-param"><span class="n">botdeps</span></em>, <em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">group_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mesh_dx</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.fromArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.fromArrays" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class method to initialize an EdgeRupture class from arrays of
 longitude, latitude, and depth along the top and bottom edges.</p>
 <dl class="field-list simple">
@@ -84,7 +85,7 @@ If None, then assume only single group.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.getLength">
 <code class="sig-name descname">getLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.getLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.getLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute length of rupture (km). For EdgeRupture, we compute the length
@@ -99,7 +100,7 @@ as the length of the top edge projected to the surface.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.getWidth">
 <code class="sig-name descname">getWidth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.getWidth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.getWidth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute average rupture width in km. For EdgeRupture, we compute this
@@ -114,7 +115,7 @@ as the rupture area divided by teh rupture length.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.getArea">
 <code class="sig-name descname">getArea</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.getArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.getArea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the rupture area. For EdgeRupture, we compute this by grouping
@@ -131,7 +132,7 @@ we can compute area.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.getStrike">
 <code class="sig-name descname">getStrike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.getStrike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.getStrike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return representative strike for this rupture. Note that strike
@@ -146,7 +147,7 @@ can vary along the rupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.getDip">
 <code class="sig-name descname">getDip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.getDip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.getDip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Representative dip for this rupture. Note that dip
@@ -161,7 +162,7 @@ can vary along the rupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.lats">
 <em class="property">property </em><code class="sig-name descname">lats</code><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.lats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of latitudes for the rupture verticies arranged for
@@ -181,7 +182,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.lons">
 <em class="property">property </em><code class="sig-name descname">lons</code><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.lons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of longitudes for the rupture verticies arranged for
@@ -201,7 +202,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.depths">
 <em class="property">property </em><code class="sig-name descname">depths</code><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.depths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of depths for the rupture verticies arranged for
@@ -221,7 +222,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.getDepthToTop">
 <code class="sig-name descname">getDepthToTop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.getDepthToTop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.getDepthToTop" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -234,7 +235,7 @@ segments.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.getQuadrilaterals">
 <code class="sig-name descname">getQuadrilaterals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.getQuadrilaterals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.getQuadrilaterals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of quadrilaterals. Unlike QuadRupture, these
@@ -254,9 +255,9 @@ horizontal top/bottom edges.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.computeRrup">
-<code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing rupture distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -275,9 +276,9 @@ horizontal top/bottom edges.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.computeRjb">
-<code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing Joyner-Boore distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -296,9 +297,9 @@ horizontal top/bottom edges.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.computeGC2">
-<code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeGC2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeGC2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing version 2 of the Generalized Coordinate system
 (GC2) by Spudich and Chiou OFR 2015-1028.</p>
 <dl class="field-list simple">

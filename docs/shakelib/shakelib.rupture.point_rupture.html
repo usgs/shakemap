@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.rupture.point_rupture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.rupture.point_rupture">
 <span id="shakelib-rupture-point-rupture"></span><h1>shakelib.rupture.point_rupture<a class="headerlink" href="#module-shakelib.rupture.point_rupture" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.rupture.point_rupture.PointRupture">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.point_rupture.</code><code class="sig-name descname">PointRupture</code><span class="sig-paren">(</span><em class="sig-param">origin</em>, <em class="sig-param">reference='Origin'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.point_rupture.</code><code class="sig-name descname">PointRupture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">'Origin'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.rupture.base.Rupture</span></code></a></p>
 <p>Rupture class for point sources. The purpose is to gracefully handle:</p>
 <blockquote>
@@ -55,79 +56,79 @@ PointRupture, the ‘reference’ is probably the origin.</p></li>
 <dd class="field-even"><p>PointRupture instance.</p>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.getLength">
 <code class="sig-name descname">getLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.getLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.getLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rupture length, which is None for a PointRupture.
 Could potentially put in a default value based on magnitude.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.getWidth">
 <code class="sig-name descname">getWidth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.getWidth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.getWidth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rupture width.
 Could potentially put in a default value based on magnitude.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.getArea">
 <code class="sig-name descname">getArea</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.getArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.getArea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rupture area, which is None for a PointRupture.
 Could potentially put in a default value based on magnitude.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.getStrike">
 <code class="sig-name descname">getStrike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.getStrike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.getStrike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Strike, which is None.
 Could potentially get from strec or something?</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.getDip">
 <code class="sig-name descname">getDip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.getDip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.getDip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dip, which is None.
 Could potentially get from strec or something?</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.getDepthToTop">
 <code class="sig-name descname">getDepthToTop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.getDepthToTop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.getDepthToTop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Depth to top of rupture.
 Could get from hypo/magnitude?</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.getQuadrilaterals">
 <code class="sig-name descname">getQuadrilaterals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.getQuadrilaterals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.getQuadrilaterals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to return rupture quadrilaterals. Returns None for
 PointRupture.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.lats">
 <em class="property">property </em><code class="sig-name descname">lats</code><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.lats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns rupture latitudes, which is just the hypocenter for a
 PointRupture.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.lons">
 <em class="property">property </em><code class="sig-name descname">lons</code><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.lons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns rupture longitudes, which is just the hypocenter for a
 PointRupture.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.depths">
 <em class="property">property </em><code class="sig-name descname">depths</code><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.depths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns rupture depths, which is just the hypocenter for a
 PointRupture.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.computeRjb">
-<code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert point-distances to Joyner-Boore distances based on magnitude.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -147,9 +148,9 @@ and second an array of the variance of those predictions.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.computeRrup">
-<code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert point-distances to rupture distances based on magnitude.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -169,9 +170,9 @@ second an array of the variance of those predictions.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.point_rupture.PointRupture.computeGC2">
-<code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.computeGC2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/point_rupture.html#PointRupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.point_rupture.PointRupture.computeGC2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing version 2 of the Generalized Coordinate system
 (GC2) by Spudich and Chiou OFR 2015-1028.</p>
 <dl class="field-list simple">

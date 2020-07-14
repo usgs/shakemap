@@ -868,7 +868,7 @@ parameter in the ``bounds`` sub-section of the
 
 ShakeMap can also be configured to compute ground motions for
 an arbitrary set of points. The operator may create a file
-containing rows of latitude, longitude, Vs30, and a location or facility
+containing rows of longitude, latitude, Vs30, and a location or facility
 identifier (with the columns being separated by whitespace).
 The file may then be specified with the ``file`` parameter in
 the ``prediction_location`` sub-section of the ``interp`` section

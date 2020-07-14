@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.correlation.loth_baker_2013 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.correlation.loth_baker_2013">
 <span id="shakelib-correlation-loth-baker-2013"></span><h1>shakelib.correlation.loth_baker_2013<a class="headerlink" href="#module-shakelib.correlation.loth_baker_2013" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.correlation.loth_baker_2013.LothBaker2013">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.correlation.loth_baker_2013.</code><code class="sig-name descname">LothBaker2013</code><span class="sig-paren">(</span><em class="sig-param">periods</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/loth_baker_2013.html#LothBaker2013"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.loth_baker_2013.LothBaker2013" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.correlation.loth_baker_2013.</code><code class="sig-name descname">LothBaker2013</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">periods</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/loth_baker_2013.html#LothBaker2013"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.loth_baker_2013.LothBaker2013" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.correlation.ccf_base.html#shakelib.correlation.ccf_base.CrossCorrelationBase" title="shakelib.correlation.ccf_base.CrossCorrelationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.correlation.ccf_base.CrossCorrelationBase</span></code></a></p>
 <p>Created by Christophe Loth, 12/18/2012
 Pythonized and vectorized by C. Bruce Worden, 3/15/2017
@@ -56,9 +57,9 @@ sorted from smallest to largest.</p>
 <dd class="field-even"><p>An instance of <a class="reference internal" href="#shakelib.correlation.loth_baker_2013.LothBaker2013" title="shakelib.correlation.loth_baker_2013.LothBaker2013"><code class="xref py py-class docutils literal notranslate"><span class="pre">LothBaker2013</span></code></a>.</p>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.correlation.loth_baker_2013.LothBaker2013.getCorrelation">
-<code class="sig-name descname">getCorrelation</code><span class="sig-paren">(</span><em class="sig-param">ix1</em>, <em class="sig-param">ix2</em>, <em class="sig-param">h</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/loth_baker_2013.html#LothBaker2013.getCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.loth_baker_2013.LothBaker2013.getCorrelation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getCorrelation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ix1</span></em>, <em class="sig-param"><span class="n">ix2</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/loth_baker_2013.html#LothBaker2013.getCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.loth_baker_2013.LothBaker2013.getCorrelation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the correlation between two periods and a separation distance
 of h.</p>
 <p>The indices (ix1 and ix2) and h must have the same dimensions. The

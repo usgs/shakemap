@@ -3,6 +3,7 @@ shakelib.conversions
 
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.conversions.imc
    shakelib.conversions.imt
@@ -10,6 +11,7 @@ shakelib.conversions
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.conversions.convert_imc
    shakelib.conversions.convert_imt

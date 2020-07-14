@@ -4,6 +4,7 @@ shakelib.rupture
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.rupture.base
    shakelib.rupture.constants
