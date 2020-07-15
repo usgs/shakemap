@@ -1076,11 +1076,13 @@ class ModelModule(CoreModule):
         df1['MMI_outliers'] = np.full_like(df1['lon'], 0, dtype=np.bool)
         for imtstr in preferred_imts:
             if 'derived_MMI_from_' + imtstr in df1:
-                ixx = np.isnan(df1['MMI'])
+                ixx = (np.isnan(df1['MMI']) | df1['MMI_outliers']) \
+                    & ~(np.isnan(df1['derived_MMI_from_' + imtstr])
+                        | df1[imtstr + '_outliers'])
                 df1['MMI'][ixx] = df1['derived_MMI_from_' + imtstr][ixx]
                 df1['MMI_sd'][ixx] = \
                     df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
-                df1['MMI_outliers'][ixx] |= df1[imtstr + '_outliers'][ixx]
+                df1['MMI_outliers'][ixx] = False
         self.df1.imts.add('MMI')
         #
         # Get the prediction and stddevs
