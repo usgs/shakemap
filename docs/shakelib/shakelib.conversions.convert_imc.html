@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.conversions.convert_imc &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,12 +32,12 @@
             
   <div class="section" id="module-shakelib.conversions.convert_imc">
 <span id="shakelib-conversions-convert-imc"></span><h1>shakelib.conversions.convert_imc<a class="headerlink" href="#module-shakelib.conversions.convert_imc" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.conversions.convert_imc.ComponentConverter">
 <em class="property">class </em><code class="sig-prename descclassname">shakelib.conversions.convert_imc.</code><code class="sig-name descname">ComponentConverter</code><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
 <p>Base class for implementing conversions between components.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.convert_imc.ComponentConverter.checkUnknown">
 <code class="sig-name descname">checkUnknown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.checkUnknown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.checkUnknown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if imc_in or imc_out is an unknown type.</p>
@@ -44,9 +45,9 @@
 to AVERAGE_HORIZONTAL.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.convert_imc.ComponentConverter.convertAmps">
-<code class="sig-name descname">convertAmps</code><span class="sig-paren">(</span><em class="sig-param">imt</em>, <em class="sig-param">amps</em>, <em class="sig-param">rrups=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertAmps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertAmps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">convertAmps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">amps</span></em>, <em class="sig-param"><span class="n">rrups</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertAmps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertAmps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of amps converted from one IMC to another.</p>
 <p>Note: This can be used to perform chained conversions.</p>
 <dl class="field-list simple">
@@ -71,9 +72,9 @@ Default is None.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.convert_imc.ComponentConverter.convertAmpsOnce">
-<em class="property">abstract </em><code class="sig-name descname">convertAmpsOnce</code><span class="sig-paren">(</span><em class="sig-param">imt</em>, <em class="sig-param">amps</em>, <em class="sig-param">rrups=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">convertAmpsOnce</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">amps</span></em>, <em class="sig-param"><span class="n">rrups</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of amps converted from one IMC to another.</p>
 <p>Note: This does not implement chained conversions.</p>
 <dl class="field-list simple">
@@ -97,9 +98,9 @@ containing the rupture distances of the ground motions.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.convert_imc.ComponentConverter.convertSigmas">
-<code class="sig-name descname">convertSigmas</code><span class="sig-paren">(</span><em class="sig-param">imt</em>, <em class="sig-param">sigmas</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertSigmas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertSigmas" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">convertSigmas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">sigmas</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertSigmas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertSigmas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of standard deviations converted from one IMC
 to another.</p>
 <p>Note:  This can be used to perform chained conversions.</p>
@@ -121,9 +122,9 @@ the logged ground motions.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.convert_imc.ComponentConverter.convertSigmasOnce">
-<em class="property">abstract </em><code class="sig-name descname">convertSigmasOnce</code><span class="sig-paren">(</span><em class="sig-param">imt</em>, <em class="sig-param">sigmas</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertSigmasOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">convertSigmasOnce</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">sigmas</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertSigmasOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of standard deviations converted from one IMC
 to another.</p>
 <p>Note: This does not implement chained conversions.</p>
@@ -145,9 +146,9 @@ the logged ground motions.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.convert_imc.ComponentConverter.pathSearch">
-<em class="property">static </em><code class="sig-name descname">pathSearch</code><span class="sig-paren">(</span><em class="sig-param">graph</em>, <em class="sig-param">imc_in</em>, <em class="sig-param">imc_out</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.pathSearch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.pathSearch" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">pathSearch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph</span></em>, <em class="sig-param"><span class="n">imc_in</span></em>, <em class="sig-param"><span class="n">imc_out</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.pathSearch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.pathSearch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method to create a “path” to convert one IMC to another.</p>
 <p>This can be used for chain conversions</p>
 <dl class="field-list simple">
@@ -168,9 +169,9 @@ conversions between IMCs.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.conversions.convert_imc.ComponentConverter.getShortestPath">
-<code class="sig-name descname">getShortestPath</code><span class="sig-paren">(</span><em class="sig-param">graph</em>, <em class="sig-param">imc_in</em>, <em class="sig-param">imc_out</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.getShortestPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.getShortestPath" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getShortestPath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph</span></em>, <em class="sig-param"><span class="n">imc_in</span></em>, <em class="sig-param"><span class="n">imc_out</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.getShortestPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.getShortestPath" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a “path” to convert one IMC to another.</p>
 <p>This can be used for chain conversions</p>
 <dl class="field-list simple">

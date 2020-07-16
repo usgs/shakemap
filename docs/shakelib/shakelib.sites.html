@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.sites &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.sites">
 <span id="shakelib-sites"></span><h1>shakelib.sites<a class="headerlink" href="#module-shakelib.sites" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.sites.Sites">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.sites.</code><code class="sig-name descname">Sites</code><span class="sig-paren">(</span><em class="sig-param">vs30grid</em>, <em class="sig-param">vs30measured_grid=None</em>, <em class="sig-param">backarc=None</em>, <em class="sig-param">defaultVs30=686.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.sites.</code><code class="sig-name descname">Sites</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vs30grid</span></em>, <em class="sig-param"><span class="n">vs30measured_grid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">backarc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">defaultVs30</span><span class="o">=</span><span class="default_value">686.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An object to encapsulate information used to generate a GEM
 <a class="reference external" href="https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py">SitesContext</a>.</p>
@@ -51,9 +52,9 @@ is not specified.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.sites.Sites.fromBounds">
-<em class="property">classmethod </em><code class="sig-name descname">fromBounds</code><span class="sig-paren">(</span><em class="sig-param">xmin</em>, <em class="sig-param">xmax</em>, <em class="sig-param">ymin</em>, <em class="sig-param">ymax</em>, <em class="sig-param">dx</em>, <em class="sig-param">dy</em>, <em class="sig-param">defaultVs30=686.0</em>, <em class="sig-param">vs30File=None</em>, <em class="sig-param">vs30measured_grid=None</em>, <em class="sig-param">backarc=None</em>, <em class="sig-param">padding=False</em>, <em class="sig-param">resample=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.fromBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.fromBounds" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xmin</span></em>, <em class="sig-param"><span class="n">xmax</span></em>, <em class="sig-param"><span class="n">ymin</span></em>, <em class="sig-param"><span class="n">ymax</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">dy</span></em>, <em class="sig-param"><span class="n">defaultVs30</span><span class="o">=</span><span class="default_value">686.0</span></em>, <em class="sig-param"><span class="n">vs30File</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vs30measured_grid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">backarc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">padding</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">resample</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.fromBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.fromBounds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Sites object by defining a center point, resolution, extent,
 and Vs30 values.</p>
 <dl class="field-list simple">
@@ -82,9 +83,9 @@ resampled.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.sites.Sites.fromCenter">
-<em class="property">classmethod </em><code class="sig-name descname">fromCenter</code><span class="sig-paren">(</span><em class="sig-param">cx</em>, <em class="sig-param">cy</em>, <em class="sig-param">xspan</em>, <em class="sig-param">yspan</em>, <em class="sig-param">dx</em>, <em class="sig-param">dy</em>, <em class="sig-param">defaultVs30=686.0</em>, <em class="sig-param">vs30File=None</em>, <em class="sig-param">vs30measured_grid=None</em>, <em class="sig-param">backarc=None</em>, <em class="sig-param">padding=False</em>, <em class="sig-param">resample=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.fromCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.fromCenter" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromCenter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cx</span></em>, <em class="sig-param"><span class="n">cy</span></em>, <em class="sig-param"><span class="n">xspan</span></em>, <em class="sig-param"><span class="n">yspan</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">dy</span></em>, <em class="sig-param"><span class="n">defaultVs30</span><span class="o">=</span><span class="default_value">686.0</span></em>, <em class="sig-param"><span class="n">vs30File</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vs30measured_grid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">backarc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">padding</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">resample</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.fromCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.fromCenter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Sites object by defining a center point, resolution, extent,
 and Vs30 values.</p>
 <dl class="field-list simple">
@@ -113,9 +114,9 @@ resampled.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.sites.Sites.getSitesContext">
-<code class="sig-name descname">getSitesContext</code><span class="sig-paren">(</span><em class="sig-param">lldict=None</em>, <em class="sig-param">rock_vs30=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.getSitesContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.getSitesContext" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getSitesContext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lldict</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rock_vs30</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.getSitesContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.getSitesContext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a SitesContext object by sampling the current Sites object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -151,13 +152,13 @@ value.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.sites.Sites.getVs30Grid">
 <code class="sig-name descname">getVs30Grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.getVs30Grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.getVs30Grid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns: Grid2D object containing Vs30 values for this Sites object.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.sites.Sites.getNxNy">
 <code class="sig-name descname">getNxNy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.getNxNy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.getNxNy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns: The number of grid points in x and y.</p>

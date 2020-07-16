@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.gmice.wald99 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,7 +32,7 @@
             
   <div class="section" id="module-shakelib.gmice.wald99">
 <span id="shakelib-gmice-wald99"></span><h1>shakelib.gmice.wald99<a class="headerlink" href="#module-shakelib.gmice.wald99" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.gmice.wald99.Wald99">
 <em class="property">class </em><code class="sig-prename descclassname">shakelib.gmice.wald99.</code><code class="sig-name descname">Wald99</code><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE" title="shakelib.gmice.gmice.GMICE"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.gmice.gmice.GMICE</span></code></a></p>
@@ -44,9 +45,9 @@ for higher intensities, PGA for lower) as is recommended in the reference.</p>
 Relationships between peak gorund acceleration, peak ground
 velocity, and Modified Mercalli Intensity in California,
 Earthquake Spectra, Volume15, No. 3, August 1999.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.wald99.Wald99.getPreferredMI">
-<code class="sig-name descname">getPreferredMI</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">dists=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99.getPreferredMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99.getPreferredMI" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getPreferredMI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99.getPreferredMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99.getPreferredMI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to compute macroseismic intensity from the preferred
 ground-motion intensity. The function uses PGV by default, but
 this may be overridden by individual classes.</p>
@@ -67,9 +68,9 @@ point in question).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.wald99.Wald99.getMIfromGM">
-<code class="sig-name descname">getMIfromGM</code><span class="sig-paren">(</span><em class="sig-param">amps</em>, <em class="sig-param">imt</em>, <em class="sig-param">dists=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99.getMIfromGM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99.getMIfromGM" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getMIfromGM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">amps</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99.getMIfromGM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99.getMIfromGM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to compute macroseismic intensity from ground-motion
 intensity. Supported ground-motion IMTs are PGA and PGV</p>
 <dl class="field-list simple">
@@ -93,9 +94,9 @@ point in question).</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.wald99.Wald99.getGMfromMI">
-<code class="sig-name descname">getGMfromMI</code><span class="sig-paren">(</span><em class="sig-param">mmi</em>, <em class="sig-param">imt</em>, <em class="sig-param">dists=None</em>, <em class="sig-param">mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99.getGMfromMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99.getGMfromMI" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getGMfromMI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mmi</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99.getGMfromMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99.getGMfromMI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to tcompute ground-motion intensity from macroseismic
 intensity. Supported IMTs are PGA and PGV.</p>
 <dl class="field-list simple">
@@ -119,7 +120,7 @@ and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.wald99.Wald99.getGM2MIsd">
 <code class="sig-name descname">getGM2MIsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99.getGM2MIsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99.getGM2MIsd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of standard deviations for the ground-motion
@@ -131,7 +132,7 @@ to MMI conversion. The keys are the ground motion types.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.gmice.wald99.Wald99.getMI2GMsd">
 <code class="sig-name descname">getMI2GMsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/wald99.html#Wald99.getMI2GMsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.wald99.Wald99.getMI2GMsd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of standard deviations for the MMI

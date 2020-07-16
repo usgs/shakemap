@@ -123,6 +123,7 @@ dev_list=(
     "rope"
     "yapf"
     "sphinx"
+    "sphinx-argparse"
 )
 
 # Required package list:

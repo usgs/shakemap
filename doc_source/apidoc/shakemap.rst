@@ -3,6 +3,7 @@ shakemap
 
 
 .. toctree::
+   :maxdepth: 12
 
    shakemap.coremods
    shakemap.utils

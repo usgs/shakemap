@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.correlation.dummy &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.correlation.dummy">
 <span id="shakelib-correlation-dummy"></span><h1>shakelib.correlation.dummy<a class="headerlink" href="#module-shakelib.correlation.dummy" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.correlation.dummy.DummyCorrelation">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.correlation.dummy.</code><code class="sig-name descname">DummyCorrelation</code><span class="sig-paren">(</span><em class="sig-param">periods</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/dummy.html#DummyCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.dummy.DummyCorrelation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.correlation.dummy.</code><code class="sig-name descname">DummyCorrelation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">periods</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/dummy.html#DummyCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.dummy.DummyCorrelation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.correlation.ccf_base.html#shakelib.correlation.ccf_base.CrossCorrelationBase" title="shakelib.correlation.ccf_base.CrossCorrelationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.correlation.ccf_base.CrossCorrelationBase</span></code></a></p>
 <p>Simplified correlation module for testing purposes. Should not be used
 in productions runs as it does not produce valid correlations.</p>
@@ -48,9 +49,9 @@ and must me sorted from smallest to largest.</p>
 <dd class="field-even"><p>An instance of <a class="reference internal" href="#shakelib.correlation.dummy.DummyCorrelation" title="shakelib.correlation.dummy.DummyCorrelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">DummyCorrelation</span></code></a>.</p>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.correlation.dummy.DummyCorrelation.getCorrelation">
-<code class="sig-name descname">getCorrelation</code><span class="sig-paren">(</span><em class="sig-param">ix1</em>, <em class="sig-param">ix2</em>, <em class="sig-param">h</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/dummy.html#DummyCorrelation.getCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.dummy.DummyCorrelation.getCorrelation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getCorrelation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ix1</span></em>, <em class="sig-param"><span class="n">ix2</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/dummy.html#DummyCorrelation.getCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.dummy.DummyCorrelation.getCorrelation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the correlation between two periods and a separation distance
 of h km. The result returned is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rho</span> <span class="o">=</span> <span class="n">T1</span><span class="o">/</span><span class="n">T2</span> <span class="o">*</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">h</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span>

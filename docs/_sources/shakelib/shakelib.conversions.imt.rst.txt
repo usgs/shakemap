@@ -4,6 +4,7 @@ shakelib.conversions.imt
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.conversions.imt.bommer_alarcon_2006
    shakelib.conversions.imt.newmark_hall_1982

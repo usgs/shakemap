@@ -4,6 +4,7 @@ shakelib.gmice
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.gmice.ak07
    shakelib.gmice.fm11

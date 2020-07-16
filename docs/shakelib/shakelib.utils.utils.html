@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.utils.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.utils.utils">
 <span id="shakelib-utils-utils"></span><h1>shakelib.utils.utils<a class="headerlink" href="#module-shakelib.utils.utils" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.utils.utils.replace_dyfi">
-<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">replace_dyfi</code><span class="sig-paren">(</span><em class="sig-param">stationfile</em>, <em class="sig-param">dyfi_xml</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#replace_dyfi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.replace_dyfi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">replace_dyfi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stationfile</span></em>, <em class="sig-param"><span class="n">dyfi_xml</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#replace_dyfi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.replace_dyfi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove any non-instrumented data from station file, add DYFI.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -53,9 +54,9 @@ instrumented station data.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.utils.utils.get_extent">
-<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">get_extent</code><span class="sig-paren">(</span><em class="sig-param">rupture=None</em>, <em class="sig-param">config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#get_extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.get_extent" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">get_extent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rupture</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#get_extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.get_extent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to compute map extent from rupture. There are numerous methods for
 getting the extent:</p>
 <blockquote>
@@ -86,9 +87,9 @@ arc-minute..</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.utils.utils.is_stable">
-<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">is_stable</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#is_stable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.is_stable" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">is_stable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#is_stable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.is_stable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if point is located in the US stable tectonic region. This uses
 STREC but only makes use of the stable tectonic region. Any location that
 is not mapped as stable is classified as active.</p>

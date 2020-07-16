@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.rupture.base &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,7 +32,7 @@
             
   <div class="section" id="module-shakelib.rupture.base">
 <span id="shakelib-rupture-base"></span><h1>shakelib.rupture.base<a class="headerlink" href="#module-shakelib.rupture.base" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.rupture.base.Rupture">
 <em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.base.</code><code class="sig-name descname">Rupture</code><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
@@ -55,9 +56,9 @@ with horizontal top and obttom edges.</p></li>
 edge specification.</p></li>
 </ul>
 </div></blockquote>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.writeGeoJson">
-<code class="sig-name descname">writeGeoJson</code><span class="sig-paren">(</span><em class="sig-param">file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.writeGeoJson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.writeGeoJson" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">writeGeoJson</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.writeGeoJson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.writeGeoJson" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the rupture to a GeoJson file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -66,7 +67,7 @@ edge specification.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getLength">
 <em class="property">abstract </em><code class="sig-name descname">getLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getLength" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -79,7 +80,7 @@ edge specification.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getWidth">
 <em class="property">abstract </em><code class="sig-name descname">getWidth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getWidth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getWidth" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -92,7 +93,7 @@ edge specification.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getArea">
 <em class="property">abstract </em><code class="sig-name descname">getArea</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getArea" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -105,7 +106,7 @@ edge specification.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getStrike">
 <em class="property">abstract </em><code class="sig-name descname">getStrike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getStrike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getStrike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return strike angle. If rupture consists of multiple quadrilaterals,
@@ -123,12 +124,12 @@ by this algorithm.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getDip">
 <em class="property">abstract </em><code class="sig-name descname">getDip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getDip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getDip" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getDepthToTop">
 <em class="property">abstract </em><code class="sig-name descname">getDepthToTop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getDepthToTop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getDepthToTop" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -141,14 +142,14 @@ by this algorithm.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getQuadrilaterals">
 <em class="property">abstract </em><code class="sig-name descname">getQuadrilaterals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getQuadrilaterals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getQuadrilaterals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to return rupture quadrilaterals. Returns None for
 PointRupture.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getReference">
 <code class="sig-name descname">getReference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getReference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getReference" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -161,7 +162,7 @@ PointRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getOrigin">
 <code class="sig-name descname">getOrigin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getOrigin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getOrigin" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -171,24 +172,24 @@ PointRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.lats">
 <em class="property">abstract property </em><code class="sig-name descname">lats</code><a class="headerlink" href="#shakelib.rupture.base.Rupture.lats" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.lons">
 <em class="property">abstract property </em><code class="sig-name descname">lons</code><a class="headerlink" href="#shakelib.rupture.base.Rupture.lons" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.depths">
 <em class="property">abstract property </em><code class="sig-name descname">depths</code><a class="headerlink" href="#shakelib.rupture.base.Rupture.depths" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.getRuptureContext">
-<code class="sig-name descname">getRuptureContext</code><span class="sig-paren">(</span><em class="sig-param">gmpelist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getRuptureContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getRuptureContext" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getRuptureContext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpelist</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.getRuptureContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.getRuptureContext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an Openquake <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.RuptureContext">RuptureContext</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -200,9 +201,9 @@ PointRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.computeRhyp">
-<code class="sig-name descname">computeRhyp</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeRhyp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeRhyp" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeRhyp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeRhyp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeRhyp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing hypocentral distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -221,9 +222,9 @@ PointRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.computeRepi">
-<code class="sig-name descname">computeRepi</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeRepi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeRepi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">computeRepi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeRepi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeRepi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing epicentral distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -242,9 +243,9 @@ PointRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.computeRjb">
-<em class="property">abstract </em><code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeRjb" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeRjb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing Joyner-Boore distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -263,9 +264,9 @@ PointRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.computeRrup">
-<em class="property">abstract </em><code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeRrup" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeRrup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing rupture distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -284,9 +285,9 @@ PointRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.computeGC2">
-<em class="property">abstract </em><code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param">lon</em>, <em class="sig-param">lat</em>, <em class="sig-param">depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeGC2" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.computeGC2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing version 2 of the Generalized Coordinate system
 (GC2) by Spudich and Chiou OFR 2015-1028.</p>
 <dl class="field-list simple">
@@ -310,13 +311,13 @@ PointRupture.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.plot3d">
 <code class="sig-name descname">plot3d</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.plot3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.plot3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for making a quick 3D wireframe plot of rupture.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.base.Rupture.map">
 <code class="sig-name descname">map</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/base.html#Rupture.map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.base.Rupture.map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for making a quick map of the fault.</p>

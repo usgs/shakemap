@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.rupture.origin &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -31,9 +32,9 @@
             
   <div class="section" id="module-shakelib.rupture.origin">
 <span id="shakelib-rupture-origin"></span><h1>shakelib.rupture.origin<a class="headerlink" href="#module-shakelib.rupture.origin" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.rupture.origin.Origin">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">Origin</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">Origin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The purpose of this class is to read/store event origin information,
 which is usually derived from an xml file called “event.xml”. There is
@@ -83,9 +84,9 @@ unspecified ruptures, respectively.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.origin.Origin.fromFile">
-<em class="property">classmethod </em><code class="sig-name descname">fromFile</code><span class="sig-paren">(</span><em class="sig-param">eventxmlfile</em>, <em class="sig-param">sourcefile=None</em>, <em class="sig-param">momentfile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.fromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.fromFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventxmlfile</span></em>, <em class="sig-param"><span class="n">sourcefile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">momentfile</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.fromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.fromFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class method to create a Origin object by specifying an event.xml
 file, a rupture file, a source.txt file, and a moment.xml file.</p>
 <dl class="field-list simple">
@@ -102,7 +103,7 @@ file, a rupture file, a source.txt file, and a moment.xml file.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.origin.Origin.getHypo">
 <code class="sig-name descname">getHypo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.getHypo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.getHypo" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -112,9 +113,9 @@ file, a rupture file, a source.txt file, and a moment.xml file.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.origin.Origin.setMechanism">
-<code class="sig-name descname">setMechanism</code><span class="sig-paren">(</span><em class="sig-param">mech=None</em>, <em class="sig-param">rake=None</em>, <em class="sig-param">dip=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.setMechanism"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.setMechanism" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setMechanism</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mech</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rake</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dip</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.setMechanism"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.setMechanism" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the earthquake mechanism manually (overriding any values read
 in from event.xml or source.txt. If rake and dip are not specified,
 they will be assigned by mechanism as follows:</p>
@@ -166,9 +167,9 @@ converted to range between -180 and 180 degrees.</p></li>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.origin.write_event_file">
-<code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">write_event_file</code><span class="sig-paren">(</span><em class="sig-param">event</em>, <em class="sig-param">xmlfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#write_event_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.write_event_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">write_event_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">xmlfile</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#write_event_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.write_event_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write event.xml file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -199,9 +200,9 @@ converted to range between -180 and 180 degrees.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.origin.read_event_file">
-<code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">read_event_file</code><span class="sig-paren">(</span><em class="sig-param">eventxml</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_event_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_event_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">read_event_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventxml</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_event_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_event_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read event.xml file from disk, returning a dictionary of attributes.
 Input XML format looks like this (all elements are required unless
 explicitly labeled optional):</p>
@@ -266,9 +267,9 @@ explicitly labeled optional):</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.origin.read_moment_quakeml">
-<code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">read_moment_quakeml</code><span class="sig-paren">(</span><em class="sig-param">momentfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_moment_quakeml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_moment_quakeml" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">read_moment_quakeml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">momentfile</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_moment_quakeml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_moment_quakeml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read moment parameters from a QuakeML file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -313,9 +314,9 @@ explicitly labeled optional):</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakelib.rupture.origin.read_source">
-<code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">read_source</code><span class="sig-paren">(</span><em class="sig-param">sourcefile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_source" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakelib.rupture.origin.</code><code class="sig-name descname">read_source</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sourcefile</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read source.txt file, which has lines like key=value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

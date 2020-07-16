@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakemap.utils.queue &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -33,9 +34,9 @@
             
   <div class="section" id="module-shakemap.utils.queue">
 <span id="shakemap-utils-queue"></span><h1>shakemap.utils.queue<a class="headerlink" href="#module-shakemap.utils.queue" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.queue.send_queue">
-<code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">send_queue</code><span class="sig-paren">(</span><em class="sig-param">command</em>, <em class="sig-param">data</em>, <em class="sig-param">port=9755</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#send_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.send_queue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">send_queue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">command</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">port</span><span class="o">=</span><span class="default_value">9755</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#send_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.send_queue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a command and its data to the queue process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -63,9 +64,9 @@ serialized.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.queue.str_to_seconds">
-<code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">str_to_seconds</code><span class="sig-paren">(</span><em class="sig-param">tstring</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#str_to_seconds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.str_to_seconds" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">str_to_seconds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tstring</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#str_to_seconds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.str_to_seconds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert time strings to seconds. Strings can be of the
 form:</p>
 <blockquote>
@@ -94,9 +95,9 @@ is returned.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.queue.parse_config">
-<code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">parse_config</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#parse_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.parse_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">parse_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#parse_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.parse_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the config object to get usable data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -112,9 +113,9 @@ configuration file.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.queue.get_config">
-<code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">get_config</code><span class="sig-paren">(</span><em class="sig-param">install_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.get_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">get_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">install_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.get_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the config and get it into a usable state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -129,16 +130,16 @@ configuration file.</p>
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="shakemap.utils.queue.Queue">
-<em class="property">class </em><code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">Queue</code><span class="sig-paren">(</span><em class="sig-param">pargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">Queue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.queueMainLoop">
 <code class="sig-name descname">queueMainLoop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.queueMainLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.queueMainLoop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.doPeriodicTasks">
 <code class="sig-name descname">doPeriodicTasks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.doPeriodicTasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.doPeriodicTasks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check for finished children and start any needed timed repeats.</p>
@@ -152,7 +153,7 @@ configuration file.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.getLogger">
 <code class="sig-name descname">getLogger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.getLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.getLogger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set up a logger for this process.</p>
@@ -166,7 +167,7 @@ configuration file.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.associateAll">
 <code class="sig-name descname">associateAll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.associateAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.associateAll" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do the associateAll method of the the AmplitudeHandler and
@@ -181,9 +182,9 @@ then process all of the events with updated data.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.writeEventXml">
-<code class="sig-name descname">writeEventXml</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.writeEventXml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.writeEventXml" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">writeEventXml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.writeEventXml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.writeEventXml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the event directory if it doesn’t exist and write/re-write
 the event.xml file</p>
 <dl class="field-list simple">
@@ -199,15 +200,15 @@ the event.xml file</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.moveEventDirectory">
-<code class="sig-name descname">moveEventDirectory</code><span class="sig-paren">(</span><em class="sig-param">oldid</em>, <em class="sig-param">newid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.moveEventDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.moveEventDirectory" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">moveEventDirectory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">oldid</span></em>, <em class="sig-param"><span class="n">newid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.moveEventDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.moveEventDirectory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change the name of an existing event directory to a new ID.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.processOrigin">
-<code class="sig-name descname">processOrigin</code><span class="sig-paren">(</span><em class="sig-param">event</em>, <em class="sig-param">action</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.processOrigin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.processOrigin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">processOrigin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.processOrigin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.processOrigin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if an event should be processed (or reprocessed) and
 dispatch it for processing.</p>
 <dl class="field-list simple">
@@ -227,9 +228,9 @@ to be called.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.processOther">
-<code class="sig-name descname">processOther</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">action</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.processOther"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.processOther" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">processOther</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.processOther"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.processOther" title="Permalink to this definition">¶</a></dt>
 <dd><p>A trigger has been issued for an event. Treat this as
 an origin update. If the event in question is not in our
 database, ignore the message.</p>
@@ -250,9 +251,9 @@ to be called.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.processCancel">
-<code class="sig-name descname">processCancel</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.processCancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.processCancel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">processCancel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.processCancel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.processCancel" title="Permalink to this definition">¶</a></dt>
 <dd><p>We’ve received a cancellation of an event: run ‘shake cancel’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -268,9 +269,9 @@ under the ‘id’ key.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.magnitudeTooSmall">
-<code class="sig-name descname">magnitudeTooSmall</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.magnitudeTooSmall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.magnitudeTooSmall" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">magnitudeTooSmall</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.magnitudeTooSmall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.magnitudeTooSmall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return False if the magnitude is greater than the threshold
 magnitude of the first metro box within which it falls, or
 the global minmag if it does not fall within a box; return
@@ -289,9 +290,9 @@ true otherwise.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.eventTooOldOrInFuture">
-<code class="sig-name descname">eventTooOldOrInFuture</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.eventTooOldOrInFuture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.eventTooOldOrInFuture" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">eventTooOldOrInFuture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.eventTooOldOrInFuture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.eventTooOldOrInFuture" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the event is too old or too far in the future to
 process; return False otherwise.</p>
 <dl class="field-list simple">
@@ -308,9 +309,9 @@ more than future_event_age in the future; returns False otherwise.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.dispatchEvent">
-<code class="sig-name descname">dispatchEvent</code><span class="sig-paren">(</span><em class="sig-param">event</em>, <em class="sig-param">action</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.dispatchEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.dispatchEvent" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dispatchEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.dispatchEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.dispatchEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Queue a run for the specified event.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -333,13 +334,13 @@ exact commands that will be run.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.runQueuedEvents">
 <code class="sig-name descname">runQueuedEvents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.runQueuedEvents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.runQueuedEvents" title="Permalink to this definition">¶</a></dt>
 <dd><p>If there is space, run events from the queue</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.reapChildren">
 <code class="sig-name descname">reapChildren</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.reapChildren"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.reapChildren" title="Permalink to this definition">¶</a></dt>
 <dd><p>Look through the list of child processes, reap the ones that have
@@ -355,9 +356,9 @@ from the list of children.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.Queue.getContext">
-<code class="sig-name descname">getContext</code><span class="sig-paren">(</span><em class="sig-param">context</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.getContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.getContext" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getContext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.getContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.getContext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a context based on the value of the ‘attached’ argument.
 If attached is True, then the function returns an instance of the
 Dummycontext; if it is False the function returns the ‘context’
@@ -382,7 +383,7 @@ the ‘context’ argument.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="shakemap.utils.queue.Dummycontext">
 <em class="property">class </em><code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">Dummycontext</code><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Dummycontext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.Dummycontext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
@@ -390,47 +391,47 @@ the ‘context’ argument.</p>
 with ‘with’. It doesn’t do anything.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="shakemap.utils.queue.EventQueue">
-<em class="property">class </em><code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">EventQueue</code><span class="sig-paren">(</span><em class="sig-param">ipath</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakemap.utils.queue.</code><code class="sig-name descname">EventQueue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ipath</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to maintain some persistence in the event of a program
 crash or shutdown. The db file can be removed if the operator wants
 a fresh start.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.EventQueue.commit">
 <code class="sig-name descname">commit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.commit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.commit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Commit any operations to the database.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.EventQueue.getQueuedEvents">
 <code class="sig-name descname">getQueuedEvents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.getQueuedEvents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.getQueuedEvents" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.EventQueue.queueEvent">
-<code class="sig-name descname">queueEvent</code><span class="sig-paren">(</span><em class="sig-param">eventid</em>, <em class="sig-param">command</em>, <em class="sig-param">mag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.queueEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.queueEvent" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">queueEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventid</span></em>, <em class="sig-param"><span class="n">command</span></em>, <em class="sig-param"><span class="n">mag</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.queueEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.queueEvent" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.EventQueue.dequeueEvent">
-<code class="sig-name descname">dequeueEvent</code><span class="sig-paren">(</span><em class="sig-param">eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.dequeueEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.dequeueEvent" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dequeueEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.dequeueEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.dequeueEvent" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.EventQueue.getRunningEvents">
 <code class="sig-name descname">getRunningEvents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.getRunningEvents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.getRunningEvents" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.EventQueue.insertRunningEvent">
-<code class="sig-name descname">insertRunningEvent</code><span class="sig-paren">(</span><em class="sig-param">eventid</em>, <em class="sig-param">command</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.insertRunningEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.insertRunningEvent" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insertRunningEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventid</span></em>, <em class="sig-param"><span class="n">command</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.insertRunningEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.insertRunningEvent" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.utils.queue.EventQueue.deleteRunningEvent">
-<code class="sig-name descname">deleteRunningEvent</code><span class="sig-paren">(</span><em class="sig-param">eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.deleteRunningEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.deleteRunningEvent" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">deleteRunningEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue.deleteRunningEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue.deleteRunningEvent" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -474,6 +475,7 @@ a fresh start.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.pgm_convert.html">shakemap.utils.pgm_convert</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>

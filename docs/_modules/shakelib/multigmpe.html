@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shakelib.multigmpe &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -38,7 +39,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">GMPE</span><span class="p">,</span> <span class="n">IPE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">GMPE</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_2014</span> <span class="k">import</span> <span class="n">BooreEtAl2014</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">CampbellBozorgnia2014</span><span class="p">)</span>
@@ -53,11 +54,6 @@
 <div class="viewcode-block" id="MultiGMPE"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE">[docs]</a><span class="k">class</span> <span class="nc">MultiGMPE</span><span class="p">(</span><span class="n">GMPE</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements a GMPE that is the combination of multiple GMPEs.</span>
-
-<span class="sd">    To do</span>
-
-<span class="sd">        * Allow site to be based on a model that isn&#39;t a GMPE (e.g.,</span>
-<span class="sd">          Borcherdt).</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -302,6 +298,7 @@
         <span class="c1"># http://usgs.github.io/shakemap/manual4_0/tg_processing.html#ground-motion-prediction</span>
         <span class="c1"># for a discussion on the way this is implemented here.</span>
         <span class="c1"># -------------------------------------------------------------- # noqa</span>
+
         <span class="n">nwts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wts</span><span class="p">)</span>
         <span class="n">npwts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wts</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">nsites</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lnmu</span><span class="p">)</span>
@@ -316,6 +313,7 @@
             <span class="n">cc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">lnmu_list</span><span class="p">),</span> <span class="p">(</span><span class="n">nwts</span><span class="p">,</span> <span class="n">nwts</span><span class="p">))</span>
             <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
             <span class="n">cc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">cc</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
         <span class="c1"># Multiply the correlation coefficients by the weights matrix</span>
         <span class="c1"># (this is cheaper than multiplying all of elements of each</span>
         <span class="c1"># stddev array by their weights since we have to multiply</span>
@@ -326,7 +324,8 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstds</span> <span class="o">*</span> <span class="mi">2</span><span class="p">):</span>
             <span class="n">sdlist</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nwts</span><span class="p">):</span>
-                <span class="n">sdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lnsd_list</span><span class="p">[</span><span class="n">j</span> <span class="o">*</span> <span class="n">nstds</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+                <span class="n">sdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">lnsd_list</span><span class="p">[</span><span class="n">j</span> <span class="o">*</span> <span class="n">nstds</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
             <span class="n">sdstack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">sdlist</span><span class="p">)</span>
             <span class="n">wcov</span> <span class="o">=</span> <span class="p">(</span><span class="n">sdstack</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">sdstack</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span> <span class="o">*</span> <span class="n">cc</span>
             <span class="c1"># This sums the weighted covariance as each point in the output</span>
@@ -622,8 +621,8 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
 
         <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">GMPE</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">IPE</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> is not a GMPE or IPE instance.&quot;</span> <span class="o">%</span> <span class="n">g</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">GMPE</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> is not a GMPE instance.&quot;</span> <span class="o">%</span> <span class="n">g</span><span class="p">)</span>
 
         <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span> <span class="o">=</span> <span class="n">gmpes</span>
@@ -978,15 +977,15 @@
     <span class="n">per_max</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">get_gmpe_sa_periods</span><span class="p">(</span><span class="n">g</span><span class="p">))</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
     <span class="n">per_min</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">get_gmpe_sa_periods</span><span class="p">(</span><span class="n">g</span><span class="p">))</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">PGA</span><span class="p">():</span>
-        <span class="n">sgmpe</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span> <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span>
-                 <span class="n">get_gmpe_coef_table</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">]</span>
-        <span class="n">swts</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gmpes</span><span class="p">,</span> <span class="n">wts</span><span class="p">)</span> <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span>
-                <span class="n">get_gmpe_coef_table</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">]</span>
+        <span class="n">sgmpe</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">gmpes</span> <span class="k">if</span> <span class="n">PGA</span> <span class="ow">in</span>
+                 <span class="n">g</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">]</span>
+        <span class="n">swts</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gmpes</span><span class="p">,</span> <span class="n">wts</span><span class="p">)</span> <span class="k">if</span> <span class="n">PGA</span> <span class="ow">in</span>
+                <span class="n">g</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">PGV</span><span class="p">():</span>
         <span class="n">sgmpe</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">swts</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gmpes</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">imt</span> <span class="ow">in</span> <span class="n">get_gmpe_coef_table</span><span class="p">(</span><span class="n">gmpes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">)</span> <span class="ow">or</span>\
+            <span class="k">if</span> <span class="p">(</span><span class="n">PGV</span> <span class="ow">in</span> <span class="n">gmpes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">)</span> <span class="ow">or</span>\
                <span class="p">(</span><span class="n">per_max</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">1.0</span> <span class="ow">and</span> <span class="n">per_min</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">):</span>
                 <span class="n">sgmpe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="n">swts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -1020,9 +1019,12 @@
 <span class="sd">        list: List of periods.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ctab</span> <span class="o">=</span> <span class="n">get_gmpe_coef_table</span><span class="p">(</span><span class="n">gmpe</span><span class="p">)</span><span class="o">.</span><span class="n">sa_coeffs</span>
-    <span class="n">ilist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ctab</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="n">per</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">period</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ilist</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;[NGAEast]&#39;</span><span class="p">:</span>
+        <span class="n">per</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">per_array</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ctab</span> <span class="o">=</span> <span class="n">get_gmpe_coef_table</span><span class="p">(</span><span class="n">gmpe</span><span class="p">)</span><span class="o">.</span><span class="n">sa_coeffs</span>
+        <span class="n">ilist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ctab</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">per</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">period</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ilist</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">per</span></div>
 
 

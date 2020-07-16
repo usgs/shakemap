@@ -3,6 +3,7 @@ shakelib
 
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.conversions
    shakelib.correlation
@@ -16,6 +17,7 @@ shakelib
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.distance
    shakelib.multigmpe

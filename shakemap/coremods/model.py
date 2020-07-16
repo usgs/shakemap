@@ -221,7 +221,8 @@ class ModelModule(CoreModule):
         # If the --no_rupture flag is used, switch to a PointRupture
         if self.no_rupture:
             self.rupture_obj = PointRupture(self.rupture_obj._origin)
-        if 'mechanism' in self.config['modeling']:
+        print(self.config['modeling']['mechanism'])
+        if self.config['modeling']['mechanism'] is not None:
             self.rupture_obj._origin.setMechanism(
                 mech=self.config['modeling']['mechanism'])
         self.rx = self.rupture_obj.getRuptureContext([self.default_gmpe])
@@ -1076,11 +1077,13 @@ class ModelModule(CoreModule):
         df1['MMI_outliers'] = np.full_like(df1['lon'], 0, dtype=np.bool)
         for imtstr in preferred_imts:
             if 'derived_MMI_from_' + imtstr in df1:
-                ixx = np.isnan(df1['MMI'])
+                ixx = (np.isnan(df1['MMI']) | df1['MMI_outliers']) \
+                    & ~(np.isnan(df1['derived_MMI_from_' + imtstr])
+                        | df1[imtstr + '_outliers'])
                 df1['MMI'][ixx] = df1['derived_MMI_from_' + imtstr][ixx]
                 df1['MMI_sd'][ixx] = \
                     df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
-                df1['MMI_outliers'][ixx] |= df1[imtstr + '_outliers'][ixx]
+                df1['MMI_outliers'][ixx] = False
         self.df1.imts.add('MMI')
         #
         # Get the prediction and stddevs
