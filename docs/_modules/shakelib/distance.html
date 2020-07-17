@@ -39,12 +39,12 @@
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">GMPE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim</span> <span class="k">import</span> <span class="n">base</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">GMPE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim</span> <span class="kn">import</span> <span class="n">base</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="k">import</span> <span class="n">ShakeLibException</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="k">import</span> <span class="n">EdgeRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="kn">import</span> <span class="n">ShakeLibException</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="kn">import</span> <span class="n">EdgeRupture</span>
 
 
 <div class="viewcode-block" id="Distance"><a class="viewcode-back" href="../../shakelib/shakelib.distance.html#shakelib.distance.Distance">[docs]</a><span class="k">class</span> <span class="nc">Distance</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -61,7 +61,7 @@
 <span class="sd">        Report 2015-1028, 20 p., http://dx.doi.org/10.3133/ofr20151028.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rupture</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rupture</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor for Distance class.</span>
 

@@ -38,12 +38,12 @@
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.point</span> <span class="k">import</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.point</span> <span class="kn">import</span> <span class="n">Point</span>
 
-<span class="kn">from</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="k">import</span> <span class="n">latlon2ecef</span>
-<span class="kn">from</span> <span class="nn">impactutils.vectorutils.vector</span> <span class="k">import</span> <span class="n">Vector</span>
-<span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="k">import</span> <span class="n">Rupture</span>
+<span class="kn">from</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="kn">import</span> <span class="n">latlon2ecef</span>
+<span class="kn">from</span> <span class="nn">impactutils.vectorutils.vector</span> <span class="kn">import</span> <span class="n">Vector</span>
+<span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="kn">import</span> <span class="n">HistoricTime</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="kn">import</span> <span class="n">Rupture</span>
 <span class="kn">import</span> <span class="nn">shakelib.rupture.constants</span> <span class="k">as</span> <span class="nn">constants</span>
 <span class="kn">import</span> <span class="nn">shakelib.rupture.utils</span> <span class="k">as</span> <span class="nn">utils</span>
 <span class="kn">import</span> <span class="nn">shakelib.rupture.gc2</span> <span class="k">as</span> <span class="nn">gc2</span>
@@ -59,7 +59,7 @@
 <span class="sd">    force fashion based on this mesh, which can be quite large.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization of an EdgeRupture from a GeoJSON dictionary and an</span>
 <span class="sd">        Origin.</span>

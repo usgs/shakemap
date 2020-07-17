@@ -52,7 +52,7 @@ GMPEs.</p>
 
 <dl class="py attribute">
 <dt id="shakelib.gmpe.nga_east.NGAEast.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
-<code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = frozenset({&lt;class 'openquake.hazardlib.imt.PGV'&gt;, &lt;class 'openquake.hazardlib.imt.SA'&gt;, &lt;class 'openquake.hazardlib.imt.PGA'&gt;})</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = frozenset({&lt;class 'openquake.hazardlib.imt.SA'&gt;, &lt;class 'openquake.hazardlib.imt.PGA'&gt;, &lt;class 'openquake.hazardlib.imt.PGV'&gt;})</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -82,12 +82,12 @@ GMPEs.</p>
 
 <dl class="py attribute">
 <dt id="shakelib.gmpe.nga_east.NGAEast.this_module">
-<code class="sig-name descname">this_module</code><em class="property"> = '/Users/cbworden/Unix/python/shakemap/shakelib/gmpe'</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.this_module" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">this_module</code><em class="property"> = '/Users/emthompson/src/python/shakemap/shakelib/gmpe'</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.this_module" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="shakelib.gmpe.nga_east.NGAEast.NGA_BASE_PATH">
-<code class="sig-name descname">NGA_BASE_PATH</code><em class="property"> = '/Users/cbworden/Unix/python/shakemap/shakelib/gmpe/../../shakemap/data/nga_east_tables'</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.NGA_BASE_PATH" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NGA_BASE_PATH</code><em class="property"> = '/Users/emthompson/src/python/shakemap/shakelib/gmpe/../../shakemap/data/nga_east_tables'</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.NGA_BASE_PATH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -118,6 +118,36 @@ GMPEs.</p>
 <dl class="py attribute">
 <dt id="shakelib.gmpe.nga_east.NGAEast.SIGMA_WEIGHTS">
 <code class="sig-name descname">SIGMA_WEIGHTS</code><em class="property"> = [0.8, 0.2]</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.SIGMA_WEIGHTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="shakelib.gmpe.nga_east.NGAEast.PATH">
+<code class="sig-name descname">PATH</code><em class="property"> = '/Users/emthompson/src/python/shakemap/shakelib/gmpe/nga_east_small_mag'</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="shakelib.gmpe.nga_east.NGAEast.SMALL_M_SLOPE">
+<code class="sig-name descname">SMALL_M_SLOPE</code><em class="property"> = array([[ 0.80820245,  0.84387544,  0.89844428,  0.97692668,  1.07516402,          1.32874342,  1.76167362,  2.01346601,  2.15423367,  2.21238314,          2.20295268,  2.22050691,  2.25191013],        [ 0.95653274,  0.96790235,  1.01108721,  1.08816951,  1.18763225,          1.45419079,  1.89868371,  2.15750901,  2.30441411,  2.36816657,          2.35806514,  2.37550121,  2.40780173],        [ 1.10483754,  1.09190415,  1.12371596,  1.19940068,  1.30008723,          1.57962285,  2.03566379,  2.30153038,  2.45458767,  2.52394609,          2.51317545,  2.53049495,  2.56369318],        [ 1.17850132,  1.14838487,  1.17263774,  1.24934993,  1.35169092,          1.6405928 ,  2.10355963,  2.37606129,  2.53182287,  2.60649676,          2.59852364,  2.61558555,  2.64930242],        [ 1.22108056,  1.17559486,  1.19344886,  1.27258554,  1.37699699,          1.67441897,  2.14266533,  2.42233453,  2.57926238,  2.65969661,          2.65667064,  2.67337173,  2.70746585],        [ 1.35381786,  1.30459178,  1.32561149,  1.39975683,  1.49046903,          1.77119077,  2.23846121,  2.50918908,  2.65691821,  2.7352025 ,          2.73448546,  2.74830612,  2.78569139],        [ 1.48275105,  1.43730912,  1.45516233,  1.515912  ,  1.59957524,          1.8715428 ,  2.32487117,  2.5977188 ,  2.74732913,  2.833214  ,          2.84039745,  2.85351663,  2.89294948],        [ 1.55986901,  1.5181802 ,  1.52283178,  1.58399155,  1.66520129,          1.92906402,  2.37682591,  2.63795165,  2.79310909,  2.87518285,          2.88725563,  2.91311963,  2.95069222],        [ 1.61234683,  1.57297469,  1.55919177,  1.6125088 ,  1.6905367 ,          1.95549838,  2.40173746,  2.66968838,  2.81643712,  2.90021973,          2.92540353,  2.94753911,  2.99329066],        [ 1.72966549,  1.68953027,  1.65238375,  1.68511319,  1.74919737,          2.00291473,  2.4502969 ,  2.71127476,  2.86219468,  2.97174922,          2.99457045,  3.02700357,  3.0746081 ],        [ 1.89019575,  1.85613426,  1.79916207,  1.79582838,  1.83235122,          2.06567938,  2.49925169,  2.77060683,  2.93523037,  3.05210926,          3.09544244,  3.13961075,  3.19891543],        [ 2.01825192,  2.00848248,  1.96359258,  1.93374392,  1.93342618,          2.1191825 ,  2.55160199,  2.81384538,  2.97594782,  3.10423528,          3.1644255 ,  3.2232813 ,  3.29628048],        [ 2.21072527,  2.21013135,  2.19208808,  2.14288765,  2.09865699,          2.20116805,  2.58612428,  2.84958383,  3.01185276,  3.15571334,          3.24204249,  3.31516207,  3.40858634],        [ 2.35867722,  2.36282466,  2.35886196,  2.31589422,  2.23061991,          2.27654106,  2.62952911,  2.88216365,  3.0457857 ,  3.19927514,          3.3078434 ,  3.40342774,  3.51632704]])</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.SMALL_M_SLOPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="shakelib.gmpe.nga_east.NGAEast.SMALL_M_SLOPE_PGA">
+<code class="sig-name descname">SMALL_M_SLOPE_PGA</code><em class="property"> = array([ 0.85797944,  1.00138125,  1.14476104,  1.21349233,  1.25057542,         1.38536656,  1.5187841 ,  1.59530119,  1.6451895 ,  1.74896685,         1.90817415,  2.0352719 ,  2.22078201,  2.36479805])</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.SMALL_M_SLOPE_PGA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="shakelib.gmpe.nga_east.NGAEast.SMALL_M_SLOPE_PGV">
+<code class="sig-name descname">SMALL_M_SLOPE_PGV</code><em class="property"> = array([ 1.40175894,  1.56051571,  1.71940479,  1.78302932,  1.80362654,         1.92810638,  2.06796069,  2.15100395,  2.20592499,  2.34320509,         2.52009112,  2.67485147,  2.83826841,  3.00557819])</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.SMALL_M_SLOPE_PGV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="shakelib.gmpe.nga_east.NGAEast.SMALL_M_DIST">
+<code class="sig-name descname">SMALL_M_DIST</code><em class="property"> = array([  1.00000000e+00,   2.00000000e+00,   4.00000000e+00,          6.50000000e+00,   1.00000000e+01,   2.00000000e+01,          4.00000000e+01,   6.50000000e+01,   1.00000000e+02,          2.00000000e+02,   4.00000000e+02,   6.50000000e+02,          1.00000000e+03,   1.40000000e+03])</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.SMALL_M_DIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="shakelib.gmpe.nga_east.NGAEast.SMALL_M_PER">
+<code class="sig-name descname">SMALL_M_PER</code><em class="property"> = array([  0.01 ,   0.02 ,   0.04 ,   0.065,   0.1  ,   0.2  ,   0.4  ,          0.65 ,   1.   ,   2.   ,   4.   ,   6.5  ,  10.   ])</em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.SMALL_M_PER" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

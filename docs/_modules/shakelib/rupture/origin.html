@@ -38,16 +38,16 @@
 <span class="kn">import</span> <span class="nn">os.path</span>
 
 <span class="c1"># third party</span>
-<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
 <span class="kn">import</span> <span class="nn">defusedxml.ElementTree</span> <span class="k">as</span> <span class="nn">dET</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo</span> <span class="k">import</span> <span class="n">point</span>
-<span class="kn">from</span> <span class="nn">obspy.io.quakeml.core</span> <span class="k">import</span> <span class="n">_is_quakeml</span>
-<span class="kn">from</span> <span class="nn">obspy.core.event</span> <span class="k">import</span> <span class="n">read_events</span>
-<span class="kn">from</span> <span class="nn">strec.tensor</span> <span class="k">import</span> <span class="n">fill_tensor_from_components</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo</span> <span class="kn">import</span> <span class="n">point</span>
+<span class="kn">from</span> <span class="nn">obspy.io.quakeml.core</span> <span class="kn">import</span> <span class="n">_is_quakeml</span>
+<span class="kn">from</span> <span class="nn">obspy.core.event</span> <span class="kn">import</span> <span class="n">read_events</span>
+<span class="kn">from</span> <span class="nn">strec.tensor</span> <span class="kn">import</span> <span class="n">fill_tensor_from_components</span>
 
-<span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="k">import</span> <span class="n">ShakeLibException</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="kn">import</span> <span class="n">HistoricTime</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="kn">import</span> <span class="n">ShakeLibException</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="kn">import</span> <span class="n">constants</span>
 
 
 <div class="viewcode-block" id="Origin"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin">[docs]</a><span class="k">class</span> <span class="nc">Origin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -79,7 +79,7 @@
 <span class="sd">    &#39;type&#39; are missing (or empty strings) then &#39;mech&#39; is set to ALL.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Construct an Origin object.</span>
 
 <span class="sd">        Args:</span>

@@ -41,48 +41,48 @@
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">date</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span>
 <span class="kn">import</span> <span class="nn">openquake.hazardlib.const</span> <span class="k">as</span> <span class="nn">oqconst</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
 <span class="kn">import</span> <span class="nn">cartopy.io.shapereader</span> <span class="k">as</span> <span class="nn">shpreader</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">shape</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">shape</span>
 
 <span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">cf</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
-<span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.point_rupture</span> <span class="k">import</span> <span class="n">PointRupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="k">import</span> <span class="n">Sites</span>
-<span class="kn">from</span> <span class="nn">shakelib.distance</span> <span class="k">import</span> <span class="p">(</span><span class="n">Distance</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="kn">import</span> <span class="n">GeoDict</span>
+<span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="kn">import</span> <span class="n">Grid2D</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.point_rupture</span> <span class="kn">import</span> <span class="n">PointRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="kn">import</span> <span class="n">Sites</span>
+<span class="kn">from</span> <span class="nn">shakelib.distance</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Distance</span><span class="p">,</span>
                                <span class="n">get_distance</span><span class="p">,</span>
                                <span class="n">get_distance_measures</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="k">import</span> <span class="n">MultiGMPE</span>
-<span class="kn">from</span> <span class="nn">shakelib.virtualipe</span> <span class="k">import</span> <span class="n">VirtualIPE</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.utils</span> <span class="k">import</span> <span class="n">get_extent</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapInputContainer</span>
-<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="kn">import</span> <span class="n">MultiGMPE</span>
+<span class="kn">from</span> <span class="nn">shakelib.virtualipe</span> <span class="kn">import</span> <span class="n">VirtualIPE</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.utils</span> <span class="kn">import</span> <span class="n">get_extent</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="kn">import</span> <span class="n">oq_to_file</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="kn">import</span> <span class="n">ShakeMapInputContainer</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="kn">import</span> <span class="n">ShakeMapOutputContainer</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="kn">import</span> <span class="n">constants</span>
 
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
-<span class="kn">from</span> <span class="nn">shakemap._version</span> <span class="k">import</span> <span class="n">get_versions</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.generic_amp</span> <span class="k">import</span> <span class="n">get_generic_amp_factors</span>
-<span class="kn">from</span> <span class="nn">shakemap.c.clib</span> <span class="k">import</span> <span class="p">(</span><span class="n">make_sigma_matrix</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="kn">import</span> <span class="n">get_object_from_config</span>
+<span class="kn">from</span> <span class="nn">shakemap._version</span> <span class="kn">import</span> <span class="n">get_versions</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.generic_amp</span> <span class="kn">import</span> <span class="n">get_generic_amp_factors</span>
+<span class="kn">from</span> <span class="nn">shakemap.c.clib</span> <span class="kn">import</span> <span class="p">(</span><span class="n">make_sigma_matrix</span><span class="p">,</span>
                              <span class="n">geodetic_distance_fast</span><span class="p">,</span>
                              <span class="n">make_sd_array</span><span class="p">)</span>
 <span class="c1"># from shakemap.utils.exception import TerminateShakeMap</span>
 
-<span class="kn">from</span> <span class="nn">shakelib.directivity.rowshandel2013</span> <span class="k">import</span> <span class="n">Rowshandel2013</span>
+<span class="kn">from</span> <span class="nn">shakelib.directivity.rowshandel2013</span> <span class="kn">import</span> <span class="n">Rowshandel2013</span>
 
 <span class="c1">#</span>
 <span class="c1"># TODO: Some constants; these should maybe be in a configuration</span>
@@ -113,7 +113,7 @@
 
 
 <div class="viewcode-block" id="DataFrame"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.DataFrame">[docs]</a><span class="k">class</span> <span class="nc">DataFrame</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># noqa</span>
         <span class="n">imts</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># noqa</span>
         <span class="n">sx</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># noqa</span>
@@ -137,7 +137,7 @@
     <span class="n">rock_vs30</span> <span class="o">=</span> <span class="mf">760.0</span>
     <span class="n">soil_vs30</span> <span class="o">=</span> <span class="mf">180.0</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ModelModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
@@ -254,7 +254,8 @@
         <span class="c1"># If the --no_rupture flag is used, switch to a PointRupture</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_rupture</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;mechanism&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;mechanism&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;mechanism&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">setMechanism</span><span class="p">(</span>
                 <span class="n">mech</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;mechanism&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">getRuptureContext</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">default_gmpe</span><span class="p">])</span>
@@ -1109,11 +1110,13 @@
         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">preferred_imts</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">df1</span><span class="p">:</span>
-                <span class="n">ixx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">])</span>
+                <span class="n">ixx</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">])</span> <span class="o">|</span> <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_outliers&#39;</span><span class="p">])</span> \
+                    <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span><span class="p">])</span>
+                        <span class="o">|</span> <span class="n">df1</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">])</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">=</span> <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_sd&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">=</span> \
                     <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span>
-                <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_outliers&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">|=</span> <span class="n">df1</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span>
+                <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_outliers&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">imts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Get the prediction and stddevs</span>
