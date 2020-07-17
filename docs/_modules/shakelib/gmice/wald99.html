@@ -35,9 +35,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># stdlib imports</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span>
-<span class="kn">from</span> <span class="nn">shakelib.gmice.gmice</span> <span class="k">import</span> <span class="n">GMICE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="kn">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span>
+<span class="kn">from</span> <span class="nn">shakelib.gmice.gmice</span> <span class="kn">import</span> <span class="n">GMICE</span>
 
 
 <div class="viewcode-block" id="Wald99"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99">[docs]</a><span class="k">class</span> <span class="nc">Wald99</span><span class="p">(</span><span class="n">GMICE</span><span class="p">):</span>
@@ -63,7 +63,7 @@
     <span class="c1"># Imm = 2.10 * log10(PGV) + 3.40  for Imm &lt; 5</span>
     <span class="c1">#</span>
     <span class="c1"># -----------------------------------------------------------------------</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_max</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Wald et al. (1999)&#39;</span>

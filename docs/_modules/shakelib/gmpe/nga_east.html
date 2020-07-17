@@ -43,11 +43,12 @@
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">RectBivariateSpline</span>
 
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">GMPE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">IMT</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.usgs_ceus_2019</span> <span class="k">import</span> <span class="n">NGAEastUSGSGMPE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">GMPE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">IMT</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.usgs_ceus_2019</span> <span class="kn">import</span> <span class="n">NGAEastUSGSGMPE</span>
 
 <span class="c1"># Max distance for evaluating NGAEast. This *should* be 1500, but due to what</span>
 <span class="c1"># appears to be a floating point precision issue, we get a division by zero</span>
@@ -98,6 +99,19 @@
     <span class="n">SIGMA_MODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;EPRI&quot;</span><span class="p">,</span> <span class="s2">&quot;PANEL&quot;</span><span class="p">]</span>
     <span class="n">SIGMA_WEIGHTS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
 
+    <span class="c1"># For small magnitude extrapolation</span>
+    <span class="n">PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;nga_east_small_mag&#39;</span><span class="p">)</span>
+    <span class="n">SMALL_M_SLOPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slopes.txt&#39;</span><span class="p">))</span>
+    <span class="n">SMALL_M_SLOPE_PGA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slope_pga.txt&#39;</span><span class="p">))</span>
+    <span class="n">SMALL_M_SLOPE_PGV</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slope_pgv.txt&#39;</span><span class="p">))</span>
+    <span class="n">SMALL_M_DIST</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slope_distances.txt&#39;</span><span class="p">))</span>
+    <span class="n">SMALL_M_PER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slope_periods.txt&#39;</span><span class="p">))</span>
+
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># To simplify, use the COLLAPSED branch, but cannot get inter and intra</span>
     <span class="c1"># event standard deviations in this case.</span>
@@ -112,7 +126,7 @@
         <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;SA&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">per_list_str</span><span class="p">]</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">gmpes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">sigma_wts</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">all_table_paths</span> <span class="o">=</span> <span class="p">[]</span>
@@ -149,6 +163,15 @@
         <span class="c1"># Is IMT PGA or PGV?</span>
         <span class="n">is_pga</span> <span class="o">=</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">IMT</span><span class="o">.</span><span class="n">PGA</span><span class="p">()</span>
         <span class="n">is_pgv</span> <span class="o">=</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">IMT</span><span class="o">.</span><span class="n">PGV</span><span class="p">()</span>
+
+        <span class="c1"># Is magnitude less than 4? If so, we will need to set it to 4.0 and</span>
+        <span class="c1"># then extrapolate the tables at the end.</span>
+        <span class="k">if</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;</span> <span class="mf">4.0</span><span class="p">:</span>
+            <span class="n">is_small_mag</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">delta_mag</span> <span class="o">=</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">4.0</span>
+            <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">=</span> <span class="mf">4.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">is_small_mag</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ALL_TABLE_PATHS</span><span class="p">):</span>
             <span class="k">if</span> <span class="s1">&#39;usgs&#39;</span> <span class="ow">in</span> <span class="n">tp</span><span class="p">:</span>
@@ -228,6 +251,29 @@
         <span class="c1"># Zero out values at distances beyond the range for which NGA East</span>
         <span class="c1"># was defined.</span>
         <span class="n">mean</span><span class="p">[</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span> <span class="o">&gt;</span> <span class="n">MAX_RRUP</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">999.0</span>
+
+        <span class="c1"># Do we need to extrapolate for small magnitude factor?</span>
+        <span class="k">if</span> <span class="n">is_small_mag</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_pga</span><span class="p">:</span>
+                <span class="n">slopes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_DIST</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_SLOPE_PGA</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">is_pgv</span><span class="p">:</span>
+                <span class="n">slopes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_DIST</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_SLOPE_PGV</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">interp_obj</span> <span class="o">=</span> <span class="n">RectBivariateSpline</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_DIST</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_PER</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_SLOPE</span><span class="p">,</span> <span class="n">kx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ky</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">slopes</span> <span class="o">=</span> <span class="n">interp_obj</span><span class="o">.</span><span class="n">ev</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">imt</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">slopes</span> <span class="o">*</span> <span class="n">delta_mag</span>
 
         <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span></div></div>
 </pre></div>

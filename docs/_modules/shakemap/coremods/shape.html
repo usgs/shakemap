@@ -35,29 +35,29 @@
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">shutil</span> <span class="k">import</span> <span class="n">copyfile</span>
+<span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span>
 <span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">cf</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
-<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="kn">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">OQIMT</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="kn">import</span> <span class="n">ConfigObj</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">OQIMT</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_data_path</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_data_path</span><span class="p">,</span>
                                    <span class="n">get_config_paths</span><span class="p">,</span>
                                    <span class="n">get_configspec</span><span class="p">,</span>
                                    <span class="n">get_custom_validator</span><span class="p">,</span>
                                    <span class="n">config_error</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
-<span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="k">import</span> <span class="n">contour</span>
-<span class="kn">from</span> <span class="nn">shakemap.c.pcontour</span> <span class="k">import</span> <span class="n">pcontour</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="kn">import</span> <span class="n">get_object_from_config</span>
+<span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="kn">import</span> <span class="n">contour</span>
+<span class="kn">from</span> <span class="nn">shakemap.c.pcontour</span> <span class="kn">import</span> <span class="n">pcontour</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="kn">import</span> <span class="n">oq_to_file</span>
 
 
 <div class="viewcode-block" id="ShapeModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.shape.html#shakemap.coremods.shape.ShapeModule">[docs]</a><span class="k">class</span> <span class="nc">ShapeModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -69,7 +69,7 @@
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/shape\.zip&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate a ShapeModule class with an event ID.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

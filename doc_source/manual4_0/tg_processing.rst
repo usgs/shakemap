@@ -19,11 +19,15 @@ specifics of ShakeMap's implementation of this method are described below.
 Ground-Motion Prediction
 ==========================
 
+Ground Motion Models
+--------------------
+
 ShakeMap uses ground-motion prediction equations (GMPEs) to provide the
 initial estimates of ground motions. The GMPEs are drawn from the set
 of GMPEs implemented by the GEM OpenQuake project. The full list of
-available GMPEs may be found 
-`here <https://docs.openquake.org/oq-hazardlib/master/_modules/openquake/hazardlib/gsim/>`_.
+available GMPEs may be found
+`here <https://github.com/gem/oq-engine/tree/master/openquake/hazardlib/gsim/>`_.
+
 In addition to these individual GMPEs, ShakeMap allows for a weighted
 combination of two or more GMPEs. GMPEs are configured in ShakeMap
 as GMPE "sets" (see *gmpe_sets.conf* and *modules.conf* for 
@@ -33,8 +37,38 @@ is specified with the ``gmpe`` parameter of the ``model`` section of
 :class:`MultiGMPE <shakelib.multigmpe.MultiGMPE>` class.
 The MultiGMPE class allows for smooth transitions between tectonic
 environments, as well as consistency with the methodology of other
-projects, such as the `USGS National Seismic Hazard Mapping Project 
-<https://earthquake.usgs.gov/hazards/hazmaps/>`_.
+projects, such as the `USGS National Seismic Hazard Model
+<https://www.usgs.gov/natural-hazards/earthquake-hazards/hazards/>`_.
+
+Ground Motion Model Sets
+------------------------
+
+By default, ShakeMap comes with a few GMPE sets pre-configured, and we review a
+few of the important ones here. One example is the "active_crustal_nshmp2014,"
+which combines four NGA West2 GMPEs using equal weights. This is used by the
+USGS National Seismic Hazard Model (NSHM)
+for shallow crustal earthquakes, and was not changed in the 2018 update. We
+also include the 2014 NSHM set of GMPEs for stable continental regions
+("stable_continental_nshmp2014_rlme"). However, this was updated in 2018 to
+use the NGA East GMPE. This can be specified using the "stable_continental_ngae"
+GMPE set. One limitation of the NGA East model is that it was not developed for
+use with magnitudes less than 4. Our implementation includes an extension of their
+model to smaller magnitudes that extrapolates the small-magnitude scaling of
+ground motions. The slope of this adustment varies with period and distance,
+as illustrated in :num:`Figure #nga-east-slope`.
+
+.. _nga-east-sope:
+
+.. figure:: _static/nga-east_smallM_slopes.*
+   :width: 500
+   :align: left
+
+   Estimated small-magnitue scaling of the NGA-East median ground motion model
+   as a function of period and distance.
+
+
+Uncertainty from Multiple Models
+--------------------------------
 
 The MultiGMPE module uses a list of GMPEs and their weights to 
 produce a weighted mean at each location. If we treat the outputs of the

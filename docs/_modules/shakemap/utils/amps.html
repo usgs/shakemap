@@ -35,21 +35,21 @@
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">xml.dom</span> <span class="k">import</span> <span class="n">minidom</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">xml.dom</span> <span class="kn">import</span> <span class="n">minidom</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">defusedxml.cElementTree</span> <span class="k">as</span> <span class="nn">dET</span>
 <span class="kn">import</span> <span class="nn">xml.etree.cElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">zip_longest</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">zip_longest</span>
 
 <span class="c1"># third party libraries</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">geodetic_distance</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="kn">import</span> <span class="n">geodetic_distance</span>
 
 <span class="c1"># local libraries</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="kn">import</span> <span class="n">constants</span>
 
 <span class="c1"># define all of the tables as dictionaries</span>
 <span class="n">EVENT</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER PRIMARY KEY&#39;</span><span class="p">),</span>
@@ -117,7 +117,7 @@
 <span class="sd">    earthquake events.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Instantiate amplitude handler with ShakeMap profile paths.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -581,7 +581,7 @@
 
         <span class="k">return</span></div>
 
-    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Destructor.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>

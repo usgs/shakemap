@@ -33,17 +33,17 @@
   <h1>Source code for shakemap.utils.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
-<span class="kn">from</span> <span class="nn">urllib</span> <span class="k">import</span> <span class="n">request</span>
-<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="k">import</span> <span class="n">HTTPError</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="n">get_config_paths</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="c1"># third party imports</span>
-<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="kn">import</span> <span class="n">ConfigObj</span>
 
 <span class="c1"># url template for json file describing everything we know about a network</span>
 <span class="n">NETWORK_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://earthquake.usgs.gov/data/comcat/&#39;</span>
