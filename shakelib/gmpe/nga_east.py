@@ -10,6 +10,7 @@ import logging
 
 import pandas as pd
 import numpy as np
+from scipy.interpolate import RectBivariateSpline
 
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib import const
@@ -65,6 +66,19 @@ class NGAEast(GMPE):
     SIGMA_MODS = ["EPRI", "PANEL"]
     SIGMA_WEIGHTS = [0.8, 0.2]
 
+    # For small magnitude extrapolation
+    PATH = os.path.join(os.path.dirname(__file__), 'nga_east_small_mag')
+    SMALL_M_SLOPE = np.loadtxt(
+        os.path.join(PATH, 'nga-east-smallM_slopes.txt'))
+    SMALL_M_SLOPE_PGA = np.loadtxt(
+        os.path.join(PATH, 'nga-east-smallM_slope_pga.txt'))
+    SMALL_M_SLOPE_PGV = np.loadtxt(
+        os.path.join(PATH, 'nga-east-smallM_slope_pgv.txt'))
+    SMALL_M_DIST = np.loadtxt(
+        os.path.join(PATH, 'nga-east-smallM_slope_distances.txt'))
+    SMALL_M_PER = np.loadtxt(
+        os.path.join(PATH, 'nga-east-smallM_slope_periods.txt'))
+
     # -------------------------------------------------------------------------
     # To simplify, use the COLLAPSED branch, but cannot get inter and intra
     # event standard deviations in this case.
@@ -116,6 +130,15 @@ class NGAEast(GMPE):
         # Is IMT PGA or PGV?
         is_pga = imt == IMT.PGA()
         is_pgv = imt == IMT.PGV()
+
+        # Is magnitude less than 4? If so, we will need to set it to 4.0 and
+        # then extrapolate the tables at the end.
+        if rup.mag < 4.0:
+            is_small_mag = True
+            delta_mag = rup.mag - 4.0
+            rup.mag = 4.0
+        else:
+            is_small_mag = False
 
         for i, tp in enumerate(self.ALL_TABLE_PATHS):
             if 'usgs' in tp:
@@ -195,5 +218,28 @@ class NGAEast(GMPE):
         # Zero out values at distances beyond the range for which NGA East
         # was defined.
         mean[dists.rrup > MAX_RRUP] = -999.0
+
+        # Do we need to extrapolate for small magnitude factor?
+        if is_small_mag:
+            if is_pga:
+                slopes = np.interp(
+                    np.log(dists.rrup),
+                    np.log(self.SMALL_M_DIST),
+                    self.SMALL_M_SLOPE_PGA)
+            elif is_pgv:
+                slopes = np.interp(
+                    np.log(dists.rrup),
+                    np.log(self.SMALL_M_DIST),
+                    self.SMALL_M_SLOPE_PGV)
+            else:
+                interp_obj = RectBivariateSpline(
+                    np.log(self.SMALL_M_DIST),
+                    np.log(self.SMALL_M_PER),
+                    self.SMALL_M_SLOPE, kx=1, ky=1)
+                slopes = interp_obj.ev(
+                    np.log(dists.rrup),
+                    np.log(imt.period)
+                )
+            mean = mean + slopes * delta_mag
 
         return mean, stddevs
