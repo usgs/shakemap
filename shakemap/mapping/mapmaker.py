@@ -98,9 +98,7 @@ MMI_LABELS = {
 IMT_RANGES = {
     'PGV': (1e-2, 500),
     'PGA': (1e-4, 500),
-    'SA(0.3)': (1e-4, 500),
-    'SA(1.0)': (1e-4, 500),
-    'SA(3.0)': (1e-4, 400)
+    'SA': (1e-4, 500),
 }
 
 DEG2KM = 111.191
@@ -288,9 +286,10 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
         tdict (dict): Dictionary containing the text strings for printing
             on the maps (in the language of the user's choice).
     """
-    imtlabel = imtype + ' ' + tdict['units'][imtype]
-    # imtlabel = imtype
-
+    if imtype.startswith('SA('):
+        imtlabel = imtype + ' ' + tdict['units']['SA']
+    else:
+        imtlabel = imtype + ' ' + tdict['units'][imtype]
     cax = fig.add_axes([0.1, 0.13, 0.8, 0.02])
     plt.axis('off')
     cax_xmin, cax_xmax = cax.get_xlim()
@@ -307,57 +306,61 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
     }
     font0.set_weight('bold')
 
-    xloc = firstcol_width / 2
-    plt.text(xloc, 0.5, imtlabel,
-             fontproperties=font0, **alignment)
-    # draw top/bottom edges of table
-    plt.plot([bottom, top], [bottom, bottom], 'k', clip_on=False)
-    plt.plot([bottom, top], [top, top], 'k', clip_on=False)
-    # draw left edge of table
-    plt.plot([bottom, bottom], [bottom, top], 'k', clip_on=False)
-    # draw right edge of first column
-    plt.plot([firstcol_width, firstcol_width], [0, 1], 'k', clip_on=False)
-    # draw right edge of table
-    plt.plot([1, 1], [0, 1], 'k', clip_on=False)
-
-    # get the MMI/IMT values we need
-    itype = 'log'
-    divisor = 1
-    if imtype != 'PGV':
-        divisor = 100
-    dmin, dmax = IMT_RANGES[imtype]
-    imt_values = np.log(getContourLevels(dmin, dmax, itype=itype) / divisor)
-    if gmice.supports(imtype):
-        mmi_values, _ = gmice.getMIfromGM(imt_values, imt.from_string(imtype))
-    else:
+    if not gmice.supports(imtype):
         gmice = WGRW12()
-        mmi_values, _ = gmice.getMIfromGM(imt_values, imt.from_string(imtype))
-    mmi_colors = [palette.getDataColor(
-        mmi, color_format='hex') for mmi in mmi_values]
-    new_imts = []
-    new_mmi_colors = []
-    for mmic, imtv in zip(mmi_colors, imt_values):
-        if mmic not in new_mmi_colors:
-            new_imts.append(imtv)
-            new_mmi_colors.append(mmic)
+    if gmice.supports(imtype):
+        xloc = firstcol_width / 2
+        plt.text(xloc, 0.5, imtlabel,
+                 fontproperties=font0, **alignment)
+        # draw top/bottom edges of table
+        plt.plot([bottom, top], [bottom, bottom], 'k', clip_on=False)
+        plt.plot([bottom, top], [top, top], 'k', clip_on=False)
+        # draw left edge of table
+        plt.plot([bottom, bottom], [bottom, top], 'k', clip_on=False)
+        # draw right edge of first column
+        plt.plot([firstcol_width, firstcol_width], [0, 1], 'k', clip_on=False)
+        # draw right edge of table
+        plt.plot([1, 1], [0, 1], 'k', clip_on=False)
 
-    width = (1 - firstcol_width) / len(new_imts)
-    left = firstcol_width
-    for mmic, imtv in zip(new_mmi_colors, imt_values):
-        right = left + width
-        px = [left, right, right, left, left]
-        py = [top, top, bottom, bottom, top]
-        plt.plot([right, right], [bottom, top], 'k')
-        plt.fill(px, py, mmic, ec=mmic)
-        xloc = left + width / 2.0
-        imtstr = "{0:.3g}".format(np.exp(imtv) * divisor)
-        th = plt.text(xloc, 0.5, imtstr, fontproperties=font0, **alignment)
-        th.set_path_effects(
-            [path_effects.Stroke(linewidth=2.0,
-                                 foreground='white'),
-             path_effects.Normal()]
-        )
-        left = right
+        # get the MMI/IMT values we need
+        itype = 'log'
+        divisor = 1
+        if imtype != 'PGV':
+            divisor = 100
+        if imtype.startswith('SA('):
+            dmin, dmax = IMT_RANGES['SA']
+        else:
+            dmin, dmax = IMT_RANGES[imtype]
+        imt_values = np.log(
+            getContourLevels(dmin, dmax, itype=itype) / divisor)
+
+        mmi_values, _ = gmice.getMIfromGM(imt_values, imt.from_string(imtype))
+        mmi_colors = [palette.getDataColor(
+            mmi, color_format='hex') for mmi in mmi_values]
+        new_imts = []
+        new_mmi_colors = []
+        for mmic, imtv in zip(mmi_colors, imt_values):
+            if mmic not in new_mmi_colors:
+                new_imts.append(imtv)
+                new_mmi_colors.append(mmic)
+
+        width = (1 - firstcol_width) / len(new_imts)
+        left = firstcol_width
+        for mmic, imtv in zip(new_mmi_colors, imt_values):
+            right = left + width
+            px = [left, right, right, left, left]
+            py = [top, top, bottom, bottom, top]
+            plt.plot([right, right], [bottom, top], 'k')
+            plt.fill(px, py, mmic, ec=mmic)
+            xloc = left + width / 2.0
+            imtstr = "{0:.3g}".format(np.exp(imtv) * divisor)
+            th = plt.text(xloc, 0.5, imtstr, fontproperties=font0, **alignment)
+            th.set_path_effects(
+                [path_effects.Stroke(linewidth=2.0,
+                                     foreground='white'),
+                 path_effects.Normal()]
+            )
+            left = right
 
     # Explanation of symbols: triangle is instrument, circle is mmi,
     # epicenter is black star
@@ -372,19 +375,25 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
     left_offset = 0.005
     label_pad = 0.02
 
-    yloc_sixth_row = 0.6
-    yloc_seventh_row = 0.15
+    if gmice.supports(imtype):
+        yloc_sixth_row = 0.6
+        yloc_seventh_row = 0.15
+    else:
+        yloc_sixth_row = 2.15
+        yloc_seventh_row = 0.80
 
     # Instrument
     triangle_marker_x = left_offset
     triangle_text_x = triangle_marker_x + label_pad
     plt.plot(triangle_marker_x, yloc_seventh_row, '^', markerfacecolor='w',
-             markeredgecolor='k', markersize=6, mew=0.5, clip_on=False)
+             markeredgecolor='k', markersize=6, mew=0.5, clip_on=False,
+             zorder=10000)
     plt.text(triangle_text_x,
              yloc_seventh_row,
              tdict['legend']['instrument'],
              va='center',
-             ha='left')
+             ha='left',
+             zorder=9999)
 
     # Macroseismic
     circle_marker_x = triangle_text_x + item_sep[0]
@@ -394,12 +403,14 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
              markerfacecolor='w',
              markeredgecolor='k',
              markersize=4,
-             mew=0.5)
+             mew=0.5,
+             zorder=10000)
     plt.text(circle_text_x,
              yloc_seventh_row,
              tdict['legend']['intensity'],
              va='center',
-             ha='left')
+             ha='left',
+             zorder=9999)
 
     # Epicenter
     star_marker_x = circle_marker_x + item_sep[1]
@@ -407,12 +418,14 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
     plt.plot(star_marker_x,
              yloc_seventh_row, 'k*',
              markersize=12,
-             mew=0.5)
+             mew=0.5,
+             zorder=10000)
     plt.text(star_text_x,
              yloc_seventh_row,
              tdict['legend']['epicenter'],
              va='center',
-             ha='left')
+             ha='left',
+             zorder=9999)
 
     if not point_source:
         rup_marker_x = star_marker_x + item_sep[2]
@@ -426,14 +439,15 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
             height=rheight,
             linewidth=2,
             edgecolor='k',
-            facecolor='w'
-        )
+            facecolor='w',
+            zorder=10000)
         cax.add_patch(rup)
         plt.text(rup_text_x,
                  yloc_seventh_row,
                  tdict['legend']['rupture'],
                  va='center',
-                 ha='left')
+                 ha='left',
+                 zorder=9999)
 
     # Add conversion reference and shakemap version/process time
     version_x = 1.0
@@ -441,13 +455,16 @@ def _draw_imt_legend(fig, palette, imtype, gmice, process_time, map_version,
            tdict['legend']['processed'], process_time)
     plt.text(version_x, yloc_sixth_row,
              '%s %i: %s %s' % tpl,
-             ha='right', va='center')
+             ha='right', va='center',
+             zorder=9999)
 
-    ref = gmice.name
-    refx = 0
-    plt.text(refx, yloc_sixth_row,
-             '%s %s' % (tdict['legend']['scale'], ref),
-             va='center')
+    if gmice.supports(imtype):
+        ref = gmice.name
+        refx = 0
+        plt.text(refx, yloc_sixth_row,
+                 '%s %s' % (tdict['legend']['scale'], ref),
+                 va='center',
+                 zorder=9999)
 
 
 def _draw_mmi_legend(fig, palette, gmice, process_time, map_version,
@@ -867,7 +884,11 @@ def _draw_title(imt, adict, uncertainty=False):
         latstr = '%s%.2f' % (tdict['title_parts']['north'], hlat)
     dep = float(edict['depth'])
     eid = edict['event_id']
-    imtstr = tdict['IMTYPES'][imt]
+    if imt.startswith('SA('):
+        period = imt.replace('SA(', '').replace(')', '')
+        imtstr = period + tdict['IMTYPES']['SA']
+    else:
+        imtstr = tdict['IMTYPES'][imt]
     if len(eid) <= 10:
         fmt = ('%s %s\n%s %s: %s\n %s %s %s%.1f %s %s '
                '%s: %.1f%s %s:%s')
@@ -992,7 +1013,7 @@ def _draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
         ax.plot(mmilon, mmilat, 'ko', fillstyle='none', mew=0.5,
                 markersize=4, zorder=STATIONS_ZORDER, transform=geoproj)
 
-        # plot MMI as slightly larger triangles
+        # plot instruments as slightly larger triangles
         instlat = inst_dict['lat']
         instlon = inst_dict['lon']
         ax.plot(instlon, instlat, 'k^', fillstyle='none', mew=0.5,
