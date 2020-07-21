@@ -44,16 +44,12 @@
         "MMI": "Macroseismic Intensity Map",
         "PGV": "Peak Ground Velocity Map",
         "PGA": "Peak Ground Acceleration Map",
-        "SA(0.3)": "0.3 Second Peak Spectral Acceleration Map",
-        "SA(1.0)": "1.0 Second Peak Spectral Acceleration Map",
-        "SA(3.0)": "3.0 Second Peak Spectral Acceleration Map"
+        "SA": " Second Peak Spectral Acceleration Map"
     },
     "units": {
          "PGV": "(cm/s)",
          "PGA": "(%g)",
-         "SA(0.3)": "(%g)",
-         "SA(1.0)": "(%g)",
-         "SA(3.0)": "(%g)"
+         "SA": "(%g)"
     },
     "legend": {
         "instrument": "Seismic Instrument",
