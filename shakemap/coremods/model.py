@@ -221,7 +221,6 @@ class ModelModule(CoreModule):
         # If the --no_rupture flag is used, switch to a PointRupture
         if self.no_rupture:
             self.rupture_obj = PointRupture(self.rupture_obj._origin)
-        print(self.config['modeling']['mechanism'])
         if self.config['modeling']['mechanism'] is not None:
             self.rupture_obj._origin.setMechanism(
                 mech=self.config['modeling']['mechanism'])
