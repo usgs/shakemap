@@ -35,7 +35,16 @@ while getopts p:d FLAG; do
   esac
 done
 
+if [ $py_ver == '3.8' ] && [ "$unamestr" == 'Linux' ]; then
+    echo "WARNING: ShakeMap on Python v3.8 on some versions of Linux "
+    echo "may fail in unexpected ways. We are enforcing the use "
+    echo "of Python v3.7 until this warning disappears."
+    echo ""
+    py_ver=3.7
+fi
+
 echo "Using python version $py_ver"
+echo ""
 
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d "$matplotlibdir" ]; then
