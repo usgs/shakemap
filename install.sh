@@ -35,7 +35,7 @@ while getopts p:d FLAG; do
   esac
 done
 
-if [ $py_ver -eq 3.8 && "$unamestr" == 'Linux' ]; then
+if [ $py_ver -eq 3.8 ] && [ "$unamestr" == 'Linux' ]; then
     echo "WARNING: ShakeMap on Python v3.8 on some versions of Linux "
     echo "may fail in unexpected ways. We are enforcing the use "
     echo "of Python v3.7 until this warning disappears."
