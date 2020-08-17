@@ -1,7 +1,7 @@
 language: python
 sudo: false
 python:
-    - "3.8"
+    - "3.7"
 
 dist: xenial
 services:
@@ -11,8 +11,8 @@ install:
     - bash install.sh
     - . $HOME/miniconda/etc/profile.d/conda.sh
     - conda activate shakemap
-    - conda list
-    - which gcc
+    # - conda list
+    # - which gcc
 script:
     - export PYTHONPATH="."
     - py.test --cov=.
