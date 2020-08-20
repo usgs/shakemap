@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>2.3. Data Processing &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -50,8 +50,8 @@ specifics of ShakeMap’s implementation of this method are described below.</p>
 initial estimates of ground motions. The GMPEs are drawn from the set
 of GMPEs implemented by the GEM OpenQuake project. The full list of
 available GMPEs may be found
-<a class="reference external" href="https://docs.openquake.org/oq-hazardlib/master/_modules/openquake/hazardlib/gsim/">here</a>.
-In addition to these individual GMPEs, ShakeMap allows for a weighted
+<a class="reference external" href="https://github.com/gem/oq-engine/tree/master/openquake/hazardlib/gsim/">here</a>.</p>
+<p>In addition to these individual GMPEs, ShakeMap allows for a weighted
 combination of two or more GMPEs. GMPEs are configured in ShakeMap
 as GMPE “sets” (see <em>gmpe_sets.conf</em> and <em>modules.conf</em> for
 information on the specification of GMPE sets; the GMPE set to use
@@ -60,7 +60,7 @@ is specified with the <code class="docutils literal notranslate"><span class="pr
 <a class="reference internal" href="../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE" title="shakelib.multigmpe.MultiGMPE"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGMPE</span></code></a> class.
 The MultiGMPE class allows for smooth transitions between tectonic
 environments, as well as consistency with the methodology of other
-projects, such as the <a class="reference external" href="https://earthquake.usgs.gov/hazards/hazmaps/">USGS National Seismic Hazard Model</a>.</p>
+projects, such as the <a class="reference external" href="https://www.usgs.gov/natural-hazards/earthquake-hazards/hazards/">USGS National Seismic Hazard Model</a>.</p>
 </div>
 <div class="section" id="ground-motion-model-sets">
 <h3><span class="section-number">2.3.1.2. </span>Ground Motion Model Sets<a class="headerlink" href="#ground-motion-model-sets" title="Permalink to this headline">¶</a></h3>
