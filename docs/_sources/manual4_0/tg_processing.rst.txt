@@ -25,8 +25,9 @@ Ground Motion Models
 ShakeMap uses ground-motion prediction equations (GMPEs) to provide the
 initial estimates of ground motions. The GMPEs are drawn from the set
 of GMPEs implemented by the GEM OpenQuake project. The full list of
-available GMPEs may be found 
-`here <https://docs.openquake.org/oq-hazardlib/master/_modules/openquake/hazardlib/gsim/>`_.
+available GMPEs may be found
+`here <https://github.com/gem/oq-engine/tree/master/openquake/hazardlib/gsim/>`_.
+
 In addition to these individual GMPEs, ShakeMap allows for a weighted
 combination of two or more GMPEs. GMPEs are configured in ShakeMap
 as GMPE "sets" (see *gmpe_sets.conf* and *modules.conf* for 
@@ -37,7 +38,7 @@ is specified with the ``gmpe`` parameter of the ``model`` section of
 The MultiGMPE class allows for smooth transitions between tectonic
 environments, as well as consistency with the methodology of other
 projects, such as the `USGS National Seismic Hazard Model
-<https://earthquake.usgs.gov/hazards/hazmaps/>`_.
+<https://www.usgs.gov/natural-hazards/earthquake-hazards/hazards/>`_.
 
 Ground Motion Model Sets
 ------------------------

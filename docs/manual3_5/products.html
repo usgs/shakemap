@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3.2. Products and Formats &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -623,13 +623,13 @@ zip format (<em>hazus.zip</em>) to facilitate file transfer.</p>
 <p>An important note on the values of the parameters in the HAZUS shape files is that they are empirically corrected from the standard ShakeMap <strong>peak ground motion values</strong> to approximate the <strong>geometric mean</strong> values used for HAZUS loss estimation.  HAZUS was calibrated to work with mean ground motion values (FEMA, 1997). Peak amplitudes are corrected by scaling values down by 15 percent (Campbell, 1997; Joyner, oral commun., 2000). While more recent work by <a class="reference internal" href="../manual4_0/sm4_references.html#beyer2006"><span class="std std-ref">Beyer and Bommer (2006)</span></a> suggests different conversion factors, for the HAZUS shape files we continue to use 15 percent to maintain consistency in HAZUS results. As of this writing, FEMA is considering switching to peak ground motions as presented by ShakeMap rather than employing the geometric mean component.</p>
 </div>
 </div>
-<div class="section" id="esri-raster-files-fit-files">
-<h4><span class="section-number">3.2.2.6.2. </span>ESRI Raster Files (<em>.fit</em> files)<a class="headerlink" href="#esri-raster-files-fit-files" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="esri-raster-files-flt-files">
+<h4><span class="section-number">3.2.2.6.2. </span>ESRI Raster Files (<em>.flt</em> files)<a class="headerlink" href="#esri-raster-files-flt-files" title="Permalink to this headline">¶</a></h4>
 <p>ESRI raster grids of the ground-motion
 parameters and their uncertainties are also available. The files are found in a
 zipped archive called <em>raster.zip</em>. Each archive contains four files per
-parameter: <em>&lt;param&gt;.fit</em> and <em>&lt;param&gt;.hdr</em>, which contain the ground-motion
-data, and <em>&lt;param&gt;_std.fit</em> and <em>&lt;param&gt;_std.hdr</em>, which contain the
+parameter: <em>&lt;param&gt;.flt</em> and <em>&lt;param&gt;.hdr</em>, which contain the ground-motion
+data, and <em>&lt;param&gt;_std.flt</em> and <em>&lt;param&gt;_std.hdr</em>, which contain the
 uncertainties for the ground motions. See <em>grid.xml</em> for information on units.
 As with the other GIS files, PGA, PGV, and MMI are available for all events,
 while the PSA parameters are usually only included for earthquakes
@@ -866,7 +866,7 @@ be completed.</p>
 <li class="toctree-l5"><a class="reference internal" href="#station-lists">3.2.2.5. Station Lists</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#gis-products">3.2.2.6. GIS Products</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="#shapefiles">3.2.2.6.1. Shapefiles</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#esri-raster-files-fit-files">3.2.2.6.2. ESRI Raster Files (<em>.fit</em> files)</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#esri-raster-files-flt-files">3.2.2.6.2. ESRI Raster Files (<em>.flt</em> files)</a></li>
 <li class="toctree-l6"><a class="reference internal" href="#google-earth-overlay">3.2.2.6.3. Google Earth Overlay</a></li>
 <li class="toctree-l6"><a class="reference internal" href="#contour-files">3.2.2.6.4. Contour Files</a></li>
 </ul>
