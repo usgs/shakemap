@@ -1073,7 +1073,7 @@ class ModelModule(CoreModule):
         if(df1['MMI'] is None):
             df1['MMI'] = np.full_like(df1['lon'], np.nan)
             df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
-        df1['MMI_outliers'] = np.full_like(df1['lon'], 0, dtype=np.bool)
+        df1['MMI_outliers'] = np.full_like(df1['lon'], True, dtype=np.bool)
         for imtstr in preferred_imts:
             if 'derived_MMI_from_' + imtstr in df1:
                 ixx = (np.isnan(df1['MMI']) | df1['MMI_outliers']) \
