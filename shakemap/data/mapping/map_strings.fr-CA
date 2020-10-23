@@ -1,9 +1,9 @@
 {
     "IMTYPES": {
         "MMI": "Carte d'intensité macrosismique",
-        "PGV": "Carte de vitesse de pointe au sol",
-        "PGA": "Carte d'accélération de pointe au sol",
-        "SA": "Carte d'accélération spectrale du deuxième pic"
+        "PGV": "Carte de vitesse maximale du sol",
+        "PGA": "Carte d'accélération maximale du sol",
+        "SA": " seconde - Carte d'accélération spectrale"
     },
     "units": {
          "PGV": "(cm/s)",
@@ -22,12 +22,12 @@
     "mmi_scale": {
         "shaking_labels": [
             "SECOUSSE",
-            "Aucun",
+            "Non perçue",
             "Faible",
-            "Léger",
-            "Modérer",
-            "Puissant",
-            "Très puissant",
+            "Légère",
+            "Modérée",
+            "Forte",
+            "Très forte",
             "Sévère",
             "Violent",
             "Extrême"
@@ -40,9 +40,9 @@
             "Très légers",
             "Légers",
             "Modérés",
-            "Modérés/Lourds",
-            "Lourds",
-            "Extrêmes"
+            "Destructeurs",
+            "Dévastateurs",
+            "Désastreux"
         ],
         "acc_label": "PGA(%g)",
         "vel_label": "PGV(cm/s)",
@@ -51,7 +51,7 @@
             "IV", "V", "VI", "VII", "VIII", "IX", "X+"
         ],
         "box_widths": [ 
-            11.5, 7.75, 6.75, 7.0, 10.25, 8.5, 12.0, 16.25, 8.25, 11.75
+            11.5, 10.75, 6.75, 7.0, 11.0, 6.75, 9.75, 12.5, 12.5, 11.5
         ],
         "mmi_colorbar_labels": [
             "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"
