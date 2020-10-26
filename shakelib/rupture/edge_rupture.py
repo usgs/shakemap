@@ -370,7 +370,17 @@ class EdgeRupture(Rupture):
             list: Segment group indexes; length equals the number of
                 quadrilaterals.
         """
-        return copy.deepcopy(self._group_index)
+        # This is a big hacky because the _group_index attribute is different
+        # for an edge rupture than for quad rupture. Maybe re-doing the code
+        # at a lower level would be a better resolution to this problem.
+        ugroup = np.unique(self._group_index)
+        ngroup = len(ugroup)
+        fixed_group_index = []
+        for i in range(ngroup):
+            ind = np.where(self._group_index == ugroup[i])[0]
+            nq = len(ind) - 1
+            fixed_group_index.extend([i] * nq)
+        return fixed_group_index
 
     def _computeStrikeDip(self):
         """
