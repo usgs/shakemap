@@ -167,6 +167,8 @@ class ModelModule(CoreModule):
         if len(self.sim_imt_paths):
             self.use_simulations = True
 
+        self.config['use_simulations'] = self.use_simulations
+
         # ---------------------------------------------------------------------
         # Clear away results from previous runs
         # ---------------------------------------------------------------------
@@ -2285,14 +2287,17 @@ class ModelModule(CoreModule):
             pe = gmpe
             sd_types = self.gmpe_stddev_types
 
-            # --------------------------------------------------------------------
-            # Describe the MultiGMPE
-            # --------------------------------------------------------------------
-            if not hasattr(self, '_info'):
-                self._info = {
-                    'multigmpe': {}
-                }
-            self._info['multigmpe'][str(oqimt)] = gmpe.describe()
+            if not self.use_simulations:
+                # --------------------------------------------------------------------
+                # Describe the MultiGMPE
+                # --------------------------------------------------------------------
+                if not hasattr(self, '_info'):
+                    self._info = {
+                        'multigmpe': {}
+                    }
+                self._info['multigmpe'][str(oqimt)] = gmpe.describe()
+            else:
+                self._info = {}
 
         mean, stddevs = pe.get_mean_and_stddevs(
             copy.deepcopy(sx), self.rx,
@@ -2352,7 +2357,7 @@ class ModelModule(CoreModule):
                 x1 = np.log(per_below)
                 x2 = np.log(per_above)
                 fd = fd_below + (np.log(tper) - x1) * \
-                    (fd_above - fd_below)/(x2 - x1)
+                    (fd_above - fd_below) / (x2 - x1)
             # Reshape to match the mean
             fd = fd.reshape(mean.shape)
             # Store the interpolated grid
@@ -2372,9 +2377,9 @@ class ModelModule(CoreModule):
         """
         # We want to only use resolutions that are multiples of 1 minute or
         # an integer division of 1 minute.
-        one_minute = 1/60
+        one_minute = 1 / 60
         multiples = np.arange(1, 11)
-        divisions = 1/multiples
+        divisions = 1 / multiples
         factors = np.sort(np.unique(np.concatenate((divisions, multiples))))
         ok_res = one_minute * factors
         latspan = self.N - self.S
