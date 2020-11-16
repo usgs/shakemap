@@ -929,7 +929,7 @@ def _draw_title(imt, adict, uncertainty=False):
         imtstr = period + tdict['IMTYPES']['SA']
     else:
         imtstr = tdict['IMTYPES'][imt]
-    if len(eid) <= 10:
+    if len(eid) <= 20:
         fmt = ('%s %s\n%s %s: %s\n %s %s %s%.1f %s %s '
                '%s: %.1f%s %s:%s')
     else:
@@ -1199,8 +1199,8 @@ def draw_map(adict, override_scenario=False):
     # Retrieve the epicenter - this will get used on the map
     rupture = rupture_from_dict(adict['ruptdict'])
     origin = rupture.getOrigin()
-    center_lat = origin.lat
-    center_lon = origin.lon
+    epi_lat = origin.lat
+    epi_lon = origin.lon
 
     # load the cities data, limit to cities within shakemap bounds
     cities = adict['allcities'].limitByBounds((gd.xmin, gd.xmax,
@@ -1208,6 +1208,8 @@ def draw_map(adict, override_scenario=False):
 
     # get the map boundaries and figure size
     bounds, figsize, aspect = _get_map_info(gd)
+    center_lat = np.mean(bounds[2:4])
+    center_lon = np.mean(bounds[0:2])
 
     # Note: dimensions are: [left, bottom, width, height]
     dim_left = 0.1
@@ -1440,7 +1442,7 @@ def draw_map(adict, override_scenario=False):
 
     # Draw the epicenter as a black star
     plt.sca(ax)
-    plt.plot(center_lon, center_lat, 'k*', markersize=16,
+    plt.plot(epi_lon, epi_lat, 'k*', markersize=16,
              zorder=EPICENTER_ZORDER, transform=geoproj)
 
     # draw the rupture polygon(s) in black, if not point rupture

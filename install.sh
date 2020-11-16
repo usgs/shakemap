@@ -139,7 +139,7 @@ dev_list=(
 package_list=(
       "python=$py_ver"
       "$CC_PKG"
-      "cartopy"
+      "cartopy>=0.18"
       "cython"
       "defusedxml"
       "descartes"
