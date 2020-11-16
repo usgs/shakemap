@@ -804,8 +804,6 @@ def _draw_graticules(adict, ax, xmin, xmax, ymin, ymax):
     gl.left_labels = True
     gl.right_labels = False
     gl.xlines = True
-    gl.xlabels_top = False
-    gl.ylabels_right = False
 
     # create a dictionary with the intervals we want for a span
     # of degrees.
