@@ -12,6 +12,7 @@ import datetime
 import shutil
 import sys
 import re
+import json
 
 # third party imports
 from configobj import ConfigObj
@@ -212,6 +213,12 @@ class AssembleModule(CoreModule):
                 history = {'history': []}
                 new_line = [timestamp, originator, 1, self.comment]
                 history['history'].append(new_line)
+        elif os.path.isfile(os.path.join(datadir, 'history.json')):
+            jsonfile = os.path.join(datadir, 'history.json')
+            history_list = json.load(open(jsonfile, 'rt'))
+            history = {'history': history_list}
+            new_line = [timestamp, originator, 1, self.comment]
+            history['history'].append(new_line)
         else:
             #
             # No backup and no existing file. Make this version 1
