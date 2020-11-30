@@ -253,7 +253,14 @@ class StationList(object):
                 elev = feature['properties'].get('elev', None)
                 vs30 = feature['properties'].get('vs30', None)
                 stddev = 0
-                instrumented = int(netid.lower() not in CIIM_TUPLE)
+
+                # is this an intensity observation or an instrument?
+                instrumented = 1
+                # some MMI stations are coded as INTENSITY_[SOURCE]
+                has_intensity = 'intensity' in netid.lower()
+                is_ciim = netid.lower() in CIIM_TUPLE
+                if has_intensity or is_ciim:
+                    instrumented = 0
 
                 station_rows.append((sta_id, network, code, name, lat, lon,
                                      elev, vs30, stddev, instrumented))
