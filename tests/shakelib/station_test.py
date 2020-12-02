@@ -51,7 +51,7 @@ def test_station():
     if SAVE:
         ldf = [df1, df2]
         with open(ppath, 'wb') as f:
-            pickle.dump(ldf, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(ldf, f, protocol=4)
     else:
         with open(ppath, 'rb') as f:
             ldf = pickle.load(f)
@@ -95,7 +95,7 @@ def test_station():
     if SAVE:
         ldf = [df1, df2]
         with open(ppath, 'wb') as f:
-            pickle.dump(ldf, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(ldf, f, protocol=4)
     else:
         with open(ppath, 'rb') as f:
             ldf = pickle.load(f)
@@ -145,7 +145,7 @@ def test_station2():
     if SAVE:
         ldf = [df1, df2]
         with open(ppath, 'wb') as f:
-            pickle.dump(ldf, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(ldf, f, protocol=4)
     else:
         with open(ppath, 'rb') as f:
             ldf = pickle.load(f)
