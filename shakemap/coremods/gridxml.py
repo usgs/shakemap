@@ -17,13 +17,6 @@ from shakemap.utils.config import get_config_paths
 import shakemap
 from shakelib.rupture import constants
 
-# historically, we only had the component we are now calling
-# 'GREATER_OF_TWO_HORIZONTAL'.
-# As we do not intend grid.xml files to be forward compatible with
-# additional layers of information and different components (RotD50, etc.)
-# we'll hard code this here until grid.xml files experience their heat death.
-COMPONENT = 'GREATER_OF_TWO_HORIZONTAL'
-
 
 def _oq_to_gridxml(oqimt):
     """
@@ -106,113 +99,126 @@ class GridXMLModule(CoreModule):
         if container.getDataType() != 'grid':
             raise NotImplementedError('gridxml module can only function on '
                                       'gridded data, not sets of points')
-        gridnames = container.getIMTs(COMPONENT)
-        xml_types = ['grid', 'uncertainty']
-        for xml_type in xml_types:
-            layers = OrderedDict()
-            field_keys = OrderedDict()
-            for gridname in gridnames:
-                imt_field = _oq_to_gridxml(gridname)
-                imtdict = container.getIMTGrids(gridname, COMPONENT)
-                if xml_type == 'grid':
-                    grid_data = imtdict['mean']
-                    metadata = imtdict['mean_metadata']
-                elif xml_type == 'uncertainty':
-                    grid_data = imtdict['std']
-                    metadata = imtdict['std_metadata']
 
-                units = metadata['units']
-                digits = metadata['digits']
-                # convert from HDF units to legacy grid.xml units
-                if xml_type == 'grid':
-                    if units == 'ln(cm/s)':
-                        grid_data = np.exp(grid_data)
-                        units = 'cm/s'
-                    elif units == 'ln(g)':
-                        grid_data = np.exp(grid_data) * 100
-                        units = '%g'
+        components = container.getComponents()
+        for component in components:
+            xml_types = ['grid', 'uncertainty']
+            for xml_type in xml_types:
+                layers = OrderedDict()
+                field_keys = OrderedDict()
+                gridnames = container.getIMTs(component)
+                for gridname in gridnames:
+                    imt_field = _oq_to_gridxml(gridname)
+                    imtdict = container.getIMTGrids(gridname, component)
+                    if xml_type == 'grid':
+                        grid_data = imtdict['mean']
+                        metadata = imtdict['mean_metadata']
+                    elif xml_type == 'uncertainty':
+                        grid_data = imtdict['std']
+                        metadata = imtdict['std_metadata']
+
+                    units = metadata['units']
+                    digits = metadata['digits']
+                    # convert from HDF units to legacy grid.xml units
+                    if xml_type == 'grid':
+                        if units == 'ln(cm/s)':
+                            grid_data = np.exp(grid_data)
+                            units = 'cm/s'
+                        elif units == 'ln(g)':
+                            grid_data = np.exp(grid_data) * 100
+                            units = '%g'
+                        else:
+                            pass
+
+                    if xml_type == 'grid':
+                        layers[imt_field] = grid_data
+                        field_keys[imt_field] = (units, digits)
                     else:
-                        pass
+                        layers['STD' + imt_field] = grid_data
+                        field_keys['STD' + imt_field] = (units, digits)
 
                 if xml_type == 'grid':
-                    layers[imt_field] = grid_data
-                    field_keys[imt_field] = (units, digits)
+                    grid_data, _ = container.getArray([], 'vs30')
+                    units = 'm/s'
+                    digits = metadata['digits']
+                    layers['SVEL'] = grid_data
+                    field_keys['SVEL'] = (units, digits)
+
+                geodict = GeoDict(metadata)
+
+                config = container.getConfig()
+
+                # event dictionary
+                info = container.getMetadata()
+                event_info = info['input']['event_information']
+                event_dict = {}
+                event_dict['event_id'] = event_info['event_id']
+                event_dict['magnitude'] = float(event_info['magnitude'])
+                event_dict['depth'] = float(event_info['depth'])
+                event_dict['lat'] = float(event_info['latitude'])
+                event_dict['lon'] = float(event_info['longitude'])
+                try:
+                    event_dict['event_timestamp'] = datetime.strptime(
+                        event_info['origin_time'], constants.TIMEFMT)
+                except ValueError:
+                    event_dict['event_timestamp'] = datetime.strptime(
+                        event_info['origin_time'], constants.ALT_TIMEFMT)
+                event_dict['event_description'] = event_info['location']
+                event_dict['event_network'] = \
+                    info['input']['event_information']['eventsource']
+                event_dict['intensity_observations'] =\
+                    info['input']['event_information']['intensity_observations']
+                event_dict['seismic_stations'] =\
+                    info['input']['event_information']['seismic_stations']
+                if info['input']['event_information']['fault_ref'] == 'Origin':
+                    event_dict['point_source'] = 'True'
                 else:
-                    layers['STD' + imt_field] = grid_data
-                    field_keys['STD' + imt_field] = (units, digits)
+                    event_dict['point_source'] = 'False'
 
-            if xml_type == 'grid':
-                grid_data, _ = container.getArray([], 'vs30')
-                units = 'm/s'
-                digits = metadata['digits']
-                layers['SVEL'] = grid_data
-                field_keys['SVEL'] = (units, digits)
+                # shake dictionary
+                shake_dict = {}
+                shake_dict['event_id'] = event_dict['event_id']
+                shake_dict['shakemap_id'] = event_dict['event_id']
+                shake_dict['shakemap_version'] = \
+                    info['processing']['shakemap_versions']['map_version']
+                shake_dict['code_version'] = shakemap.__version__
+                ptime = info['processing']['shakemap_versions']['process_time']
+                try:
+                    shake_dict['process_timestamp'] = datetime.strptime(
+                        ptime, constants.TIMEFMT)
+                except ValueError:
+                    shake_dict['process_timestamp'] = datetime.strptime(
+                        ptime, constants.ALT_TIMEFMT)
 
-            geodict = GeoDict(metadata)
+                shake_dict['shakemap_originator'] = \
+                    config['system']['source_network']
+                shake_dict['map_status'] = config['system']['map_status']
+                shake_dict['shakemap_event_type'] = 'ACTUAL'
+                if event_dict['event_id'].endswith('_se'):
+                    shake_dict['shakemap_event_type'] = 'SCENARIO'
 
-            config = container.getConfig()
+                shake_grid = ShakeGrid(
+                    layers, geodict, event_dict,
+                    shake_dict, {}, field_keys=field_keys)
+                if component == 'GREATER_OF_TWO_HORIZONTAL':
+                    fname = os.path.join(datadir, '%s.xml' % xml_type)
+                else:
+                    fname = os.path.join(datadir, '%s_%s.xml' % (xml_type,
+                                                                 component))
+                logger.debug('Saving IMT grids to %s' % fname)
+                shake_grid.save(fname)  # TODO - set grid version number
 
-            # event dictionary
-            info = container.getMetadata()
-            event_info = info['input']['event_information']
-            event_dict = {}
-            event_dict['event_id'] = event_info['event_id']
-            event_dict['magnitude'] = float(event_info['magnitude'])
-            event_dict['depth'] = float(event_info['depth'])
-            event_dict['lat'] = float(event_info['latitude'])
-            event_dict['lon'] = float(event_info['longitude'])
-            try:
-                event_dict['event_timestamp'] = datetime.strptime(
-                    event_info['origin_time'], constants.TIMEFMT)
-            except ValueError:
-                event_dict['event_timestamp'] = datetime.strptime(
-                    event_info['origin_time'], constants.ALT_TIMEFMT)
-            event_dict['event_description'] = event_info['location']
-            event_dict['event_network'] = \
-                info['input']['event_information']['eventsource']
-            event_dict['intensity_observations'] =\
-                info['input']['event_information']['intensity_observations']
-            event_dict['seismic_stations'] =\
-                info['input']['event_information']['seismic_stations']
-            if info['input']['event_information']['fault_ref'] == 'Origin':
-                event_dict['point_source'] = 'True'
-            else:
-                event_dict['point_source'] = 'False'
-
-            # shake dictionary
-            shake_dict = {}
-            shake_dict['event_id'] = event_dict['event_id']
-            shake_dict['shakemap_id'] = event_dict['event_id']
-            shake_dict['shakemap_version'] = \
-                info['processing']['shakemap_versions']['map_version']
-            shake_dict['code_version'] = shakemap.__version__
-            ptime = info['processing']['shakemap_versions']['process_time']
-            try:
-                shake_dict['process_timestamp'] = datetime.strptime(
-                    ptime, constants.TIMEFMT)
-            except ValueError:
-                shake_dict['process_timestamp'] = datetime.strptime(
-                    ptime, constants.ALT_TIMEFMT)
-
-            shake_dict['shakemap_originator'] = \
-                config['system']['source_network']
-            shake_dict['map_status'] = config['system']['map_status']
-            shake_dict['shakemap_event_type'] = 'ACTUAL'
-            if event_dict['event_id'].endswith('_se'):
-                shake_dict['shakemap_event_type'] = 'SCENARIO'
-
-            shake_grid = ShakeGrid(
-                layers, geodict, event_dict,
-                shake_dict, {}, field_keys=field_keys)
-            fname = os.path.join(datadir, '%s.xml' % xml_type)
-            logger.debug('Saving IMT grids to %s' % fname)
-            shake_grid.save(fname)  # TODO - set grid version number
-
-        self.contents.addFile('xmlGrids', 'XML Grid',
-                              'XML grid of ground motions',
-                              'grid.xml', 'text/xml')
-        self.contents.addFile('uncertaintyGrid', 'Uncertainty Grid',
-                              'XML grid of uncertainties',
-                              'uncertainty.xml', 'text/xml')
+                if xml_type == 'grid':
+                    self.contents.addFile(
+                        'xmlGrids',
+                        'XML Grid',
+                        'XML grid of %s ground motions' % component,
+                        fname, 'text/xml')
+                else:
+                    self.contents.addFile(
+                        'uncertaintyGrids',
+                        'Uncertainty Grid',
+                        'XML grid of %s uncertainties' % component,
+                        fname, 'text/xml')
 
         container.close()
