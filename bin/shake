@@ -165,11 +165,15 @@ def get_parser():
     parser.add_argument('-c', '--cancel', action='store_true',
                         help='Cancel shakemap; execute cancel_modules list in '
                              'shake.conf.')
+    group.add_argument('-y', '--dryrun', action='store_true',
+                       help='Print a command line that would be executed if '
+                            'the process was called without this flag, and '
+                            'then exit without other action.')
     parser.add_argument(
         '-a', '--autorun', action='store_true',
         help='No-op; we are keeping this argument for backward compatibility '
         'but it no longer does anything. It is now the default behavior to '
-        'use the autorun_modules in shake.conf when no modules are sepcified.')
+        'use the autorun_modules in shake.conf when no modules are specified.')
     parser.add_argument('-v', '--version', action='version',
                         version='ShakeMap version %s' % shakemap.__version__,
                         help='Print the version of ShakeMap and quit.')
@@ -221,11 +225,13 @@ def main(args):
         if not len(args.cmds):
             if not args.cancel:
                 # cancel option was not set
-                logger.info(
-                    'No modules specified, checking for autoun_modules...')
+                if args.dryrun is False:
+                    logger.info(
+                        'No modules specified, checking for autoun_modules...')
                 args.cmds = shlex.split(_config_['autorun_modules'])
                 if len(args.cmds):
-                    logger.info('Autorun modules found: %s' % args.cmds)
+                    if args.dryrun is False:
+                        logger.info('Autorun modules found: %s' % args.cmds)
                 else:
                     logger.warning(
                         'No modules specified, and no autorun_modules '
@@ -248,6 +254,18 @@ def main(args):
 
         arglist = args.cmds.copy()
         logger.debug('arglist: %s' % arglist)
+
+        if args.dryrun is True:
+
+            cmdlist = ""
+            for item in arglist:
+                if ' ' in item:
+                    cmdlist += "'%s' " % item
+                else:
+                    cmdlist += item + ' '
+            print("Dryrun. The following command would be run:")
+            print("shake %s %s" % (args.eventid, cmdlist))
+            sys.exit(0)
 
         oldcmd = ''
         while(len(arglist) > 0):
