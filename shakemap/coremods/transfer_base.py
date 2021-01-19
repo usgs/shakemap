@@ -208,7 +208,7 @@ class TransferBaseModule(CoreModule):
 
     def parseArgs(self, arglist):
         """
-        Set up the object to accept the --comment flag.
+        Set up the object to accept the --cancel flag.
         """
         parser = argparse.ArgumentParser(
             prog=self.__class__.command_name,
