@@ -79,35 +79,3 @@ class PDLTransfer(TransferBaseModule):
 
         if not self.cancel:
             shutil.rmtree(downloads_dir, ignore_errors=True)
-
-    def parseArgs(self, arglist):
-        """
-        Set up the object to accept the --dev flag.
-        """
-        parser = argparse.ArgumentParser(
-            prog=self.__class__.command_name,
-            description=inspect.getdoc(self.__class__))
-        helpstr = ('Send products to the PDL server configured in "devconfig" '
-                   'in the transfer.conf configuration file rather than the '
-                   'default "configfile".')
-        parser.add_argument('-d', '--dev', help=helpstr,
-                            action='store_true', default=False)
-        helpstr = ('Print the PDL command that would be executed, and then '
-                   'quit without doing anything. WARNING: do not use this '
-                   'option, it is currently not enabled.')
-        parser.add_argument('-r', '--dryrun', help=helpstr,
-                            action='store_true', default=False)
-        #
-        # This line should be in any modules that overrides this
-        # one. It will collect up everything after the current
-        # modules options in args.rem, which should be returned
-        # by this function. Note: doing parser.parse_known_args()
-        # will not work as it will suck up any later modules'
-        # options that are the same as this one's.
-        #
-        parser.add_argument('rem', nargs=argparse.REMAINDER,
-                            help=argparse.SUPPRESS)
-        args = parser.parse_args(arglist)
-        self.usedevconfig = args.dev
-        self.dryrun = args.dryrun
-        return args.rem
