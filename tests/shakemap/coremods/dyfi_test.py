@@ -59,8 +59,8 @@ def test_dyfi():
 
     # Test reading a file
     eventdir = 'eventdata/nc72282711/current/data'
-    testfile = os.path.join(datadir,eventdir,'dyfi_geo_10km.geojson')
-    dataframe, msg = _get_dyfi_dataframe(None,testfile)
+    testfile = os.path.join(datadir, eventdir, 'dyfi_geo_10km.geojson')
+    dataframe, msg = _get_dyfi_dataframe(None, testfile)
     assert len(dataframe) == 203
 
 
