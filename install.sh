@@ -148,7 +148,7 @@ package_list=(
       "fiona"
       "gdal"
       "h5py"
-      "impactutils"
+      "impactutils=0.8.24"
       "ipython"
       "libcomcat"
       "lockfile"
