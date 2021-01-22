@@ -68,7 +68,6 @@ setup(name='shakemap',
       },
       scripts=[
           'bin/associate_amps',
-          'bin/pgm2json',
           'bin/getdyfi',
           'bin/receive_amps',
           'bin/receive_origins',
