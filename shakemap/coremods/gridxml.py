@@ -207,18 +207,19 @@ class GridXMLModule(CoreModule):
                                                                  component))
                 logger.debug('Saving IMT grids to %s' % fname)
                 shake_grid.save(fname)  # TODO - set grid version number
+                cname = os.path.split(fname)[1]
 
                 if xml_type == 'grid':
                     self.contents.addFile(
                         'xmlGrids',
                         'XML Grid',
                         'XML grid of %s ground motions' % component,
-                        fname, 'text/xml')
+                        cname, 'text/xml')
                 else:
                     self.contents.addFile(
                         'uncertaintyGrids',
                         'Uncertainty Grid',
                         'XML grid of %s uncertainties' % component,
-                        fname, 'text/xml')
+                        cname, 'text/xml')
 
         container.close()
