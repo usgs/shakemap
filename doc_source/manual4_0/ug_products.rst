@@ -1633,7 +1633,7 @@ readily available for each ShakeMap event, USGS also hosts a real-time
 `Disaster Response ArcGIS service
 <https://www.esri.com/en-us/disaster-response/disasters/earthquakes>`_,
 providing `live feeds
-<https://www.arcgis.com/home/item.html?id=f6fc7166a7454f01a9bc6d106eae8d78>`_
+<https://www.arcgis.com/home/item.html?id=9e2f2b544c954fda9cd13b7f3e6eebce>`_
 to several USGS post-earthquake products. 
 
 .. sidebar:: Related GIS Service Interactions

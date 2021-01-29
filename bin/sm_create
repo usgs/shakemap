@@ -15,7 +15,6 @@ import copy
 from libcomcat.search import get_event_by_id
 from configobj import ConfigObj
 from impactutils.time.ancient_time import HistoricTime
-from impactutils.io.table import dataframe_to_xml
 import numpy as np
 
 # local imports
@@ -32,6 +31,7 @@ from shakemap.utils.utils import (get_network_name,
 from shakemap.utils.probs import get_weights
 from shakemap.utils.layers import (validate_config,
                                    update_config_regions)
+from shakemap.utils.dataframe import dataframe_to_xml
 from shakemap.coremods.dyfi import _get_dyfi_dataframe
 from shakelib.rupture import constants
 from shakelib.station import StationList
@@ -168,7 +168,8 @@ def get_parser():
     parser.add_argument(
         '-p', '--preserve-params', action='store_true',
         default=False,
-        help='Preserve model parameters detected in ComCat.')
+        help='Preserve model parameters detected in ComCat. Should only be '
+             'used on ShakeMap 3.5 products')
     return parser
 
 
@@ -341,21 +342,23 @@ def main(args):
                 data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
                 shakemap.getContent('stationlist.xml', filename=data_file)
                 got_data_file = True
-            except Exception as e:
+            except Exception:
                 try:
                     data_file = os.path.join(
                         event_dir, '%s_dat.json' % eventid)
                     shakemap.getContent('stationlist.json', filename=data_file)
                     got_data_file = True
-                except Exception as e:
+                # TODO: do something sensible here??
+                except Exception:
                     pass
 
             if got_data_file:
-                instrument_file = write_instrumented(data_file, event_dir)
-                macro_file = write_macroseismic(data_file, event_dir)
+                _ = write_instrumented(data_file, event_dir)
+                _ = write_macroseismic(data_file, event_dir)
                 os.remove(data_file)
             else:
-                fmt = 'Error while attempting to download ShakeMap ground motion data file.'
+                fmt = 'Error while attempting to download ShakeMap ground ' \
+                      'motion data file.'
                 print(fmt)
 
             # let's try to write out the input data in as many as three files:
@@ -401,11 +404,10 @@ def main(args):
                         os.remove(fault_file)
                     except Exception as e:
                         msg = (
-                            'WARNING: UNABLE TO PARSE FAULT TEXT FILE. ERROR: \n\n'
-                            '%s\n\n'
-                            'The following text file has been left in place for '
-                            'you to edit manually:\n\n'
-                            '%s\n')
+                            'WARNING: UNABLE TO PARSE FAULT TEXT FILE. '
+                            'ERROR: \n\n%s\n\n'
+                            'The following text file has been left in place '
+                            'for you to edit manually:\n\n%s\n')
 
                         errmsg = str(e)
                         print(msg % (errmsg, fault_file))
@@ -468,8 +470,8 @@ def _write_model_conf(shakemap, module_conf, migrate_conf, event_dir,
         'bias': {}
     }
     misc_dict = jsondict['processing']['miscellaneous']
-    bias_max_mag = misc_dict['bias_max_mag']
-    max_range = misc_dict['bias_max_range']
+    bias_max_mag = float(misc_dict['bias_max_mag'])
+    max_range = float(misc_dict['bias_max_range'])
     if bias_max_mag > 0 and max_range > 0:
         model['modeling']['bias']['do_bias'] = True
         model['modeling']['bias']['max_range'] = max_range
@@ -481,8 +483,8 @@ def _write_model_conf(shakemap, module_conf, migrate_conf, event_dir,
     model['data'] = {
         'outlier': {}
     }
-    max_deviation = misc_dict['outlier_deviation_level']
-    outlier_max_mag = misc_dict['outlier_max_mag']
+    max_deviation = float(misc_dict['outlier_deviation_level'])
+    outlier_max_mag = float(misc_dict['outlier_max_mag'])
     if outlier_max_mag > 0 and max_deviation > 0:
         model['data']['outlier']['do_outlier'] = True
         model['data']['outlier']['max_deviation'] = max_deviation
@@ -493,7 +495,10 @@ def _write_model_conf(shakemap, module_conf, migrate_conf, event_dir,
     # set the gmice in model.conf
     allowed_gmice = module_conf['gmice_modules'].keys()
     gmm_dict = jsondict['processing']['ground_motion_modules']
-    gmice = gmm_dict['mi2pgm']['module']
+    if 'mi2pgm' in gmm_dict:
+        gmice = gmm_dict['mi2pgm']['module']
+    else:
+        gmice = gmm_dict['gmice']['module']
     # WGRW11 in SM3.5 is WGRW12 in SM4.0
     if gmice == 'WGRW11':
         gmice = 'WGRW12'

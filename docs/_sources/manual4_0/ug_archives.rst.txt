@@ -292,7 +292,7 @@ exercises around the world.
    as the “Contributor” in the “Advanced Options” dropdown menu. The
    available catalogues of scenarios will change over time.
  * **Scenarios 1.0**. ShakeMaps are available online on the
-   `ShakeMap homepage <http://earthquake.usgs.gov/earthquakes/shakemap/>`_,
+   `ShakeMap homepage <https://earthquake.usgs.gov/data/shakemap/>`_,
    which consists of all the standardized ShakeMap products and formats.
    Output grids for the entire dataset can also be obtained at that site.
 

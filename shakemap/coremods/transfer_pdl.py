@@ -1,6 +1,7 @@
 # stdlib imports
+import argparse
+import inspect
 import os.path
-from datetime import datetime
 import shutil
 import logging
 
@@ -52,8 +53,18 @@ class PDLTransfer(TransferBaseModule):
         # each one
         for destination, params in self.config['pdl'].items():
             params.update(properties)
-            fmt = 'Doing PDL transfer to %s...' % destination
-            logging.debug(fmt)
+            if self.usedevconfig is True:
+                if (params['devconfig'] is None or not
+                        os.path.isfile(params['devconfig'])):
+                    raise FileNotFoundError('Dev config file "%s" does not '
+                                            'exist' % params['devconfig'])
+                # Swap the config file for the devconfig file
+                params['configfile'] = params['devconfig']
+                fmt = 'Doing PDL transfer to %s DEV...' % destination
+                logging.debug(fmt)
+            else:
+                fmt = 'Doing PDL transfer to %s...' % destination
+                logging.debug(fmt)
 
             sender = PDLSender(properties=params,
                                local_directory=pdl_dir,

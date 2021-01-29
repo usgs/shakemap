@@ -17,6 +17,7 @@ TABLES = OrderedDict((
     ('station',
      OrderedDict((
          ('id', 'text primary key'),  # id is net.sta
+         ('shortref', 'text'),  # foreign "key" to reference table
          ('network', 'text'),
          ('code', 'text'),
          ('name', 'text'),
@@ -46,7 +47,15 @@ TABLES = OrderedDict((
          ('nresp', 'int'),
          ('flag', 'text')
      ))
-     )
+     ),
+    ('reference',
+     OrderedDict((
+         ('id', 'integer primary key'),
+         ('shortref', 'text'),
+         ('longref', 'text'),
+         ('description', 'text'),
+     ))
+     ),
 ))
 
 #
@@ -101,7 +110,7 @@ class StationList(object):
         self.cursor.close()
         self.db.close()
 
-    @classmethod
+    @ classmethod
     def loadFromSQL(cls, sql, dbfile=':memory:'):
         """
         Create a new object from saved SQL code (see :meth:`dumpToSQL`).
@@ -135,7 +144,7 @@ class StationList(object):
 
         return "\n".join(list(self.db.iterdump()))
 
-    @classmethod
+    @ classmethod
     def loadFromFiles(cls, filelist, dbfile=':memory:'):
         """
         Create a StationList object by reading one or more ShakeMap XML or
@@ -238,6 +247,18 @@ class StationList(object):
                 logging.warn('%s is not a ShakeMap JSON stationlist, skipping'
                              % jfile)
                 continue
+
+            # if present, insert reference stuff into the database
+            if 'references' in stas:
+                for shortref, refdict in stas['references'].items():
+                    longref = refdict['long_reference']
+                    description = refdict['description']
+                    query = (f'INSERT INTO reference '
+                             '(shortref, longref, description) VALUES '
+                             f'("{shortref}","{longref}","{description}")')
+                    self.cursor.execute(query)
+                    self.db.commit()
+
             for feature in stas['features']:
                 sta_id = feature['id']
                 if sta_id in sta_set:
@@ -253,6 +274,8 @@ class StationList(object):
                 elev = feature['properties'].get('elev', None)
                 vs30 = feature['properties'].get('vs30', None)
                 stddev = 0
+
+                # is this an intensity observation or an instrument?
                 instrumented = int(netid.lower() not in CIIM_TUPLE)
 
                 station_rows.append((sta_id, network, code, name, lat, lon,
@@ -378,7 +401,19 @@ class StationList(object):
     def getGeoJson(self):
         jdict = {'type': 'FeatureCollection',
                  'features': []}
-
+        query = 'SELECT shortref, longref, description FROM reference'
+        self.cursor.execute(query)
+        rows = self.cursor.fetchall()
+        if len(rows):
+            refdict = {}
+            for row in rows:
+                shortref = row[0]
+                longref = row[1]
+                description = row[2]
+                refdict[shortref] = {'long_reference': longref,
+                                     'description': description
+                                     }
+            jdict['references'] = refdict
         self.cursor.execute(
             'SELECT id, network, code, name, lat, lon, elev, vs30, '
             'instrumented from station'
@@ -793,7 +828,7 @@ class StationList(object):
             channel_set.add(channel)
         return
 
-    @staticmethod
+    @ staticmethod
     def _getGroundMotions(comp, imt_translate):
         """
         Get a dictionary of peak ground motions (values and flags).
@@ -927,8 +962,8 @@ class StationList(object):
                     if 'Intensity Questionnaire' in str(compname):
                         compdict['mmi'] = {'amps': {}, 'attrs': {}}
                         continue
-                    tpgmdict, ims, imt_translate = \
-                        self._getGroundMotions(comp, imt_translate)
+                    tpgmdict, ims, imt_translate = self._getGroundMotions(
+                        comp, imt_translate)
                     if compname in compdict:
                         pgmdict = compdict[compname]['amps']
                     else:
@@ -950,12 +985,11 @@ class StationList(object):
                         nresp = int(attributes['nresp'])
                     else:
                         nresp = -1
-                    compdict['mmi']['amps']['MMI'] = \
-                        {'value': float(attributes['intensity']),
-                         'stddev': stddev,
-                         'nresp': nresp,
-                         'flag': '0',
-                         'units': 'intensity'}
+                    compdict['mmi']['amps']['MMI'] = {'value': float(attributes['intensity']),
+                                                      'stddev': stddev,
+                                                      'nresp': nresp,
+                                                      'flag': '0',
+                                                      'units': 'intensity'}
                     imtset.add('MMI')
                 stationdict[sta_id] = (attributes, copy.copy(compdict))
         return stationdict, imtset

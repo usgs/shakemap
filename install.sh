@@ -139,7 +139,7 @@ dev_list=(
 package_list=(
       "python=$py_ver"
       "$CC_PKG"
-      "cartopy"
+      "cartopy>=0.18"
       "cython"
       "defusedxml"
       "descartes"
@@ -148,7 +148,7 @@ package_list=(
       "fiona"
       "gdal"
       "h5py"
-      "impactutils"
+      "impactutils=0.8.24"
       "ipython"
       "libcomcat"
       "lockfile"

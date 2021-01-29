@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import logging
+import copy
 
 import pandas as pd
 import numpy as np
@@ -108,7 +109,7 @@ class NGAEast(GMPE):
         self.sigma_weights = np.array(sigma_wts)
         self.ALL_TABLE_PATHS = all_table_paths
 
-    def get_mean_and_stddevs(self, sites, rup, dists, imt, stddev_types):
+    def get_mean_and_stddevs(self, sites, rx, dists, imt, stddev_types):
         # List of GMPE weights, which is the product of the the branch weights
         # for the seed models vs the NGA East resampled models as well as the
         # weights for the indivudual GMPES as defined by Petersen et al. (2019)
@@ -133,6 +134,7 @@ class NGAEast(GMPE):
 
         # Is magnitude less than 4? If so, we will need to set it to 4.0 and
         # then extrapolate the tables at the end.
+        rup = copy.deepcopy(rx)
         if rup.mag < 4.0:
             is_small_mag = True
             delta_mag = rup.mag - 4.0
@@ -198,7 +200,7 @@ class NGAEast(GMPE):
                     gm._return_tables(rup.mag, imt, "IMLs")
                 except KeyError:
                     continue
-                except:
+                except Exception:
                     logging.error("Unexpected error:", sys.exc_info()[0])
             tmean, tstddevs = gm.get_mean_and_stddevs(
                 sites, rup, dists, imt, stddev_types)

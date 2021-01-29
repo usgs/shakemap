@@ -208,13 +208,23 @@ class TransferBaseModule(CoreModule):
 
     def parseArgs(self, arglist):
         """
-        Set up the object to accept the --comment flag.
+        Set up the object to accept the --cancel flag.
         """
         parser = argparse.ArgumentParser(
             prog=self.__class__.command_name,
             description=inspect.getdoc(self.__class__))
         helpstr = 'Cancel this event.'
         parser.add_argument('-c', '--cancel', help=helpstr,
+                            action='store_true', default=False)
+        helpstr = ('Send products to the PDL server configured in "devconfig" '
+                   'in the transfer.conf configuration file rather than the '
+                   'default "configfile".')
+        parser.add_argument('-d', '--dev', help=helpstr,
+                            action='store_true', default=False)
+        helpstr = ('Print the PDL command that would be executed, and then '
+                   'quit without doing anything. WARNING: do not use this '
+                   'option, it is currently not enabled.')
+        parser.add_argument('-r', '--dryrun', help=helpstr,
                             action='store_true', default=False)
         #
         # This line should be in any modules that overrides this
@@ -228,4 +238,6 @@ class TransferBaseModule(CoreModule):
                             help=argparse.SUPPRESS)
         args = parser.parse_args(arglist)
         self.cancel = args.cancel
+        self.usedevconfig = args.dev
+        self.dryrun = args.dryrun
         return args.rem

@@ -6,10 +6,14 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 import numpy
+import shutil
 
 # This should be handled by conda when we install a platform-specific
 # compiler, but apparently isn't on macs (yet?)
-os.environ['CC'] = 'clang'
+if shutil.which('clang') is None:
+    os.environ['CC'] = 'gcc'
+else:
+    os.environ['CC'] = 'clang'
 
 sourcefiles = ["shakemap/c/pcontour.pyx", "shakemap/c/contour.c"]
 
@@ -64,7 +68,6 @@ setup(name='shakemap',
       },
       scripts=[
           'bin/associate_amps',
-          'bin/pgm2json',
           'bin/getdyfi',
           'bin/receive_amps',
           'bin/receive_origins',

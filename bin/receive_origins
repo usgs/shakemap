@@ -106,7 +106,7 @@ def main(args):
         logger.info('No event ID, skipping')
         sys.exit(0)
 
-    if args.preferred_eventsource in ('pt', 'at', 'dr'):
+    if args.preferred_eventsource in ('pt', 'at', 'dr', 'ew'):
         logger.info('Undesirable eventsource: %s' % args.preferred_eventsource)
         sys.exit(0)
 

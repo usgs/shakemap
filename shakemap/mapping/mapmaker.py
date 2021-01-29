@@ -14,7 +14,6 @@ from matplotlib import patches
 # from matplotlib import colors
 
 import cartopy.crs as ccrs  # projections
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import pyproj
 
 from shapely.geometry import shape as sShape
@@ -49,6 +48,7 @@ FIGWIDTH = 9.5
 FIGHEIGHT = 10.0
 XOFFSET = 4  # how many pixels between the city dot and the city text
 VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
+DEGREE_SYMBOL = u'\u00B0'
 
 # define the zorder values for various map components
 # all of the zorder values for different plotted parameters
@@ -747,10 +747,48 @@ def _label_close_to_edge(x, y, xmin, xmax, ymin, ymax):
             dtop < height / MAP_FRAC or dbottom < height / MAP_FRAC)
 
 
-def _draw_graticules(ax, xmin, xmax, ymin, ymax):
+def _east_west_formatted(tdict, longitude, num_format='g'):
+    """
+    East-west tick formatter
+
+    Args:
+        longitude (float): longitude
+        num_format (string): string formatter
+    Returns:
+        string: formatter tick
+    """
+    fmt_string = u'{longitude:{num_format}}{degree}{hemisphere}'
+    return fmt_string.format(
+        longitude=abs(longitude),
+        num_format=num_format,
+        hemisphere=tdict['title_parts']['west' if longitude < 0 else 'east'],
+        degree=DEGREE_SYMBOL)
+
+
+def _north_south_formatted(tdict, latitude, num_format='g'):
+    """
+    North-south tick formatter
+
+    Args:
+        latitude (float): latitude
+        num_format (string): string formatter
+    Returns:
+        string: formatter tick
+    """
+    fmt_string = u'{latitude:{num_format}}{degree}{hemisphere}'
+    return fmt_string.format(
+        latitude=abs(latitude),
+        num_format=num_format,
+        hemisphere=tdict['title_parts']['south' if latitude < 0 else 'north'],
+        degree=DEGREE_SYMBOL)
+
+
+def _draw_graticules(adict, ax, xmin, xmax, ymin, ymax):
     """Draw map graticules, tick labels on map axes.
 
     Args:
+        adict (dict): The dictionary containing the key geographic
+            and ShakeMap data. See draw_map() for a descritption.
         ax (GeoAxes): Cartopy GeoAxes.
         xmin (float): Left edge of map (degrees).
         xmax (float): Right edge of map (degrees).
@@ -810,8 +848,10 @@ def _draw_graticules(ax, xmin, xmax, ymin, ymax):
 
     gl.xlocator = mticker.FixedLocator(xlocs)
     gl.ylocator = mticker.FixedLocator(ylocs)
-    gl.xformatter = LONGITUDE_FORMATTER
-    gl.yformatter = LATITUDE_FORMATTER
+    gl.xformatter = mticker.FuncFormatter(
+        lambda v, pos: _east_west_formatted(adict['tdict'], v))
+    gl.yformatter = mticker.FuncFormatter(
+        lambda v, pos: _north_south_formatted(adict['tdict'], v))
     gl.xlabel_style = {'size': 10, 'color': 'black'}
     gl.ylabel_style = {'size': 10, 'color': 'black'}
 
@@ -889,7 +929,7 @@ def _draw_title(imt, adict, uncertainty=False):
         imtstr = period + tdict['IMTYPES']['SA']
     else:
         imtstr = tdict['IMTYPES'][imt]
-    if len(eid) <= 10:
+    if len(eid) <= 20:
         fmt = ('%s %s\n%s %s: %s\n %s %s %s%.1f %s %s '
                '%s: %.1f%s %s:%s')
     else:
@@ -1159,8 +1199,8 @@ def draw_map(adict, override_scenario=False):
     # Retrieve the epicenter - this will get used on the map
     rupture = rupture_from_dict(adict['ruptdict'])
     origin = rupture.getOrigin()
-    center_lat = origin.lat
-    center_lon = origin.lon
+    epi_lat = origin.lat
+    epi_lon = origin.lon
 
     # load the cities data, limit to cities within shakemap bounds
     cities = adict['allcities'].limitByBounds((gd.xmin, gd.xmax,
@@ -1168,6 +1208,8 @@ def draw_map(adict, override_scenario=False):
 
     # get the map boundaries and figure size
     bounds, figsize, aspect = _get_map_info(gd)
+    center_lat = np.mean(bounds[2:4])
+    center_lon = np.mean(bounds[0:2])
 
     # Note: dimensions are: [left, bottom, width, height]
     dim_left = 0.1
@@ -1370,7 +1412,7 @@ def draw_map(adict, override_scenario=False):
                        zorder=ROAD_ZORDER)
 
     # draw graticules, ticks, tick labels
-    _draw_graticules(ax, *bounds)
+    _draw_graticules(adict, ax, *bounds)
 
     # is this event a scenario?
     info = adict['info']
@@ -1400,7 +1442,7 @@ def draw_map(adict, override_scenario=False):
 
     # Draw the epicenter as a black star
     plt.sca(ax)
-    plt.plot(center_lon, center_lat, 'k*', markersize=16,
+    plt.plot(epi_lon, epi_lat, 'k*', markersize=16,
              zorder=EPICENTER_ZORDER, transform=geoproj)
 
     # draw the rupture polygon(s) in black, if not point rupture
@@ -1584,7 +1626,7 @@ def draw_uncertainty_map(adict, override_scenario=False):
                        zorder=OCEAN_ZORDER)
 
     # draw graticules, ticks, tick labels
-    _draw_graticules(ax, *bounds)
+    _draw_graticules(adict, ax, *bounds)
 
     # is this event a scenario?
     info = adict['info']

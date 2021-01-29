@@ -10,7 +10,7 @@ import re
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.dyfi import _get_dyfi_dataframe
-from impactutils.io.table import dataframe_to_xml
+from shakemap.utils.dataframe import dataframe_to_xml
 
 DETAIL_TEMPLATE = 'https://earthquake.usgs.gov/fdsnws/event/1/query?' \
                   'eventid=[EID]&format=geojson'
@@ -66,7 +66,7 @@ def main(args):
     # if not, check if inputfile provided
     elif args.inputfile:
         eventid = args.url_or_id
-        dataframe, msg = _get_dyfi_dataframe(None,args.inputfile)
+        dataframe, msg = _get_dyfi_dataframe(None, args.inputfile)
 
     # if not, load URL
     else:
