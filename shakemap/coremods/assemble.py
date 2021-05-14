@@ -216,8 +216,13 @@ class AssembleModule(CoreModule):
         elif os.path.isfile(os.path.join(datadir, 'history.json')):
             jsonfile = os.path.join(datadir, 'history.json')
             history_list = json.load(open(jsonfile, 'rt'))
+            highest_version = 0
+            for maprun in history_list:
+                if maprun[2] > highest_version:
+                    highest_version = maprun[2]
             history = {'history': history_list}
-            new_line = [timestamp, originator, 1, self.comment]
+            new_line = [timestamp, originator,
+                        highest_version + 1, self.comment]
             history['history'].append(new_line)
         else:
             #
