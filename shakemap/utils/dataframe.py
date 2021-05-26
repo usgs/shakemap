@@ -82,6 +82,8 @@ def dataframe_to_xml(df, xmlfile, reference=None):
             station.attrib['dist'] = f"{tmprow['DISTANCE']:.1f}"
         if 'INTENSITY' in tmprow:
             station.attrib['intensity'] = f"{tmprow['INTENSITY']:.1f}"
+        if 'STDDEV' in tmprow:
+            station.attrib['intensity_stddev'] = f"{tmprow['STDDEV']:.4f}"
         if 'NRESP' in tmprow:
             station.attrib['nresp'] = f"{int(tmprow['NRESP']):d}"
         if 'SOURCE' in tmprow:
