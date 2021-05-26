@@ -5,18 +5,16 @@ if [ "$unamestr" == 'Linux' ]; then
     prof=~/.bashrc
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     matplotlibdir=~/.config/matplotlib
-    CC=gcc_linux-64
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
-    #    CC=clangxx_osx-64
-    CC=gcc
 else
     echo "Unsupported environment. Exiting."
     exit
 fi
 
+CC_PKG=c-compiler
 
 source $prof
 
@@ -24,7 +22,7 @@ source $prof
 VENV=shakemap
 
 developer=0
-py_ver=3.6
+py_ver=3.8
 while getopts p:d FLAG; do
   case $FLAG in
     p)
@@ -37,7 +35,16 @@ while getopts p:d FLAG; do
   esac
 done
 
+if [ $py_ver == '3.8' ] && [ "$unamestr" == 'Linux' ]; then
+    echo "WARNING: ShakeMap on Python v3.8 on some versions of Linux "
+    echo "may fail in unexpected ways. We are enforcing the use "
+    echo "of Python v3.7 until this warning disappears."
+    echo ""
+    py_ver=3.7
+fi
+
 echo "Using python version $py_ver"
+echo ""
 
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d "$matplotlibdir" ]; then
@@ -48,6 +55,7 @@ if [ ! -d "$matplotlibdir" ]; then
         exit 1
     fi
 fi
+
 matplotlibrc=$matplotlibdir/matplotlibrc
 if [ ! -e "$matplotlibrc" ]; then
     echo "backend : Agg" > "$matplotlibrc"
@@ -72,7 +80,7 @@ if [ $? -ne 0 ]; then
 
     command -v curl >/dev/null 2>&1 || { echo >&2 "Script requires curl but it's not installed. Aborting."; exit 1; }
 
-    curl $mini_conda_url -o miniconda.sh;
+    curl -L $mini_conda_url -o miniconda.sh;
 
     # if curl fails, bow out gracefully
     if [ $? -ne 0 ];then
@@ -91,6 +99,9 @@ if [ $? -ne 0 ]; then
     fi
     
     . $HOME/miniconda/etc/profile.d/conda.sh
+
+    # remove the shell script
+    rm miniconda.sh
 else
     echo "conda detected, installing $VENV environment..."
 fi
@@ -104,8 +115,6 @@ if [ $? -ne 0 ]; then
     echo ". $_CONDA_ROOT/etc/profile.d/conda.sh" >> $prof
 fi
 
-env_file=environment.yml
-
 
 # Start in conda base environment
 echo "Activate base virtual environment"
@@ -115,37 +124,39 @@ conda activate base
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
 
+# Extra packages to install with dev option
 dev_list=(
-    "ipython"
     "autopep8"
     "flake8"
     "pyflakes"
     "rope"
     "yapf"
     "sphinx"
+    "sphinx-argparse"
 )
 
-# Package list:
+# Required package list:
 package_list=(
       "python=$py_ver"
-      "cartopy"
+      "$CC_PKG"
+      "cartopy>=0.18"
       "cython"
       "defusedxml"
       "descartes"
       "docutils"
       "configobj"
       "fiona"
-      "$CC"
       "gdal"
       "h5py"
-      "impactutils=0.8.15"
-      "libcomcat=1.2.13"
+      "impactutils"
+      "ipython"
+      "libcomcat"
       "lockfile"
       "mapio"
-      "matplotlib<=2.3"
+      "matplotlib-base"
       "numpy"
       "obspy"
-      "openquake.engine"
+      "openmp"
       "pandas"
       "ps2ff"
       "psutil"
@@ -159,7 +170,7 @@ package_list=(
       "scipy"
       "shapely"
       "simplekml"
-      "strec=2.1.4"
+      "strec"
       "versioneer"
       "vcrpy"
 )
@@ -170,16 +181,18 @@ if [ $developer == 1 ]; then
 fi
 
 # Create a conda virtual environment
-echo "Creating the $VENV virtual environment:"
-conda create -y -n $VENV -c conda-forge \
-      --channel-priority ${package_list[*]}
+conda config --add channels 'conda-forge'
+conda config --add channels 'defaults'
+conda config --set channel_priority flexible
 
+echo "Creating the $VENV virtual environment:"
+conda create -y -n $VENV ${package_list[*]}
 
 # Bail out at this point if the conda create command fails.
 # Clean up zip files we've downloaded
 if [ $? -ne 0 ]; then
     echo "Failed to create conda environment.  Resolve any conflicts, then try again."
-    exit
+    exit 1
 fi
 
 
@@ -202,9 +215,24 @@ if [ $? -ne 0 ];then
     exit 1
 fi
 
+# The presence of a __pycache__ folder in bin/ can cause the pip
+# install to fail... just to be safe, we'll delete it here.
+if [ -d bin/__pycache__ ]; then
+    rm -rf bin/__pycache__
+fi
+
 if [ $developer == 1 ]; then
     pip install sphinx-argparse
 fi
+
+# Install OQ from github to get NGA East since it isn't in a release yet.
+echo "Installing OpenQuake from github..."
+pip install --upgrade git+https://github.com/gem/oq-engine
+if [ $? -ne 0 ];then
+    echo "Failed to pip install OpenQuake. Exiting."
+    exit 1
+fi
+
 
 # This package
 echo "Installing ${VENV}..."
@@ -215,6 +243,7 @@ if [ $? -ne 0 ];then
     echo "Failed to pip install this package. Exiting."
     exit 1
 fi
+
 
 # Tell the user they have to activate this environment
 echo "Type 'conda activate $VENV' to use this new virtual environment."

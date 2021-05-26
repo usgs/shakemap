@@ -90,7 +90,7 @@ class TransferBaseModule(CoreModule):
                 tnow = datetime.utcnow().strftime(constants.TIMEFMT)
                 f.write('Saved %s by %s\n' % (tnow, self.command_name))
 
-    def getProperties(self, info):
+    def getProperties(self, info, props=None):
         properties = {}
         product_properties = {}
         # origin info
@@ -101,8 +101,8 @@ class TransferBaseModule(CoreModule):
         # This fix should already be done by the time we get here, but this
         # is just an insurance check
         if origin['eventsourcecode'].startswith(origin['netid']):
-            eventsourcecode = origin['eventsourcecode'].replace(origin['netid'],
-                                                                '', 1)
+            eventsourcecode = \
+                origin['eventsourcecode'].replace(origin['netid'], '', 1)
         else:
             eventsourcecode = origin['eventsourcecode']
         properties['eventsourcecode'] = eventsourcecode
@@ -165,17 +165,23 @@ class TransferBaseModule(CoreModule):
         product_properties['process-timestamp'] = vinfo['process_time']
         product_properties['version'] = vinfo['map_version']
         product_properties['map-status'] = vinfo['map_status']
-        product_properties['shakemap-code-version'] = vinfo['shakemap_revision']
+        product_properties['shakemap-code-version'] = \
+            vinfo['shakemap_revision']
 
         # if this process is being run manually, set the review-status property
         # to "reviewed". If automatic, then set to "automatic".
-        product_properties['review-status'] = 'automatic'
-        if sys.stdout is not None and sys.stdout.isatty():
-            product_properties['review-status'] = 'reviewed'
+        if props is None or 'review-status' not in props:
+            product_properties['review-status'] = 'automatic'
+            if sys.stdout is not None and sys.stdout.isatty():
+                product_properties['review-status'] = 'reviewed'
 
         # what gmice was used for the model calculations
         gmice = info['processing']['ground_motion_modules']['gmice']['module']
         product_properties['gmice'] = gmice
+
+        if props:
+            for this_prop, value in props.items():
+                product_properties[this_prop] = value
 
         return (properties, product_properties)
 
@@ -202,13 +208,23 @@ class TransferBaseModule(CoreModule):
 
     def parseArgs(self, arglist):
         """
-        Set up the object to accept the --comment flag.
+        Set up the object to accept the --cancel flag.
         """
         parser = argparse.ArgumentParser(
             prog=self.__class__.command_name,
             description=inspect.getdoc(self.__class__))
         helpstr = 'Cancel this event.'
         parser.add_argument('-c', '--cancel', help=helpstr,
+                            action='store_true', default=False)
+        helpstr = ('Send products to the PDL server configured in "devconfig" '
+                   'in the transfer.conf configuration file rather than the '
+                   'default "configfile".')
+        parser.add_argument('-d', '--dev', help=helpstr,
+                            action='store_true', default=False)
+        helpstr = ('Print the PDL command that would be executed, and then '
+                   'quit without doing anything. WARNING: do not use this '
+                   'option, it is currently not enabled.')
+        parser.add_argument('-r', '--dryrun', help=helpstr,
                             action='store_true', default=False)
         #
         # This line should be in any modules that overrides this
@@ -222,4 +238,6 @@ class TransferBaseModule(CoreModule):
                             help=argparse.SUPPRESS)
         args = parser.parse_args(arglist)
         self.cancel = args.cancel
+        self.usedevconfig = args.dev
+        self.dryrun = args.dryrun
         return args.rem

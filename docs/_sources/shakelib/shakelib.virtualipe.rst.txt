@@ -2,6 +2,6 @@ shakelib.virtualipe
 ==========================
 
 .. automodule:: shakelib.virtualipe
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

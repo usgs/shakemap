@@ -68,111 +68,126 @@ class PlotRegr(CoreModule):
         # Otherwise we get weird errors from matplotlib
         max_workers = config['products']['mapping']['max_workers']
 
-        #
-        # Cheating here a bit by assuming that the IMTs are the same
-        # as the regression IMTs
-        #
-        rockgrid = {}
-        soilgrid = {}
-        rocksd = {}
-        soilsd = {}
-        imtlist = oc.getIMTs('GREATER_OF_TWO_HORIZONTAL')
-        for myimt in imtlist:
-            rockgrid[myimt], _ = oc.getArray(['attenuation', 'rock', myimt],
-                                             'mean')
-            soilgrid[myimt], _ = oc.getArray(['attenuation', 'soil', myimt],
-                                             'mean')
-            rocksd[myimt], _ = oc.getArray(['attenuation', 'rock', myimt],
-                                           'std')
-            soilsd[myimt], _ = oc.getArray(['attenuation', 'soil', myimt],
-                                           'std')
-        distances, _ = oc.getArray(['attenuation', 'distances'], 'rrup')
-
-        stations = oc.getStationDict()
-
-        #
-        # Make plots
-        #
-        alist = []
-        for myimt in imtlist:
-            a = {'myimt': myimt,
-                 'rockgrid': rockgrid,
-                 'soilgrid': soilgrid,
-                 'rocksd': rocksd,
-                 'soilsd': soilsd,
-                 'stations': stations,
-                 'distances': distances,
-                 'eventid': self._eventid,
-                 'datadir': datadir
-                 }
-            alist.append(a)
-            if myimt == 'MMI':
-                self.contents.addFile('miRegr', 'Intensity Regression',
-                                      'Regression plot of macroseismic '
-                                      'intensity.',
-                                      'mmi_regr.png', 'image/png')
-            elif myimt == 'PGA':
-                self.contents.addFile('pgaRegr', 'PGA Regression',
-                                      'Regression plot of peak '
-                                      'ground acceleration (%g).',
-                                      'pga_regr.png', 'image/png')
-            elif myimt == 'PGV':
-                self.contents.addFile('pgvRegr', 'PGV Regression',
-                                      'Regression plot of peak ground '
-                                      'velocity (cm/s).',
-                                      'pgv_regr.png', 'image/png')
-            else:
-                oqimt = imt.from_string(myimt)
-                period = str(oqimt.period)
-                filebase = oq_to_file(myimt)
-                psacap = 'Regression plot of ' + period + ' sec 5% damped ' \
-                         'pseudo-spectral acceleration(%g).'
-                self.contents.addFile(filebase + 'Regr',
-                                      'PSA ' + period + ' sec Regression',
-                                      psacap,
-                                      filebase + '_regr.png',
-                                      'image/png')
-
-        if max_workers > 0:
-            with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
-                results = ex.map(make_plots, alist)
-                list(results)
-        else:
-            for adict in alist:
-                make_plots(adict)
-
-        #
-        # Make attenuation_curves.json
-        #
-        jdict = {'eventid': self._eventid}
-        jdict['gmpe'] = {}
-        for site in ['soil', 'rock']:
-            jdict['gmpe'][site] = {}
+        components = oc.getComponents()
+        for component in components:
+            #
+            # Cheating here a bit by assuming that the IMTs are the same
+            # as the regression IMTs
+            #
+            rockgrid = {}
+            soilgrid = {}
+            rocksd = {}
+            soilsd = {}
+            imtlist = oc.getIMTs(component)
             for myimt in imtlist:
-                jdict['gmpe'][site][myimt] = {}
-                jdict['gmpe'][site][myimt]['mean'] = oc.getArray(
-                    ['attenuation', site, myimt], 'mean')[0].tolist()
-                jdict['gmpe'][site][myimt]['stddev'] = oc.getArray(
-                    ['attenuation', site, myimt], 'std')[0].tolist()
-        jdict['distances'] = {}
-        for dtype in ['repi', 'rhypo', 'rjb', 'rrup']:
-            jdict['distances'][dtype] = oc.getArray(
-                ['attenuation', 'distances'], dtype)[0].tolist()
-        jdict['mean_bias'] = {}
-        info = oc.getMetadata()
-        for myimt in imtlist:
-            jdict['mean_bias'][myimt] = info['output']['ground_motions'][
-                                             myimt]['bias']
-        jstring = json.dumps(jdict, allow_nan=False)
-        jfile = os.path.join(datadir, 'attenuation_curves.json')
-        f = open(jfile, 'wt')
-        f.write(jstring)
-        f.close()
-        oc.close()
-        cap = "Nominal attenuation curves"
-        self.contents.addFile('attenuationCurves', 'Attenuation Curves',
-                              cap, 'attenuation_curves.json',
-                              'application/json')
+                rockgrid[myimt], _ = oc.getArray(['attenuation', 'rock',
+                                                  myimt], 'mean')
+                soilgrid[myimt], _ = oc.getArray(['attenuation', 'soil',
+                                                  myimt], 'mean')
+                rocksd[myimt], _ = oc.getArray(['attenuation', 'rock',
+                                                myimt], 'std')
+                soilsd[myimt], _ = oc.getArray(['attenuation', 'soil',
+                                                myimt], 'std')
+            distances, _ = oc.getArray(['attenuation', 'distances'], 'rrup')
+
+            stations = oc.getStationDict()
+
+            if component == 'GREATER_OF_TWO_HORIZONTAL':
+                ctype = ''
+                cfile = ''
+            else:
+                ctype = ' %s' % component
+                cfile = '_%s' % component
+            #
+            # Make plots
+            #
+            alist = []
+            for myimt in imtlist:
+                a = {'myimt': myimt,
+                     'rockgrid': rockgrid,
+                     'soilgrid': soilgrid,
+                     'rocksd': rocksd,
+                     'soilsd': soilsd,
+                     'stations': stations,
+                     'distances': distances,
+                     'eventid': self._eventid,
+                     'datadir': datadir,
+                     'component': cfile
+                     }
+                alist.append(a)
+                if myimt == 'MMI':
+                    self.contents.addFile('miRegr', 'Intensity Regression',
+                                          'Regression plot of macroseismic '
+                                          'intensity%s.' % ctype,
+                                          'mmi_regr%s.png' % cfile,
+                                          'image/png')
+                elif myimt == 'PGA':
+                    self.contents.addFile(
+                        'pgaRegr', 'PGA Regression', 'Regression plot of peak '
+                        'ground acceleration (%%g)%s.' % ctype,
+                        'pga_regr%s.png' % cfile,
+                        'image/png')
+                elif myimt == 'PGV':
+                    self.contents.addFile('pgvRegr', 'PGV Regression',
+                                          'Regression plot of peak ground '
+                                          'velocity (cm/s)%s.' % ctype,
+                                          'pgv_regr%s.png' % cfile,
+                                          'image/png')
+                else:
+                    oqimt = imt.from_string(myimt)
+                    period = str(oqimt.period)
+                    filebase = oq_to_file(myimt)
+                    psacap = ('Regression plot of ' + period +
+                              ' sec 5%% damped pseudo-spectral '
+                              'acceleration(%%g)%s.' % ctype)
+                    self.contents.addFile(filebase + 'Regr',
+                                          'PSA ' + period + ' sec Regression',
+                                          psacap,
+                                          filebase + '_regr%s.png' % cfile,
+                                          'image/png')
+
+            if max_workers > 0:
+                with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
+                    results = ex.map(make_plots, alist)
+                    list(results)
+            else:
+                for adict in alist:
+                    make_plots(adict)
+
+            #
+            # Make attenuation_curves.json
+            #
+            jdict = {'eventid': self._eventid}
+            jdict['gmpe'] = {}
+            for site in ['soil', 'rock']:
+                jdict['gmpe'][site] = {}
+                for myimt in imtlist:
+                    jdict['gmpe'][site][myimt] = {}
+                    jdict['gmpe'][site][myimt]['mean'] = oc.getArray(
+                        ['attenuation', site, myimt], 'mean')[0].round(
+                            decimals=5).tolist()
+                    jdict['gmpe'][site][myimt]['stddev'] = oc.getArray(
+                        ['attenuation', site, myimt], 'std')[0].round(
+                            decimals=5).tolist()
+            jdict['distances'] = {}
+            for dtype in ['repi', 'rhypo', 'rjb', 'rrup']:
+                jdict['distances'][dtype] = oc.getArray(
+                    ['attenuation', 'distances'], dtype)[0].round(
+                        decimals=5).tolist()
+            jdict['mean_bias'] = {}
+            info = oc.getMetadata()
+            for myimt in imtlist:
+                jdict['mean_bias'][myimt] = info['output']['ground_motions'][
+                                                 myimt]['bias']
+            jstring = json.dumps(jdict, allow_nan=False)
+            jfile = os.path.join(datadir, 'attenuation_curves%s.json' % cfile)
+            f = open(jfile, 'wt')
+            f.write(jstring)
+            f.close()
+            oc.close()
+            cap = "Nominal attenuation curves"
+            self.contents.addFile('attenuationCurves', 'Attenuation Curves',
+                                  cap, jfile, 'application/json')
 
 
 def make_plots(adict):
@@ -185,6 +200,7 @@ def make_plots(adict):
     soilsd = adict['soilsd']
     stations = adict['stations']
     distances = adict['distances']
+    cfile = adict['component']
 
     plt.figure(figsize=(10, 10))
 
@@ -276,6 +292,6 @@ def make_plots(adict):
     plt.legend()
 
     fileimt = oq_to_file(myimt)
-    pfile = os.path.join(datadir, fileimt + '_regr.png')
+    pfile = os.path.join(datadir, fileimt + '_regr%s.png' % cfile)
     plt.savefig(pfile)
     plt.close()

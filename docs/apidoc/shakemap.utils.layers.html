@@ -1,21 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.utils.layers &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap.utils.logging" href="shakemap.utils.logging.html" />
@@ -36,86 +34,74 @@
             
   <div class="section" id="module-shakemap.utils.layers">
 <span id="shakemap-utils-layers"></span><h1>shakemap.utils.layers<a class="headerlink" href="#module-shakemap.utils.layers" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.validate_config">
-<code class="descclassname">shakemap.utils.layers.</code><code class="descname">validate_config</code><span class="sig-paren">(</span><em>mydict</em>, <em>install_path</em>, <em>data_path</em>, <em>global_data_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#validate_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.validate_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">validate_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mydict</span></em>, <em class="sig-param"><span class="n">install_path</span></em>, <em class="sig-param"><span class="n">data_path</span></em>, <em class="sig-param"><span class="n">global_data_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#validate_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.validate_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively validate select.conf.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mydict</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Full or partial config dictionary.</li>
-<li><strong>install_path</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mydict</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Full or partial config dictionary.</p></li>
+<li><p><strong>install_path</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.nearest_edge">
-<code class="descclassname">shakemap.utils.layers.</code><code class="descname">nearest_edge</code><span class="sig-paren">(</span><em>elon</em>, <em>elat</em>, <em>poly</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#nearest_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.nearest_edge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">nearest_edge</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elon</span></em>, <em class="sig-param"><span class="n">elat</span></em>, <em class="sig-param"><span class="n">poly</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#nearest_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.nearest_edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distance from a point to the nearest edge of a
 polygon.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</li>
-<li><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</li>
-<li><strong>poly</strong> (<em>Polygon</em>) – An instance of a shapely Polygon.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</p></li>
+<li><p><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</p></li>
+<li><p><strong>poly</strong> (<em>Polygon</em>) – An instance of a shapely Polygon.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance (in km) from the reference point to the
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The distance (in km) from the reference point to the
 nearest edge (or vertex) of the polygon.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.dist_to_layer">
-<code class="descclassname">shakemap.utils.layers.</code><code class="descname">dist_to_layer</code><span class="sig-paren">(</span><em>elon</em>, <em>elat</em>, <em>geom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#dist_to_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.dist_to_layer" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">dist_to_layer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elon</span></em>, <em class="sig-param"><span class="n">elat</span></em>, <em class="sig-param"><span class="n">geom</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#dist_to_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.dist_to_layer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distance from a point to the polygon(s) in a layer; zero if
 the point is inside the polygon. If the nearest edge of the polygon is
 greater than 5000 km from the point, the point cannot be inside the
 polygon and the distance reported will be the distance to the nearest
 edge. So don’t make polygons too big.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</li>
-<li><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</li>
-<li><strong>geom</strong> (<em>Polygon</em><em> or </em><em>MultiPolygon</em>) – An instance of a shapely Polygon
-or MultiPolygon.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</p></li>
+<li><p><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</p></li>
+<li><p><strong>geom</strong> (<em>Polygon</em><em> or </em><em>MultiPolygon</em>) – An instance of a shapely Polygon
+or MultiPolygon.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance (in km) from the reference point to the
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The distance (in km) from the reference point to the
 nearest polygon in the layer. The distance will be zero if the
 point lies inside the polygon.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.get_layer_distances">
-<code class="descclassname">shakemap.utils.layers.</code><code class="descname">get_layer_distances</code><span class="sig-paren">(</span><em>elon</em>, <em>elat</em>, <em>layer_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#get_layer_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.get_layer_distances" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">get_layer_distances</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elon</span></em>, <em class="sig-param"><span class="n">elat</span></em>, <em class="sig-param"><span class="n">layer_dir</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#get_layer_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.get_layer_distances" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distances from a point to the nearest polygon in each
 layer file found in ‘layer_dir’. The distance will be zero if
 the point is inside a polygon. If the nearest edge of a polygon is
@@ -125,34 +111,30 @@ nearest edge. So don’t make polygons too big.</p>
 <p>The layer files should be written in Well-Known Text (with .wkt
 extensions), and should contain either a single POLYGON or
 MULTIPOLYGON object. The layer name will be the file’s basename.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</li>
-<li><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</li>
-<li><strong>layer_dir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the directory containg the layer
-files.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</p></li>
+<li><p><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</p></li>
+<li><p><strong>layer_dir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the directory containg the layer
+files.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dictionary where the keys are the layer names, and the
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary where the keys are the layer names, and the
 values are the distance (in km) from the reference point to the
 nearest polygon in the layer. The distance will be zero if the
 point lies inside the polygon.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.utils.layers.update_config_regions">
-<code class="descclassname">shakemap.utils.layers.</code><code class="descname">update_config_regions</code><span class="sig-paren">(</span><em>lat</em>, <em>lon</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#update_config_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.update_config_regions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.utils.layers.</code><code class="sig-name descname">update_config_regions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#update_config_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.layers.update_config_regions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -181,46 +163,41 @@ point lies inside the polygon.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.exception.html">shakemap.utils.exception</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.generic_amp.html">shakemap.utils.generic_amp</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">shakemap.utils.layers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.exception.html">shakemap.utils.exception</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.generic_amp.html">shakemap.utils.generic_amp</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.layers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.pgm_convert.html">shakemap.utils.pgm_convert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

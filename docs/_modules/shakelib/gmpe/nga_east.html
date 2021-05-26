@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>shakelib.gmpe.nga_east &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.gmpe.nga_east</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module to simplify importing the OQ implementation of the</span>
+<span class="sd">NGA-East GMPE suite.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">RectBivariateSpline</span>
+
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">GMPE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">IMT</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.usgs_ceus_2019</span> <span class="kn">import</span> <span class="n">NGAEastUSGSGMPE</span>
+
+<span class="c1"># Max distance for evaluating NGAEast. This *should* be 1500, but due to what</span>
+<span class="c1"># appears to be a floating point precision issue, we get a division by zero</span>
+<span class="c1"># error at a value of 1500 returning nans. So we have to cap the distance at a</span>
+<span class="c1"># value slightly smaller.</span>
+
+<span class="c1"># This is also used to zero out the results at greater distances.</span>
+
+<span class="n">MAX_RRUP</span> <span class="o">=</span> <span class="mf">1499.9</span>
+
+
+<div class="viewcode-block" id="NGAEast"><a class="viewcode-back" href="../../../shakelib/shakelib.gmpe.nga_east.html#shakelib.gmpe.nga_east.NGAEast">[docs]</a><span class="k">class</span> <span class="nc">NGAEast</span><span class="p">(</span><span class="n">GMPE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns NGA East GMPE that combines all of the individual NGAEastUSGSGMPE</span>
+<span class="sd">    GMPEs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DEFINED_FOR_TECTONIC_REGION_TYPE</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">TRT</span><span class="o">.</span><span class="n">STABLE_CONTINENTAL</span>
+    <span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span>
+    <span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
+        <span class="n">IMT</span><span class="o">.</span><span class="n">PGA</span><span class="p">,</span>
+        <span class="n">IMT</span><span class="o">.</span><span class="n">PGV</span><span class="p">,</span>
+        <span class="n">IMT</span><span class="o">.</span><span class="n">SA</span>
+    <span class="p">])</span>
+
+    <span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTRA_EVENT</span>
+    <span class="p">])</span>
+    <span class="n">REQUIRES_SITES_PARAMETERS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="p">))</span>
+    <span class="n">REQUIRES_RUPTURE_PARAMETERS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="s1">&#39;mag&#39;</span><span class="p">,</span> <span class="p">))</span>
+    <span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="p">))</span>
+
+    <span class="n">TABLE_PATHS</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">NGAEastUSGSGMPE</span><span class="o">.</span><span class="n">PATH</span><span class="p">)</span>
+    <span class="n">this_module</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">NGA_BASE_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">this_module</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;shakemap&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;nga_east_tables&#39;</span><span class="p">)</span>
+
+    <span class="n">NGA_EAST_USGS_WEIGHT</span> <span class="o">=</span> <span class="mf">0.667</span>
+    <span class="n">NGA_EAST_SEED_WEIGHT</span> <span class="o">=</span> <span class="mf">0.333</span>
+
+    <span class="n">NGA_EAST_USGS</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">NGA_BASE_PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-usgs-weights.dat&#39;</span><span class="p">))</span>
+    <span class="n">NGA_EAST_SEEDS</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">NGA_BASE_PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-seed-weights.dat&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Sigma models and their weights</span>
+    <span class="n">SIGMA_MODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;EPRI&quot;</span><span class="p">,</span> <span class="s2">&quot;PANEL&quot;</span><span class="p">]</span>
+    <span class="n">SIGMA_WEIGHTS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+
+    <span class="c1"># For small magnitude extrapolation</span>
+    <span class="n">PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;nga_east_small_mag&#39;</span><span class="p">)</span>
+    <span class="n">SMALL_M_SLOPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slopes.txt&#39;</span><span class="p">))</span>
+    <span class="n">SMALL_M_SLOPE_PGA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slope_pga.txt&#39;</span><span class="p">))</span>
+    <span class="n">SMALL_M_SLOPE_PGV</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slope_pgv.txt&#39;</span><span class="p">))</span>
+    <span class="n">SMALL_M_DIST</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slope_distances.txt&#39;</span><span class="p">))</span>
+    <span class="n">SMALL_M_PER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s1">&#39;nga-east-smallM_slope_periods.txt&#39;</span><span class="p">))</span>
+
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="c1"># To simplify, use the COLLAPSED branch, but cannot get inter and intra</span>
+    <span class="c1"># event standard deviations in this case.</span>
+    <span class="c1"># SIGMA_MODS = [&quot;COLLAPSED&quot;]</span>
+    <span class="c1"># SIGMA_WEIGHTS = [1.0]</span>
+
+    <span class="c1"># Parse the periods of the columns</span>
+    <span class="n">per_idx_start</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">per_idx_end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="n">per_list_str</span> <span class="o">=</span> <span class="n">NGA_EAST_USGS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="n">per_idx_start</span><span class="p">:</span><span class="n">per_idx_end</span><span class="p">]</span>
+    <span class="n">per_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;SA&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">per_list_str</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">gmpes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sigma_wts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_table_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sigma_mod</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SIGMA_MODS</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">table_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TABLE_PATHS</span><span class="p">:</span>
+                <span class="n">gmpe</span> <span class="o">=</span> <span class="n">NGAEastUSGSGMPE</span><span class="p">(</span>
+                    <span class="n">gmpe_table</span><span class="o">=</span><span class="n">table_path</span><span class="p">,</span> <span class="n">sigma_model</span><span class="o">=</span><span class="n">sigma_mod</span><span class="p">)</span>
+                <span class="n">gmpes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe</span><span class="p">)</span>
+                <span class="n">sigma_wts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SIGMA_WEIGHTS</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">all_table_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gmpes</span> <span class="o">=</span> <span class="n">gmpes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma_wts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ALL_TABLE_PATHS</span> <span class="o">=</span> <span class="n">all_table_paths</span>
+
+<div class="viewcode-block" id="NGAEast.get_mean_and_stddevs"><a class="viewcode-back" href="../../../shakelib/shakelib.gmpe.nga_east.html#shakelib.gmpe.nga_east.NGAEast.get_mean_and_stddevs">[docs]</a>    <span class="k">def</span> <span class="nf">get_mean_and_stddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">):</span>
+        <span class="c1"># List of GMPE weights, which is the product of the the branch weights</span>
+        <span class="c1"># for the seed models vs the NGA East resampled models as well as the</span>
+        <span class="c1"># weights for the indivudual GMPES as defined by Petersen et al. (2019)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Note that the NGA East resampled models are a function of spectral</span>
+        <span class="c1"># period.</span>
+        <span class="c1">#</span>
+        <span class="c1"># NGA East Seeds (1/3)</span>
+        <span class="c1">#     ├── B_bca10d (0.06633), wts = 0.333 * 0.06633 = 0.02208789</span>
+        <span class="c1">#     ├── B_ab95 (0.02211), wts = 0.333 * 0.02211 = 0.00736263</span>
+        <span class="c1">#     ...</span>
+        <span class="c1"># NGA East Resampled or &quot;USGS&quot; (2/3)</span>
+        <span class="c1">#     ├── Model 1 (0.1009 for PGA), wts = 0.667 * 0.1009 = 0.0673003</span>
+        <span class="c1">#     ├── Model 2 (0.1606 for PGA), wts = 0.667 * 0.1606 = 0.1071202</span>
+        <span class="c1">#     ...</span>
+        <span class="c1">#</span>
+        <span class="n">wts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gmpes</span><span class="p">)</span>
+
+        <span class="c1"># Is IMT PGA or PGV?</span>
+        <span class="n">is_pga</span> <span class="o">=</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">IMT</span><span class="o">.</span><span class="n">PGA</span><span class="p">()</span>
+        <span class="n">is_pgv</span> <span class="o">=</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">IMT</span><span class="o">.</span><span class="n">PGV</span><span class="p">()</span>
+
+        <span class="c1"># Is magnitude less than 4? If so, we will need to set it to 4.0 and</span>
+        <span class="c1"># then extrapolate the tables at the end.</span>
+        <span class="n">rup</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">rx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;</span> <span class="mf">4.0</span><span class="p">:</span>
+            <span class="n">is_small_mag</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">delta_mag</span> <span class="o">=</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">4.0</span>
+            <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">=</span> <span class="mf">4.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">is_small_mag</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ALL_TABLE_PATHS</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;usgs&#39;</span> <span class="ow">in</span> <span class="n">tp</span><span class="p">:</span>
+                <span class="c1"># Get model number from i-th path using regex</span>
+                <span class="n">mod_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="n">tp</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+                <span class="n">coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">NGA_EAST_USGS</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">mod_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="c1"># Is the IMT PGA, PGA, or SA?</span>
+                <span class="k">if</span> <span class="n">is_pga</span><span class="p">:</span>
+                    <span class="n">iweight</span> <span class="o">=</span> <span class="n">coefs</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">is_pgv</span><span class="p">:</span>
+                    <span class="n">iweight</span> <span class="o">=</span> <span class="n">coefs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># For SA, need to interpolate; we&#39;ll use log-period and</span>
+                    <span class="c1"># linear-weight interpolation.</span>
+                    <span class="n">iweight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">imt</span><span class="o">.</span><span class="n">period</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">per_array</span><span class="p">),</span>
+                        <span class="n">coefs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">per_idx_start</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">per_idx_end</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NGA_EAST_USGS_WEIGHT</span> <span class="o">*</span> <span class="n">iweight</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Strip off the cruft to get the string we need to match</span>
+                <span class="n">str_match</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;nga_east_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.hdf5&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NGA_EAST_SEEDS</span><span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">NGA_EAST_SEEDS</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">str_match</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matched</span><span class="p">):</span>
+                    <span class="n">iweight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NGA_EAST_SEEDS</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">NGA_EAST_SEEDS</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">str_match</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NGA_EAST_SEED_WEIGHT</span> <span class="o">*</span> <span class="n">iweight</span>
+
+        <span class="n">total_gmpe_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma_weights</span> <span class="o">*</span> <span class="n">wts</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">total_gmpe_weights</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Weights must sum to 1.0.&#39;</span><span class="p">)</span>
+
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">stddevs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">)):</span>
+            <span class="n">stddevs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># Apply max distance to dists.rrup</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MAX_RRUP</span><span class="p">)</span>
+
+        <span class="c1"># Since we will be dropping the models that don&#39;t have PGV,</span>
+        <span class="c1"># we now also need to track the total sum of weights for when</span>
+        <span class="c1"># the imt is PGV so that we can re-distribute the weights.</span>
+        <span class="k">if</span> <span class="n">is_pgv</span><span class="p">:</span>
+            <span class="n">twts</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Loop over gmpes</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gmpes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">is_pgv</span><span class="p">:</span>
+                <span class="c1"># Is PGV and also not available for gm?</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">gm</span><span class="o">.</span><span class="n">_return_tables</span><span class="p">(</span><span class="n">rup</span><span class="o">.</span><span class="n">mag</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="s2">&quot;IMLs&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">tmean</span><span class="p">,</span> <span class="n">tstddevs</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
+                <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
+            <span class="n">mean</span> <span class="o">+=</span> <span class="n">tmean</span> <span class="o">*</span> <span class="n">total_gmpe_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tstddevs</span><span class="p">):</span>
+                <span class="n">stddevs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sd</span> <span class="o">*</span> <span class="n">total_gmpe_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">is_pgv</span><span class="p">:</span>
+                <span class="n">twts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_gmpe_weights</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">is_pgv</span><span class="p">:</span>
+            <span class="c1"># Rescale the PGV wieghts so that they sum to 1 after dropping</span>
+            <span class="c1"># the models that are not defined for PGV.</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">twts</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stddevs</span><span class="p">):</span>
+                <span class="n">stddevs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">stddevs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">twts</span><span class="p">)</span>
+
+        <span class="c1"># Zero out values at distances beyond the range for which NGA East</span>
+        <span class="c1"># was defined.</span>
+        <span class="n">mean</span><span class="p">[</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span> <span class="o">&gt;</span> <span class="n">MAX_RRUP</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">999.0</span>
+
+        <span class="c1"># Do we need to extrapolate for small magnitude factor?</span>
+        <span class="k">if</span> <span class="n">is_small_mag</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_pga</span><span class="p">:</span>
+                <span class="n">slopes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_DIST</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_SLOPE_PGA</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">is_pgv</span><span class="p">:</span>
+                <span class="n">slopes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_DIST</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_SLOPE_PGV</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">interp_obj</span> <span class="o">=</span> <span class="n">RectBivariateSpline</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_DIST</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_PER</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">SMALL_M_SLOPE</span><span class="p">,</span> <span class="n">kx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ky</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">slopes</span> <span class="o">=</span> <span class="n">interp_obj</span><span class="o">.</span><span class="n">ev</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">imt</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">slopes</span> <span class="o">*</span> <span class="n">delta_mag</span>
+
+        <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

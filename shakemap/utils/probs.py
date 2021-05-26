@@ -156,7 +156,7 @@ def get_probs(origin, config):
     selector = SubductionSelector()
     lat, lon, depth, mag = origin.lat, origin.lon, origin.depth, origin.mag
 
-    if not origin.id.startswith(origin.netid):
+    if origin.id is not None and not origin.id.startswith(origin.netid):
         eid = origin.netid + origin.id
     else:
         eid = origin.id

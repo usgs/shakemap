@@ -1,21 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.coremods.kml &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap.coremods.mapping" href="shakemap.coremods.mapping.html" />
@@ -36,391 +34,336 @@
             
   <div class="section" id="module-shakemap.coremods.kml">
 <span id="shakemap-coremods-kml"></span><h1>shakemap.coremods.kml<a class="headerlink" href="#module-shakemap.coremods.kml" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakemap.coremods.kml.KMLModule">
-<em class="property">class </em><code class="descclassname">shakemap.coremods.kml.</code><code class="descname">KMLModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#KMLModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.KMLModule" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">KMLModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#KMLModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.KMLModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <p>kml – Generate KML/KMZ files for ShakeMap.</p>
 <p>Instantiate a KMLModule class with an event ID.</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakemap.coremods.kml.KMLModule.command_name">
-<code class="descname">command_name</code><em class="property"> = 'kml'</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.command_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">command_name</code><em class="property"> = 'kml'</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakemap.coremods.kml.KMLModule.targets">
-<code class="descname">targets</code><em class="property"> = ['products/shakemap\\.kmz']</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.targets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">targets</code><em class="property"> = ['products/shakemap\\.kmz']</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.targets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="shakemap.coremods.kml.KMLModule.dependencies">
-<code class="descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.dependencies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakemap.coremods.kml.KMLModule.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#KMLModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.execute" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#KMLModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create KML files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#NotADirectoryError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NotADirectoryError</span></code></a> – When the event data directory does not exist.</li>
-<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#FileNotFoundError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></a> – When the the shake_result HDF file does not
-exist.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#NotADirectoryError" title="(in Python v3.6)"><strong>NotADirectoryError</strong></a> – When the event data directory does not exist.</p></li>
+<li><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#FileNotFoundError" title="(in Python v3.6)"><strong>FileNotFoundError</strong></a> – When the the shake_result HDF file does not
+    exist.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_kmz">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_kmz</code><span class="sig-paren">(</span><em>container</em>, <em>datadir</em>, <em>logger</em>, <em>contents</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_kmz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_kmz" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_kmz</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">contents</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_kmz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_kmz" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.place_legend">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">place_legend</code><span class="sig-paren">(</span><em>datadir</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#place_legend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.place_legend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">place_legend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#place_legend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.place_legend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Place the ShakeMap intensity legend in the upper left corner of
 the viewer’s map.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</li>
-<li><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</p></li>
+<li><p><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Path to output intensity legend file.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Path to output intensity legend file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_epicenter">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_epicenter</code><span class="sig-paren">(</span><em>container</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_epicenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_epicenter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_epicenter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_epicenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_epicenter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Place a star marker at earthquake epicenter.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</li>
-<li><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</p></li>
+<li><p><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_polygons">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_polygons</code><span class="sig-paren">(</span><em>container</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_polygons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_polygons" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_polygons</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_polygons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_polygons" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_contours">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_contours</code><span class="sig-paren">(</span><em>container</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_contours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_contours" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_contours</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_contours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_contours" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a KML file containing MMI contour lines.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</li>
-<li><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</li>
-<li><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</p></li>
+<li><p><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</p></li>
+<li><p><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.set_look">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">set_look</code><span class="sig-paren">(</span><em>document</em>, <em>container</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#set_look"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.set_look" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">set_look</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">document</span></em>, <em class="sig-param"><span class="n">container</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#set_look"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.set_look" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the view location, altitude, and angle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</li>
-<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</p></li>
+<li><p><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_line_styles">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_line_styles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_line_styles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_line_styles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_line_styles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_line_styles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_line_styles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create line styles for contour KML.</p>
 <p>Args:</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_overlay">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_overlay</code><span class="sig-paren">(</span><em>container</em>, <em>datadir</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_overlay</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a KML file and intensity map.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</li>
-<li><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</li>
-<li><strong>document</strong> (<em>SubElement</em>) – KML document where the overlay tags should go.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</p></li>
+<li><p><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</p></li>
+<li><p><strong>document</strong> (<em>SubElement</em>) – KML document where the overlay tags should go.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(Path to output KMZ file, Path to output overlay image)</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(Path to output KMZ file, Path to output overlay image)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_overlay_image">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_overlay_image</code><span class="sig-paren">(</span><em>container</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay_image" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_overlay_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a semi-transparent PNG image of intensity.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</li>
-<li><strong>filename</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to desired output PNG file.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to desired output PNG file.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">GeoDict object for the intensity grid.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">GeoDict</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>GeoDict object for the intensity grid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>GeoDict</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_stations">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_stations</code><span class="sig-paren">(</span><em>container</em>, <em>datadir</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_stations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_stations" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_stations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_stations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_stations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a KMZ file containing station KML and necessary icons files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</li>
-<li><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</li>
-<li><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – Results of model.conf.</p></li>
+<li><p><strong>datadir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to data directory where output KMZ will be written.</p></li>
+<li><p><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Path to output KMZ file.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Path to output KMZ file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.make_placemark">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">make_placemark</code><span class="sig-paren">(</span><em>folder</em>, <em>station</em>, <em>cpalette</em>, <em>style_map</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#make_placemark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.make_placemark" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">make_placemark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder</span></em>, <em class="sig-param"><span class="n">station</span></em>, <em class="sig-param"><span class="n">cpalette</span></em>, <em class="sig-param"><span class="n">style_map</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#make_placemark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.make_placemark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a placemark element in station KML.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>folder</strong> (<em>Element</em>) – KML Folder element.</li>
-<li><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</li>
-<li><strong>cpalette</strong> (<em>ColorPalette</em>) – Object allowing user to convert MMI to color.</li>
-<li><strong>style_map</strong> (<em>skml.StyleMap</em>) – The style map for the station type.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>Element</em>) – KML Folder element.</p></li>
+<li><p><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</p></li>
+<li><p><strong>cpalette</strong> (<em>ColorPalette</em>) – Object allowing user to convert MMI to color.</p></li>
+<li><p><strong>style_map</strong> (<em>skml.StyleMap</em>) – The style map for the station type.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.get_intensity">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">get_intensity</code><span class="sig-paren">(</span><em>station</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_intensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_intensity" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">get_intensity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">station</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_intensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_intensity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the intensity value from a station dictionary.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Intensity value.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Intensity value.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.get_description_table">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">get_description_table</code><span class="sig-paren">(</span><em>station</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_description_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_description_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">get_description_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">station</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_description_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_description_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get station description as HTML table.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String containing HTML table describing station.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>String containing HTML table describing station.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.imt_to_string">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">imt_to_string</code><span class="sig-paren">(</span><em>imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#imt_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.imt_to_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">imt_to_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#imt_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.imt_to_string" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.make_row">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">make_row</code><span class="sig-paren">(</span><em>table</em>, <em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#make_row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.make_row" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">make_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#make_row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.make_row" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a row in the description table.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>table</strong> (<em>Element</em>) – LXML Element for table tag.</li>
-<li><strong>key</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Text for left hand column of row.</li>
-<li><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Text for right hand column of row.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table</strong> (<em>Element</em>) – LXML Element for table tag.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Text for left hand column of row.</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Text for right hand column of row.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.get_description">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">get_description</code><span class="sig-paren">(</span><em>station</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_description" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">get_description</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">station</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get station description as HTML definition list.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String containing HTML definition list describing station.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>String containing HTML definition list describing station.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.get_imt_text">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">get_imt_text</code><span class="sig-paren">(</span><em>station</em>, <em>imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_imt_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_imt_text" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">get_imt_text</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">station</span></em>, <em class="sig-param"><span class="n">imt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_imt_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_imt_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a text string describing the value of input IMT.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</li>
-<li><strong>imt</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – IMT string (pga,pgv, sa(0.3), etc.)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>station</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing station data.</p></li>
+<li><p><strong>imt</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – IMT string (pga,pgv, sa(0.3), etc.)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">IMT text string (i.e., “7.1 cm/sec”)</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>IMT text string (i.e., “7.1 cm/sec”)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.create_styles">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">create_styles</code><span class="sig-paren">(</span><em>document</em>, <em>icon_text</em>, <em>scale_normal</em>, <em>scale_highlight</em>, <em>color</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_styles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_styles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_styles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">document</span></em>, <em class="sig-param"><span class="n">icon_text</span></em>, <em class="sig-param"><span class="n">scale_normal</span></em>, <em class="sig-param"><span class="n">scale_highlight</span></em>, <em class="sig-param"><span class="n">color</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_styles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_styles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create styles/style maps for station KML.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.add_icon_style">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">add_icon_style</code><span class="sig-paren">(</span><em>document</em>, <em>icon_text</em>, <em>icon_scale</em>, <em>label_scale</em>, <em>color</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#add_icon_style"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.add_icon_style" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">add_icon_style</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">document</span></em>, <em class="sig-param"><span class="n">icon_text</span></em>, <em class="sig-param"><span class="n">icon_scale</span></em>, <em class="sig-param"><span class="n">label_scale</span></em>, <em class="sig-param"><span class="n">color</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#add_icon_style"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.add_icon_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create Style tag around Icon in KML.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</li>
-<li><strong>icon_text</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the icon file.</li>
-<li><strong>icon_scale</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The icon scale.</li>
-<li><strong>label_scale</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The label scale.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>document</strong> (<em>Element</em>) – LXML KML Document element.</p></li>
+<li><p><strong>icon_text</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the icon file.</p></li>
+<li><p><strong>icon_scale</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The icon scale.</p></li>
+<li><p><strong>label_scale</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The label scale.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="shakemap.coremods.kml.flip_rgb">
-<code class="descclassname">shakemap.coremods.kml.</code><code class="descname">flip_rgb</code><span class="sig-paren">(</span><em>rgb</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#flip_rgb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.flip_rgb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">flip_rgb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rgb</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#flip_rgb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.flip_rgb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reverse order of RGB hex string, prepend ‘ff’ for transparency.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rgb</strong> – RGB hex string (#E1C2D3)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ABGR hex string (#ffd3c2e1).</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rgb</strong> – RGB hex string (#E1C2D3)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ABGR hex string (#ffd3c2e1).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -449,64 +392,61 @@ the viewer’s map.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.assemble.html">shakemap.coremods.assemble</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.augment.html">shakemap.coremods.augment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.base.html">shakemap.coremods.base</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.contour.html">shakemap.coremods.contour</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.exception.html">shakemap.coremods.exception</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">shakemap.coremods.kml</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.save.html">shakemap.coremods.save</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.select.html">shakemap.coremods.select</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.shape.html">shakemap.coremods.shape</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.sleep.html">shakemap.coremods.sleep</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.stations.html">shakemap.coremods.stations</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_base.html">shakemap.coremods.transfer_base</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_email.html">shakemap.coremods.transfer_email</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_pdl.html">shakemap.coremods.transfer_pdl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.transfer_scp.html">shakemap.coremods.transfer_scp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestimage.html">shakemap.coremods.xtestimage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestplot.html">shakemap.coremods.xtestplot</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestplot_multi.html">shakemap.coremods.xtestplot_multi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakemap.coremods.xtestplot_spectra.html">shakemap.coremods.xtestplot_spectra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.assemble.html">shakemap.coremods.assemble</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.augment.html">shakemap.coremods.augment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.base.html">shakemap.coremods.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.contour.html">shakemap.coremods.contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.coverage.html">shakemap.coremods.coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.exception.html">shakemap.coremods.exception</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.groundmotion.html">shakemap.coremods.groundmotion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.kml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.save.html">shakemap.coremods.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.select.html">shakemap.coremods.select</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.shape.html">shakemap.coremods.shape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.sleep.html">shakemap.coremods.sleep</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.stations.html">shakemap.coremods.stations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer_base.html">shakemap.coremods.transfer_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer_email.html">shakemap.coremods.transfer_email</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer_pdl.html">shakemap.coremods.transfer_pdl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer_scp.html">shakemap.coremods.transfer_scp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.uncertaintymaps.html">shakemap.coremods.uncertaintymaps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestimage.html">shakemap.coremods.xtestimage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot.html">shakemap.coremods.xtestplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot_multi.html">shakemap.coremods.xtestplot_multi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot_spectra.html">shakemap.coremods.xtestplot_spectra</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

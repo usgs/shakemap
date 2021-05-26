@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3.5. Representing Macroseismic Intensity on Maps &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.6. ShakeMap Archives" href="ug_archives.html" />
+    <link rel="prev" title="3.4. Products and Formats" href="ug_products.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="representing-macroseismic-intensity-on-maps">
+<span id="sec-tg-intensity"></span><h1><span class="section-number">3.5. </span>Representing Macroseismic Intensity on Maps<a class="headerlink" href="#representing-macroseismic-intensity-on-maps" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="sm4_references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> relates recorded ground motions
+to Modified Mercalli Intensities in
+California. While not the first work of its type, Wald et al. had the advantage of using
+several earthquakes that were both very well surveyed for MMI, and also well
+instrumented for recorded ground motions. By relating the ground motions to MMI, Wald
+et al. made possible the rapid calculation of expected intensities from recorded ground
+motions. These “instrumental intensities” could be interpolated over an area and
+represented on a map.</p>
+<p>As part of the original implementation of ShakeMap,
+<a class="reference internal" href="sm4_references.html#wald1999a"><span class="std std-ref">Wald, et al. (1999a)</span></a> developed a
+color scale to represent expected intensities over the mapped area. This scale gives users
+an intuitive, easy-to-understand depiction of the ground shaking for a given earthquake.
+By mapping intensity to color, we also make the hardest-hit areas stand out for
+emergency responders and members of the media. Along with the color scale, we
+developed simplified two-word descriptions of the felt intensity as well as the likely
+damage. These abridged descriptions are not meant to replace
+more comprehensive descriptions provided in the MMI (e.g.,
+<a class="reference internal" href="sm4_references.html#dewey2000"><span class="std std-ref">Dewey et al., 2000</span></a>; <a class="reference internal" href="sm4_references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
+or EMS-98 (<a class="reference internal" href="sm4_references.html#grunthal1998"><span class="std std-ref">Grunthal et al., 1998</span></a>) scales; however,
+they offer convenient description for our purposes.</p>
+<p>By relating recorded peak ground motions to Modified Mercalli Intensities, we can
+generate instrumental intensities within a few minutes of an earthquake. In the current
+ShakeMap system, these instrumental intensities can be combined with direct measures
+of intensity (from “Did You Feel It?”, for example) and interpolated across
+the affected area. With the
+color-coding and two-word text descriptors, we can adequately describe the associated
+perceived shaking and potential damage consistent with both human response and
+damage assessments of past earthquakes to characterize the shaking from just-occurred
+earthquakes.</p>
+<div class="section" id="color-palette-for-the-shakemap-instrumental-intensity-scale">
+<h2><span class="section-number">3.5.1. </span>Color Palette for the ShakeMap Instrumental Intensity Scale<a class="headerlink" href="#color-palette-for-the-shakemap-instrumental-intensity-scale" title="Permalink to this headline">¶</a></h2>
+<p>The color coding for the Instrumental Intensity map uses a standard rainbow palette (see Table
+1.1).  The “cool” to “hot” color scheme is familiar to most and is readily recognizable,
+as it is used as a standard in many fields (for example, see USA Today’s daily temperature
+maps of the U.S.).  Note that we do not believe intensity II and III can be consistently
+distinguished from ground-motions alone, so they are grouped together,
+see <a class="pageref" href="#figure-mmi-scale">Figure  1</a>. In
+addition, we saturate intensity X+ with dark red; observed ground motions alone are not
+sufficient to warrant any higher intensities, given that the available empirical relationships
+do not have any values of intensity greater than IX. In recent years, the USGS has limited
+observed MMIs to IX, reserving intensity X for possible future
+observations (see <a class="reference internal" href="sm4_references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>, for more details); the USGS no
+longer assigns intensity XI and XII. We note that there were only
+only two intensity-IX assignments for the 1994 Northridge earthquake
+(<a class="reference internal" href="sm4_references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
+and only two or three proper intensity-IX assignments for the
+1989 Loma Prieta earthquake (J. Dewey, 2015, personal communication).</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 19%" />
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Intensity</p></th>
+<th class="head"><p>Red</p></th>
+<th class="head"><p>Green</p></th>
+<th class="head"><p>Blue</p></th>
+<th class="head"><p>Intensity</p></th>
+<th class="head"><p>Red</p></th>
+<th class="head"><p>Green</p></th>
+<th class="head"><p>Blue</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+<td><p>1</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+<td><p>2</p></td>
+<td><p>191</p></td>
+<td><p>204</p></td>
+<td><p>255</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>191</p></td>
+<td><p>204</p></td>
+<td><p>255</p></td>
+<td><p>3</p></td>
+<td><p>160</p></td>
+<td><p>230</p></td>
+<td><p>255</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>160</p></td>
+<td><p>230</p></td>
+<td><p>255</p></td>
+<td><p>4</p></td>
+<td><p>128</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>128</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+<td><p>5</p></td>
+<td><p>122</p></td>
+<td><p>255</p></td>
+<td><p>147</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>122</p></td>
+<td><p>255</p></td>
+<td><p>147</p></td>
+<td><p>6</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>255</p></td>
+<td><p>255</p></td>
+<td><p>0</p></td>
+<td><p>7</p></td>
+<td><p>255</p></td>
+<td><p>200</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>255</p></td>
+<td><p>200</p></td>
+<td><p>0</p></td>
+<td><p>8</p></td>
+<td><p>255</p></td>
+<td><p>145</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>255</p></td>
+<td><p>145</p></td>
+<td><p>0</p></td>
+<td><p>9</p></td>
+<td><p>255</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>255</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>10</p></td>
+<td><p>200</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>200</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>13</p></td>
+<td><p>128</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+<p>Table 1.1  Color Mapping Table for Instrumental Intensity. This is a portion of the
+Generic Mapping Tools (GMT) “cpt” file. Color values for intermediate intensities
+are linearly interpolated from the Red, Green, and Blue (RGB) values in columns 2-4
+to columns 6-8.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="../_images/mmi_scale_top.png"><img alt="../_images/mmi_scale_top.png" src="../_images/mmi_scale_top.png" style="width: 650px;" /></a>
+<div class="figure align-left" id="id1">
+<span id="figure-mmi-scale"></span><a class="reference internal image-reference" href="../_images/mmi_scale_bottom.png"><img alt="../_images/mmi_scale_bottom.png" src="../_images/mmi_scale_bottom.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 1: Top: ShakeMap Instrumental Intensity Scale Legend: Color palette, two-word
+text descriptors, and ranges of peak motions for Instrumental Intensities.
+Note that the peak
+motions are applicable to <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>;
+other Ground Motion/Intensity
+Conversion Equations use the same color scale, but their ranges of peak
+motions will differ. Bottom:
+Legend below PGV ShakeMap. The legend for below each ShakeMap is now map
+(parameter-) and GMICE-specific as labeled. Color-coding of stations
+corresponds to their
+intensity the GMICE (ground motion/intensity) relationship.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>We drape the color-coded Instrumental Intensity values over the topography to maximize
+the information available in terms of both geographic location and likely site conditions.
+Topography serves as a simple yet effective proxy for examining site and basin
+amplification, but we recognize that many users do not necessarily
+benefit intuitively from having topography as a basemap.</p>
+</div>
+<div class="section" id="shakemap-instrumental-intensity-scale-text-descriptions">
+<h2><span class="section-number">3.5.2. </span>ShakeMap Instrumental Intensity Scale Text Descriptions<a class="headerlink" href="#shakemap-instrumental-intensity-scale-text-descriptions" title="Permalink to this headline">¶</a></h2>
+<p>The estimated intensity map is usually wholly or partially derived from ground motions
+recorded by seismic instruments, and represents intensities that are likely to have been
+associated with the recorded ground motions. However, unlike conventional intensities,
+the instrumental intensities are not based on observations of the earthquake’s effects on
+people or structures. The terms “perceived shaking” and “potential damage” in the
+ShakeMap legend are chosen for this reason; these intensities were not observed, but they
+are consistent on average with intensities at these ranges of ground motions recorded in a
+number of past earthquakes (see, for example,
+<a class="reference internal" href="sm4_references.html#wald1999b"><span class="std std-ref">Wald et al., 1999b</span></a>; <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al., 2012</span></a>).
+Two-word descriptions of both shaking and damage levels are provided to summarize the
+effects in an area; they were derived with careful consideration of the existing
+descriptions in the Modified Mercalli definitions (L. Dengler and J. Dewey, written
+communication, 1998, 2003).</p>
+<p>The ShakeMap qualitative descriptions of shaking are intended to be consistent with the way
+people perceive the shaking in earthquakes.  The descriptions for intensities up to VII are
+constrained by the work of <a class="reference internal" href="sm4_references.html#dengler1998"><span class="std std-ref">Dengler and Dewey (1998)</span></a>,
+in which they compared results of
+telephone surveys with USGS MMI intensities for the 1994 Northridge earthquake. The
+ShakeMap descriptions up to intensity VII may be viewed as a rendering of Dengler and
+Dewey’s Figure 7a.</p>
+<p>The instrumental intensity map for the Northridge earthquake shares most of the notable
+features of the Modified Mercalli map prepared by the USGS
+(<a class="reference internal" href="sm4_references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
+including the relatively high intensities near Santa Monica and southeast of the epicenter
+near Sherman Oaks.  However, in general, the area of intensity IX on the instrumentally
+derived intensity map is slightly larger than on the USGS Modified Mercalli intensity
+map. This reflects the fact that although much of the Santa Susanna mountains, north and
+northwest of the epicenter, were very strongly shaken, the region is also sparsely
+populated, hence, observed intensities could not be determined there.  This is a fundamental
+difference between observed and instrumentally derived intensities: instrumental
+intensities will show high levels of strong shaking independent of the exposure of
+populations and buildings, while observed intensities only represent
+intensities where there are
+structures to damage and people to experience the earthquake.</p>
+<p>The ShakeMap descriptions of felt shaking begin to lose meaning above
+intensity VII or VIII. In
+the <a class="reference internal" href="sm4_references.html#dengler1998"><span class="std std-ref">Dengler and Dewey (1998)</span></a> study, peoples’
+perception of shaking began to saturate in
+the VII-VIII range, with more than half the people at VII-VIII and above
+reporting the shaking as “violent” (on a scale from “weak” to “violent”).  In the ShakeMap
+descriptions, we intensified the descriptions of shaking with increases of intensity above
+VII, because the evidence from instrumental data is that the shaking is stronger.  But we
+know of no solid evidence that one could discriminate intensities higher than VII on the
+basis of different individuals’ descriptions of perceived shaking alone.</p>
+<p>ShakeMap is not unique in describing intensity VI as corresponding to strong shaking. In
+the 7-point Japanese macroseismic scale, for which intensity 4 is equivalent to MMI VI,
+intensity 4 is described as “strong.” In the European Macroseismic Scale (<a class="reference internal" href="sm4_references.html#grunthal1998"><span class="std std-ref">Grunthel et al.,
+1998</span></a>) (EMS-98), which is compatible with MMI
+(<a class="reference internal" href="sm4_references.html#musson2010"><span class="std std-ref">Musson et al., 2010</span></a>), the bullet description of intensity
+V is  “strong.”  Higher EMS-98 intensities are given bullet descriptions in terms of the
+damage they produce, rather than the strength of perceived shaking.</p>
+</div>
+<div class="section" id="shakemap-intensity-scale-and-peak-ground-motions">
+<h2><span class="section-number">3.5.3. </span>ShakeMap Intensity Scale and Peak Ground Motions<a class="headerlink" href="#shakemap-intensity-scale-and-peak-ground-motions" title="Permalink to this headline">¶</a></h2>
+<p>The ShakeMap Instrumental Intensity Scale Legend provides the PGA and PGV
+associated with the central value in each
+intensity box (see <a class="pageref" href="#figure-mmi-scale">Figure  1</a>). For all current GMICEs,
+the ground motion scale is
+logarithmic, with an increase of one intensity unit resulting from approximately a
+doubling of peak ground motion. Nevertheless, each GMICE has its own mapping of
+ground motion to intensity, and thus the values shown in the scale legend can vary,
+depending on the GMICE chosen for the map in question. To avoid confusion, the
+legends now have a citation in the lower left specifying which GMICE was used to
+produce the map and scale. Note, however, that while the mapping of ground motion to
+intensity varies, the mapping of color to intensity remains the same for all maps.</p>
+<p>We note that the ShakeMap legends (e.g., <a class="pageref" href="#figure-mmi-scale">Figure  1</a>)
+have evolved slightly from the
+earlier version of ShakeMap and the 2005 ShakeMap Manual. The PGMs tabulated are
+no longer provided by (previously redundant) PGM ranges, but rather by the median
+motions associated with the intensity on the scale.</p>
+</div>
+<div class="section" id="color-coding-stations-by-intensity">
+<h2><span class="section-number">3.5.4. </span>Color Coding Stations by Intensity<a class="headerlink" href="#color-coding-stations-by-intensity" title="Permalink to this headline">¶</a></h2>
+<p>Traditionally, stations on the PGM ShakeMaps were color-coded to the seismic network
+that provided them. More recent versions of ShakeMap, however, allow the operator to
+color the stations with the intensity they produced, with each PGM parameter (e.g., PGA,
+PGV, PSA03) using its own intensity correlation. <a class="pageref" href="#figure-northridge-intensity-scales">Figure  2</a> (and
+many of the other figures throughout this guide) illustrates the color coding of stations
+by their intensity values for several parameters. The operator can elect this option by
+calling the program <em>mapping</em> with the flag <em>-pgminten</em>.</p>
+<div class="figure align-left" id="id2">
+<span id="figure-northridge-intensity-scales"></span><a class="reference internal image-reference" href="../_images/northridge_intensity_scales.png"><img alt="../_images/northridge_intensity_scales.png" src="../_images/northridge_intensity_scales.png" style="width: 617.5px; height: 1234.05px;" /></a>
+<p class="caption"><span class="caption-text">Figure 2: ShakeMap for the 1994 M6.7 Northridge, CA earthquake with a finite fault (red
+rectangle), strong motion data (triangles) and intensity data (circles).
+Stations and macroseismic
+data are color coded according to their intensity value, either as
+observed (for macroseismic data)
+or as converted by <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> and
+indicated by the scales shown. Note:
+Macroseismic data do not change colors from map to map, but seismic
+stations do, since the
+estimated intensity conversion depends on which parameter is used.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.0 Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sm4_introduction.html">1. Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_technical_guide.html">2. Technical Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="sm4_users_guide.html">3. Users Guide</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ug_background.html">3.1. Background</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ug_shakemap_operations.html">3.2. ShakeMap Operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ug_choice_of_parameters.html">3.3. Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ug_products.html">3.4. Products and Formats</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">3.5. Representing Macroseismic Intensity on Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#color-palette-for-the-shakemap-instrumental-intensity-scale">3.5.1. Color Palette for the ShakeMap Instrumental Intensity Scale</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap-instrumental-intensity-scale-text-descriptions">3.5.2. ShakeMap Instrumental Intensity Scale Text Descriptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap-intensity-scale-and-peak-ground-motions">3.5.3. ShakeMap Intensity Scale and Peak Ground Motions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#color-coding-stations-by-intensity">3.5.4. Color Coding Stations by Intensity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ug_archives.html">3.6. ShakeMap Archives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ug_applications.html">3.7. Applications of ShakeMap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ug_related_systems.html">3.8. Related Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ug_disclaimers.html">3.9. Disclaimers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_software_guide.html">4. Software and Implementation Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_acknowledgments.html">5. Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_references.html">6. References and Bibliography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_glossary.html">7. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

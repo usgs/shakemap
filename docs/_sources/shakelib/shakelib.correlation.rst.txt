@@ -4,6 +4,7 @@ shakelib.correlation
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.correlation.ccf_base
    shakelib.correlation.dummy
@@ -12,6 +13,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.correlation
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

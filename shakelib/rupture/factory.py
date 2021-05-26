@@ -172,12 +172,15 @@ def rupture_from_dict(d):
     # What type of rupture is this?
     geo_type = d['features'][0]['geometry']['type']
     if geo_type == 'MultiPolygon':
-        # EdgeRupture will have 'mesh_dx' in metadata
-        if 'mesh_dx' in d['metadata']:
+        valid_quads = is_quadrupture_class(d)
+        if valid_quads is True:
+            rupt = QuadRupture(d, origin)
+        elif 'mesh_dx' in d['metadata']:
+            # EdgeRupture will have 'mesh_dx' in metadata
             mesh_dx = d['metadata']['mesh_dx']
             rupt = EdgeRupture(d, origin, mesh_dx=mesh_dx)
         else:
-            rupt = QuadRupture(d, origin)
+            raise ValueError('Invalid rupture dictionary.')
     elif geo_type == 'Point':
         rupt = PointRupture(origin)
 

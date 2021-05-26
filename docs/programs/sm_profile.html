@@ -1,21 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>sm_profile &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sm_queue" href="sm_queue.html" />
@@ -37,7 +35,8 @@
   <div class="section" id="sm-profile">
 <span id="id1"></span><h1>sm_profile<a class="headerlink" href="#sm-profile" title="Permalink to this headline">¶</a></h1>
 <p><blockquote>
-<div>Manage ShakeMap profiles.</div></blockquote>
+<div><p>Manage ShakeMap profiles.</p>
+</div></blockquote>
 <p>These ShakeMap profiles allow one user to have multiple ShakeMap profiles
 (installations) on the same machine.  These profiles can all be configured
 differently, if desired. By default the profiles reside in the file
@@ -49,36 +48,32 @@ differently, if desired. By default the profiles reside in the file
 </div>
 <div class="section" id="Named Arguments">
 <h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>-s, --switch</kbd></td>
-<td>Switch from current profile to PROFILE.</td></tr>
-<tr><td class="option-group">
-<kbd>-l, --list</kbd></td>
-<td>List all configured profiles.</td></tr>
-<tr><td class="option-group">
-<kbd>-c, --create</kbd></td>
-<td>Create new profile PROFILE and switch to it.</td></tr>
-<tr><td class="option-group">
-<kbd>-d, --delete</kbd></td>
-<td>Delete existing profile PROFILE.</td></tr>
-<tr><td class="option-group">
-<kbd>-a, --accept</kbd></td>
-<td>Accept the defaults when creating or deleting a profile.</td></tr>
-<tr><td class="option-group">
-<kbd>-n, --nogrids</kbd></td>
-<td>Do not attempt to download the topo or vs30 grids.</td></tr>
-<tr><td class="option-group">
-<kbd>-p, --preserve</kbd></td>
-<td>Preserve data when deleting a profile</td></tr>
-<tr><td class="option-group">
-<kbd>-f, --file</kbd></td>
-<td>Specify an alternative file in which the profiles (will) reside</td></tr>
-</tbody>
-</table>
+<dl class="option-list">
+<dt><kbd>-s, --switch</kbd></dt>
+<dd><p>Switch from current profile to PROFILE.</p>
+</dd>
+<dt><kbd>-l, --list</kbd></dt>
+<dd><p>List all configured profiles.</p>
+</dd>
+<dt><kbd>-c, --create</kbd></dt>
+<dd><p>Create new profile PROFILE and switch to it.</p>
+</dd>
+<dt><kbd>-d, --delete</kbd></dt>
+<dd><p>Delete existing profile PROFILE.</p>
+</dd>
+<dt><kbd>-a, --accept</kbd></dt>
+<dd><p>Accept the defaults when creating or deleting a profile.</p>
+</dd>
+<dt><kbd>-n, --nogrids</kbd></dt>
+<dd><p>Do not attempt to download the topo or vs30 grids.</p>
+</dd>
+<dt><kbd>-p, --preserve</kbd></dt>
+<dd><p>Preserve data when deleting a profile</p>
+</dd>
+<dt><kbd>-f, --file</kbd></dt>
+<dd><p>Specify an alternative file in which the profiles (will) reside</p>
+</dd>
+</dl>
 </div>
 <p></p>
 </div>
@@ -107,41 +102,35 @@ differently, if desired. By default the profiles reside in the file
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="programs.html">ShakeMap 4.0a Command Line Interface</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shake.html">shake</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sm_compare.html">sm_compare</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sm_create.html">sm_create</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">sm_profile</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="programs.html">ShakeMap 4.0 Command Line Interface</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shake.html">shake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_compare.html">sm_compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_create.html">sm_create</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="sm_queue.html">sm_queue</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getdyfi.html">getdyfi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_queue.html">sm_queue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getdyfi.html">getdyfi</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

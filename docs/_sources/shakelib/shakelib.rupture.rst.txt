@@ -4,6 +4,7 @@ shakelib.rupture
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.rupture.base
    shakelib.rupture.constants
@@ -17,6 +18,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.rupture
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

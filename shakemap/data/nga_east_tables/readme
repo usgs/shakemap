@@ -1,0 +1,3 @@
+These data files were downloaded from the NSHM code here:
+https://github.com/usgs/nshmp-haz/blob/master/src/gov/usgs/earthquake/nshmp/gmm/tables
+* Modified SP16 to SP15 to match OQ

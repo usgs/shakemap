@@ -17,6 +17,7 @@ TABLES = OrderedDict((
     ('station',
      OrderedDict((
          ('id', 'text primary key'),  # id is net.sta
+         ('shortref', 'text'),  # foreign "key" to reference table
          ('network', 'text'),
          ('code', 'text'),
          ('name', 'text'),
@@ -46,7 +47,15 @@ TABLES = OrderedDict((
          ('nresp', 'int'),
          ('flag', 'text')
      ))
-     )
+     ),
+    ('reference',
+     OrderedDict((
+         ('id', 'integer primary key'),
+         ('shortref', 'text'),
+         ('longref', 'text'),
+         ('description', 'text'),
+     ))
+     ),
 ))
 
 #
@@ -101,7 +110,7 @@ class StationList(object):
         self.cursor.close()
         self.db.close()
 
-    @classmethod
+    @ classmethod
     def loadFromSQL(cls, sql, dbfile=':memory:'):
         """
         Create a new object from saved SQL code (see :meth:`dumpToSQL`).
@@ -116,7 +125,6 @@ class StationList(object):
         Returns:
             :class:`Stationlist` object.
         """
-
         db = sqlite3.connect(dbfile, timeout=15)
         self = cls(db)
         self.cursor.executescript(sql)
@@ -136,7 +144,7 @@ class StationList(object):
 
         return "\n".join(list(self.db.iterdump()))
 
-    @classmethod
+    @ classmethod
     def loadFromFiles(cls, filelist, dbfile=':memory:'):
         """
         Create a StationList object by reading one or more ShakeMap XML or
@@ -239,6 +247,18 @@ class StationList(object):
                 logging.warn('%s is not a ShakeMap JSON stationlist, skipping'
                              % jfile)
                 continue
+
+            # if present, insert reference stuff into the database
+            if 'references' in stas:
+                for shortref, refdict in stas['references'].items():
+                    longref = refdict['long_reference']
+                    description = refdict['description']
+                    query = (f'INSERT INTO reference '
+                             '(shortref, longref, description) VALUES '
+                             f'("{shortref}","{longref}","{description}")')
+                    self.cursor.execute(query)
+                    self.db.commit()
+
             for feature in stas['features']:
                 sta_id = feature['id']
                 if sta_id in sta_set:
@@ -254,6 +274,8 @@ class StationList(object):
                 elev = feature['properties'].get('elev', None)
                 vs30 = feature['properties'].get('vs30', None)
                 stddev = 0
+
+                # is this an intensity observation or an instrument?
                 instrumented = int(netid.lower() not in CIIM_TUPLE)
 
                 station_rows.append((sta_id, network, code, name, lat, lon,
@@ -263,16 +285,17 @@ class StationList(object):
                     try:
                         amplitude = float(
                             feature['properties'].get('intensity', np.nan))
-                    except ValueError:
+                    except (ValueError, TypeError):
                         amplitude = np.nan
                     try:
                         stddev = float(
-                            feature['properties'].get('intensity_stddev', np.nan))
-                    except ValueError:
+                            feature['properties'].get('intensity_stddev',
+                                                      np.nan))
+                    except (ValueError, TypeError):
                         stddev = np.nan
                     try:
                         nresp = int(feature['properties'].get('nresp', -1))
-                    except ValueError:
+                    except (ValueError, TypeError):
                         nresp = -1
                     flag = feature['properties']['intensity_flag']
                     if not flag or flag == '':
@@ -290,7 +313,13 @@ class StationList(object):
                 chan_names = []
                 for comp in feature['properties']['channels']:
                     chan_names.append(comp['name'])
-                orients = _getOrientationSet(chan_names)
+                # Some legacy data stupidly names the channel the same as the
+                # station name. If there is only one channel, and its name
+                # is the station name, we assume it's horizontal and move on.
+                if len(chan_names) == 1 and chan_names[0] == name:
+                    orients = ['H']
+                else:
+                    orients = _getOrientationSet(chan_names)
                 #
                 # Now insert the amps into the database
                 #
@@ -314,7 +343,9 @@ class StationList(object):
                             stddev = 0
                         flag = amp['flag']
                         units = amp['units']
-                        if amplitude == 'null' or np.isnan(float(amplitude)):
+                        if (amplitude == 'null' or
+                                np.isnan(float(amplitude)) or
+                                amplitude <= 0):
                             amplitude = 'NULL'
                             flag = 'G'
                         elif imt_type == 'MMI':
@@ -370,7 +401,19 @@ class StationList(object):
     def getGeoJson(self):
         jdict = {'type': 'FeatureCollection',
                  'features': []}
-
+        query = 'SELECT shortref, longref, description FROM reference'
+        self.cursor.execute(query)
+        rows = self.cursor.fetchall()
+        if len(rows):
+            refdict = {}
+            for row in rows:
+                shortref = row[0]
+                longref = row[1]
+                description = row[2]
+                refdict[shortref] = {'long_reference': longref,
+                                     'description': description
+                                     }
+            jdict['references'] = refdict
         self.cursor.execute(
             'SELECT id, network, code, name, lat, lon, elev, vs30, '
             'instrumented from station'
@@ -384,7 +427,7 @@ class StationList(object):
                 'properties': {
                     'code': str(sta[2]),
                     'name': sta[3],
-                    'instrumentType': 'UNK' if sta[8] is 1 else 'OBSERVED',
+                    'instrumentType': 'UNK' if sta[8] == 1 else 'OBSERVED',
                     'source': sta[1],
                     'network': sta[1],
                     'commType': 'UNK',
@@ -412,7 +455,7 @@ class StationList(object):
                 'AND a.imt_id = i.id' % (str(sta[0]))
             )
             amp_rows = self.cursor.fetchall()
-            if sta[8] is 0:
+            if sta[8] == 0:
                 if len(amp_rows) != 1:
                     logging.warn("Couldn't find intensity for MMI station.")
                     continue
@@ -568,8 +611,13 @@ class StationList(object):
                                not in CIIM_TUPLE)
             for original_channel, cdict in comp_dict.items():
                 pgm_dict = cdict['amps']
-                orientation = cdict['attrs'].get('orientation', None)
-                orientation = _getOrientation(original_channel, orientation)
+                if len(comp_dict) == 1 and original_channel == \
+                        station_attributes.get('name', ''):
+                    orientation = 'H'
+                else:
+                    orientation = cdict['attrs'].get('orientation', None)
+                    orientation = _getOrientation(original_channel,
+                                                  orientation)
                 for imt_type, imt_dict in pgm_dict.items():
                     if (instrumented == 0) and (imt_type != 'MMI'):
                         continue
@@ -780,7 +828,7 @@ class StationList(object):
             channel_set.add(channel)
         return
 
-    @staticmethod
+    @ staticmethod
     def _getGroundMotions(comp, imt_translate):
         """
         Get a dictionary of peak ground motions (values and flags).
@@ -814,7 +862,7 @@ class StationList(object):
             if 'value' in pgm.attrib:
                 try:
                     value = float(pgm.attrib['value'])
-                except ValueError:
+                except (ValueError, TypeError):
                     logging.warn('Unknown value in XML: %s for amp: %s' %
                                  (pgm.attrib['value'], pgm.tag))
                     continue
@@ -914,8 +962,8 @@ class StationList(object):
                     if 'Intensity Questionnaire' in str(compname):
                         compdict['mmi'] = {'amps': {}, 'attrs': {}}
                         continue
-                    tpgmdict, ims, imt_translate = \
-                        self._getGroundMotions(comp, imt_translate)
+                    tpgmdict, ims, imt_translate = self._getGroundMotions(
+                        comp, imt_translate)
                     if compname in compdict:
                         pgmdict = compdict[compname]['amps']
                     else:
@@ -937,12 +985,11 @@ class StationList(object):
                         nresp = int(attributes['nresp'])
                     else:
                         nresp = -1
-                    compdict['mmi']['amps']['MMI'] = \
-                        {'value': float(attributes['intensity']),
-                         'stddev': stddev,
-                         'nresp': nresp,
-                         'flag': '0',
-                         'units': 'intensity'}
+                    compdict['mmi']['amps']['MMI'] = {'value': float(attributes['intensity']),
+                                                      'stddev': stddev,
+                                                      'nresp': nresp,
+                                                      'flag': '0',
+                                                      'units': 'intensity'}
                     imtset.add('MMI')
                 stationdict[sta_id] = (attributes, copy.copy(compdict))
         return stationdict, imtset
@@ -987,6 +1034,10 @@ def _getOrientation(orig_channel, orient):
         Character representing the channel orientation. One of 'N',
         'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
     """
+    if not len(orig_channel.strip()):
+        orientation = 'U'  # default when we don't know anything about channel
+        return orientation
+
     if orig_channel == 'mmi' or orig_channel == 'DERIVED':
         orientation = 'H'           # mmi is arbitrarily horizontal
     elif orig_channel[-1] in ('N', 'E', 'Z'):
@@ -1004,6 +1055,7 @@ def _getOrientation(orig_channel, orient):
             orientation = 'U'
     else:
         orientation = 'U'  # this is unknown
+
     return orientation
 
 

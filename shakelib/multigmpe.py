@@ -6,7 +6,7 @@ import logging
 
 import numpy as np
 
-from openquake.hazardlib.gsim.base import GMPE, IPE
+from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
     CampbellBozorgnia2014)
@@ -22,17 +22,14 @@ class MultiGMPE(GMPE):
     """
     Implements a GMPE that is the combination of multiple GMPEs.
 
-    To do
-
-        * Allow site to be based on a model that isn't a GMPE (e.g.,
-          Borcherdt).
-
     """
 
     DEFINED_FOR_TECTONIC_REGION_TYPE = None
     DEFINED_FOR_INTENSITY_MEASURE_TYPES = None
     DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = None
-    DEFINED_FOR_STANDARD_DEVIATION_TYPES = None
+    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
+        const.StdDev.TOTAL
+    ])
     REQUIRES_SITES_PARAMETERS = None
     REQUIRES_RUPTURE_PARAMETERS = None
     REQUIRES_DISTANCES = None
@@ -67,13 +64,13 @@ class MultiGMPE(GMPE):
         for k, v in sites.__dict__.items():
             if k == '_slots_':
                 continue
-            if (k is not 'lons') and (k is not 'lats'):
+            if (k != 'lons') and (k != 'lats'):
                 shapes.append(v.shape)
                 sites.__dict__[k] = np.reshape(sites.__dict__[k], (-1,))
         for k, v in dists.__dict__.items():
             if k == '_slots_':
                 continue
-            if (k is not 'lons') and (k is not 'lats') and v is not None:
+            if (k != 'lons') and (k != 'lats') and v is not None:
                 shapes.append(v.shape)
                 dists.__dict__[k] = np.reshape(dists.__dict__[k], (-1,))
         shapeset = set(shapes)
@@ -106,12 +103,12 @@ class MultiGMPE(GMPE):
         for k, v in dists.__dict__.items():
             if k == '_slots_':
                 continue
-            if (k is not 'lons') and (k is not 'lats') and v is not None:
+            if (k != 'lons') and (k != 'lats') and v is not None:
                 dists.__dict__[k] = np.reshape(dists.__dict__[k], orig_shape)
         for k, v in sites.__dict__.items():
             if k == '_slots_':
                 continue
-            if (k is not 'lons') and (k is not 'lats'):
+            if (k != 'lons') and (k != 'lats'):
                 sites.__dict__[k] = np.reshape(sites.__dict__[k], orig_shape)
 
         # Reshape output
@@ -133,11 +130,15 @@ class MultiGMPE(GMPE):
             wts = self.WEIGHTS_LARGE_DISTANCE
 
         # ---------------------------------------------------------------------
-        # These are arrays to hold the weighted combination of the GMPEs
+        # This is the array to hold the weighted combination of the GMPEs
         # ---------------------------------------------------------------------
         lnmu = np.zeros_like(sites.vs30)
-        lnsd2 = [np.zeros_like(sites.vs30)
-                 for a in range(2 * len(stddev_types))]
+        # ---------------------------------------------------------------------
+        # Hold on to the individual means and stddevs so we can compute the
+        # combined stddev
+        # ---------------------------------------------------------------------
+        lnmu_list = []
+        lnsd_list = []
 
         for i, gmpe in enumerate(self.GMPES):
             # -----------------------------------------------------------------
@@ -173,7 +174,7 @@ class MultiGMPE(GMPE):
             # -----------------------------------------------------------------
             if hasattr(gmpe, 'GMPE_LIMITS'):
                 gmpes_with_limits = list(gmpe.GMPE_LIMITS.keys())
-                gmpe_class_str = str(gmpe).replace('()', '')
+                gmpe_class_str = str(gmpe).replace('[', '').replace(']', '')
                 if gmpe_class_str in gmpes_with_limits:
                     limit_dict = gmpe.GMPE_LIMITS[gmpe_class_str]
                     for k, v in limit_dict.items():
@@ -240,9 +241,7 @@ class MultiGMPE(GMPE):
                         lsd[j] = bk17.convertSigmas(imt, lsd[j])
 
             # End: if GMPE is not MultiGMPE
-            else:
-                for a in list(lsd):
-                    lsd.append(a)
+
             #
             # At this point lsd will have 2 * len(stddev_types) entries, the
             # first group will have the point-source to finite rupture
@@ -251,24 +250,55 @@ class MultiGMPE(GMPE):
             #
 
             # -----------------------------------------------------------------
-            # Compute weighted mean and sd
+            # Compute weighted mean and collect the elements to compute sd
             # -----------------------------------------------------------------
 
             lnmu = lnmu + wts[i] * lmean
+            lnmu_list.append(lmean)
+            lnsd_list = lnsd_list + lsd
 
-            # Note: the lnsd2 calculation isn't complete until we drop out of
-            # this loop and subtract lnmu**2
-            # For an explanation of this method, see:
-            # https://stats.stackexchange.com/questions/16608/what-is-the-variance-of-the-weighted-mixture-of-two-gaussians  # noqa
-            for j, sd2 in enumerate(lnsd2):
-                lnsd2[j] = sd2 + wts[i] * (lmean**2 + lsd[j]**2)
+        # -----------------------------------------------------------------
+        # The mean is a weighted sum of random variables, so the stddev
+        # is the weighted sum of of their covariances (effectively). See:
+        # https://en.wikipedia.org/wiki/Variance#Weighted_sum_of_variables
+        # for an explanation. Also see:
+        # http://usgs.github.io/shakemap/manual4_0/tg_processing.html#ground-motion-prediction
+        # for a discussion on the way this is implemented here.
+        # -------------------------------------------------------------- # noqa
 
-        for j, sd2 in enumerate(lnsd2):
-            lnsd2[j] = sd2 - lnmu**2
+        nwts = len(wts)
+        npwts = np.array(wts).reshape((1, -1))
+        nsites = len(lnmu)
+        # Find the correlation coefficients among the gmpes; if there are
+        # fewer than 10 points, just use an approximation (noting that the
+        # correlation among GMPEs tends to be quite high).
+        if nsites < 10:
+            cc = np.full((nwts, nwts), 0.95)
+            np.fill_diagonal(cc, 1.0)
+        else:
+            np.seterr(divide='ignore', invalid='ignore')
+            cc = np.reshape(np.corrcoef(lnmu_list), (nwts, nwts))
+            np.seterr(divide='warn', invalid='warn')
+            cc[np.isnan(cc)] = 1.0
 
-        lnsd = [np.sqrt(a) for a in lnsd2]
+        # Multiply the correlation coefficients by the weights matrix
+        # (this is cheaper than multiplying all of elements of each
+        # stddev array by their weights since we have to multiply
+        # everything by the correlation coefficient matrix anyway))
+        cc = ((npwts * npwts.T) * cc).reshape((nwts, nwts, 1))
+        nstds = len(stddev_types)
+        lnsd_new = []
+        for i in range(nstds * 2):
+            sdlist = []
+            for j in range(nwts):
+                sdlist.append(
+                    lnsd_list[j * nstds * 2 + i].reshape((1, 1, -1)))
+            sdstack = np.hstack(sdlist)
+            wcov = (sdstack * np.transpose(sdstack, axes=(1, 0, 2))) * cc
+            # This sums the weighted covariance as each point in the output
+            lnsd_new.append(np.sqrt(wcov.sum((0, 1))))
 
-        return lnmu, lnsd
+        return lnmu, lnsd_new
 
     @classmethod
     def from_config(cls, conf, filter_imt=None):
@@ -347,11 +377,14 @@ class MultiGMPE(GMPE):
         # name here since the conf is not available within the MultiGMPE class.
         mods = conf['gmpe_modules']
         mod_keys = mods.keys()
+        new_gmpe_lims = {}
         for k, v in gmpe_lims.items():
             if k in mod_keys:
-                gmpe_lims[mods[k][0]] = gmpe_lims.pop(k)
+                new_gmpe_lims[mods[k][0]] = v
+            else:
+                new_gmpe_lims[k] = v
 
-        out.GMPE_LIMITS = gmpe_lims
+        out.GMPE_LIMITS = new_gmpe_lims
 
         return out
 
@@ -555,8 +588,8 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
 
         for g in gmpes:
-            if not isinstance(g, GMPE) and not isinstance(g, IPE):
-                raise Exception("\"%s\" is not a GMPE or IPE instance." % g)
+            if not isinstance(g, GMPE):
+                raise Exception("\"%s\" is not a GMPE instance." % g)
 
         self = cls()
         self.GMPES = gmpes
@@ -756,34 +789,34 @@ class MultiGMPE(GMPE):
             An OQ sites context with the depth parameters set for the
             requested GMPE.
         """
-        if gmpe == 'MultiGMPE()':
+        if gmpe == '[MultiGMPE]':
             return sites
 
         sites = Sites._addDepthParameters(sites)
 
-        if gmpe == 'AbrahamsonEtAl2014()' or \
-           gmpe == 'AbrahamsonEtAl2014RegTWN()' or \
-           gmpe == 'AbrahamsonEtAl2014RegCHN()':
+        if gmpe == '[AbrahamsonEtAl2014]' or \
+           gmpe == '[AbrahamsonEtAl2014RegTWN]' or \
+           gmpe == '[AbrahamsonEtAl2014RegCHN]':
             sites.z1pt0 = sites.z1pt0_ask14_cal
-        if gmpe == 'AbrahamsonEtAl2014RegJPN()':
+        if gmpe == '[AbrahamsonEtAl2014RegJPN]':
             sites.z1pt0 = sites.z1pt0_ask14_jpn
-        if gmpe == 'ChiouYoungs2014()' or \
+        if gmpe == '[ChiouYoungs2014]' or \
            isinstance(gmpe, BooreEtAl2014):
             sites.z1pt0 = sites.z1pt0_cy14_cal
         if isinstance(gmpe, CampbellBozorgnia2014):
-            if gmpe == 'CampbellBozorgnia2014JapanSite()' or \
-               gmpe == 'CampbellBozorgnia2014HighQJapanSite()' or \
-               gmpe == 'CampbellBozorgnia2014LowQJapanSite()':
+            if gmpe == '[CampbellBozorgnia2014JapanSite]' or \
+               gmpe == '[CampbellBozorgnia2014HighQJapanSite]' or \
+               gmpe == '[CampbellBozorgnia2014LowQJapanSite]':
                 sites.z2pt5 = sites.z2pt5_cb14_jpn
             else:
                 sites.z2pt5 = sites.z2pt5_cb14_cal
-        if gmpe == 'ChiouYoungs2008()' or \
-           gmpe == 'Bradley2013()' or \
-           gmpe == 'Bradley2013Volc()':
+        if gmpe == '[ChiouYoungs2008]' or \
+           gmpe == '[Bradley2013]' or \
+           gmpe == '[Bradley2013Volc]':
             sites.z1pt0 = sites.z1pt0_cy08
-        if gmpe == 'CampbellBozorgnia2008()':
+        if gmpe == '[CampbellBozorgnia2008]':
             sites.z2pt5 = sites.z2pt5_cb07
-        if gmpe == 'AbrahamsonSilva2008()':
+        if gmpe == '[AbrahamsonSilva2008]':
             sites.z1pt0 = gmpe._compute_median_z1pt0(sites.vs30)
 
         return sites
@@ -911,15 +944,15 @@ def filter_gmpe_list(gmpes, wts, imt):
     per_max = [np.max(get_gmpe_sa_periods(g)) for g in gmpes]
     per_min = [np.min(get_gmpe_sa_periods(g)) for g in gmpes]
     if imt == PGA():
-        sgmpe = [g for g in gmpes if imt in
-                 get_gmpe_coef_table(g).non_sa_coeffs]
-        swts = [w for g, w in zip(gmpes, wts) if imt in
-                get_gmpe_coef_table(g).non_sa_coeffs]
+        sgmpe = [g for g in gmpes if PGA in
+                 g.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
+        swts = [w for g, w in zip(gmpes, wts) if PGA in
+                g.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
     elif imt == PGV():
         sgmpe = []
         swts = []
         for i in range(len(gmpes)):
-            if (imt in get_gmpe_coef_table(gmpes[i]).non_sa_coeffs) or\
+            if (PGV in gmpes[i].DEFINED_FOR_INTENSITY_MEASURE_TYPES) or\
                (per_max[i] >= 1.0 and per_min[i] <= 1.0):
                 sgmpe.append(gmpes[i])
                 swts.append(wts[i])
@@ -953,9 +986,12 @@ def get_gmpe_sa_periods(gmpe):
         list: List of periods.
 
     """
-    ctab = get_gmpe_coef_table(gmpe).sa_coeffs
-    ilist = list(ctab.keys())
-    per = [i.period for i in ilist]
+    if gmpe == '[NGAEast]':
+        per = gmpe.per_array
+    else:
+        ctab = get_gmpe_coef_table(gmpe).sa_coeffs
+        ilist = list(ctab.keys())
+        per = [i.period for i in ilist]
     return per
 
 

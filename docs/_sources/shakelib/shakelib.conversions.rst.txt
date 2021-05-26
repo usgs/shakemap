@@ -3,13 +3,15 @@ shakelib.conversions
 
 
 .. toctree::
+   :maxdepth: 12
 
-    shakelib.conversions.imc
-    shakelib.conversions.imt
+   shakelib.conversions.imc
+   shakelib.conversions.imt
 
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.conversions.convert_imc
    shakelib.conversions.convert_imt
@@ -17,6 +19,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.conversions
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

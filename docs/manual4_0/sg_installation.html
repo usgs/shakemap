@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4.2. Installation and Configuration &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.3. Queueing Events" href="sg_queue.html" />
+    <link rel="prev" title="4.1. Software Architecture" href="sg_architecture.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation-and-configuration">
+<span id="sec-installation-4"></span><h1><span class="section-number">4.2. </span>Installation and Configuration<a class="headerlink" href="#installation-and-configuration" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference external" href="https://github.com/usgs/shakemap/wiki">ShakeMap Wiki</a> provides
+a basic quick-start guide to installing and running ShakeMap v4. The
+present section is intended to provide supplementary material and
+additional detail for installing, configuring, and running v4.</p>
+<div class="section" id="installation">
+<h2><span class="section-number">4.2.1. </span>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The Wiki does a pretty good job of explaining the installation process,
+which is fairly automated. Here we will just reiterate that things will
+go most smoothly if you use the bash shell and conda virtual environment.
+Taking a more manual approach will likely lead to conflicts with system
+software (ShakeMap runs on Python 3.7 or 3.8, while many systems still
+use 2.7 as a default) and dependency headaches.</p>
+</div>
+<div class="section" id="configuration">
+<h2><span class="section-number">4.2.2. </span>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>After running <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> the newly-created profile will have its
+<em>config</em> directory populated with a default set of configuration files.
+These files should be reviewed by the operator prior to running
+ShakeMap. Additionally, the config files sometimes change when the
+code is updated and so it is fairly common for errors encountered after
+an update to be related to changes in the configs. We hope that the
+configs will become more stable as the code matures, however it is
+useful to check your configuration files against those in the
+directory <em>shakemap/data</em> to make sure that you make any necessary
+changes to parameters.</p>
+<p>Some internationalization support is included in the making of maps with
+the <code class="docutils literal notranslate"><span class="pre">mapping</span></code> module. See the <em>products.conf</em> section below.</p>
+<p>The configuration files are discussed in the sections below.</p>
+<div class="section" id="model-conf">
+<h3><span class="section-number">4.2.2.1. </span>model.conf<a class="headerlink" href="#model-conf" title="Permalink to this headline">¶</a></h3>
+<p><em>model.conf</em> contains configuration options for the way modeling works, such
+as the GMPE or GMPEs to use, the location of the Vs30, the IMTs to compute,
+and options on where the predictions should be computed (i.e., grid
+resolution or a list of site locations). One can make a copy of this
+file in an event directory to have event-specific config options.
+In the event-specific <em>model.conf</em> it is only necessary to list parameters
+that differ from those in the global file. Note that you must include
+any section or sub-section indicators for the parameter in question. For
+instance, to set the <code class="docutils literal notranslate"><span class="pre">max_deviation</span></code> parameter in an event-specific
+model.conf file, you would include the lines:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">data</span><span class="p">]</span>
+  <span class="p">[[</span><span class="n">outlier</span><span class="p">]]</span>
+    <span class="n">max_deviation</span> <span class="o">=</span> <span class="mf">2.0</span>
+</pre></div>
+</div>
+<p>One may also create a custom GMPE set in the event-specific <em>model.conf</em>
+and set the system to use it. For instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">gmpe_sets</span><span class="p">]</span>
+  <span class="p">[[</span><span class="n">gmpe_northridge_custom</span><span class="p">]]</span>
+    <span class="n">gmpes</span> <span class="o">=</span> <span class="n">active_crustal_california</span><span class="p">,</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">weights_larage_dist</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dist_cutoff</span> <span class="o">=</span> <span class="n">nan</span>
+    <span class="n">site_gmpes</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">weights_site_gmpes</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">[</span><span class="n">modeling</span><span class="p">]</span>
+  <span class="n">gmpe</span> <span class="o">=</span> <span class="n">gmpe_northridge_custom</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="select-conf">
+<h3><span class="section-number">4.2.2.2. </span>select.conf<a class="headerlink" href="#select-conf" title="Permalink to this headline">¶</a></h3>
+<p><em>select.conf</em> has options for GMPE selection, which are used by
+the <code class="docutils literal notranslate"><span class="pre">select</span></code> module. Note that if/when the <code class="docutils literal notranslate"><span class="pre">select</span></code> module runs, it
+creates the file <em>model_select.conf</em> in the event’s <em>current</em> directory,
+which overrides the GMPE set in the <em>model.conf</em> file located in the
+global config directory, but the config settings in an event-specific
+<em>model.conf</em> take precedence over the settings in <em>model_select.conf</em>.
+Thus, if there are any event-specific changes to the <em>model.conf</em>,
+a sensible approach is to rename <em>model_select.conf</em> to <em>model.conf</em>
+and then add any other config options to it.</p>
+<p>Please see the
+<a class="reference internal" href="tg_select.html#sec-select-4"><span class="std std-ref">Ground Motion Selection section</span></a> for
+additional details on how this configuration works.</p>
+</div>
+<div class="section" id="products-conf">
+<h3><span class="section-number">4.2.2.3. </span>products.conf<a class="headerlink" href="#products-conf" title="Permalink to this headline">¶</a></h3>
+<p><em>products.conf</em> holds options for the various ShakeMap products, such as
+contours, rasters, and maps. Additional explanation is
+available as comments in the <em>products.conf</em> file.</p>
+<p>Of particular
+interest to some users will be the options for <strong>language</strong> and
+possibly <strong>fontfamily</strong>. These options allow for the maps to be
+generated in a language other than English. If your language
+of interest already exists in <em>shakemap/data/mapping</em> then you
+can specify its extension for the <strong>language</strong> parameter. You may or
+may not have to set the <strong>fontfamily</strong> parameter to support your
+language of choice – that will depend on your system configuration.</p>
+<p>If your language does not appear as one of the options in
+<em>shakemap/data/mapping</em>, you may make the translations as
+described in one of the language files (e.g., <em>map_strings.en</em>)
+and add your new file (with the proper extension – see
+<a class="reference external" href="https://www.iana.org/assignments/language-subtag-registry">https://www.iana.org/assignments/language-subtag-registry</a>
+for a list of options) to <em>shakemap/data/mapping</em> directory, and then
+use that extension for your <strong>language</strong> parameter. Please also send us
+your file so that we can include it in the repository. That way it will
+be there the next time you update or install the ShakeMap software.</p>
+<p>Note that the translations only apply to the products of the <code class="docutils literal notranslate"><span class="pre">mapping</span></code>
+module.</p>
+</div>
+<div class="section" id="gmpe-sets-conf">
+<h3><span class="section-number">4.2.2.4. </span>gmpe_sets.conf<a class="headerlink" href="#gmpe-sets-conf" title="Permalink to this headline">¶</a></h3>
+<p>This file defines the GMPE sets that are available to be set in
+<em>model.conf</em>. These sets can be as simple as a single GMPE with a
+weight of 1.0. The GMPE sets can be selected directly from <em>model.conf</em>,
+or a the custom GMPE set created by the <code class="docutils literal notranslate"><span class="pre">select</span></code> module can be
+selected.</p>
+</div>
+<div class="section" id="modules-conf">
+<h3><span class="section-number">4.2.2.5. </span>modules.conf<a class="headerlink" href="#modules-conf" title="Permalink to this headline">¶</a></h3>
+<p><em>modules.conf</em> ontrols what GMPEs are available for constructing GMPE sets.
+Generally, this only needs to be edited if you wish to use a GMPE that is not
+currently imported. The GMPEs are imported
+from the <a class="reference external" href="https://github.com/gem/oq-engine">OpenQuake Engine</a>
+<a class="reference external" href="https://github.com/gem/oq-engine/tree/master/openquake/hazardlib">hazardlib</a>
+library.</p>
+</div>
+<div class="section" id="shake-conf">
+<h3><span class="section-number">4.2.2.6. </span>shake.conf<a class="headerlink" href="#shake-conf" title="Permalink to this headline">¶</a></h3>
+<p>This configuration file is only for very general configuration options
+relating
+to the operation of <code class="docutils literal notranslate"><span class="pre">shake</span></code>. It allows the operator to configure additional
+repositories of ShakeMap modules (“plugins,” if you will). It also allows
+the user to set the modules for automatic runs, using the parameter
+<strong>autorun_modules</strong>. The
+general idea is that shake can be run specifying specific modules like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shake</span> <span class="o">&lt;</span><span class="n">event</span> <span class="nb">id</span><span class="o">&gt;</span> <span class="n">module1</span> <span class="n">module2</span>
+</pre></div>
+</div>
+<p>But since there are many modules and <code class="docutils literal notranslate"><span class="pre">shake</span></code> is often invoked via
+automated processes, it is convenient to configure a list of
+<strong>*utorun_modules</strong> that will be used when no module is specified
+on the command line, i.e., like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shake</span> <span class="o">&lt;</span><span class="n">event</span> <span class="nb">id</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="logging-conf">
+<h3><span class="section-number">4.2.2.7. </span>logging.conf<a class="headerlink" href="#logging-conf" title="Permalink to this headline">¶</a></h3>
+<p><em>logging.conf</em> contains options for logging. Most users will likely not
+need to modify this file unless they wish to change the format of the
+messages, date/time stamps, or other logging behavior.</p>
+</div>
+<div class="section" id="transfer-conf">
+<h3><span class="section-number">4.2.2.8. </span>transfer.conf<a class="headerlink" href="#transfer-conf" title="Permalink to this headline">¶</a></h3>
+<p><em>transfer.conf</em> controls the transfer of ShakeMap products to remote
+systems via the
+<code class="docutils literal notranslate"><span class="pre">transfer</span></code> module. See the documentation within the file itself for
+explanation of the available options.</p>
+</div>
+<div class="section" id="migrate-conf">
+<h3><span class="section-number">4.2.2.9. </span>migrate.conf<a class="headerlink" href="#migrate-conf" title="Permalink to this headline">¶</a></h3>
+<p>This file holds parameters that determine how ShakeMap 3.5 data directories
+are migrated to ShakeMap 4.0-compatible directories via the program
+<code class="docutils literal notranslate"><span class="pre">sm_migrate</span></code>. This file allows the user to choose which OpenQuake
+GMPE should be used in place of the ShakeMap GMPE previously used
+for each event.</p>
+</div>
+</div>
+<div class="section" id="downloading-and-configuring-vs30-and-topography">
+<h2><span class="section-number">4.2.3. </span>Downloading and Configuring Vs30 and Topography<a class="headerlink" href="#downloading-and-configuring-vs30-and-topography" title="Permalink to this headline">¶</a></h2>
+<p>We provide three files available by FTP at
+<a class="reference external" href="ftp://hazards.cr.usgs.gov/shakemap">ftp://hazards.cr.usgs.gov/shakemap</a>:</p>
+<ul class="simple">
+<li><p><em>global_vs30.grd</em> – The 30 arcsecond resolution Vs30 data set for the entire globe.</p></li>
+<li><p><em>topo_30sec.grd</em> – The 30 arcsecond resolution topography data for the entire globe.</p></li>
+<li><p><em>topo_15sec.grd</em> – The 15 arcsecond resolution topography data for the entire globe.</p></li>
+</ul>
+<p>By ‘entire globe’ we mean from 56 degrees south to 84 degrees north latitude.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> allows the user to download the 30-arcsecond topo
+and Vs30 files as part of the creation of a profile. If <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> is
+called with the <code class="docutils literal notranslate"><span class="pre">-a</span></code> option, these files will be downloaded automatically
+and the profile will be configured to use them.</p>
+<p>If you did not have <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> download the grids, you have a choice
+of 15 or 30 second resolution topography. 15 second data shows
+more detail at small scales, but causes ShakeMap to take significantly
+longer to make the various output maps. The ShakeMap system at the National
+Earthquake Information Center uses the 30 second data. If you plan to use
+the 15 second data, modify the topo file name below to topo_15sec.grd.</p>
+<p>Note that these files are somewhat large: the 30-second topo is 238 Mb, the
+30-second Vs30 is 582 Mb, and the 15-second topo is 745 Mb.</p>
+<p>To download the files, do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">mkdir</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span>
+<span class="o">&gt;</span> <span class="n">mkdir</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span><span class="o">/</span><span class="n">vs30</span>
+<span class="o">&gt;</span> <span class="n">mkdir</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span><span class="o">/</span><span class="n">topo</span>
+<span class="o">&gt;</span> <span class="n">cd</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span><span class="o">/</span><span class="n">vs30</span>
+<span class="o">&gt;</span> <span class="n">curl</span> <span class="n">ftp</span><span class="p">:</span><span class="o">//</span><span class="n">hazards</span><span class="o">.</span><span class="n">cr</span><span class="o">.</span><span class="n">usgs</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">shakemap</span><span class="o">/</span><span class="n">global_vs30</span><span class="o">.</span><span class="n">grd</span> <span class="o">-</span><span class="n">o</span> <span class="n">global_vs30</span><span class="o">.</span><span class="n">grd</span>
+<span class="o">&gt;</span> <span class="n">cd</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span><span class="o">/</span><span class="n">topo</span>
+<span class="o">&gt;</span> <span class="n">curl</span> <span class="n">ftp</span><span class="p">:</span><span class="o">//</span><span class="n">hazards</span><span class="o">.</span><span class="n">cr</span><span class="o">.</span><span class="n">usgs</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">shakemap</span><span class="o">/</span><span class="n">topo_30sec</span><span class="o">.</span><span class="n">grd</span> <span class="o">-</span><span class="n">o</span> <span class="n">topo_30sec</span><span class="o">.</span><span class="n">grd</span>
+</pre></div>
+</div>
+<p>By default, the system is configured to find the Vs30 and topography files in
+the locations described above. To set the paths to other locations or file
+names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">cd</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_profiles</span><span class="o">/</span><span class="p">[</span><span class="n">profile</span><span class="p">]</span><span class="o">/</span><span class="n">install</span><span class="o">/</span><span class="n">config</span>
+</pre></div>
+</div>
+<p>Modify <em>model.conf</em> to change the line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vs30file</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">DATA_DIR</span><span class="o">&gt;/</span><span class="n">vs30</span><span class="o">/</span><span class="n">global_vs30</span><span class="o">.</span><span class="n">grd</span>
+</pre></div>
+</div>
+<p>to the location of your Vs30 data. Similarly, edit <em>products.conf</em> and
+change the line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">topography</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">DATA_DIR</span><span class="o">&gt;/</span><span class="n">topo</span><span class="o">/</span><span class="n">topo_30sec</span><span class="o">.</span><span class="n">grd</span>
+</pre></div>
+</div>
+<p>to the path to your topography file. Note that ShakeMap completes
+the macro <code class="docutils literal notranslate"><span class="pre">&lt;INSTALL_DIR&gt;</span></code> for the profile in question, but you may set
+the paths to any absolute path on your system.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.0 Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sm4_introduction.html">1. Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_technical_guide.html">2. Technical Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_users_guide.html">3. Users Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="sm4_software_guide.html">4. Software and Implementation Guide</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sg_architecture.html">4.1. Software Architecture</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">4.2. Installation and Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#installation">4.2.1. Installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration">4.2.2. Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#model-conf">4.2.2.1. model.conf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#select-conf">4.2.2.2. select.conf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#products-conf">4.2.2.3. products.conf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#gmpe-sets-conf">4.2.2.4. gmpe_sets.conf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#modules-conf">4.2.2.5. modules.conf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-conf">4.2.2.6. shake.conf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#logging-conf">4.2.2.7. logging.conf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#transfer-conf">4.2.2.8. transfer.conf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#migrate-conf">4.2.2.9. migrate.conf</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#downloading-and-configuring-vs30-and-topography">4.2.3. Downloading and Configuring Vs30 and Topography</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sg_queue.html">4.3. Queueing Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_input_formats.html">4.4. Input Data Formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_output_formats.html">4.5. Output Data Formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_operational.html">4.6. Operational Considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_operational.html#shakemap-implementation-checklist">4.7. ShakeMap Implementation Checklist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_operational.html#software-installation">4.8. Software Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_contributing.html">4.9. Guidelines for Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_acknowledgments.html">5. Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_references.html">6. References and Bibliography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_glossary.html">7. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

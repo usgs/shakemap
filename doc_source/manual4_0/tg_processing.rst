@@ -14,14 +14,20 @@ multivariate normal distribution (MVN). The MVN approach employed by
 ShakeMap is described in :ref:`Worden et al., 2018 <worden2018>`. The 
 specifics of ShakeMap's implementation of this method are described below.
 
+.. _subsec-ground-motion-prediction-4:
+
 Ground-Motion Prediction
 ==========================
+
+Ground Motion Models
+--------------------
 
 ShakeMap uses ground-motion prediction equations (GMPEs) to provide the
 initial estimates of ground motions. The GMPEs are drawn from the set
 of GMPEs implemented by the GEM OpenQuake project. The full list of
-available GMPEs may be found 
-`here <https://docs.openquake.org/oq-hazardlib/master/_modules/openquake/hazardlib/gsim/>`_.
+available GMPEs may be found
+`here <https://github.com/gem/oq-engine/tree/master/openquake/hazardlib/gsim/>`_.
+
 In addition to these individual GMPEs, ShakeMap allows for a weighted
 combination of two or more GMPEs. GMPEs are configured in ShakeMap
 as GMPE "sets" (see *gmpe_sets.conf* and *modules.conf* for 
@@ -31,39 +37,90 @@ is specified with the ``gmpe`` parameter of the ``model`` section of
 :class:`MultiGMPE <shakelib.multigmpe.MultiGMPE>` class.
 The MultiGMPE class allows for smooth transitions between tectonic
 environments, as well as consistency with the methodology of other
-projects, such as the `USGS National Seismic Hazard Mapping Project 
-<https://earthquake.usgs.gov/hazards/hazmaps/>`_.
+projects, such as the `USGS National Seismic Hazard Model
+<https://www.usgs.gov/natural-hazards/earthquake-hazards/hazards/>`_.
+
+Ground Motion Model Sets
+------------------------
+
+By default, ShakeMap comes with a few GMPE sets pre-configured, and we review a
+few of the important ones here. One example is the "active_crustal_nshmp2014,"
+which combines four NGA West2 GMPEs using equal weights. This is used by the
+USGS National Seismic Hazard Model (NSHM)
+for shallow crustal earthquakes, and was not changed in the 2018 update. We
+also include the 2014 NSHM set of GMPEs for stable continental regions
+("stable_continental_nshmp2014_rlme"). However, this was updated in 2018 to
+use the NGA East GMPE. This can be specified using the "stable_continental_ngae"
+GMPE set. One limitation of the NGA East model is that it was not developed for
+use with magnitudes less than 4. Our implementation includes an extension of their
+model to smaller magnitudes that extrapolates the small-magnitude scaling of
+ground motions. The slope of this adustment varies with period and distance,
+as illustrated in :num:`Figure #nga-east-slope`.
+
+.. _nga-east-sope:
+
+.. figure:: _static/nga-east_smallM_slopes.*
+   :width: 500
+   :align: left
+
+   Estimated small-magnitue scaling of the NGA-East median ground motion model
+   as a function of period and distance.
+
+
+Uncertainty from Multiple Models
+--------------------------------
 
 The MultiGMPE module uses a list of GMPEs and their weights to 
-produce a weighted mean at each location:
+produce a weighted mean at each location. If we treat the outputs of the
+GMPEs as random variables, then we can define a variable :math:`X` as a 
+column vector of :math:`n` random variables :math:`X_1,...,X_n`. If the
+weights are given by :math:`w`, a column vector with elements
+:math:`w_1,...,w_n`, then the weighted mean, :math:`\mu` is given by:
 
 .. math::
 
-    \mu = \sum_{i=1}^{n} w_i \mu_i,
+   \mu = w^{T}X
 
-where :math:`w_i` are the weights and :math:`\mu_i` are the 
-individual means. Since the result is a mixture distribution,
-the variances are given by:
+The variance of this mean can then be expressed as:
 
 .. math::
 
-    \sigma^2 = \sum_{i=1}^{n} w_i \left( {\left( \mu_i - \mu \right)}^2 + 
-                                     \sigma^2_i \right),
+   \mathrm{Var}\left( w^{T}X \right) = w^{T}\Sigma w,
 
-where :math:`\sigma_i` are the standard deviations of the corresponding
-components of the mean. We note that while the mean will typically be
-a smooth function with distance (all else being equal) this formulation 
-can lead to some unexpected features in the standard deviation field. 
-These features, however, tend to be fairly small in magnitude relative
-to the overall standard deviation. For example :num:`Figure #gmpe-test-mean`
+in which :math:`\Sigma` is the covariance matrix of :math:`X`. This
+covariance matrix is derived from the stated standard deviations of
+the GMPEs (which may be heteroscedastic), and the computed correlations
+among the elements of :math:`X`, as follows. The GMPE-defined standard
+deviations supply a vector :math:`\sigma` with elements 
+:math:`\sigma_1,...,\sigma_n` corresponding to the elements of :math:`X`
+above. The correlation matrix, :math:`P`, is computed from all of the 
+values provided by each GMPE for a given execution of the MultiGMPE (if
+fewer than ten elements are computed for a given execution, then a 
+correlation matrix is approximated). The covariance matrix is then
+given by:
+
+.. math::
+
+   \Sigma = \sigma\sigma^T * P
+
+in which :math:`*` represents element-by-element multiplication. Since
+the standard deviations provided by the various GMPEs may be 
+heteroscedastic, the variance must be computed for each point in the
+output. This variance calculation is applied to the within-event,
+between-event, and total variance of the MultiGMPE. Because variances are
+additive, the total is expected to be the sum of the within-event and
+between-event variances.
+
+:num:`Figure #gmpe-test-mean`
 shows the mean ground motion field computed from a 50-50 weighting of
 the :ref:`Abrahamson et al (2014) <abrahamson2014>` and the 
 :ref:`Chiou and Youngs (2014) <chiou2014>` GMPEs. The
-field smoothly decays with distance, as expected. In contrast, the
-standard deviation field (:num:`Figure #gmpe-test-sd` displays an
-unexpected oscillatory behavior. Upon inspection of the cross-section
-plots, however,
-we find that the oscillations are very small in magnitude.
+field smoothly decays with distance, as expected. The
+standard deviation field (:num:`Figure #gmpe-test-sd`) shows a 
+somewhat lower value near the source than at distance.
+Upon inspection of the cross-section plots and scale, however,
+we find that the variation is very small in amplitude. This
+variation is due to the heteroscedastic nature of the GMPEs.
 
 .. _gmpe-test-mean:
 
@@ -88,7 +145,7 @@ we find that the oscillations are very small in magnitude.
    :ref:`Chiou and Youngs (2014) <chiou2014>` GMPEs.
 
 If the requested IMT is PGV, and some of the selected GMPEs do not 
-produce PGV, them those GMPEs are removed from the list and the list
+produce PGV, then those GMPEs are removed from the list and the list
 is re-weighted with the remaining GMPEs in accordance with their 
 original proportional weights. If none of the GMPEs in a set 
 produce PGV, then MultiGMPE computs 1.0 s spectral acceleration and
@@ -96,14 +153,78 @@ uses the :ref:`Newmark and Hall (1982) <newmark1982>` equations to
 convert to PGV. 
 
 The MultiGMPE class will also accept a second set of GMPEs and weights
-to use beyond a specified distance. A third set of GMPEs may be supplied
+to use beyond a specified distance. 
+
+.. _subsec-site-amplification-4:
+
+Site Corrections
+--------------------
+
+Near-surface conditions can have a substantial effect on ground motions. Ground motions 
+at soft-soil sites, for instance, will typically be amplified relative to sites on bedrock. 
+Because we wish to interpolate sparse data to a grid over which site characteristics may 
+vary greatly, we compute our residuals and predicted ground motions using 
+site amplification factors.
+
+A third set of GMPEs may be supplied to the MultiGMPE class
 if all of the GMPEs in the primary set do not support Vs30-based site
 amplification. The GMPEs in this set will be used to compute the site
 terms, which will then be applied to the results of the primary set.
+Otherwise, the individual GMPEs will each apply site corrections to the
+ground motions they provide to the mean. As Vs30 has become a near-ubiquitous
+site amplification proxy parameter in current-genereation GMPEs, the latter
+approach usually applies.
+
+Site Characterization Map
+-------------------------
 
 In general, site amplifications are computed using a Vs30 grid supplied
 by the operator (see the Vs30 parameters ``vs30file`` and ``vs30default``
 in the ``data`` section of *model.conf* for configuration information.)
+Each region wishing to implement ShakeMap should have a Vs30 map that covers the 
+entire area they wish to map. 
+
+Some ShakeMap operators have employed existing geotechnically- or geologically-based 
+Vs30 maps, or have developed their own Vs30 map for the area covered by their 
+ShakeMap system. For regions lacking such maps (including most of globe) operators often 
+employ the approach of :ref:`Wald and Allen \(2007\) <wald2007>`, revised by :ref:`Allen and Wald, \(2009b\) <allen2009b>`, 
+which provides estimates of Vs30 as a function of more readily available topographic 
+slope data. Wald and Allen's slope-based Vs30-mapping proxy is employed by the Global 
+ShakeMap (GSM) system. 
+
+Recent developments by :ref:`Wald et al. \(2011d\) <wald2011a>` and
+:ref:`Thompson et al. \(2012 <thompson2012>`; :ref:`2014 <thompson2014>`) provide a 
+basis for refining Vs30 maps when Vs30 data constraints are abundant. Their method 
+employs not only geologic units and topographic slope, but also explicitly constrains map 
+values near Vs30 observations using kriging-with-a-trend to introduce the level of spatial 
+variations seen in the Vs30 data (:ref:`Thompson et al., 2014 <thompson2014>`). 
+An example of Vs30 for California using this approach is provided in
+:num:`Figure #thompson-vs30`. Thompson et al. describe how 
+differences among Vs30 base maps translate into variations in site amplification in 
+ShakeMap. 
+ 
+.. _thompson-vs30:
+
+.. figure:: _static/thompson_vs30.*
+   :align: left
+   :width: 650px
+
+   Revised California Vs30 Map (:ref:`Thompson et al., 2014 <thompson2014>`).
+   This map combines geology, topographic slope, and constraints of map
+   values near Vs30 observations using kriging-with-a-trend.  Inset shows
+   Los Angeles region, with Los Angeles Basin indicating low Vs30 velocities. 
+
+:ref:`Worden et al. \(2015\) <worden2015>` and 
+:ref:`Heath et al. \(2020\) <heath2020>` further consolidate readily
+available Vs30 map grids used for ShakeMaps at global regional seismic networks
+with background derived from the topographic-based Vs30 proxy to develop a 
+consistently scaled mosaic of `Vs30 maps for the globe
+<https://github.com/usgs/earthquake-global_vs30>`_
+with smooth transitions from tile to tile.
+
+
+Generic Amplification Factors
+-----------------------------
 
 Shakemap does not currently support operator-supplied basin
 depths. Some modern GMPEs use basin depths (typically "Z1.0" or "Z2.5")
@@ -122,6 +243,8 @@ grids should taper to zero at the edges, and are assumed to be zero
 everywhere outside of the supplied grid(s). See the module
 :mod:`shakemap.utils.generic_amp` for more on the generic amplification
 factors.
+
+.. _subsec-gmice:
 
 Ground Motion to Intensity Conversions
 ======================================
@@ -163,11 +286,11 @@ available. The available IPEs are for active tectonic and stable
 tectonic regions. If a suitable IPE is not available, the operator may
 specify the :class:`VirtualIPE <shakelib.virtualipe.VirtualIPE>` as the 
 IPE of choice. The VirtualIPE uses the configured GMPE and GMICE to form
-a composite IPE. That is, ground motions (typically PGV) are predicted
-via the GMPE and then converted to intensity via the GMICE. 
+a composite IPE. That is, ground motions (typically PGV or PGV and PGA)
+are predicted via the GMPE and then converted to intensity via the GMICE. 
 
 While the VirtualIPE allows the application of ShakeMap to a wider range
-of tectonic environments that the available IPEs, it comes at the cost of
+of tectonic environments than the available IPEs, it comes at the cost of
 greater uncertainty in the predicted intensity values than the available
 IPEs. In particular, the standard deviation of a predicted intensity as 
 given by the rules of error propagation (see :ref:`Ku (1966) <ku1966>` is:
@@ -198,8 +321,8 @@ the mean intensity from a VirtualIPE of the
 :ref:`Chiou and Youngs (2014) <chiou2014>` GMPEs combined with the
 GMICE of :ref:`Worden et al. (2012) <worden2012>`. The MMI values 
 display a distinct change in slope as the relation reaches the
-lower intensities. This is due to the different slopes of the two
-lines of the bilinear relationship. More significantly, 
+lower intensities. This change in slope is due to the different slopes
+of the two lines of the bilinear relationship. More significantly, 
 :num:`Figure #gmice-test-sd`
 displays a dramatic drop in the standard deviation at the 
 point where the two lines of the bi-linear relationship meet.
@@ -210,7 +333,7 @@ consequence of the bilinear form of the GMICE.
 
 .. figure:: _static/wgrw12_figure_6.*
    :width: 550
-   :align: center
+   :align: left
 
    MMI vs. PGV for the :ref:`Worden et al. (2012) <worden2012>` 
    GMICE. Note the bi-linear relationship of the three GMICE
@@ -241,6 +364,7 @@ consequence of the bilinear form of the GMICE.
    :ref:`Chiou and Youngs (2014) <chiou2014>` GMPEs, and
    the :ref:`Worden et al. (2012) <worden2012>` GMICE.
 
+|
 
 .. _subsec-cross-correlation:
 
@@ -291,11 +415,11 @@ means of dealing with these amplitudes is through the flagging
 of outliers.
 
 Outlier flagging works through an operator-configurable 
-parameter ``max_deviation`` in the ``outlier`` sub-section of
+parameter (``max_deviation`` in the ``outlier`` sub-section of
 the ``data`` section of *model.conf*). Essentially, 
 for each ground
 motion in the input, a prediction is calculated with the
-configured GMPE. If the observed amplitude is greater than
+configured GMPE (or GMPE set). If the observed amplitude is greater than
 ``max_deviation`` standard deviations above or below the 
 prediction, then that observation is flagged as an 
 outlier and is not used in further processing.
@@ -317,7 +441,9 @@ effect.
 Outlier flagging is performed on a per-IMT basis. Thus, for
 example, if a station's PGA value is flagged, the other IMTs
 from that station are unaffected (unless they, too, are 
-flagged).
+flagged). Derived parameters are, however, flagged if their source
+parameter is flagged (e.g., if PGV is flagged, then the MMI derived
+from it is also flagged).
 
 
 Interpolation
@@ -332,7 +458,7 @@ discuss some specific details of its implementation within ShakeMap.
 Computation
 -----------
 
-The conditional MVN can be summarized as a situation in which we have a
+The conditional MVN can be summarized as a case in which we have a
 random variable of interest :math:`\bm{Y}` where we wish to compute
 predictions
 at a set of *M* ordinates (:math:`\bm{Y}_1`) conditioned upon a set of
@@ -377,7 +503,7 @@ and covariance:
         \right].
 
 where :math:`M \times M`, :math:`M \times N`, :math:`N \times M`, and 
-:math:`N \times N` give the dimensions of the partitioned arrays. The
+:math:`N \times N` give the dimensions of the partitioned matrices. The
 mean values may be taken from a GMPE or other ground motion model. The
 elements of the covariance matrix are given by:
 
@@ -391,7 +517,9 @@ position *(i, j)*,
 :math:`\rho_{{Y_i},{Y_j}}` is the correlation between the elements
 :math:`Y_i` and :math:`Y_j` of the vector :math:`\bm{Y}`, and
 :math:`\phi_{Y_i}` and :math:`\phi_{Y_j}` are the within-event standard
-deviations of the elements :math:`Y_i` and :math:`Y_j`.
+deviations of the elements :math:`Y_i` and :math:`Y_j`. We note that the
+correlation between :math:`Y_i` and :math:`Y_j` may be a function of
+distance: either physical separation, spectral separation, or both.
 
 Given a set of observations :math:`\mathbf{Y_2} = \mathbf{y_2}`, and
 their (usually predicted) means :math:`\bm{\mu}_{\mathbf{Y_2}}`, we define 
@@ -543,7 +671,7 @@ specifics of the correlation function.
 
 .. figure:: _static/Figure_mu_compare.*
    :width: 450
-   :align: center
+   :align: left
 
    Conditional spectra for two sets of conditioning observations:
    One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
@@ -558,7 +686,7 @@ specifics of the correlation function.
 
 .. figure:: _static/Figure_sigma_compare.*
    :width: 450
-   :align: center
+   :align: left
 
    The standard deviations of conditional spectra for two sets of 
    conditioning observations:
@@ -631,7 +759,7 @@ the number of observations becomes large.
 
 .. figure:: _static/event_term_number_obs.*
    :width: 450
-   :align: center
+   :align: left
 
    The event term as a function of the number of residuals. Here all
    of the residuals have a uniform value of 1.0. The within-event
@@ -719,7 +847,6 @@ the GMICE) will carry the additional uncertainty of the conversion process.
 Intensity observations themselves -- such as those obtained through the
 "Did You Feel It?" system -- have an inherent uncertainty due to the 
 averaging process in their derivation. 
-
 This standard deviation may be specified by the 
 operator in the input file. If it is not specified, ShakeMap assigns a
 default standard deviation to intensity measurements of 0.3 intensity
@@ -766,15 +893,16 @@ over a gridded region. The grid is centered on the epicenter of
 the earthquake, and its extent is set automatically. The default
 configuration tends to err on the side of larger maps, however
 the operator may control the parameters used to determine the
-map extent through the *extent.conf* configuration file. Alternately,
+map extent through the ``extent`` section of the *model.conf* 
+configuration file. Alternately,
 the operator may set fixed bounds for maps through the ``extent``
-parameter in the ``prediction_location`` sub-section of the 
-``interp`` section in *model.conf* (which, like all parameters in 
+parameter in the ``bounds`` sub-section of the 
+``extent`` section in *model.conf* (which, like all parameters in 
 *model.conf* may be set globally or on an event-by-event basis).
 
 ShakeMap can also be configured to compute ground motions for
 an arbitrary set of points. The operator may create a file
-containing rows of latitude, longitude, Vs30, and a location or facility
+containing rows of longitude, latitude, Vs30, and a location or facility
 identifier (with the columns being separated by whitespace).
 The file may then be specified with the ``file`` parameter in
 the ``prediction_location`` sub-section of the ``interp`` section
@@ -783,6 +911,9 @@ of *model.conf*.
 
 Performance Considerations
 ==========================
+
+Multithreading
+--------------
 
 The run time of ShakeMap is most strongly controlled by the number
 of input seismic stations (and macroseismic observations), the size
@@ -803,6 +934,23 @@ error of the type::
     too many memory regions.
 
 then ``max_workers`` should be reduced (or, you can obtain or 
-compile BLAS libraries that are reentrant safe -- a topic which is
+compile BLAS libraries that are reentrant-safe -- a topic which is
 far beyond the scope of this manual.)
 
+Grid Size
+----------
+
+At a given grid resolution (as specified in *model.conf*), the number
+of points in the grid can grow very large for maps that cover several
+degrees of latitude and longitude. ShakeMap's automatic scaling 
+feature can often produce such large maps for larger-magnitude 
+earthquakes. The resulting increase in ShakeMap run times can be
+quite dramatic. To alleviate this situation in cases where ShakeMap 
+is run automatically (and thus the map extent is determined automatically)
+we have introduced the parameter ``nmax`` in the ``interp`` section of
+*model.conf*. This parameter can be set to limit the number of points
+in the grid
+by increasing the X and Y grid spacing until the limit is not exceeded.
+The default value of 500,000 seems to provide a good balance between
+resolution and run time, but the operator may adjust the value to suit
+their needs.

@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4.3. Queueing Events &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.4. Input Data Formats" href="sg_input_formats.html" />
+    <link rel="prev" title="4.2. Installation and Configuration" href="sg_installation.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="queueing-events">
+<span id="sec-queue-4"></span><h1><span class="section-number">4.3. </span>Queueing Events<a class="headerlink" href="#queueing-events" title="Permalink to this headline">¶</a></h1>
+<p>Many regional operators will require an automated method of
+triggering ShakeMap runs. Shakemap v4 provides a flexible mechanism
+for filtering events and initiating runs via the <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>
+program. <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> may be initiated via an init script (see
+<code class="docutils literal notranslate"><span class="pre">init.sh</span></code> in the <code class="docutils literal notranslate"><span class="pre">contrib</span></code> directory, for example) which can
+started by a system startup script, or maintained by crontab.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> waits on a socket for messages from an external
+process or database. The messages – serialized JSON – may be
+of several types, and when received from a trusted source,
+instruct the queue to take certain actions: rerun the event,
+cancel the event, or possibly take no action, depending on
+the configuration and the specifics of the event and its run
+history.</p>
+<p>For the purposes of this discussion, we will treat the JSON
+from the sending process as a Python dictionary This dictionary
+must have keys “type” and “data”. Special keys for “type” are
+“origin”, “cancel”, and “test”. If the type is “origin”, then the
+“data” element needs to describe the origin with the appropriate
+informmation. Here is an example of an origin-type dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;origin&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;us1000abcd&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;netid&#39;</span><span class="p">:</span> <span class="s1">&#39;us&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;network&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="s1">&#39;2018-05-06T14:12:16.5Z&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="s1">&#39;34.5&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="s1">&#39;123.6&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="s1">&#39;6.2&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;mag&#39;</span><span class="p">:</span> <span class="s1">&#39;5.6&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;locstring&#39;</span><span class="p">:</span> <span class="s1">&#39;231 km SE of Guam&#39;</span>
+          <span class="s1">&#39;alt_eventids&#39;</span><span class="p">:</span> <span class="s1">&#39;id1,id2,id3&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;Event added&#39;</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>The fields are:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 81%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>id</p></td>
+<td><p>Event ID</p></td>
+</tr>
+<tr class="row-even"><td><p>netid</p></td>
+<td><p>The (usually) 2-letter network code</p></td>
+</tr>
+<tr class="row-odd"><td><p>network</p></td>
+<td><p>A text description of the network</p></td>
+</tr>
+<tr class="row-even"><td><p>time</p></td>
+<td><p>Origin time in UTC: YYYY-mm-ddTHH:MM:SS.fZ’</p></td>
+</tr>
+<tr class="row-odd"><td><p>lat</p></td>
+<td><p>Origin latitude</p></td>
+</tr>
+<tr class="row-even"><td><p>lon</p></td>
+<td><p>Origin longitude</p></td>
+</tr>
+<tr class="row-odd"><td><p>depth</p></td>
+<td><p>Origin depth</p></td>
+</tr>
+<tr class="row-even"><td><p>mag</p></td>
+<td><p>Origin magnitude</p></td>
+</tr>
+<tr class="row-odd"><td><p>locstring</p></td>
+<td><p>A text description of the origin location</p></td>
+</tr>
+<tr class="row-even"><td><p>alt_eventids</p></td>
+<td><p>A comma-separated list of alternate event IDs for the event</p></td>
+</tr>
+<tr class="row-odd"><td><p>action</p></td>
+<td><p>A text description action that resulted in this trigger</p></td>
+</tr>
+</tbody>
+</table>
+<p>For all “type” values other than “origin”, the “data” dictionary
+need only specify the “id” key and its value. The “origin” type
+will be treated as a new or updated origin, and will trigger a
+run of <code class="docutils literal notranslate"><span class="pre">shake</span></code> subject to the rules described below. The
+“cancel” type will will run <code class="docutils literal notranslate"><span class="pre">shake</span></code> with the <code class="docutils literal notranslate"><span class="pre">cancel</span></code> module
+(assuming that there has been a previous run of <code class="docutils literal notranslate"><span class="pre">shake</span></code> for that
+event). The “test” type will print a message and take no further
+action. All other values of “type” will be treated as if something
+has changed for that event, and <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> should consider rerunning
+the event subject to the same rules as an updated origin. The “type”
+of the trigger will be printed in the log.</p>
+<p>If provided, the <code class="docutils literal notranslate"><span class="pre">alt_eventids</span></code> field allows for the possibility that
+the event
+was originally processed under a different ID, but the authoritative ID
+has changed since then. If the original ID is listed in the
+<code class="docutils literal notranslate"><span class="pre">alt_eventids</span></code> string, then the system will copy the data associated
+with the old ID into the directory for the new ID, and the event database
+will be updated to reflect the new ID.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">action</span></code> is provided, it will be given as the argument to
+the <code class="docutils literal notranslate"><span class="pre">assemble</span></code> or <code class="docutils literal notranslate"><span class="pre">augment</span></code> module when the event is processed by
+<code class="docutils literal notranslate"><span class="pre">shake</span></code>.</p>
+<p>The library module <code class="docutils literal notranslate"><span class="pre">shakemap.utils.queue</span></code> provides a helper function
+<code class="docutils literal notranslate"><span class="pre">send_queue</span></code> that will send a message to the local instance of
+<code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. For code written in other languages, the message must
+be serialized JSON encoded in UTF-8.</p>
+<p><a class="pageref" href="#basic-queue">Figure  1</a> is a simplified example of a generic
+implementation of <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. The figure shows two example messages
+that might be sent by a triggering process (“User Process”) to
+<code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>. <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>
+listens on a socket for incoming messages and, when they arrive,
+decides their disposition. It then goes back to listening for new
+messages. If no input is received for 30 seconds, the process checks
+for any scheduled repeats that it may need to initiate, tends to any
+other unfinished business (reaping dead child processes, removing old
+events from the database, etc.) and then goes back to listening on
+the socket.</p>
+<div class="figure align-left" id="id1">
+<span id="basic-queue"></span><a class="reference internal image-reference" href="../_images/queue_basic.png"><img alt="../_images/queue_basic.png" src="../_images/queue_basic.png" style="width: 700px;" /></a>
+<p class="caption"><span class="caption-text">Figure 1: A simplified flowchart for <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> and a triggering process.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>When a trigger is received by <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>, it uses the process
+illustrated in <a class="pageref" href="#process-origin">Figure  2</a> to determine the
+disposition of the event. The purpose of the logic illustrated
+in <a class="pageref" href="#process-origin">Figure  2</a> is twofold: 1) to determine if
+the event meets the magnitude and timing criteria for the event
+to run, and 2) to prevent too many re-runs of events when
+trigger messages come very frequently. See <em>queue.conf</em> for
+details on the parameters and their effects on the processing
+logic.</p>
+<div class="figure align-left" id="id2">
+<span id="process-origin"></span><a class="reference internal image-reference" href="../_images/process_origin.png"><img alt="../_images/process_origin.png" src="../_images/process_origin.png" style="width: 700px;" /></a>
+<p class="caption"><span class="caption-text">Figure 2: A flowchart illustrating the decision-making process of
+<code class="docutils literal notranslate"><span class="pre">sm_queue</span></code>.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="aqms">
+<h2><span class="section-number">4.3.1. </span>AQMS<a class="headerlink" href="#aqms" title="Permalink to this headline">¶</a></h2>
+<p>For AQMS systems that currently use the ShakeMap v3.5 <code class="docutils literal notranslate"><span class="pre">queue</span></code> process,
+we have provided a simple drop-in replacement that emulates the existing
+functionality through the GitHub repository
+<a class="reference external" href="https://github.com/cbworden/shakemap-aqms">https://github.com/cbworden/shakemap-aqms</a>.
+In this setup, illustrated in <a class="pageref" href="#queue-aqms">Figure  3</a>, <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> is
+configured as discussed above, but another process, <code class="docutils literal notranslate"><span class="pre">aqms_queue</span></code> is also
+runs alongside it. <code class="docutils literal notranslate"><span class="pre">aqms_queue</span></code> is designed to receive the same messages
+as the old ShakeMap v3.5 <code class="docutils literal notranslate"><span class="pre">queue</span></code> (that is, the messages from
+<code class="docutils literal notranslate"><span class="pre">shake_alarm</span></code> and <code class="docutils literal notranslate"><span class="pre">shake_cancel</span></code>). When a trigger is received by
+<code class="docutils literal notranslate"><span class="pre">aqms_queue</span></code>, it retrieves the relevant event parameters from the AQMS
+database, and sends them to <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> as described above. In this way,
+the existing triggering mechanisms of ShakeMap v3.5 will continue to work
+unmodified (though Python versions of <code class="docutils literal notranslate"><span class="pre">shake_alarm</span></code> and <code class="docutils literal notranslate"><span class="pre">shake_cancel</span></code>
+are provided for operators who wish to update from the older Perl versions).</p>
+<div class="figure align-left" id="id3">
+<span id="queue-aqms"></span><a class="reference internal image-reference" href="../_images/queue_aqms.png"><img alt="../_images/queue_aqms.png" src="../_images/queue_aqms.png" style="width: 700px;" /></a>
+<p class="caption"><span class="caption-text">Figure 3: A flowchart illustrating the use of the AQMS extensions
+to ShakeMap v4.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<p>The AQMS repositiory also contains a coremod for <code class="docutils literal notranslate"><span class="pre">shake</span></code> called
+<code class="docutils literal notranslate"><span class="pre">aqms_db2xml</span></code> that takes the place of <code class="docutils literal notranslate"><span class="pre">db2xml</span></code> in ShakeMap v3.5.
+This module should appear before <code class="docutils literal notranslate"><span class="pre">assemble</span></code> in the <code class="docutils literal notranslate"><span class="pre">shake</span></code> module
+list. See the AQMS repository for more on installing the AQMS
+extensions to ShakeMap v4.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.0 Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sm4_introduction.html">1. Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_technical_guide.html">2. Technical Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_users_guide.html">3. Users Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="sm4_software_guide.html">4. Software and Implementation Guide</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sg_architecture.html">4.1. Software Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_installation.html">4.2. Installation and Configuration</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">4.3. Queueing Events</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aqms">4.3.1. AQMS</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sg_input_formats.html">4.4. Input Data Formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_output_formats.html">4.5. Output Data Formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_operational.html">4.6. Operational Considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_operational.html#shakemap-implementation-checklist">4.7. ShakeMap Implementation Checklist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_operational.html#software-installation">4.8. Software Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sg_contributing.html">4.9. Guidelines for Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_acknowledgments.html">5. Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_references.html">6. References and Bibliography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_glossary.html">7. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

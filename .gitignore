@@ -1,5 +1,6 @@
 *.pyc
 build
+default.profraw
 *~
 .DS_Store
 .ipynb_checkpoints/
@@ -31,3 +32,5 @@ shakemap/c/pcontour.c
 shakemap/c/clib.c
 shakemap/c/*.so
 strec_results.json
+test-output.xml
+**/default.profraw

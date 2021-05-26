@@ -5,6 +5,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+=================
 Table of Contents
 =================
 
@@ -15,11 +16,15 @@ Table of Contents
 
 .. toctree::
    :numbered:
+   :maxdepth: 2
 
-   introduction.rst
-   technical_guide.rst
-   references.rst
-   glossary.rst
+   Introduction <sm4_introduction>
+   Technical Guide <sm4_technical_guide>
+   Users Guide <sm4_users_guide>
+   Software and Implementation Guide <sm4_software_guide>
+   Acknowledgments <sm4_acknowledgments>
+   References and Bibliography <sm4_references>
+   Glossary <sm4_glossary>
 
 ..   users_guide.rst
 ..   software_guide.rst

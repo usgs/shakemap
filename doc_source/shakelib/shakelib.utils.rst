@@ -4,6 +4,7 @@ shakelib.utils
 Submodules
 
 .. toctree::
+   :maxdepth: 12
 
    shakelib.utils.containers
    shakelib.utils.exception
@@ -13,6 +14,6 @@ Submodules
 Module contents
 
 .. automodule:: shakelib.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

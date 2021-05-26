@@ -1,12 +1,22 @@
-+---------------+----------------------+ 
-| Linux build   | |Travis|             | 
-+---------------+----------------------+ 
-| Code quality  | |Codacy|             | 
-+---------------+----------------------+ 
-| Code coverage | |CodeCov|            | 
-+---------------+----------------------+ 
-| Azure builds  | |Azure|              | 
-+---------------+----------------------+ 
++---------+------------------+-----------------+------------+
+| Azure   | |AzureM1015P37|  | OSX 10.15       | Python 3.7 |
++         +------------------+-----------------+------------+
+|         | |AzureM1015P38|  | OSX 10.15       | Python 3.8 |
++         +------------------+-----------------+------------+
+|         | |AzureM1014P37|  | OSX 10.14       | Python 3.7 |
++         +------------------+-----------------+------------+
+|         | |AzureM1014P38|  | OSX 10.14       | Python 3.8 |
++         +------------------+-----------------+------------+
+|         | |AzureLP37|      | ubuntu          | Python 3.7 |
++         +------------------+-----------------+------------+
+|         | |AzureLP38|      | ubuntu          | Python 3.8 |
++---------+------------------+-----------------+------------+
+| Travis  | |Travis|         | ubuntu          | Python 3.7 |
++---------+------------------+-----------------+------------+
+| Codacy  | |Codacy|                                        |
++---------+-------------------------------------------------+
+| CodeCov | |CodeCov|                                       |
++---------+-------------------------------------------------+
 
 
 .. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
@@ -20,9 +30,31 @@
 .. |Codacy| image:: https://api.codacy.com/project/badge/Grade/1f771008e85041b89b97b6d12d85298a
     :target: https://www.codacy.com/app/emthompson_2/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
 
-.. |Azure| image:: https://dev.azure.com/cbworden/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master
-   :target: https://dev.azure.com/cbworden/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+.. |AzureM1015P37| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_15_Python37
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
+
+.. |AzureM1015P38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_15_Python38
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+.. |AzureM1014P37| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_14_Python37
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+.. |AzureM1014P38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_14_Python38
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+.. |AzureLP37| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python37
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+.. |AzureLP38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python38
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+
 
 shakemap
 ========

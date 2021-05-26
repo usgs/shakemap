@@ -1,3 +1,4 @@
+#cython: language_level=3
 import numpy as np
 cimport cython
 from cython.parallel import prange
@@ -6,9 +7,6 @@ from libc.math cimport (sqrt,
                         sin,
                         asin,
                         exp)
-
-cdef double EARTH_RADIUS = 6371.
-
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -42,6 +40,7 @@ def make_sigma_matrix(double[:, ::1]corr12, double[:, ::1]corr_adj12,
 def geodetic_distance_fast(double[::1]lons1, double[::1]lats1,
                            double[::1]lons2, double[::1]lats2,
                            double[:, ::1]result):
+    cdef double EARTH_RADIUS = 6371.
     cdef Py_ssize_t nx = lons1.shape[0]
     cdef Py_ssize_t ny = lons2.shape[0]
 
@@ -78,6 +77,7 @@ def geodetic_distance_fast(double[::1]lons1, double[::1]lats1,
 def geodetic_distance_haversine(double[::1]lons1, double[::1]lats1,
                                 double[::1]lons2, double[::1]lats2,
                                 double[:, ::1]result):
+    cdef double EARTH_RADIUS = 6371.
     cdef Py_ssize_t nx = lons1.shape[0]
     cdef Py_ssize_t ny = lons2.shape[0]
 

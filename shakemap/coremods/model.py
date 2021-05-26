@@ -167,6 +167,8 @@ class ModelModule(CoreModule):
         if len(self.sim_imt_paths):
             self.use_simulations = True
 
+        self.config['use_simulations'] = self.use_simulations
+
         # ---------------------------------------------------------------------
         # Clear away results from previous runs
         # ---------------------------------------------------------------------
@@ -195,7 +197,11 @@ class ModelModule(CoreModule):
         else:
             ipe = get_object_from_config('ipe', 'modeling', self.config)
             if 'vs30' not in ipe.REQUIRES_SITES_PARAMETERS:
-                ipe.REQUIRES_SITES_PARAMETERS.add('vs30')
+                # REQUIRES_SITES_PARAMETERS is now a frozen set so we have to
+                # work around it
+                tmpset = set(ipe.REQUIRES_SITES_PARAMETERS)
+                tmpset.add('vs30')
+                ipe.REQUIRES_SITES_PARAMETERS = frozenset(tmpset)
             ipe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
                 oqconst.IMC.GREATER_OF_TWO_HORIZONTAL
             self.ipe = MultiGMPE.from_list([ipe], [1.0])
@@ -217,7 +223,7 @@ class ModelModule(CoreModule):
         # If the --no_rupture flag is used, switch to a PointRupture
         if self.no_rupture:
             self.rupture_obj = PointRupture(self.rupture_obj._origin)
-        if 'mechanism' in self.config['modeling']:
+        if self.config['modeling']['mechanism'] is not None:
             self.rupture_obj._origin.setMechanism(
                 mech=self.config['modeling']['mechanism'])
         self.rx = self.rupture_obj.getRuptureContext([self.default_gmpe])
@@ -1027,6 +1033,7 @@ class ModelModule(CoreModule):
                     df2[imtstr + '_pred_phi'] = pstddev[2]
                 df2[imtstr + '_residual'] = df2[imtstr] - pmean
                 df2[imtstr + '_outliers'] = np.isnan(df2[imtstr + '_residual'])
+                df2[imtstr + '_outliers'] |= df2['MMI_outliers']
 
     def _deriveMMIFromIMTs(self):
         """
@@ -1068,12 +1075,16 @@ class ModelModule(CoreModule):
         if(df1['MMI'] is None):
             df1['MMI'] = np.full_like(df1['lon'], np.nan)
             df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
+        df1['MMI_outliers'] = np.full_like(df1['lon'], True, dtype=np.bool)
         for imtstr in preferred_imts:
             if 'derived_MMI_from_' + imtstr in df1:
-                ixx = np.isnan(df1['MMI'])
+                ixx = (np.isnan(df1['MMI']) | df1['MMI_outliers']) \
+                    & ~(np.isnan(df1['derived_MMI_from_' + imtstr])
+                        | df1[imtstr + '_outliers'])
                 df1['MMI'][ixx] = df1['derived_MMI_from_' + imtstr][ixx]
                 df1['MMI_sd'][ixx] = \
                     df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
+                df1['MMI_outliers'][ixx] = False
         self.df1.imts.add('MMI')
         #
         # Get the prediction and stddevs
@@ -1103,7 +1114,7 @@ class ModelModule(CoreModule):
             df1['MMI' + '_pred_tau'] = pstddev[1]
             df1['MMI' + '_pred_phi'] = pstddev[2]
         df1['MMI' + '_residual'] = df1['MMI'] - pmean
-        df1['MMI' + '_outliers'] = np.isnan(df1['MMI' + '_residual'])
+        df1['MMI' + '_outliers'] |= np.isnan(df1['MMI' + '_residual'])
 
     def _fillDataArrays(self):
         """
@@ -1522,14 +1533,12 @@ class ModelModule(CoreModule):
         self.logger.debug('total time for %s=%f' %
                           (imtstr, time.time() - time1))
 
-
     def _applyCustomMask(self):
         """ Apply custom masks to IMT grid outputs. """
         if self.mask_file:
             mask = self._getMask(self.mask_file)
             for grid in self.outgrid.values():
                 grid[~mask] = np.nan
-
 
     def _getLandMask(self):
         """
@@ -1543,7 +1552,6 @@ class ModelModule(CoreModule):
                                              name='ocean',
                                              resolution='10m')
         return self._getMask(oceans)
-
 
     def _getMask(self, vector=None):
         """
@@ -1719,12 +1727,20 @@ class ModelModule(CoreModule):
             _string_round(self.N - self.S, 3)
         info[op][mi]['grid_span']['units'] = 'degrees'
         info[op][mi]['min'] = {}
-        info[op][mi]['min']['longitude'] = _string_round(self.W, 3)
-        info[op][mi]['min']['latitude'] = _string_round(self.S, 3)
-        info[op][mi]['min']['units'] = 'degrees'
         info[op][mi]['max'] = {}
-        info[op][mi]['max']['longitude'] = _string_round(self.E, 3)
+        min_long = self.W
+        max_long = self.E
+        if self.rx.hypo_lon < 0:
+            if min_long > 0:  # Crossing the 180 from the negative side
+                min_long = min_long - 360
+        else:
+            if max_long < 0:  # Crossing the 180 from the positive side
+                max_long = max_long + 360
+        info[op][mi]['min']['longitude'] = _string_round(min_long, 3)
+        info[op][mi]['max']['longitude'] = _string_round(max_long, 3)
+        info[op][mi]['min']['latitude'] = _string_round(self.S, 3)
         info[op][mi]['max']['latitude'] = _string_round(self.N, 3)
+        info[op][mi]['min']['units'] = 'degrees'
         info[op][mi]['max']['units'] = 'degrees'
         info[op][un] = {}
         info[op][un]['grade'] = mygrade
@@ -1813,10 +1829,12 @@ class ModelModule(CoreModule):
             sdf = getattr(self, ndf).df
             imts = getattr(self, ndf).imts
             for myimt in imts:
-                mybias = self.bias_num[myimt] / \
+                mybias_var = 1.0 / \
                     ((1.0 / sdf[myimt + '_pred_tau']**2) +
                      self.bias_den[myimt])
+                mybias = self.bias_num[myimt] * mybias_var
                 sdf[myimt + '_bias'] = mybias.ravel()
+                sdf[myimt + '_bias_sigma'] = np.sqrt(mybias_var.ravel())
 
         # ---------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
@@ -1931,6 +1949,7 @@ class ModelModule(CoreModule):
                 sigma_str_rock = 'ln_sigma_rock'
                 sigma_str_soil = 'ln_sigma_soil'
                 bias_str = 'ln_bias'
+                bias_sigma_str = 'ln_bias_sigma'
                 if key.startswith('PGV'):
                     value = np.exp(myamp)
                     value_rock = np.exp(myamp_rock)
@@ -1947,6 +1966,7 @@ class ModelModule(CoreModule):
                     sigma_str_rock = 'sigma_rock'
                     sigma_str_soil = 'sigma_soil'
                     bias_str = 'bias'
+                    bias_sigma_str = 'bias_sigma'
                 else:
                     value = np.exp(myamp) * 100
                     value_rock = np.exp(myamp_rock) * 100
@@ -1962,6 +1982,7 @@ class ModelModule(CoreModule):
                 mysigma_soil = sdf[key + '_sigma_soil'][six]
                 imt_name = key.lower().replace('_pred', '')
                 mybias = sdf[imt_name.upper() + '_bias'][six]
+                mybias_sigma = sdf[imt_name.upper() + '_bias_sigma'][six]
                 station['properties']['predictions'].append({
                     'name': imt_name,
                     'value': _round_float(value, 4),
@@ -1974,6 +1995,7 @@ class ModelModule(CoreModule):
                     sigma_str_rock: _round_float(mysigma_rock, 4),
                     sigma_str_soil: _round_float(mysigma_soil, 4),
                     bias_str: _round_float(mybias, 4),
+                    bias_sigma_str: _round_float(mybias_sigma, 4),
                 })
             #
             # For df1 stations, add the MMIs comverted from PGM
@@ -1992,10 +2014,17 @@ class ModelModule(CoreModule):
                     if np.isnan(myamp):
                         myamp = 'null'
                         mysd = 'null'
+                        flag = '0'
+                    else:
+                        if sdf[myimt + "_outliers"][six] == 1:
+                            flag = "Outlier"
+                        else:
+                            flag = "0"
                     station['properties']['mmi_from_pgm'].append({
                         'name': imt_name,
                         'value': _round_float(myamp, 2),
                         'sigma': _round_float(mysd, 2),
+                        'flag': flag
                     })
 
             #
@@ -2018,11 +2047,18 @@ class ModelModule(CoreModule):
                     if np.isnan(value):
                         value = 'null'
                         mysd = 'null'
+                        flag = '0'
+                    else:
+                        if sdf[myimt + "_outliers"][six] == 1:
+                            flag = "Outlier"
+                        else:
+                            flag = "0"
                     station['properties']['pgm_from_mmi'].append({
                         'name': imt_name,
                         'value': _round_float(value, 4),
                         'units': units,
                         'ln_sigma': _round_float(mysd, 4),
+                        'flag': flag
                     })
             #
             # Set the generic distance property (this is rrup)
@@ -2064,8 +2100,16 @@ class ModelModule(CoreModule):
         Store gridded data in the output container.
         """
         metadata = {}
-        metadata['xmin'] = self.W
-        metadata['xmax'] = self.E
+        min_long = self.W
+        max_long = self.E
+        if self.rx.hypo_lon < 0:
+            if min_long > 0:  # Crossing the 180 from the negative side
+                min_long = min_long - 360
+        else:
+            if max_long < 0:  # Crossing the 180 from the positive side
+                max_long = max_long + 360
+        metadata['xmin'] = min_long
+        metadata['xmax'] = max_long
         metadata['ymin'] = self.S
         metadata['ymax'] = self.N
         metadata['nx'] = self.smnx
@@ -2243,14 +2287,17 @@ class ModelModule(CoreModule):
             pe = gmpe
             sd_types = self.gmpe_stddev_types
 
-            # --------------------------------------------------------------------
-            # Describe the MultiGMPE
-            # --------------------------------------------------------------------
-            if not hasattr(self, '_info'):
-                self._info = {
-                    'multigmpe': {}
-                }
-            self._info['multigmpe'][str(oqimt)] = gmpe.describe()
+            if not self.use_simulations:
+                # --------------------------------------------------------------------
+                # Describe the MultiGMPE
+                # --------------------------------------------------------------------
+                if not hasattr(self, '_info'):
+                    self._info = {
+                        'multigmpe': {}
+                    }
+                self._info['multigmpe'][str(oqimt)] = gmpe.describe()
+            else:
+                self._info = {}
 
         mean, stddevs = pe.get_mean_and_stddevs(
             copy.deepcopy(sx), self.rx,
@@ -2310,7 +2357,7 @@ class ModelModule(CoreModule):
                 x1 = np.log(per_below)
                 x2 = np.log(per_above)
                 fd = fd_below + (np.log(tper) - x1) * \
-                    (fd_above - fd_below)/(x2 - x1)
+                    (fd_above - fd_below) / (x2 - x1)
             # Reshape to match the mean
             fd = fd.reshape(mean.shape)
             # Store the interpolated grid
@@ -2330,9 +2377,9 @@ class ModelModule(CoreModule):
         """
         # We want to only use resolutions that are multiples of 1 minute or
         # an integer division of 1 minute.
-        one_minute = 1/60
+        one_minute = 1 / 60
         multiples = np.arange(1, 11)
-        divisions = 1/multiples
+        divisions = 1 / multiples
         factors = np.sort(np.unique(np.concatenate((divisions, multiples))))
         ok_res = one_minute * factors
         latspan = self.N - self.S

@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2.1. Philosophy of Estimating and Interpolating Ground Motions &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.2. Recorded Ground-motion Parameters" href="tg_parameters.html" />
+    <link rel="prev" title="2. Technical Guide" href="sm4_technical_guide.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="philosophy-of-estimating-and-interpolating-ground-motions">
+<span id="sec-philosophy"></span><h1><span class="section-number">2.1. </span>Philosophy of Estimating and Interpolating Ground Motions<a class="headerlink" href="#philosophy-of-estimating-and-interpolating-ground-motions" title="Permalink to this headline">¶</a></h1>
+<p>The overall strategy for the deployment of stations under the ANSS implementation plan
+relies on dense instrumentation concentrated in urban areas with high seismic hazards
+(<a class="reference internal" href="sm4_references.html#usgs1999"><span class="std std-ref">USGS, 1999</span></a>) and fewer stations in outlying areas.  Based on this philosophy, and when
+fully deployed, maps generated in these urban regions are expected to be most accurate
+where the population at risk is the greatest, and therefore, where emergency response and
+recovery efforts will likely be most urgent and complex.</p>
+<p>Even so, significant gaps in the observed shaking distribution will likely remain,
+especially in the transition from urban to more rural environments. Likewise, many
+critical facilities and lifelines are widely distributed, away from population centers and
+their dense seismic sensor networks.  Thus, as a fundamental strategy for ShakeMap, we
+have developed algorithms to best describe the shaking in more remote areas by utilizing
+a variety of seismological tools.  In addition to the areas without sufficient
+instrumentation where we would like to estimate motions to help assess the situation, and
+as a fail-safe backup, it is also useful to have these algorithms in place in
+the event of potential communication dropout from a portion of the network.  The same
+tools are, in fact, beneficial for interpolating between observations (i.e., seismic stations) even
+within densely instrumented portions of the networks.</p>
+<p>If there were stations at each of the tens of thousands of map grid points needed to
+adequately portray shaking, then the creation of shaking maps would be relatively simple.
+Of course, stations are not available for the overwhelming majority of these grid points, and in many cases grid
+points may be tens of kilometers or more from the nearest reporting station.  The overall mapping
+philosophy is then to combine information from individual stations, site amplification
+characteristics, and ground-motion prediction equations for the distance to the hypocenter
+(or to the causative fault) to create the best composite map.  The procedure should
+produce reasonable estimates at grid points located far from available data while
+preserving the detailed shaking information available for regions where there are stations
+nearby.</p>
+<p>It should be mentioned that mathematically, or algorithmically, geospatial interpolation
+can take many forms. There are some good reasons to employ geospatial
+kriging-with-a-trend <a class="reference external" href="https://en.wikipedia.org/wiki/Kriging">kriging-with-a-trend</a>.
+However, the complexity of the trends (GMPE, as well as inter-event bias
+corrections per Intensity Measure or IM), the use of multiply-weighted strong-motion and macroseimic
+data, and the real-time nature of the processing require other considerations.
+The approach ShakeMap currently employs for interpolation
+(<a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al., 2018</span></a>) applies a conditional
+multi-variate normal distribution, within which some or all of the points
+upon which the distribution is conditioned may themselves have uncertainty.
+It remains to be seen to what extent this approach is analogous
+to kriging-with-a-trend mathematically.</p>
+<p>Estimating motions where there are few stations, and then interpolating the recordings and
+estimates to a fine grid for mapping and contouring, requires several steps. In the
+following sections, we describe the process from input to final interpolated grid.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.0 Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sm4_introduction.html">1. Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="sm4_technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">2.1. Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_parameters.html">2.2. Recorded Ground-motion Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html">2.3. Data Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_select.html">2.4. Ground Motion Model Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html">2.5. Verification</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_users_guide.html">3. Users Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_software_guide.html">4. Software and Implementation Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_acknowledgments.html">5. Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_references.html">6. References and Bibliography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm4_glossary.html">7. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

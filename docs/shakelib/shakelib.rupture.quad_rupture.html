@@ -1,25 +1,21 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.rupture.quad_rupture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakelib.rupture.utils" href="shakelib.rupture.utils.html" />
-    <link rel="prev" title="shakelib.rupture.point_rupture" href="shakelib.rupture.point_rupture.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -36,9 +32,9 @@
             
   <div class="section" id="module-shakelib.rupture.quad_rupture">
 <span id="shakelib-rupture-quad-rupture"></span><h1>shakelib.rupture.quad_rupture<a class="headerlink" href="#module-shakelib.rupture.quad_rupture" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture">
-<em class="property">class </em><code class="descclassname">shakelib.rupture.quad_rupture.</code><code class="descname">QuadRupture</code><span class="sig-paren">(</span><em>d</em>, <em>origin</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.rupture.quad_rupture.</code><code class="sig-name descname">QuadRupture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">origin</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.rupture.base.Rupture</span></code></a></p>
 <p>Rupture class that represents the rupture surface as a combination of
 quadrilaterals. Each quadrilateral must have horizontal top and bottom
@@ -46,146 +42,129 @@ edges and must be coplanar. These restrictions make the computation of
 rupture distances more efficient. The number of points in the top edges
 must match the number of points in the bottom edge.</p>
 <p>Create a QuadRupture instance from a GeoJSON dictionary and an Origin.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>d</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Rupture GeoJSON dictionary.</li>
-<li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap Origin object.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Rupture GeoJSON dictionary.</p></li>
+<li><p><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap Origin object.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">QuadRupture instance.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>QuadRupture instance.</p>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getDepthAtPoint">
-<code class="descname">getDepthAtPoint</code><span class="sig-paren">(</span><em>lat</em>, <em>lon</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDepthAtPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDepthAtPoint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getDepthAtPoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDepthAtPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDepthAtPoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getLength">
-<code class="descname">getLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getLength" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getLength" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute length of rupture based on top edge in km.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Length of rupture (km).</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Length of rupture (km).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getWidth">
-<code class="descname">getWidth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getWidth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getWidth" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getWidth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getWidth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getWidth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute average rupture width (km) for all quadrilaterals defined for
 the rupture.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Average width in km of all rupture quadrilaterals.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Average width in km of all rupture quadrilaterals.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getArea">
-<code class="descname">getArea</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getArea" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getArea</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getArea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getArea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute area of rupture.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Rupture area in square km.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Rupture area in square km.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.fromTrace">
-<em class="property">classmethod </em><code class="descname">fromTrace</code><span class="sig-paren">(</span><em>xp0</em>, <em>yp0</em>, <em>xp1</em>, <em>yp1</em>, <em>zp</em>, <em>widths</em>, <em>dips</em>, <em>origin</em>, <em>strike=None</em>, <em>group_index=None</em>, <em>reference=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromTrace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromTrace" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromTrace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xp0</span></em>, <em class="sig-param"><span class="n">yp0</span></em>, <em class="sig-param"><span class="n">xp1</span></em>, <em class="sig-param"><span class="n">yp1</span></em>, <em class="sig-param"><span class="n">zp</span></em>, <em class="sig-param"><span class="n">widths</span></em>, <em class="sig-param"><span class="n">dips</span></em>, <em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">strike</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">group_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromTrace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromTrace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a QuadRupture instance from a set of vertices that define the
 top of the rupture, and an array of widths/dips.</p>
 <p>Each rupture quadrilaterial is defined by specifying the latitude,
 longitude, and depth of the two vertices on the top edges, which must
 have the dame depths. The other verticies are then constructed from
 the top edges and the width and dip of the quadrilateral.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>xp0</strong> (<em>array</em>) – Array or list of longitudes (floats) of p0.</li>
-<li><strong>yp0</strong> (<em>array</em>) – Array or list of latitudes (floats) of p0.</li>
-<li><strong>xp1</strong> (<em>array</em>) – Array or list of longitudes (floats) of p1.</li>
-<li><strong>yp1</strong> (<em>array</em>) – Array or list of latitudes (floats) of p1.</li>
-<li><strong>zp</strong> (<em>array</em>) – Array or list of depths for each of the top of rupture
-rectangles (km).</li>
-<li><strong>widths</strong> (<em>array</em>) – Array of widths for each of rectangle (km).</li>
-<li><strong>dips</strong> (<em>array</em>) – Array of dips for each of rectangle (degrees).</li>
-<li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap origin object.</li>
-<li><strong>strike</strong> (<em>array</em>) – If None then strike is computed from verticies of
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xp0</strong> (<em>array</em>) – Array or list of longitudes (floats) of p0.</p></li>
+<li><p><strong>yp0</strong> (<em>array</em>) – Array or list of latitudes (floats) of p0.</p></li>
+<li><p><strong>xp1</strong> (<em>array</em>) – Array or list of longitudes (floats) of p1.</p></li>
+<li><p><strong>yp1</strong> (<em>array</em>) – Array or list of latitudes (floats) of p1.</p></li>
+<li><p><strong>zp</strong> (<em>array</em>) – Array or list of depths for each of the top of rupture
+rectangles (km).</p></li>
+<li><p><strong>widths</strong> (<em>array</em>) – Array of widths for each of rectangle (km).</p></li>
+<li><p><strong>dips</strong> (<em>array</em>) – Array of dips for each of rectangle (degrees).</p></li>
+<li><p><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap origin object.</p></li>
+<li><p><strong>strike</strong> (<em>array</em>) – If None then strike is computed from verticies of
 top edge of each quadrilateral. If the array has only a
 single value, then all
 quadrilaterals are constructed assuming this strike direction.
 If an array with the same length as the trace coordinates then
-it specifies the strike for each quadrilateral.</li>
-<li><strong>group_index</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of integers to indicate group index. If
+it specifies the strike for each quadrilateral.</p></li>
+<li><p><strong>group_index</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of integers to indicate group index. If
 None then each quadrilateral is assumed to be in a different
 group since there is no guarantee that any of them are
-continuous.</li>
-<li><strong>reference</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – String explaining where the rupture definition
-came from (publication style reference, etc.).</li>
+continuous.</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – String explaining where the rupture definition
+came from (publication style reference, etc.).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">QuadRupture instance.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ShakeLibException</span></code> – if the input arrays are not all the same
-length, or if the strike array is not length 1 or the same
-length as the input arrays.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>QuadRupture instance.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="shakelib.utils.exception.html#shakelib.utils.exception.ShakeLibException" title="shakelib.utils.exception.ShakeLibException"><strong>ShakeLibException</strong></a> – if the input arrays are not all the same
+    length, or if the strike array is not length 1 or the same
+    length as the input arrays.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.writeTextFile">
-<code class="descname">writeTextFile</code><span class="sig-paren">(</span><em>rupturefile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.writeTextFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.writeTextFile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">writeTextFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rupturefile</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.writeTextFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.writeTextFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write rupture data to rupture file format as defined in ShakeMap
 Software Guide.</p>
 <p>Note that this currently treats each quadrilateral as a separate
 polygon. This needs to be udpated.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rupturefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Filename of output data file OR file-like
-object.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rupturefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Filename of output data file OR file-like
+object.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.fromOrientation">
-<em class="property">classmethod </em><code class="descname">fromOrientation</code><span class="sig-paren">(</span><em>px</em>, <em>py</em>, <em>pz</em>, <em>dx</em>, <em>dy</em>, <em>length</em>, <em>width</em>, <em>strike</em>, <em>dip</em>, <em>origin</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromOrientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromOrientation" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromOrientation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">px</span></em>, <em class="sig-param"><span class="n">py</span></em>, <em class="sig-param"><span class="n">pz</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">dy</span></em>, <em class="sig-param"><span class="n">length</span></em>, <em class="sig-param"><span class="n">width</span></em>, <em class="sig-param"><span class="n">strike</span></em>, <em class="sig-param"><span class="n">dip</span></em>, <em class="sig-param"><span class="n">origin</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromOrientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromOrientation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a QuadRupture instance from a known point, shape, and
 orientation.</p>
 <p>A point is defined as a set of latitude, longitude, and depth, which
@@ -203,68 +182,64 @@ in the strike direction and the dip direction (nearest to the surface).
 The orientation is defined by azimuth and angle from
 horizontal, strike and dip respectively. For example in plane view:</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>::</dt>
-<dd><blockquote class="first">
+<div><dl>
+<dt>::</dt><dd><blockquote>
 <div><blockquote>
 <div><blockquote>
-<div>strike direction</div></blockquote>
+<div><p>strike direction</p>
+</div></blockquote>
 <p>p1*——————-&gt;&gt;p2
 *        | dy           |</p>
 </div></blockquote>
 <p>dip    <a href="#id1"><span class="problematic" id="id2">|</span></a>——–o              |</p>
 </div></blockquote>
-<dl class="last docutils">
-<dt>direction |   dx    known point   | Width</dt>
-<dd><p class="first">V                       |
+<dl>
+<dt>direction |   dx    known point   | Width</dt><dd><p>V                       |
 V                       |
 p4———————-p3</p>
-<blockquote class="last">
-<div>Length</div></blockquote>
+<blockquote>
+<div><p>Length</p>
+</div></blockquote>
 </dd>
 </dl>
 </dd>
 </dl>
 </div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>px</strong> (<em>array</em>) – Array or list of longitudes (floats) of the known
-point.</li>
-<li><strong>py</strong> (<em>array</em>) – Array or list of latitudes (floats) of the known point.</li>
-<li><strong>pz</strong> (<em>array</em>) – Array or list of depths (floats) of the known point.</li>
-<li><strong>dx</strong> (<em>array</em>) – Array or list of distances (floats), in the strike
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>px</strong> (<em>array</em>) – Array or list of longitudes (floats) of the known
+point.</p></li>
+<li><p><strong>py</strong> (<em>array</em>) – Array or list of latitudes (floats) of the known point.</p></li>
+<li><p><strong>pz</strong> (<em>array</em>) – Array or list of depths (floats) of the known point.</p></li>
+<li><p><strong>dx</strong> (<em>array</em>) – Array or list of distances (floats), in the strike
 direction, between the known point and P1. dx must be less than
-length.</li>
-<li><strong>dy</strong> (<em>array</em>) – Array or list of distances (floats), in the dip
+length.</p></li>
+<li><p><strong>dy</strong> (<em>array</em>) – Array or list of distances (floats), in the dip
 direction, between the known point and P1. dy must be less than
-width.</li>
-<li><strong>length</strong> (<em>array</em>) – Array or list of widths (floats) of the plane in
-the strike direction.</li>
-<li><strong>width</strong> (<em>array</em>) – Array or list of widths (floats) of the plane in the
-dip direction.</li>
-<li><strong>strike</strong> (<em>array</em>) – Array or list of strike angles (floats).</li>
-<li><strong>dip</strong> (<em>array</em>) – Array or list of dip angles (floats).</li>
-<li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap Origin object.</li>
+width.</p></li>
+<li><p><strong>length</strong> (<em>array</em>) – Array or list of widths (floats) of the plane in
+the strike direction.</p></li>
+<li><p><strong>width</strong> (<em>array</em>) – Array or list of widths (floats) of the plane in the
+dip direction.</p></li>
+<li><p><strong>strike</strong> (<em>array</em>) – Array or list of strike angles (floats).</p></li>
+<li><p><strong>dip</strong> (<em>array</em>) – Array or list of dip angles (floats).</p></li>
+<li><p><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap Origin object.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">QuadRupture instance.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ShakeLibException</span></code> – if the lengths of the points arrays are not
-all equal.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>QuadRupture instance.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="shakelib.utils.exception.html#shakelib.utils.exception.ShakeLibException" title="shakelib.utils.exception.ShakeLibException"><strong>ShakeLibException</strong></a> – if the lengths of the points arrays are not
+    all equal.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.fromVertices">
-<em class="property">classmethod </em><code class="descname">fromVertices</code><span class="sig-paren">(</span><em>xp0</em>, <em>yp0</em>, <em>zp0</em>, <em>xp1</em>, <em>yp1</em>, <em>zp1</em>, <em>xp2</em>, <em>yp2</em>, <em>zp2</em>, <em>xp3</em>, <em>yp3</em>, <em>zp3</em>, <em>origin</em>, <em>group_index=None</em>, <em>reference=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromVertices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromVertices" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromVertices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xp0</span></em>, <em class="sig-param"><span class="n">yp0</span></em>, <em class="sig-param"><span class="n">zp0</span></em>, <em class="sig-param"><span class="n">xp1</span></em>, <em class="sig-param"><span class="n">yp1</span></em>, <em class="sig-param"><span class="n">zp1</span></em>, <em class="sig-param"><span class="n">xp2</span></em>, <em class="sig-param"><span class="n">yp2</span></em>, <em class="sig-param"><span class="n">zp2</span></em>, <em class="sig-param"><span class="n">xp3</span></em>, <em class="sig-param"><span class="n">yp3</span></em>, <em class="sig-param"><span class="n">zp3</span></em>, <em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">group_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromVertices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromVertices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a QuadDrupture instance from the vector of vertices that fully
 define the quadrilaterals. The points p0, …, p3 are labeled below for
 a trapezoid:</p>
@@ -275,377 +250,329 @@ a trapezoid:</p>
 </pre></div>
 </div>
 <p>All of the following vector arguments must have the same length.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>xp0</strong> (<em>array</em>) – Array or list of longitudes (floats) of p0.</li>
-<li><strong>yp0</strong> (<em>array</em>) – Array or list of latitudes (floats) of p0.</li>
-<li><strong>zp0</strong> (<em>array</em>) – Array or list of depths (floats) of p0.</li>
-<li><strong>xp1</strong> (<em>array</em>) – Array or list of longitudes (floats) of p1.</li>
-<li><strong>yp1</strong> (<em>array</em>) – Array or list of latitudes (floats) of p1.</li>
-<li><strong>zp1</strong> (<em>array</em>) – Array or list of depths (floats) of p1.</li>
-<li><strong>xp2</strong> (<em>array</em>) – Array or list of longitudes (floats) of p2.</li>
-<li><strong>yp2</strong> (<em>array</em>) – Array or list of latitudes (floats) of p2.</li>
-<li><strong>zp2</strong> (<em>array</em>) – Array or list of depths (floats) of p2.</li>
-<li><strong>xp3</strong> (<em>array</em>) – Array or list of longitudes (floats) of p3.</li>
-<li><strong>yp3</strong> (<em>array</em>) – Array or list of latitudes (floats) of p3.</li>
-<li><strong>zp3</strong> (<em>array</em>) – Array or list of depths (floats) of p3.</li>
-<li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap Origin object.</li>
-<li><strong>group_index</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of integers to indicate group index. If
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xp0</strong> (<em>array</em>) – Array or list of longitudes (floats) of p0.</p></li>
+<li><p><strong>yp0</strong> (<em>array</em>) – Array or list of latitudes (floats) of p0.</p></li>
+<li><p><strong>zp0</strong> (<em>array</em>) – Array or list of depths (floats) of p0.</p></li>
+<li><p><strong>xp1</strong> (<em>array</em>) – Array or list of longitudes (floats) of p1.</p></li>
+<li><p><strong>yp1</strong> (<em>array</em>) – Array or list of latitudes (floats) of p1.</p></li>
+<li><p><strong>zp1</strong> (<em>array</em>) – Array or list of depths (floats) of p1.</p></li>
+<li><p><strong>xp2</strong> (<em>array</em>) – Array or list of longitudes (floats) of p2.</p></li>
+<li><p><strong>yp2</strong> (<em>array</em>) – Array or list of latitudes (floats) of p2.</p></li>
+<li><p><strong>zp2</strong> (<em>array</em>) – Array or list of depths (floats) of p2.</p></li>
+<li><p><strong>xp3</strong> (<em>array</em>) – Array or list of longitudes (floats) of p3.</p></li>
+<li><p><strong>yp3</strong> (<em>array</em>) – Array or list of latitudes (floats) of p3.</p></li>
+<li><p><strong>zp3</strong> (<em>array</em>) – Array or list of depths (floats) of p3.</p></li>
+<li><p><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap Origin object.</p></li>
+<li><p><strong>group_index</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of integers to indicate group index. If
 None then each quadrilateral is assumed to be in a different
 group since there is no guarantee that any of them are
-continuous.</li>
-<li><strong>reference</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – String explaining where the rupture definition
-came from (publication style reference, etc.)</li>
+continuous.</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – String explaining where the rupture definition
+came from (publication style reference, etc.)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">QuadRupture object, where the rupture is modeled as a series of
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>QuadRupture object, where the rupture is modeled as a series of
 trapezoids.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ShakeLibException</span></code> – if the lengths of the inptu arrays are not
-all equal, or if the length of the group_index is not the
-same as the arrays (if group_index is supplied)..</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.getQuadrilaterals">
-<code class="descname">getQuadrilaterals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getQuadrilaterals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getQuadrilaterals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of quadrilaterals.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>List of quadrilaterals where each quad is a tuple of four</dt>
-<dd><a class="reference external" href="https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py">Point</a>
-objects.</dd>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="shakelib.utils.exception.html#shakelib.utils.exception.ShakeLibException" title="shakelib.utils.exception.ShakeLibException"><strong>ShakeLibException</strong></a> – if the lengths of the inptu arrays are not
+    all equal, or if the length of the group_index is not the
+    same as the arrays (if group_index is supplied)..</p>
+</dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.getQuadrilaterals">
+<code class="sig-name descname">getQuadrilaterals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getQuadrilaterals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getQuadrilaterals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of quadrilaterals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>List of quadrilaterals where each quad is a tuple of four</dt><dd><p><a class="reference external" href="https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py">Point</a>
+objects.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getStrike">
-<code class="descname">getStrike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getStrike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getStrike" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getStrike</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getStrike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getStrike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return strike angle. If rupture consists of multiple quadrilaterals,
 the average strike angle, weighted by quad length, is returned.
 Note: for ruptures with quads where the strike angle changes by 180 deg
 due to reverses in dip direction are problematic and not handeled well
 by this algorithm.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Strike angle in degrees.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Strike angle in degrees.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getDepthToTop">
-<code class="descname">getDepthToTop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDepthToTop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDepthToTop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getDepthToTop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDepthToTop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDepthToTop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine shallowest vertex of entire rupture.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Shallowest depth of all vertices (float).</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Shallowest depth of all vertices (float).</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getDip">
-<code class="descname">getDip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDip" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getDip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return average dip of all quadrilaterals in the rupture.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Average dip in degrees.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Average dip in degrees.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getIndividualWidths">
-<code class="descname">getIndividualWidths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getIndividualWidths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getIndividualWidths" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getIndividualWidths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getIndividualWidths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getIndividualWidths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of rupture widths (km), one for each quadrilateral
 defined for the rupture.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Array of quad widths in km of all rupture quadrilaterals.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Array of quad widths in km of all rupture quadrilaterals.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.getIndividualTopLengths">
-<code class="descname">getIndividualTopLengths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getIndividualTopLengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getIndividualTopLengths" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getIndividualTopLengths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getIndividualTopLengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getIndividualTopLengths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of rupture lengths along top edge (km),
 one for each quadrilateral defined for the rupture.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Array of lengths in km of top edge of quadrilaterals.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Array of lengths in km of top edge of quadrilaterals.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.lats">
-<code class="descname">lats</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.lats" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">lats</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.lats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of latitudes for the rupture verticies arranged for
 plotting purposes; will give an outline of each group connected
 segments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Numpy array of closed-loop latitude values; disconnected</dt>
-<dd>segments are separated by nans.</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.lons">
-<code class="descname">lons</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.lons" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an array of longitudes for the rupture verticies arranged for
-plotting purposes; will give an outline of each group connected
-segments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Numpy array of closed-loop longitude values; disconnected</dt>
-<dd>segments are separated by nans.</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.depths">
-<code class="descname">depths</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.depths" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an array of depths for the rupture verticies arranged for
-plotting purposes; will give an outline of each group connected
-segments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Numpy array of closed-loop depths; disconnected</dt>
-<dd>segments are separated by nans.</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.getDeps">
-<code class="descname">getDeps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDeps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a copy of the array of depths for the rupture verticies.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Numpy array of latitude values.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.getNumGroups">
-<code class="descname">getNumGroups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getNumGroups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getNumGroups" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a count of the number of rupture groups.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Rnumber of rupture groups.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.getNumQuads">
-<code class="descname">getNumQuads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getNumQuads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getNumQuads" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a count of the number of rupture quadrilaterals.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Number of rupture quadrilaterals.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsArrays">
-<code class="descname">getRuptureAsArrays</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getRuptureAsArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsArrays" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a 3-tuple of numpy arrays indicating X, Y, Z (lon,lat,depth)
-coordinates. Rupture groups are separated by numpy.NaN values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>3-tuple of numpy arrays indicating X,Y,Z (lon,lat,depth)</dt>
-<dd>coordinates.</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsMesh">
-<code class="descname">getRuptureAsMesh</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getRuptureAsMesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsMesh" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return rupture segments as a OQ-Hazardlib Mesh object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">//github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Mesh (https</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.computeRjb">
-<code class="descname">computeRjb</code><span class="sig-paren">(</span><em>lon</em>, <em>lat</em>, <em>depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for computing Joyner-Boore distance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A tuple of an array of Joyner-Boore distance (km), and None.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.computeRrup">
-<code class="descname">computeRrup</code><span class="sig-paren">(</span><em>lon</em>, <em>lat</em>, <em>depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for computing rupture distance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A tuple of an array of Rupture distance (km), and None.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shakelib.rupture.quad_rupture.QuadRupture.computeGC2">
-<code class="descname">computeGC2</code><span class="sig-paren">(</span><em>lon</em>, <em>lat</em>, <em>depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeGC2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for computing version 2 of the Generalized Coordinate system
-(GC2) by Spudich and Chiou OFR 2015-1028.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>Dictionary with keys for each of the GC2-related distances,</dt>
-<dd><p class="first last">which include ‘rx’, ‘ry’, ‘ry0’, ‘U’, ‘T’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Numpy array of closed-loop latitude values; disconnected</dt><dd><p>segments are separated by nans.</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.lons">
+<em class="property">property </em><code class="sig-name descname">lons</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.lons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an array of longitudes for the rupture verticies arranged for
+plotting purposes; will give an outline of each group connected
+segments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Numpy array of closed-loop longitude values; disconnected</dt><dd><p>segments are separated by nans.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.depths">
+<em class="property">property </em><code class="sig-name descname">depths</code><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.depths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an array of depths for the rupture verticies arranged for
+plotting purposes; will give an outline of each group connected
+segments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Numpy array of closed-loop depths; disconnected</dt><dd><p>segments are separated by nans.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.getDeps">
+<code class="sig-name descname">getDeps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getDeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getDeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of the array of depths for the rupture verticies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Numpy array of latitude values.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.getNumGroups">
+<code class="sig-name descname">getNumGroups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getNumGroups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getNumGroups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a count of the number of rupture groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Rnumber of rupture groups.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.getNumQuads">
+<code class="sig-name descname">getNumQuads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getNumQuads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getNumQuads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a count of the number of rupture quadrilaterals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Number of rupture quadrilaterals.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsArrays">
+<code class="sig-name descname">getRuptureAsArrays</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getRuptureAsArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsArrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 3-tuple of numpy arrays indicating X, Y, Z (lon,lat,depth)
+coordinates. Rupture groups are separated by numpy.NaN values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>3-tuple of numpy arrays indicating X,Y,Z (lon,lat,depth)</dt><dd><p>coordinates.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsMesh">
+<code class="sig-name descname">getRuptureAsMesh</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.getRuptureAsMesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsMesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return rupture segments as a OQ-Hazardlib Mesh object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>//github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Mesh (https</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.computeRjb">
+<code class="sig-name descname">computeRjb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for computing Joyner-Boore distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</p></li>
+<li><p><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</p></li>
+<li><p><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tuple of an array of Joyner-Boore distance (km), and None.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.computeRrup">
+<code class="sig-name descname">computeRrup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for computing rupture distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</p></li>
+<li><p><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</p></li>
+<li><p><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tuple of an array of Rupture distance (km), and None.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.rupture.quad_rupture.QuadRupture.computeGC2">
+<code class="sig-name descname">computeGC2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.computeGC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.computeGC2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for computing version 2 of the Generalized Coordinate system
+(GC2) by Spudich and Chiou OFR 2015-1028.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</p></li>
+<li><p><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</p></li>
+<li><p><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with keys for each of the GC2-related distances,</dt><dd><p>which include ‘rx’, ‘ry’, ‘ry0’, ‘U’, ‘T’.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -675,55 +602,24 @@ coordinates. Rupture groups are separated by numpy.NaN values.</p>
 
 
 <h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.base.html">shakelib.rupture.base</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.constants.html">shakelib.rupture.constants</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.edge_rupture.html">shakelib.rupture.edge_rupture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.factory.html">shakelib.rupture.factory</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.origin.html">shakelib.rupture.origin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.point_rupture.html">shakelib.rupture.point_rupture</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">shakelib.rupture.quad_rupture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="shakelib.rupture.utils.html">shakelib.rupture.utils</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

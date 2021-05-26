@@ -1,3 +1,8 @@
+
+.. important::
+   This ShakeMap 3.5 Manual is deprecated. Please see the `ShakeMap 4
+   Manual <http://usgs.github.io/shakemap/index.html>`__.
+
 .. _sec_products:
 
 =========================
@@ -616,14 +621,14 @@ zip format (*hazus.zip*) to facilitate file transfer.
 
 .. note:: An important note on the values of the parameters in the HAZUS shape files is that they are empirically corrected from the standard ShakeMap **peak ground motion values** to approximate the **geometric mean** values used for HAZUS loss estimation.  HAZUS was calibrated to work with mean ground motion values (FEMA, 1997). Peak amplitudes are corrected by scaling values down by 15 percent (Campbell, 1997; Joyner, oral commun., 2000). While more recent work by :ref:`Beyer and Bommer (2006) <beyer2006>` suggests different conversion factors, for the HAZUS shape files we continue to use 15 percent to maintain consistency in HAZUS results. As of this writing, FEMA is considering switching to peak ground motions as presented by ShakeMap rather than employing the geometric mean component. 
 
-ESRI Raster Files (*.fit* files)
+ESRI Raster Files (*.flt* files)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ESRI raster grids of the ground-motion
 parameters and their uncertainties are also available. The files are found in a
 zipped archive called *raster.zip*. Each archive contains four files per
-parameter: *<param>.fit* and *<param>.hdr*, which contain the ground-motion
-data, and *<param>_std.fit* and *<param>_std.hdr*, which contain the
+parameter: *<param>.flt* and *<param>.hdr*, which contain the ground-motion
+data, and *<param>_std.flt* and *<param>_std.hdr*, which contain the
 uncertainties for the ground motions. See *grid.xml* for information on units.
 As with the other GIS files, PGA, PGV, and MMI are available for all events,
 while the PSA parameters are usually only included for earthquakes

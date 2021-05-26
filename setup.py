@@ -6,10 +6,14 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 import numpy
+import shutil
 
 # This should be handled by conda when we install a platform-specific
-# compiler
-# os.environ['CC'] = 'gcc'
+# compiler, but apparently isn't on macs (yet?)
+if shutil.which('clang') is None:
+    os.environ['CC'] = 'gcc'
+else:
+    os.environ['CC'] = 'clang'
 
 sourcefiles = ["shakemap/c/pcontour.pyx", "shakemap/c/contour.c"]
 
@@ -19,13 +23,14 @@ ext_modules = [Extension("shakemap.c.pcontour",
                          sourcefiles,
                          libraries=["m"],
                          include_dirs=[numpy.get_include()],
-                         extra_compile_args=["-O3"]),
+                         extra_compile_args=[]),
                Extension("shakemap.c.clib",
                          clib_source,
-                         libraries=['m'],
+                         libraries=['m', 'omp'],
                          include_dirs=[numpy.get_include()],
-                         extra_compile_args=["-O3", "-fopenmp"],
-                         extra_link_args=["-fopenmp"])]
+                         extra_compile_args=["-fopenmp"],
+                         extra_link_args=["-fopenmp"]
+                         )]
 
 cmdclass = versioneer.get_cmdclass()
 cmdclass['build_ext'] = build_ext
@@ -66,6 +71,7 @@ setup(name='shakemap',
           'bin/getdyfi',
           'bin/receive_amps',
           'bin/receive_origins',
+          'bin/receive_origins_gsm',
           'bin/run_verification',
           'bin/shake',
           'bin/sm_check',

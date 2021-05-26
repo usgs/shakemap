@@ -2,6 +2,6 @@ shakemap.coremods.sleep
 ==============================
 
 .. automodule:: shakemap.coremods.sleep
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

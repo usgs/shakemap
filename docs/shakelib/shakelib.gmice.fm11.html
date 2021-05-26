@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>shakelib.gmice.fm11 &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.gmice.fm11">
+<span id="shakelib-gmice-fm11"></span><h1>shakelib.gmice.fm11<a class="headerlink" href="#module-shakelib.gmice.fm11" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="shakelib.gmice.fm11.FM11">
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.gmice.fm11.</code><code class="sig-name descname">FM11</code><a class="reference internal" href="../_modules/shakelib/gmice/fm11.html#FM11"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.fm11.FM11" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE" title="shakelib.gmice.gmice.GMICE"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.gmice.gmice.GMICE</span></code></a></p>
+<p>Implements the ground motion intensity conversion equations (GMICE) of
+Faenza and Michelini (2010, 2011).</p>
+<p class="rubric">References</p>
+<p>Faenza and Michelini,(2010). Regression analysis of MCS intensity and
+ground motion parameters in Italy and its application in ShakeMap.
+GJI, 180, 1138-1152, doi: 10.1111/j.1365-246X.2009.04467.xself
+and Faenza and Michelini (2011). Regression analysis of MCS intensity
+and ground motion spectral accelerations (SAs) in Italy. GJI, 186,
+1415-1430, doi: 10.1111/j.1365-246X.2011.05125.x</p>
+<dl class="py method">
+<dt id="shakelib.gmice.fm11.FM11.getMIfromGM">
+<code class="sig-name descname">getMIfromGM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">amps</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/fm11.html#FM11.getMIfromGM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.fm11.FM11.getMIfromGM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to compute macroseismic intensity from ground-motion
+intensity. Supported ground-motion IMTs are PGA, PGV and PSA
+at 0.3, 1.0, and 3.0 sec periods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>amps</strong> (<em>ndarray</em>) – Ground motion amplitude; natural log units; g for PGA and
+PSA, cm/s for PGV.</p></li>
+<li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – Type the input amps (must be one of PGA, PGV, or SA).
+Supported SA periods are 0.3, 1.0, and 3.0 sec.
+<cite>[link] &lt;http://docs.openquake.org/oq-hazardlib/master/imt.html&gt;</cite></p></li>
+<li><p><strong>dists</strong> (<em>ndarray</em>) – Not used</p></li>
+<li><p><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Not used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ndarray of Modified Mercalli Intensity and ndarray of
+dMMI / dln(amp) (i.e., the slope of the relationship at the
+point in question).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.gmice.fm11.FM11.getGMfromMI">
+<code class="sig-name descname">getGMfromMI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mmi</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/fm11.html#FM11.getGMfromMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.fm11.FM11.getGMfromMI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to tcompute ground-motion intensity from macroseismic
+intensity. Supported IMTs are PGA, PGV and PSA for 0.3, 1.0, and
+3.0 sec periods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mmi</strong> (<em>ndarray</em>) – Macroseismic intensity.</p></li>
+<li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – IMT of the requested ground-motions intensities (must be
+one of PGA, PGV, or SA).
+<cite>[link] &lt;http://docs.openquake.org/oq-hazardlib/master/imt.html&gt;</cite></p></li>
+<li><p><strong>dists</strong> (<em>ndarray</em>) – Not used</p></li>
+<li><p><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Not used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Ndarray of ground motion intensity in natural log of g for PGA
+and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI
+(i.e., the slope of the relationship at the point in question).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.gmice.fm11.FM11.getGM2MIsd">
+<code class="sig-name descname">getGM2MIsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/fm11.html#FM11.getGM2MIsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.fm11.FM11.getGM2MIsd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of standard deviations for the ground-motion
+to MMI conversion. The keys are the ground motion types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary of GM to MI sigmas (in MMI units).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="shakelib.gmice.fm11.FM11.getMI2GMsd">
+<code class="sig-name descname">getMI2GMsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/fm11.html#FM11.getMI2GMsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.fm11.FM11.getMI2GMsd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of standard deviations for the MMI
+to ground-motion conversion. The keys are the ground motion
+types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary of MI to GM sigmas (ln(PGM) units).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

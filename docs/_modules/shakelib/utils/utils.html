@@ -1,21 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.utils.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -36,44 +34,44 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="k">import</span> <span class="n">OrthographicProjection</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">SitesContext</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">DistancesContext</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">RuptureContext</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="kn">import</span> <span class="n">OrthographicProjection</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">SitesContext</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">DistancesContext</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">RuptureContext</span>
 
-<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="k">import</span> <span class="n">EdgeRupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="k">import</span> <span class="n">QuadRupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="k">import</span> <span class="n">Rupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="k">import</span> <span class="n">MultiGMPE</span>
-<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="k">import</span> <span class="n">Sites</span>
-<span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="k">import</span> <span class="n">StationList</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="kn">import</span> <span class="n">get_object_from_config</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="kn">import</span> <span class="n">EdgeRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="kn">import</span> <span class="n">QuadRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="kn">import</span> <span class="n">Rupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="kn">import</span> <span class="n">MultiGMPE</span>
+<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="kn">import</span> <span class="n">Sites</span>
+<span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="kn">import</span> <span class="n">StationList</span>
 
-<span class="kn">from</span> <span class="nn">strec.gmreg</span> <span class="k">import</span> <span class="n">Regionalizer</span>
+<span class="kn">from</span> <span class="nn">strec.gmreg</span> <span class="kn">import</span> <span class="n">Regionalizer</span>
 
 <span class="c1"># ACR GMPE/GMICE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.abrahamson_2014</span> <span class="k">import</span> <span class="n">AbrahamsonEtAl2014</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.abrahamson_2014</span> <span class="kn">import</span> <span class="n">AbrahamsonEtAl2014</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CampbellBozorgnia2014</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.chiou_youngs_2014</span> <span class="k">import</span> <span class="n">ChiouYoungs2014</span>
-<span class="kn">from</span> <span class="nn">shakelib.gmice.wgrw12</span> <span class="k">import</span> <span class="n">WGRW12</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.chiou_youngs_2014</span> <span class="kn">import</span> <span class="n">ChiouYoungs2014</span>
+<span class="kn">from</span> <span class="nn">shakelib.gmice.wgrw12</span> <span class="kn">import</span> <span class="n">WGRW12</span>
 
 <span class="c1"># SCR GMPE/GMICE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.frankel_1996</span> <span class="k">import</span> <span class="n">FrankelEtAl1996MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.toro_1997</span> <span class="k">import</span> <span class="n">ToroEtAl1997MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.silva_2002</span> <span class="k">import</span> <span class="n">SilvaEtAl2002MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_2003</span> <span class="k">import</span> <span class="n">Campbell2003MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.tavakoli_pezeshk_2005</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.frankel_1996</span> <span class="kn">import</span> <span class="n">FrankelEtAl1996MwNSHMP2008</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.toro_1997</span> <span class="kn">import</span> <span class="n">ToroEtAl1997MwNSHMP2008</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.silva_2002</span> <span class="kn">import</span> <span class="n">SilvaEtAl2002MwNSHMP2008</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_2003</span> <span class="kn">import</span> <span class="n">Campbell2003MwNSHMP2008</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.tavakoli_pezeshk_2005</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TavakoliPezeshk2005MwNSHMP2008</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.atkinson_boore_2006</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.atkinson_boore_2006</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AtkinsonBoore2006Modified2011</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.pezeshk_2011</span> <span class="k">import</span> <span class="n">PezeshkEtAl2011</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_atkinson_2011</span> <span class="k">import</span> <span class="n">Atkinson2008prime</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.somerville_2001</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.pezeshk_2011</span> <span class="kn">import</span> <span class="n">PezeshkEtAl2011</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_atkinson_2011</span> <span class="kn">import</span> <span class="n">Atkinson2008prime</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.somerville_2001</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SomervilleEtAl2001NSHMP2008</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">shakelib.gmice.ak07</span> <span class="k">import</span> <span class="n">AK07</span>
+<span class="kn">from</span> <span class="nn">shakelib.gmice.ak07</span> <span class="kn">import</span> <span class="n">AK07</span>
 
 
 <span class="n">DEFAULT_ACTIVE_COEFFS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">27.24</span><span class="p">,</span> <span class="mf">250.4</span><span class="p">,</span> <span class="mf">579.1</span><span class="p">]</span>
@@ -143,6 +141,7 @@
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="n">spans</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="s1">&#39;extent&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;magnitude_spans&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
@@ -153,6 +152,9 @@
                 <span class="k">if</span> <span class="s1">&#39;extent&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">999.0</span><span class="p">:</span>
                         <span class="n">bounds</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;extent&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;relative_offset&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;relative_offset&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">offsets</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;relative_offset&#39;</span><span class="p">]</span>
 
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># Simplest option: extent was specified in the config, use that and exit.</span>
@@ -165,51 +167,76 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;get_extent() requires a rupture object if the extent &#39;</span>
                         <span class="s1">&#39;is not specified in the config object.&#39;</span><span class="p">)</span>
 
-    <span class="c1"># Find the central point</span>
-    <span class="n">origin</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="p">(</span><span class="n">QuadRupture</span><span class="p">,</span> <span class="n">EdgeRupture</span><span class="p">)):</span>
-        <span class="c1"># For an extended rupture, it is the midpoint between the extent of the</span>
-        <span class="c1"># verticies</span>
-        <span class="n">lats</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">lats</span>
-        <span class="n">lons</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">lons</span>
-
-        <span class="c1"># Remove nans</span>
-        <span class="n">lons</span> <span class="o">=</span> <span class="n">lons</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lons</span><span class="p">)]</span>
-        <span class="n">lats</span> <span class="o">=</span> <span class="n">lats</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lats</span><span class="p">)]</span>
-
-        <span class="n">clat</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">lats</span><span class="p">))</span>
-        <span class="n">clon</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">lons</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># For a point source, it is just the epicenter</span>
-        <span class="n">clat</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span>
-        <span class="n">clon</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lon</span>
-
-    <span class="n">mag</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
-
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># Second simplest option: spans are hardcoded based on magnitude</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="n">extent</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spans</span><span class="p">):</span>
-        <span class="n">xmin</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">xmax</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">ymin</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">ymax</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">spankey</span><span class="p">,</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">spans</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="n">span</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mag</span> <span class="o">&lt;=</span> <span class="n">span</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">ymin</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-                <span class="n">ymax</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-                <span class="n">xmin</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-                <span class="n">xmax</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="n">xmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
+        <span class="n">extent</span> <span class="o">=</span> <span class="n">_get_extent_from_spans</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">spans</span><span class="p">)</span>
 
     <span class="c1"># -------------------------------------------------------------------------</span>
-    <span class="c1"># Use MultiGMPE to get spans</span>
+    <span class="c1"># Otherwise, use MultiGMPE to get spans</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="k">if</span> <span class="n">extent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">extent</span> <span class="o">=</span> <span class="n">_get_extent_from_multigmpe</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">offsets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">extent</span>
+
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="c1"># Apply relative offsets</span>
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span> <span class="o">=</span> <span class="n">extent</span>
+
+    <span class="n">xspan</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span>
+    <span class="n">yspan</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span>
+
+    <span class="n">xmin</span> <span class="o">+=</span> <span class="n">xspan</span> <span class="o">*</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">xmax</span> <span class="o">+=</span> <span class="n">xspan</span> <span class="o">*</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ymin</span> <span class="o">+=</span> <span class="n">yspan</span> <span class="o">*</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ymax</span> <span class="o">+=</span> <span class="n">yspan</span> <span class="o">*</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_extent_from_spans</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">spans</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Choose extent based on magnitude using a hardcoded list of spans</span>
+<span class="sd">    based on magnitude ranges.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">)</span> <span class="o">=</span> <span class="n">_rupture_center</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">()</span><span class="o">.</span><span class="n">mag</span>
+    <span class="n">xmin</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">xmax</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ymax</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">spankey</span><span class="p">,</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">spans</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="n">span</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mag</span> <span class="o">&lt;=</span> <span class="n">span</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">ymax</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">xmax</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">break</span>
+    <span class="k">if</span> <span class="n">xmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_get_extent_from_multigmpe</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use MultiGMPE to determine extent</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">)</span> <span class="o">=</span> <span class="n">_rupture_center</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="n">gmice</span> <span class="o">=</span> <span class="n">get_object_from_config</span><span class="p">(</span><span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="s1">&#39;modeling&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span> <span class="ow">in</span> <span class="n">gmice</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
+            <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">imt</span><span class="o">.</span><span class="n">PGV</span> <span class="ow">in</span> <span class="n">gmice</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
+            <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">PGV</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">PGA</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Put in some default values for conf</span>
         <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
@@ -251,9 +278,9 @@
 
         <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span>
             <span class="n">gmpes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">default_gmpes_for_site</span><span class="o">=</span><span class="n">site_gmpes</span><span class="p">)</span>
+        <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 
     <span class="n">min_mmi</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;mmi&#39;</span><span class="p">][</span><span class="s1">&#39;threshold&#39;</span><span class="p">]</span>
-    <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
     <span class="n">sd_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">]</span>
 
     <span class="c1"># Distance context</span>
@@ -307,7 +334,10 @@
     <span class="c1"># Get a projection</span>
     <span class="n">proj</span> <span class="o">=</span> <span class="n">OrthographicProjection</span><span class="p">(</span><span class="n">clon</span> <span class="o">-</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clon</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clat</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clat</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="p">(</span><span class="n">QuadRupture</span><span class="p">,</span> <span class="n">EdgeRupture</span><span class="p">)):</span>
-        <span class="n">ruptx</span><span class="p">,</span> <span class="n">rupty</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
+        <span class="n">ruptx</span><span class="p">,</span> <span class="n">rupty</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span>
+            <span class="n">rupture</span><span class="o">.</span><span class="n">lons</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">lons</span><span class="p">)],</span>
+            <span class="n">rupture</span><span class="o">.</span><span class="n">lats</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">lats</span><span class="p">)]</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ruptx</span><span class="p">,</span> <span class="n">rupty</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">)</span>
 
@@ -344,7 +374,31 @@
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Extent: </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span>
                   <span class="p">(</span><span class="n">lonmin</span><span class="p">,</span> <span class="n">lonmax</span><span class="p">,</span> <span class="n">latmin</span><span class="p">,</span> <span class="n">latmax</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">lonmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">lonmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> \
-        <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmax</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+        <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmax</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">_rupture_center</span><span class="p">(</span><span class="n">rupture</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the central point of a rupture</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="p">(</span><span class="n">QuadRupture</span><span class="p">,</span> <span class="n">EdgeRupture</span><span class="p">)):</span>
+        <span class="c1"># For an extended rupture, it is the midpoint between the extent of the</span>
+        <span class="c1"># verticies</span>
+        <span class="n">lats</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">lats</span>
+        <span class="n">lons</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">lons</span>
+
+        <span class="c1"># Remove nans</span>
+        <span class="n">lons</span> <span class="o">=</span> <span class="n">lons</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lons</span><span class="p">)]</span>
+        <span class="n">lats</span> <span class="o">=</span> <span class="n">lats</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lats</span><span class="p">)]</span>
+
+        <span class="n">clat</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">lats</span><span class="p">))</span>
+        <span class="n">clon</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">lons</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># For a point source, it is just the epicenter</span>
+        <span class="n">clat</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span>
+        <span class="n">clon</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lon</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_round_coord</span><span class="p">(</span><span class="n">coord</span><span class="p">):</span>
@@ -397,23 +451,23 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

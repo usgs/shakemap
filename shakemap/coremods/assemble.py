@@ -12,6 +12,7 @@ import datetime
 import shutil
 import sys
 import re
+import json
 
 # third party imports
 from configobj import ConfigObj
@@ -151,10 +152,10 @@ class AssembleModule(CoreModule):
         config = global_config.dict()
 
         self.logger.debug('Looking for data files...')
-        datafiles = glob.glob(os.path.join(datadir, '*_dat.xml'))
+        datafiles = sorted(glob.glob(os.path.join(datadir, '*_dat.xml')))
         if os.path.isfile(os.path.join(datadir, 'stationlist.xml')):
             datafiles.append(os.path.join(datadir, 'stationlist.xml'))
-        datafiles += glob.glob(os.path.join(datadir, '*_dat.json'))
+        datafiles += sorted(glob.glob(os.path.join(datadir, '*_dat.json')))
         if os.path.isfile(os.path.join(datadir, 'stationlist.json')):
             datafiles.append(os.path.join(datadir, 'stationlist.json'))
 
@@ -163,7 +164,8 @@ class AssembleModule(CoreModule):
         rupturefile = os.path.join(datadir, 'rupture.json')
         if not os.path.isfile(rupturefile):
             # failing any of those, look for text file versions
-            rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
+            rupturefiles = sorted(glob.glob(os.path.join(datadir,
+                                                         '*_fault.txt')))
             rupturefile = None
             if len(rupturefiles):
                 rupturefile = rupturefiles[0]
@@ -211,6 +213,17 @@ class AssembleModule(CoreModule):
                 history = {'history': []}
                 new_line = [timestamp, originator, 1, self.comment]
                 history['history'].append(new_line)
+        elif os.path.isfile(os.path.join(datadir, 'history.json')):
+            jsonfile = os.path.join(datadir, 'history.json')
+            history_list = json.load(open(jsonfile, 'rt'))
+            highest_version = 0
+            for maprun in history_list:
+                if maprun[2] > highest_version:
+                    highest_version = maprun[2]
+            history = {'history': history_list}
+            new_line = [timestamp, originator,
+                        highest_version + 1, self.comment]
+            history['history'].append(new_line)
         else:
             #
             # No backup and no existing file. Make this version 1

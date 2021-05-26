@@ -1,25 +1,21 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.directivity.rowshandel2013 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakelib.gmice" href="shakelib.gmice.html" />
-    <link rel="prev" title="shakelib.directivity.bayless2013" href="shakelib.directivity.bayless2013.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -49,27 +45,26 @@ True). If it is True then</p>
 <p>Fd = (C1 * Xiprime + C2) * LD * DT * WP</p>
 <p>where</p>
 <ul class="simple">
-<li>C1 and C2 are regression coefficients.</li>
-<li>XiPrime is a factor that accounts for rupture propagation and slip
-direction.</li>
-<li>Xic is the centering term.</li>
-<li>LD is the rupture length de-normalization factor.</li>
-<li>DT is the distance-taper.</li>
-<li>WP is the narrow-band multiplier.</li>
+<li><p>C1 and C2 are regression coefficients.</p></li>
+<li><p>XiPrime is a factor that accounts for rupture propagation and slip
+direction.</p></li>
+<li><p>Xic is the centering term.</p></li>
+<li><p>LD is the rupture length de-normalization factor.</p></li>
+<li><p>DT is the distance-taper.</p></li>
+<li><p>WP is the narrow-band multiplier.</p></li>
 </ul>
 <p>Note that Fd is intended to be used in GMPEs as:</p>
 <p>ln(IM_dir) = ln(IM) + Fd</p>
 <p>where</p>
 <ul class="simple">
-<li>Fd is the directivity effect.</li>
-<li>IM is the intensity measure predicted by the GMPE.</li>
-<li>IM_dir is the directivity-adjusted IM.</li>
+<li><p>Fd is the directivity effect.</p></li>
+<li><p>IM is the intensity measure predicted by the GMPE.</p></li>
+<li><p>IM_dir is the directivity-adjusted IM.</p></li>
 </ul>
-<dl class="docutils">
-<dt>To do</dt>
-<dd><ul class="first last simple">
-<li>Add checks on function arguments (e.g., mtype) for valid values.</li>
-<li>Interpolate periods.</li>
+<dl class="simple">
+<dt>To do</dt><dd><ul class="simple">
+<li><p>Add checks on function arguments (e.g., mtype) for valid values.</p></li>
+<li><p>Interpolate periods.</p></li>
 </ul>
 </dd>
 </dl>
@@ -78,152 +73,129 @@ direction.</li>
 Chapter 3 of PEER Report No. 2013/09, P. Spudich (Editor), Pacific
 Earthquake Engineering Research Center, Berkeley, CA.
 <a class="reference external" href="http://peer.berkeley.edu/publications/peer_reports/reports_2013/webPEER-2013-09-Spudich.pdf">[link]</a></p>
-<dl class="class">
+<dl class="py class">
 <dt id="shakelib.directivity.rowshandel2013.Rowshandel2013">
-<em class="property">class </em><code class="descclassname">shakelib.directivity.rowshandel2013.</code><code class="descname">Rowshandel2013</code><span class="sig-paren">(</span><em>origin</em>, <em>rup</em>, <em>lat</em>, <em>lon</em>, <em>dep</em>, <em>dx</em>, <em>T</em>, <em>a_weight=0.5</em>, <em>mtype=1</em>, <em>simpleDT=False</em>, <em>centered=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">shakelib.directivity.rowshandel2013.</code><code class="sig-name descname">Rowshandel2013</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">rup</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">dep</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">a_weight</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">mtype</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">simpleDT</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">centered</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Constructor for rowshandel2013.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>origin</strong> – Origin instance.</li>
-<li><strong>rup</strong> – Rupture instance.</li>
-<li><strong>lat</strong> (<em>ndarray</em>) – Numpy array of site latitudes.</li>
-<li><strong>lon</strong> (<em>ndarray</em>) – Numpy array of site longitudes.</li>
-<li><strong>dep</strong> (<em>ndarray</em>) – Numpy array of site depths (km); positive down.</li>
-<li><strong>dx</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Target mesh spacing for subruptures in km. The mesh
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>origin</strong> – Origin instance.</p></li>
+<li><p><strong>rup</strong> – Rupture instance.</p></li>
+<li><p><strong>lat</strong> (<em>ndarray</em>) – Numpy array of site latitudes.</p></li>
+<li><p><strong>lon</strong> (<em>ndarray</em>) – Numpy array of site longitudes.</p></li>
+<li><p><strong>dep</strong> (<em>ndarray</em>) – Numpy array of site depths (km); positive down.</p></li>
+<li><p><strong>dx</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Target mesh spacing for subruptures in km. The mesh
 snaps to the edges of the quadrilaterals so the actual mesh
 spacing will not equal this exactly; spacing in x and y will
-not be equal.</li>
-<li><strong>T</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List floats (or a float) for periods to compute fd;
-Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5.</li>
-<li><strong>a_weight</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Weighting factor for how p-dot-q and s-dot-q are
+not be equal.</p></li>
+<li><p><strong>T</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List floats (or a float) for periods to compute fd;
+Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5.</p></li>
+<li><p><strong>a_weight</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Weighting factor for how p-dot-q and s-dot-q are
 averaged; 0 for only p-dot-q (propagation factor) and 1 for
-only s-dot-q (slip factor).</li>
-<li><strong>mtype</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Either 1 or 2; 1 for adding only positive components
-of dot products, 2 for adding all components of dot products.</li>
-<li><strong>simpleDT</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Should the simpler DT equation be used? Usually
-False.</li>
-<li><strong>centered</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Should the centered directivity parameter be used?</li>
+only s-dot-q (slip factor).</p></li>
+<li><p><strong>mtype</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Either 1 or 2; 1 for adding only positive components
+of dot products, 2 for adding all components of dot products.</p></li>
+<li><p><strong>simpleDT</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Should the simpler DT equation be used? Usually
+False.</p></li>
+<li><p><strong>centered</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Should the centered directivity parameter be used?</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="classmethod">
+</dd>
+</dl>
+<dl class="py method">
 <dt id="shakelib.directivity.rowshandel2013.Rowshandel2013.fromSites">
-<em class="property">classmethod </em><code class="descname">fromSites</code><span class="sig-paren">(</span><em>origin</em>, <em>rup</em>, <em>sites</em>, <em>dx</em>, <em>T</em>, <em>a_weight=0.5</em>, <em>mtype=1</em>, <em>simpleDT=False</em>, <em>centered=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.fromSites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.fromSites" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromSites</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">origin</span></em>, <em class="sig-param"><span class="n">rup</span></em>, <em class="sig-param"><span class="n">sites</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">a_weight</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">mtype</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">simpleDT</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">centered</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.fromSites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.fromSites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a rowshandel2013 instance from a sites instance.</p>
 <p>Class method for constructing a rowshandel2013 instance from
 a sites instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>origin</strong> – Origin instance.</li>
-<li><strong>rup</strong> – Rupture instance.</li>
-<li><strong>sites</strong> – Sites object.</li>
-<li><strong>dx</strong> – Float for target mesh spacing for subruptures in km. The mesh
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>origin</strong> – Origin instance.</p></li>
+<li><p><strong>rup</strong> – Rupture instance.</p></li>
+<li><p><strong>sites</strong> – Sites object.</p></li>
+<li><p><strong>dx</strong> – Float for target mesh spacing for subruptures in km. The mesh
 snaps to the edges of the quadrilaterals so the actual mesh
 spacing will not equal this exactly; spacing in x and y will
-not be equal.</li>
-<li><strong>T</strong> – Period; Currently, only acceptable values are 1, 2, 3, 4, 5,
-7.5.</li>
-<li><strong>a_weight</strong> – Weighting factor for how p-dot-q and s-dot-q are
+not be equal.</p></li>
+<li><p><strong>T</strong> – Period; Currently, only acceptable values are 1, 2, 3, 4, 5,
+7.5.</p></li>
+<li><p><strong>a_weight</strong> – Weighting factor for how p-dot-q and s-dot-q are
 averaged; 0 for only p-dot-q (propagation factor) and 1 for
-only s-dot-q (slip factor).</li>
-<li><strong>mtype</strong> – Integer, either 1 or 2; 1 for adding only positive
+only s-dot-q (slip factor).</p></li>
+<li><p><strong>mtype</strong> – Integer, either 1 or 2; 1 for adding only positive
 components of dot products, 2 for adding all components of dot
-products.</li>
-<li><strong>simpleDT</strong> – Boolean; should the simpler DT equation be used? Usually
-False.</li>
-<li><strong>centered</strong> – Boolean; should the centered directivity parameter be
-used</li>
+products.</p></li>
+<li><p><strong>simpleDT</strong> – Boolean; should the simpler DT equation be used? Usually
+False.</p></li>
+<li><p><strong>centered</strong> – Boolean; should the centered directivity parameter be
+used</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Rowshandel2013 directivity class.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Rowshandel2013 directivity class.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.directivity.rowshandel2013.Rowshandel2013.getFd">
-<code class="descname">getFd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getFd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getFd" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Numpy array of Fd; this is the directivity amplification factor
-(log units).</td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">getFd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getFd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getFd" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Numpy array of Fd; this is the directivity amplification factor
+(log units).</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.directivity.rowshandel2013.Rowshandel2013.getXiPrime">
-<code class="descname">getXiPrime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getXiPrime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getXiPrime" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Numpy array of Xi’; this is the variable that accounts for
-geometric factors in Fd.</td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">getXiPrime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getXiPrime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getXiPrime" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Numpy array of Xi’; this is the variable that accounts for
+geometric factors in Fd.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.directivity.rowshandel2013.Rowshandel2013.getDT">
-<code class="descname">getDT</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getDT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getDT" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of numpy arrays of the distance taper factor. Length is the
-number of periods.</td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">getDT</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getDT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getDT" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of numpy arrays of the distance taper factor. Length is the
+number of periods.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.directivity.rowshandel2013.Rowshandel2013.getWP">
-<code class="descname">getWP</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getWP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getWP" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of numpy array of the narrow-band multiplier. Length is the
-number of periods.</td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">getWP</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getWP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getWP" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of numpy array of the narrow-band multiplier. Length is the
+number of periods.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="shakelib.directivity.rowshandel2013.Rowshandel2013.getLD">
-<code class="descname">getLD</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getLD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getLD" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Numpy array of the rupture length de-normalization factor.</td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">getLD</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getLD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getLD" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Numpy array of the rupture length de-normalization factor.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="py method">
 <dt id="shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods">
-<em class="property">classmethod </em><code class="descname">getPeriods</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getPeriods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">getPeriods</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getPeriods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of the periods for which the model is defined.</p>
 </dd></dl>
 
@@ -254,49 +226,24 @@ number of periods.</td>
 
 
 <h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="shakelib.directivity.bayless2013.html">shakelib.directivity.bayless2013</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">shakelib.directivity.rowshandel2013</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

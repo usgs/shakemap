@@ -1,21 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.utils.layers &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -35,20 +33,20 @@
   <h1>Source code for shakemap.utils.layers</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">pyproj</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span>
-<span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="k">import</span> <span class="n">transform</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span>
+<span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="kn">import</span> <span class="n">transform</span>
 <span class="kn">import</span> <span class="nn">shapely.wkt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">min_distance_to_segment</span>
-<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">ValidateError</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="kn">import</span> <span class="n">min_distance_to_segment</span>
+<span class="kn">from</span> <span class="nn">validate</span> <span class="kn">import</span> <span class="n">ValidateError</span>
 
 <span class="kn">import</span> <span class="nn">shakemap.utils.config</span> <span class="k">as</span> <span class="nn">config</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="n">path_macro_sub</span>
 
 
 <span class="c1"># ##########################################################################</span>
@@ -148,14 +146,14 @@
 
     <span class="n">project</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
         <span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
-        <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">),</span>
-        <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;aeqd  +lat_0=</span><span class="si">%f</span><span class="s1"> +lon_0=</span><span class="si">%f</span><span class="s1"> +R=6371&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elat</span><span class="p">,</span> <span class="n">elon</span><span class="p">)))</span>
+        <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">),</span>
+        <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;aeqd  +lat_0=</span><span class="si">%f</span><span class="s1"> +lon_0=</span><span class="si">%f</span><span class="s1"> +datum=WGS84&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elat</span><span class="p">,</span> <span class="n">elon</span><span class="p">)))</span>
     <span class="n">ep</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
     <span class="n">min_dist</span> <span class="o">=</span> <span class="mf">99999.</span>
     <span class="k">for</span> <span class="n">poly</span> <span class="ow">in</span> <span class="n">plist</span><span class="p">:</span>
         <span class="n">nearest</span> <span class="o">=</span> <span class="n">nearest_edge</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">poly</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">nearest</span> <span class="o">&lt;</span> <span class="mi">5000</span><span class="p">:</span>
-            <span class="n">nearest</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">transform</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">poly</span><span class="p">))</span>
+            <span class="n">nearest</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">transform</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">poly</span><span class="p">))</span> <span class="o">/</span> <span class="mf">1000.0</span>
         <span class="k">if</span> <span class="n">nearest</span> <span class="o">&lt;</span> <span class="n">min_dist</span><span class="p">:</span>
             <span class="n">min_dist</span> <span class="o">=</span> <span class="n">nearest</span>
         <span class="k">if</span> <span class="n">min_dist</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -255,23 +253,23 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sm4_index.html">ShakeMap v4 Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
