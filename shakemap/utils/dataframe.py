@@ -18,7 +18,7 @@ CHANNEL_PATTERNS = ['^[H,B][H,L,N][E,N,Z,1,2,3]$',  # match standard seed names
 PGM_COLS = ['PGA', 'PGV', 'SA(0.3)', 'SA(1.0)', 'SA(3.0)']
 OPTIONAL = ['NAME', 'DISTANCE', 'REFERENCE',
             'INTENSITY', 'SOURCE', 'LOC', 'INSTTYPE', 'ELEV',
-            'NRESP', 'INTENSITY_STDDEV', '', 'FLAG', 'INSTRUMENT', 'PERIOD',
+            'NRESP', 'STDDEV', '', 'FLAG', 'INSTRUMENT', 'PERIOD',
             'SENSITIVITY', 'SERIAL', 'SOURCE_FORMAT', 'STRUCTURE', 'DAMPING']
 FLOATRE = "[-+]?[0-9]*\.?[0-9]+"
 
@@ -82,6 +82,8 @@ def dataframe_to_xml(df, xmlfile, reference=None):
             station.attrib['dist'] = f"{tmprow['DISTANCE']:.1f}"
         if 'INTENSITY' in tmprow:
             station.attrib['intensity'] = f"{tmprow['INTENSITY']:.1f}"
+        if 'STDDEV' in tmprow:
+            station.attrib['intensity_stddev'] = f"{tmprow['STDDEV']:.4f}"
         if 'NRESP' in tmprow:
             station.attrib['nresp'] = f"{int(tmprow['NRESP']):d}"
         if 'SOURCE' in tmprow:
