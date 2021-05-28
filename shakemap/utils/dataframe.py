@@ -18,7 +18,7 @@ CHANNEL_PATTERNS = ['^[H,B][H,L,N][E,N,Z,1,2,3]$',  # match standard seed names
 PGM_COLS = ['PGA', 'PGV', 'SA(0.3)', 'SA(1.0)', 'SA(3.0)']
 OPTIONAL = ['NAME', 'DISTANCE', 'REFERENCE',
             'INTENSITY', 'SOURCE', 'LOC', 'INSTTYPE', 'ELEV',
-            'NRESP', 'INTENSITY_STDDEV', '', 'FLAG', 'INSTRUMENT', 'PERIOD',
+            'NRESP', 'STDDEV', '', 'FLAG', 'INSTRUMENT', 'PERIOD',
             'SENSITIVITY', 'SERIAL', 'SOURCE_FORMAT', 'STRUCTURE', 'DAMPING']
 FLOATRE = "[-+]?[0-9]*\.?[0-9]+"
 
