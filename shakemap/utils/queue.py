@@ -666,6 +666,8 @@ class Queue(object):
         existing = self.ampHandler.getEvent(eventid)
         if existing:
             self.dispatchEvent(data, 'cancel')
+            existing['repeats'] = None
+            self.ampHandler.insertEvent(existing, update=True)            
             return
 
         if 'alt_eventids' in data:
@@ -675,6 +677,8 @@ class Queue(object):
                 existing = self.ampHandler.getEvent(eid)
                 if existing:
                     self.dispatchEvent(existing, 'cancel')
+                    existing['repeats'] = None
+                    self.ampHandler.insertEvent(existing, update=True)                    
                     return
 
         self.logger.info('cancel is for unprocessed event %s: ignoring' %
