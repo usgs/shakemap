@@ -209,29 +209,29 @@ def test_bk17():
 
     # Test that an invalid/unknown parameter is changed to AVERAGE_HORIZONTAL
     bk17 = BooreKishida2017('wrong', imc_out[0])
-    assert bk17.imc_in == 'Average horizontal'
+    assert bk17.imc_in.value == 'Average horizontal'
     assert bk17.imc_out == imc_out[0]
     bk17 = BooreKishida2017(imc_out[0], 'wrong')
     assert bk17.imc_in == imc_out[0]
-    assert bk17.imc_out == 'Average horizontal'
+    assert bk17.imc_out.value == 'Average horizontal'
     bk17 = BooreKishida2017('wrong', 'wrong')
-    assert bk17.imc_in == 'Average horizontal'
-    assert bk17.imc_out == 'Average horizontal'
+    assert bk17.imc_in.value == 'Average horizontal'
+    assert bk17.imc_out.value == 'Average horizontal'
 
     # Test that the correct input/output imc returns the right path
     bk17 = BooreKishida2017('Average horizontal',
             'Average Horizontal (RotD50)')
     assert len(bk17.path) == 2
-    assert bk17.path[0] == 'Average horizontal'
-    assert bk17.path[-1] == 'Average Horizontal (RotD50)'
+    assert bk17.path[0].value == 'Average horizontal'
+    assert bk17.path[-1].value == 'Average Horizontal (RotD50)'
     bk17 = BooreKishida2017('Average horizontal',
             'Horizontal Maximum Direction (RotD100)')
     assert len(bk17.path) == 3
-    assert bk17.path[0] == 'Average horizontal'
-    assert bk17.path[-1] == 'Horizontal Maximum Direction (RotD100)'
-    if bk17.path[1] == 'Greater of two horizontal':
+    assert bk17.path[0].value == 'Average horizontal'
+    assert bk17.path[-1].value == 'Horizontal Maximum Direction (RotD100)'
+    if bk17.path[1].value == 'Greater of two horizontal':
         correct = True
-    elif bk17.path[1] == 'Average Horizontal (RotD50)':
+    elif bk17.path[1].value == 'Average Horizontal (RotD50)':
         correct = True
     else:
         correct = False
@@ -239,11 +239,11 @@ def test_bk17():
     bk17 = BooreKishida2017('Horizontal',
             'Random horizontal')
     assert len(bk17.path) == 3
-    assert bk17.path[0] == 'Horizontal'
-    assert bk17.path[-1] == 'Random horizontal'
-    if bk17.path[1] == 'Greater of two horizontal':
+    assert bk17.path[0].value == 'Horizontal'
+    assert bk17.path[-1].value == 'Random horizontal'
+    if bk17.path[1].value == 'Greater of two horizontal':
         correct = True
-    elif bk17.path[1] == 'Average Horizontal (RotD50)':
+    elif bk17.path[1].value == 'Average Horizontal (RotD50)':
         correct = True
     else:
         correct = False
@@ -273,8 +273,8 @@ def test_bk17():
     with pytest.raises(ValueError) as e:
         bk17.convertAmpsOnce('wrong', [10.0], rrup_in, mags_in[0])
     # Test amp conversion for unknown imc
-    bk17 = BooreKishida2017('Average Horizontal',
-            'Average Horizontal')
+    bk17 = BooreKishida2017('Average horizontal',
+            'Average horizontal')
     a = [-2.99573227, -2.30258509, -1.60943791, -0.91629073,
             -0.22314355, 0.47000363]
     mag = 8.0

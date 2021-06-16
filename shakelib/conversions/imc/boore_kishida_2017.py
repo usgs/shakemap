@@ -56,44 +56,71 @@ class BooreKishida2017(ComponentConverter):
     """
     def __init__(self, imc_in, imc_out):
         super().__init__()
-        self.imc_in = imc_in
-        self.imc_out = imc_out
+        if type(imc_in) == IMC:
+            self.imc_in = imc_in
+        elif type(imc_in) == str:
+            imc_from_str = self.imc_from_str(imc_in)
+            if imc_from_str is None:
+                logging.warning("Unknown IMC string '%s' in input, using "
+                                "Average horizontal", imc_in)
+                self.imc_in = IMC.AVERAGE_HORIZONTAL
+            else:
+                self.imc_in = imc_from_str
+        else:
+            logging.warning("Unknown object passed as input %s, using Average "
+                            "horizontal", type(imc_in))
+            self.imc_in = IMC.AVERAGE_HORIZONTAL
+        if type(imc_out) == IMC:
+            self.imc_out = imc_out
+        elif type(imc_out) == str:
+            imc_from_str = self.imc_from_str(imc_out)
+            if imc_from_str is None:
+                logging.warning("Unknown IMC string '%s' in output, using "
+                                "Average horizontal", imc_out)
+                self.imc_out = IMC.AVERAGE_HORIZONTAL
+            else:
+                self.imc_out = imc_from_str
+        else:
+            logging.warning("Unknown object passed as opuput %s, using Average "
+                            "horizontal", type(imc_out))
+            self.imc_out = IMC.AVERAGE_HORIZONTAL
+
         # Possible conversions
         self.conversion_graph = {
-            'Average Horizontal (RotD50)': set([
-                'Average Horizontal (GMRotI50)',
-                'Average horizontal',
-                'Horizontal Maximum Direction (RotD100)',
-                'Greater of two horizontal',
-                'Random horizontal',
-                'Horizontal',
-                'Median horizontal']),
-            'Average Horizontal (GMRotI50)': set([
-                'Average Horizontal (RotD50)',
-                'Greater of two horizontal']),
-            'Average horizontal': set([
-                'Average Horizontal (RotD50)',
-                'Greater of two horizontal']),
-            'Horizontal Maximum Direction (RotD100)': set([
-                'Average Horizontal (RotD50)',
-                'Greater of two horizontal']),
-            'Greater of two horizontal': set([
-                'Average Horizontal (RotD50)',
-                'Average Horizontal (GMRotI50)',
-                'Average horizontal',
-                'Horizontal Maximum Direction (RotD100)',
-                'Random horizontal',
-                'Horizontal',
-                'Median horizontal']),
-            'Horizontal': set([
-                'Greater of two horizontal',
-                'Average Horizontal (RotD50)']),
-            'Median horizontal': set([
-                'Greater of two horizontal',
-                'Average Horizontal (RotD50)']),
-            'Random horizontal': set([
-                'Greater of two horizontal',
-                'Average Horizontal (RotD50)'])
+            IMC.RotD50: set([
+                IMC.GMRotI50,
+                IMC.AVERAGE_HORIZONTAL,
+                IMC.RotD100,
+                IMC.GREATER_OF_TWO_HORIZONTAL,
+                IMC.RANDOM_HORIZONTAL,
+                IMC.HORIZONTAL,
+                IMC.MEDIAN_HORIZONTAL]),
+            IMC.GMRotI50: set([
+                IMC.RotD50,
+                IMC.GREATER_OF_TWO_HORIZONTAL]),
+            IMC.AVERAGE_HORIZONTAL: set([
+                IMC.RotD50,
+                IMC.GREATER_OF_TWO_HORIZONTAL]),
+            IMC.RotD100: set([
+                IMC.RotD50,
+                IMC.GREATER_OF_TWO_HORIZONTAL]),
+            IMC.GREATER_OF_TWO_HORIZONTAL: set([
+                IMC.RotD50,
+                IMC.GMRotI50,
+                IMC.AVERAGE_HORIZONTAL,
+                IMC.RotD100,
+                IMC.RANDOM_HORIZONTAL,
+                IMC.HORIZONTAL,
+                IMC.MEDIAN_HORIZONTAL]),
+            IMC.HORIZONTAL: set([
+                IMC.GREATER_OF_TWO_HORIZONTAL,
+                IMC.RotD50]),
+            IMC.MEDIAN_HORIZONTAL: set([
+                IMC.GREATER_OF_TWO_HORIZONTAL,
+                IMC.RotD50]),
+            IMC.RANDOM_HORIZONTAL: set([
+                IMC.GREATER_OF_TWO_HORIZONTAL,
+                IMC.RotD50])
         }
         # Check if any imc values are unknown. If they are, convert
         # to AVERAGE_HORIZONTAL
