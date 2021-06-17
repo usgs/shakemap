@@ -177,25 +177,25 @@ def test_bb06():
 
     # Test that an invalid/unknown parameter is changed to AVERAGE_HORIZONTAL
     bb06 = BeyerBommer2006('wrong', imc_out[0])
-    assert bb06.imc_in == 'Average horizontal'
+    assert bb06.imc_in.value == 'Average horizontal'
     assert bb06.imc_out == imc_out[0]
     bb06 = BeyerBommer2006(imc_out[0], 'wrong')
     assert bb06.imc_in == imc_out[0]
-    assert bb06.imc_out == 'Average horizontal'
+    assert bb06.imc_out.value == 'Average horizontal'
     bb06 = BeyerBommer2006('wrong', 'wrong')
-    assert bb06.imc_in == 'Average horizontal'
-    assert bb06.imc_out == 'Average horizontal'
+    assert bb06.imc_in.value == 'Average horizontal'
+    assert bb06.imc_out.value == 'Average horizontal'
 
 
     # Test that the correct input/output imc returns the right path
     bb06 = BeyerBommer2006('Median horizontal', 'Random horizontal')
     assert len(bb06.path) == 2
-    assert bb06.path[0] == 'Median horizontal'
-    assert bb06.path[-1] == 'Random horizontal'
+    assert bb06.path[0].value == 'Median horizontal'
+    assert bb06.path[-1].value == 'Random horizontal'
     bb06 = BeyerBommer2006('Average Horizontal (RotD50)', 'Horizontal')
     assert len(bb06.path) == 2
-    assert bb06.path[0] == 'Average Horizontal (RotD50)'
-    assert bb06.path[-1] == 'Horizontal'
+    assert bb06.path[0].value == 'Average Horizontal (RotD50)'
+    assert bb06.path[-1].value == 'Horizontal'
 
     # Test exception for unknown imt
     with pytest.raises(ValueError) as e:

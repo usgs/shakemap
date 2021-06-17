@@ -1,6 +1,8 @@
 # Standard library imports
 from abc import ABC, abstractmethod
 
+from openquake.hazardlib.const import IMC
+
 
 class ComponentConverter(ABC):
     """Base class for implementing conversions between components."""
@@ -13,9 +15,11 @@ class ComponentConverter(ABC):
         to AVERAGE_HORIZONTAL.
         """
         if self.imc_in not in self.conversion_graph:
-            self.imc_in = 'Average horizontal'
+            # self.imc_in = 'Average horizontal'
+            self.imc_in = IMC.AVERAGE_HORIZONTAL
         if self.imc_out not in self.conversion_graph:
-            self.imc_out = 'Average horizontal'
+            # self.imc_out = 'Average horizontal'
+            self.imc_out = IMC.AVERAGE_HORIZONTAL
 
     def convertAmps(self, imt, amps, rrups=None, mag=None):
         """
@@ -172,3 +176,19 @@ class ComponentConverter(ABC):
             ValueError if imc_in or imc_out are not valid..
         """
         pass
+
+    def imc_from_str(self, imcstring):
+        """
+        Convert a string to one of the OQ IMC types. Return None if the string
+        does not match any of the strings in the Enum.
+
+        Args:
+            imcstring (str): A string corresponding to one of the OQ IMC types.
+
+        Returns:
+            IMC: One of the OQ IMC types. Returns None if nothing matches.
+        """
+        for imc in IMC:
+            if imc.value == imcstring:
+                return imc
+        return None
