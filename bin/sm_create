@@ -281,8 +281,13 @@ def main(args):
         try:
             detail = get_event_by_id(args.eventid)
         except Exception as e:
-            print('Unable to connect to ComCat server. '
-                  'Please try again later. "%s"' % str(e))
+            expected_url = ('https://earthquake.usgs.gov/earthquakes'
+                            f'/eventpage/{args.eventid}/executive')
+            msg = (f'\nWe were unable to validate that {args.eventid} is a valid\n'
+                   'event ID in ComCat. The expected URL for that\n'
+                   f'event ID would be:\n\n{expected_url}\n\n'
+                   'Please check that this web page exists.\n')
+            print(msg)
             sys.exit(1)
         # get input data
         edict = _get_event_dictionary(detail, args.source)
