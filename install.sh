@@ -123,6 +123,7 @@ conda activate base
 
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
+conda clean -y --all
 
 # Extra packages to install with dev option
 dev_list=(
