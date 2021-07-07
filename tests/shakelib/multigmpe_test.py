@@ -14,7 +14,7 @@ from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 try:
     from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
 except ModuleNotFoundError as ex:
-    from openquake.hazardlib.gsim.boore_atkinson_2006 import AtkinsonBoore2006
+    from openquake.hazardlib.gsim.boore_atkinson_2008 import AtkinsonBoore2006
 from openquake.hazardlib.gsim.base import RuptureContext
 from openquake.hazardlib.gsim.base import DistancesContext
 from openquake.hazardlib.gsim.base import SitesContext
