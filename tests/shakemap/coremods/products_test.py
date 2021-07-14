@@ -262,8 +262,6 @@ def do_contour(evid, datapath):
         jfile = os.path.join(datapath, evid, 'current', 'products', fname)
         with open(jfile, 'r') as if2:
             fjson = json.load(if2)
-        # print("fjson: ", ordered(fjson))
-        # print("cjson: ", ordered(cjson))
         assert ordered(fjson) == ordered(cjson)
 
 

@@ -329,11 +329,11 @@ class BeyerBommer2006(ComponentConverter):
 
         self._verifyConversion(imc)
 
-        if 'PGA' in imt:
+        if 'PGA' in imt.string:
             return self.__pga_dict[imc]['c12']
-        elif 'PGV' in imt:
+        elif 'PGV' in imt.string:
             return self.__pgv_dict[imc]['c12']
-        elif 'SA' in imt:
+        elif 'SA' in imt.string:
             pp = imt.period
             if pp <= 0.15:
                 return self.__sa_dict[imc]['c1']
@@ -348,7 +348,7 @@ class BeyerBommer2006(ComponentConverter):
                 # but for now let's just use c2
                 return self.__sa_dict[imc]['c2']
         else:
-            raise ValueError('unknown IMT %r' % imt)
+            raise ValueError('unknown IMT %s' % imt.string)
 
     def __GM2otherSigma(self, imt, imc):
         """
@@ -374,13 +374,13 @@ class BeyerBommer2006(ComponentConverter):
 
         self._verifyConversion(imc)
 
-        if 'PGA' in imt:
+        if 'PGA' in imt.string:
             return self.__pga_dict[imc]['R'],\
                 self.__pga_dict[imc]['c34']
-        elif 'PGV' in imt:
+        elif 'PGV' in imt.string:
             return self.__pgv_dict[imc]['R'],\
                 self.__pgv_dict[imc]['c34']
-        elif 'SA' in imt:
+        elif 'SA' in imt.string:
             R = self.__sa_dict[imc]['R']
             pp = imt.period
             if pp <= 0.15:
@@ -397,7 +397,7 @@ class BeyerBommer2006(ComponentConverter):
                 # but for now let's just use c4
                 return R, self.__sa_dict[imc]['c4']
         else:
-            raise ValueError('unknown IMT %r' % imt)
+            raise ValueError('unknown IMT %s' % imt.string)
 
     def _verifyConversion(self, imc_in, imc_out=None):
         """
@@ -417,4 +417,4 @@ class BeyerBommer2006(ComponentConverter):
            imc_in != const.IMC.RotD50 and \
            imc_in != const.IMC.RANDOM_HORIZONTAL and \
            imc_in != const.IMC.HORIZONTAL:
-            raise ValueError('unknown IMC %r' % imc_in)
+            raise ValueError('unknown IMC %s' % imc_in)

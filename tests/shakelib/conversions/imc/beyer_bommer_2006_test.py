@@ -7,7 +7,7 @@ import sys
 # third party imports
 import numpy as np
 from openquake.hazardlib import const
-from openquake.hazardlib.imt import PGA, PGV, SA
+from openquake.hazardlib.imt import IMT, PGA, PGV, SA
 import pytest
 
 # local imports
@@ -207,9 +207,9 @@ def test_bb06():
 
     # Test exception for unknown imt
     with pytest.raises(ValueError) as e:
-        bb06.convertSigmasOnce('wrong', 0)
+        bb06.convertSigmasOnce(IMT('wrong'), 0)
     with pytest.raises(ValueError) as e:
-        bb06.convertAmpsOnce('wrong', [10.0], None, None)
+        bb06.convertAmpsOnce(IMT('wrong'), [10.0], None, None)
     # Test exception for unknown imc
     with pytest.raises(ValueError) as e:
         bb06._verifyConversion('Wrong', imc_out=None)

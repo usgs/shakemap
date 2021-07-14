@@ -17,6 +17,7 @@ from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib import const
 from openquake.hazardlib import imt as IMT
 from openquake.hazardlib.gsim.usgs_ceus_2019 import NGAEastUSGSGMPE
+from openquake.hazardlib.gsim.gmpe_table import _return_tables
 
 # Max distance for evaluating NGAEast. This *should* be 1500, but due to what
 # appears to be a floating point precision issue, we get a division by zero
@@ -197,7 +198,7 @@ class NGAEast(GMPE):
             if is_pgv:
                 # Is PGV and also not available for gm?
                 try:
-                    gm._return_tables(rup.mag, imt, "IMLs")
+                    _ = _return_tables(gm, rup.mag, imt, "IMLs")
                 except KeyError:
                     continue
                 except Exception:

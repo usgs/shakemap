@@ -7,7 +7,7 @@ import sys
 # third party imports
 import numpy as np
 from openquake.hazardlib import const
-from openquake.hazardlib.imt import PGA, PGV, SA
+from openquake.hazardlib.imt import IMT, PGA, PGV, SA
 import pytest
 
 # local imports
@@ -285,7 +285,7 @@ def test_bk17():
         bk17.convertAmps(imt_in[0],amps_in, None, None)
     # Test exception for unknown imt
     with pytest.raises(ValueError) as e:
-        bk17.convertAmpsOnce('wrong', [10.0], rrup_in, mags_in[0])
+        bk17.convertAmpsOnce(IMT('wrong'), [10.0], rrup_in, mags_in[0])
     # Test amp conversion for unknown imc
     bk17 = BooreKishida2017('Average horizontal',
             'Average horizontal')

@@ -185,14 +185,15 @@ class ModelModule(CoreModule):
         # rupture and distance contexts; later we'll make the
         # IMT-specific gmpes
         # ---------------------------------------------------------------------
-        self.default_gmpe = MultiGMPE.from_config(self.config)
+        self.default_gmpe = MultiGMPE.__from_config__(self.config)
 
         self.gmice = get_object_from_config('gmice', 'modeling', self.config)
 
         if self.config['ipe_modules'][self.config['modeling']['ipe']][0] == \
                 'VirtualIPE':
             pgv_imt = imt.from_string('PGV')
-            ipe_gmpe = MultiGMPE.from_config(self.config, filter_imt=pgv_imt)
+            ipe_gmpe = MultiGMPE.__from_config__(self.config,
+                                                 filter_imt=pgv_imt)
             self.ipe = VirtualIPE.fromFuncs(ipe_gmpe, self.gmice)
         else:
             ipe = get_object_from_config('ipe', 'modeling', self.config)
@@ -204,7 +205,7 @@ class ModelModule(CoreModule):
                 ipe.REQUIRES_SITES_PARAMETERS = frozenset(tmpset)
             ipe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
                 oqconst.IMC.GREATER_OF_TWO_HORIZONTAL
-            self.ipe = MultiGMPE.from_list([ipe], [1.0])
+            self.ipe = MultiGMPE.__from_list__([ipe], [1.0])
 
         ipe_sd_types = self.ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
         if len(ipe_sd_types) == 1:
@@ -626,7 +627,7 @@ class ModelModule(CoreModule):
                 lons, lats, vs30, idents = in_sites.item()
                 self.idents = [idents]
             else:
-                lons, lats, vs30, self.idents = zip(*in_sites)
+                lons, lats, vs30, self.idents = zip(in_sites)
             self.lons = np.array(lons).reshape(1, -1)
             self.lats = np.array(lats).reshape(1, -1)
             self.vs30 = np.array(vs30).reshape(1, -1)
@@ -836,8 +837,8 @@ class ModelModule(CoreModule):
                 not_supported = False
                 if imtstr != 'MMI':
                     try:
-                        gmpe = MultiGMPE.from_config(self.config,
-                                                     filter_imt=oqimt)
+                        gmpe = MultiGMPE.__from_config__(self.config,
+                                                         filter_imt=oqimt)
                     except KeyError:
                         self.logger.warn(
                             "Input IMT %s not supported by GMPE: ignoring" %
@@ -988,7 +989,8 @@ class ModelModule(CoreModule):
                 #
                 not_supported = False
                 try:
-                    gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
+                    gmpe = MultiGMPE.__from_config__(self.config,
+                                                     filter_imt=oqimt)
                 except KeyError:
                     self.logger.warn(
                         "Input IMT %s not supported by GMPE: ignoring" %
@@ -1045,7 +1047,8 @@ class ModelModule(CoreModule):
         if 'df1' not in self.dataframes:
             return
         df1 = self.df1.df
-        gmice_imts = self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+        gmice_imts = [imt.__name__ for imt in
+                      self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
         gmice_pers = self.gmice.DEFINED_FOR_SA_PERIODS
         np.seterr(invalid='ignore')
         df1['MMI'] = self.gmice.getPreferredMI(df1, dists=df1['rrup'],
@@ -1056,9 +1059,9 @@ class ModelModule(CoreModule):
             df1['MMI_sd'] = np.full_like(df1['lon'], df1['MMI_sd'])
         for imtstr in self.df1.imts:
             oqimt = imt.from_string(imtstr)
-            if not isinstance(oqimt, tuple(gmice_imts)):
+            if not oqimt.string in gmice_imts:
                 continue
-            if isinstance(oqimt, imt.SA) and \
+            if "SA" in oqimt.string and \
                oqimt.period not in gmice_pers:
                 continue
 
@@ -1327,7 +1330,7 @@ class ModelModule(CoreModule):
         #
         oqimt = imt.from_string(imtstr)
         if imtstr != 'MMI':
-            gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
+            gmpe = MultiGMPE.__from_config__(self.config, filter_imt=oqimt)
         else:
             gmpe = self.ipe
 
@@ -2205,7 +2208,7 @@ class ModelModule(CoreModule):
         # Store the IMTs
         #
         ascii_ids = np.array(
-            [x.encode('ascii') for x in self.idents]).ravel()
+            [np.char.encode(x, encoding='ascii') for x in self.idents]).ravel()
         component = self.config['interp']['component']
         for key, value in self.outgrid.items():
             # set the data grid
@@ -2295,7 +2298,7 @@ class ModelModule(CoreModule):
                     self._info = {
                         'multigmpe': {}
                     }
-                self._info['multigmpe'][str(oqimt)] = gmpe.describe()
+                self._info['multigmpe'][str(oqimt)] = gmpe.__describe__()
             else:
                 self._info = {}
 
@@ -2313,12 +2316,12 @@ class ModelModule(CoreModule):
         # Does directivity apply to this imt?
         row_pers = Rowshandel2013.getPeriods()
 
-        if isinstance(oqimt, imt.PGA):
+        if oqimt.string == "PGA":
             imt_ok = False
-        elif isinstance(oqimt, imt.PGV) or isinstance(oqimt, imt.MMI):
+        elif oqimt.string == "PGV" or oqimt.string == "MMI":
             tper = 1.0
             imt_ok = True
-        elif isinstance(oqimt, imt.SA):
+        elif "SA" in oqimt.string:
             tper = oqimt.period
             min_per = np.min(row_pers)
             max_per = np.max(row_pers)
@@ -2363,7 +2366,7 @@ class ModelModule(CoreModule):
             # Store the interpolated grid
             imtstr = str(oqimt)
             self.dir_output[imtstr] = fd
-            if isinstance(oqimt, imt.MMI):
+            if oqimt.string == "MMI":
                 mean *= np.exp(fd)
             else:
                 mean += fd

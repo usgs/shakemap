@@ -51,7 +51,7 @@ class VirtualIPE(GMPE):
     REQUIRES_SITES_PARAMETERS = None
 
     @classmethod
-    def fromFuncs(cls, gmpe, gmice):
+    def __fromFuncs__(cls, gmpe, gmice):
         """
         Creates a new VirtualIPE object with the specified MultiGMPE and
         GMICE. There is no default constructor, you must use this method.

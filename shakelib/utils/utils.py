@@ -200,7 +200,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     (clon, clat) = _rupture_center(rupture)
     origin = rupture.getOrigin()
     if config is not None:
-        gmpe = MultiGMPE.from_config(config)
+        gmpe = MultiGMPE.__from_config__(config)
         gmice = get_object_from_config('gmice', 'modeling', config)
         if imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
             default_imt = imt.SA(1.0)
@@ -247,7 +247,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
             weights = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
             gmice = AK07()
 
-        gmpe = MultiGMPE.from_list(
+        gmpe = MultiGMPE.__from_list__(
             gmpes, weights, default_gmpes_for_site=site_gmpes)
         default_imt = imt.SA(1.0)
 
@@ -274,7 +274,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     sx = SitesContext()
     # Set to soft soil conditions
     sx.vs30 = np.full_like(dx.rjb, 180)
-    sx = MultiGMPE.set_sites_depth_parameters(sx, gmpe)
+    sx = MultiGMPE.__set_sites_depth_parameters__(sx, gmpe)
     sx.vs30measured = np.full_like(sx.vs30, False, dtype=bool)
     sx = Sites._addDepthParameters(sx)
     sx.backarc = np.full_like(sx.vs30, False, dtype=bool)

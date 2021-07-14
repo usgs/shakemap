@@ -34,9 +34,9 @@ def test_virtualipe():
     # Set up the GMPE, IPE, and GMICE
     #
     gmpe_cy14 = ChiouYoungs2014()
-    gmpe = MultiGMPE.from_list([gmpe_cy14], [1.0])
+    gmpe = MultiGMPE.__from_list__([gmpe_cy14], [1.0])
     gmice = WGRW12()
-    ipe = VirtualIPE.fromFuncs(gmpe, gmice)
+    ipe = VirtualIPE.__fromFuncs__(gmpe, gmice)
 
     #
     # Use the Calexico event info
@@ -114,14 +114,14 @@ def test_virtualipe():
     #
     gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES.remove(PGV)
     gmpe.ALL_GMPES_HAVE_PGV = False
-    ipe = VirtualIPE.fromFuncs(gmpe, gmice)
+    ipe = VirtualIPE.__fromFuncs__(gmpe, gmice)
     mmi_pga, mmi_sd_pga = \
         ipe.get_mean_and_stddevs(sx, rx, dx, MMI(), sd_types)
     #
     # Try with SA(1.0)
     #
     gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES.remove(PGA)
-    ipe = VirtualIPE.fromFuncs(gmpe, gmice)
+    ipe = VirtualIPE.__fromFuncs__(gmpe, gmice)
     mmi_psa, mmi_sd_psa = \
         ipe.get_mean_and_stddevs(sx, rx, dx, MMI(), sd_types)
 
@@ -136,14 +136,14 @@ def test_virtualipe():
     #
     gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES.remove(SA)
     with pytest.raises(ShakeLibException) as e:  # noqa
-        ipe = VirtualIPE.fromFuncs(gmpe, gmice)
+        ipe = VirtualIPE.__fromFuncs__(gmpe, gmice)
 
     #
     # Now do a GMPE that uses Rjb instead of Rrup
     #
     gmpe_ba14 = BooreEtAl2014()
-    gmpe = MultiGMPE.from_list([gmpe_ba14], [1.0])
-    ipe = VirtualIPE.fromFuncs(gmpe, gmice)
+    gmpe = MultiGMPE.__from_list__([gmpe_ba14], [1.0])
+    ipe = VirtualIPE.__fromFuncs__(gmpe, gmice)
     rx = rupture_obj.getRuptureContext([gmpe])
     rx.rake = 45.
     dobj = Distance(gmpe, lons, lats, depths, rupture_obj)

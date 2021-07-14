@@ -85,12 +85,12 @@ class MultiGMPE(GMPE):
             raise Exception("Requested an unavailable stddev_type.")
 
         # Evaluate MultiGMPE:
-        lnmu, lnsd = self.__get_mean_and_stddevs(
+        lnmu, lnsd = self.__get_mean_and_stddevs__(
             sites, rup, dists, imt, stddev_types)
 
         # Check for large-distance cutoff/weights
         if hasattr(self, 'CUTOFF_DISTANCE'):
-            lnmu_large, lnsd_large = self.__get_mean_and_stddevs(
+            lnmu_large, lnsd_large = self.__get_mean_and_stddevs__(
                 sites, rup, dists, imt, stddev_types, large_dist=True)
             # Stomp on lnmu and lnsd at large distances
             dist_cutoff = self.CUTOFF_DISTANCE
@@ -118,7 +118,7 @@ class MultiGMPE(GMPE):
 
         return lnmu, lnsd
 
-    def __get_mean_and_stddevs(self, sites, rup, dists, imt, stddev_types,
+    def __get_mean_and_stddevs__(self, sites, rup, dists, imt, stddev_types,
                                large_dist=False):
 
         # ---------------------------------------------------------------------
@@ -145,7 +145,7 @@ class MultiGMPE(GMPE):
             # Loop over GMPE list
             # -----------------------------------------------------------------
 
-            sites = MultiGMPE.set_sites_depth_parameters(sites, gmpe)
+            sites = MultiGMPE.__set_sites_depth_parameters__(sites, gmpe)
 
             # -----------------------------------------------------------------
             # Select the IMT
@@ -155,7 +155,7 @@ class MultiGMPE(GMPE):
                          list(gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES)]
 
             if not isinstance(gmpe, MultiGMPE) and \
-                    (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+                    (imt.string == "PGV") and ("PGV" not in gmpe_imts):
                 timt = SA(1.0)
             else:
                 timt = imt
@@ -195,7 +195,7 @@ class MultiGMPE(GMPE):
                 # We may need to inflate the standard deviations to account for
                 # the point-source to finite rupture conversion.
                 # -------------------------------------------------------------
-                lsd_new = self.inflatePSSigma(gmpe, lmean, lsd, sites, rup,
+                lsd_new = self.__inflatePSSigma__(gmpe, lmean, lsd, sites, rup,
                                               dists, timt, stddev_types)
                 for sd in lsd:
                     lsd_new.append(sd)
@@ -205,7 +205,7 @@ class MultiGMPE(GMPE):
                 # If IMT is PGV and PGV is not given by the GMPE, then
                 # convert from PSA10.
                 # -------------------------------------------------------------
-                if (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+                if (imt.string == "PGV") and ("PGV" not in gmpe_imts):
                     nh82 = NewmarkHall1982()
                     lmean = nh82.convertAmps('PSA10', 'PGV', lmean)
                     # Put the extra sigma from NH82 into intra event and total
@@ -217,7 +217,7 @@ class MultiGMPE(GMPE):
                 # -------------------------------------------------------------
                 # -------------------------------------------------------------
                 if self.HAS_SITE[i] is False:
-                    lamps = self.get_site_factors(
+                    lamps = self.__get_site_factors__(
                         sites, rup, dists, timt, default=True)
                     lmean = lmean + lamps
 
@@ -301,7 +301,7 @@ class MultiGMPE(GMPE):
         return lnmu, lnsd_new
 
     @classmethod
-    def from_config(cls, conf, filter_imt=None):
+    def __from_config__(cls, conf, filter_imt=None):
         """
         Construct a MultiGMPE from a config file.
 
@@ -345,11 +345,11 @@ class MultiGMPE(GMPE):
             if set_of_sets is True:
                 mgmpes = []
                 for s in selected_gmpe_sets:
-                    mgmpes.append(cls.__multigmpe_from_gmpe_set(
+                    mgmpes.append(cls.__multigmpe_from_gmpe_set__(
                         conf, s, filter_imt=filter_imt))
-                out = MultiGMPE.from_list(mgmpes, gmpe_set_weights, imc=IMC)
+                out = MultiGMPE.__from_list__(mgmpes, gmpe_set_weights, imc=IMC)
             elif set_of_gmpes is True:
-                out = cls.__multigmpe_from_gmpe_set(
+                out = cls.__multigmpe_from_gmpe_set__(
                     conf,
                     selected_gmpe,
                     filter_imt=filter_imt)
@@ -361,7 +361,7 @@ class MultiGMPE(GMPE):
             modinfo = conf['gmpe_modules'][selected_gmpe]
             mod = import_module(modinfo[1])
             tmpclass = getattr(mod, modinfo[0])
-            out = MultiGMPE.from_list([tmpclass()], [1.0], imc=IMC)
+            out = MultiGMPE.__from_list__([tmpclass()], [1.0], imc=IMC)
         else:
             raise TypeError("conf['modeling']['gmpe'] must be a key in "
                             "conf['gmpe_modules'] or conf['gmpe_sets']")
@@ -388,7 +388,7 @@ class MultiGMPE(GMPE):
 
         return out
 
-    def __multigmpe_from_gmpe_set(conf, set_name, filter_imt=None):
+    def __multigmpe_from_gmpe_set__(conf, set_name, filter_imt=None):
         """
         Private method for constructing a MultiGMPE from a set_name.
 
@@ -498,7 +498,7 @@ class MultiGMPE(GMPE):
         logging.debug('    filtered_gmpes: %s' % filtered_gmpes)
         logging.debug('    filtered_wts: %s' % filtered_wts)
 
-        mgmpe = MultiGMPE.from_list(
+        mgmpe = MultiGMPE.__from_list__(
             filtered_gmpes, filtered_wts,
             default_gmpes_for_site=filtered_site_gmpes,
             default_gmpes_for_site_weights=filtered_site_wts,
@@ -522,7 +522,7 @@ class MultiGMPE(GMPE):
         return mgmpe
 
     @classmethod
-    def from_list(cls, gmpes, weights,
+    def __from_list__(cls, gmpes, weights,
                   imc=const.IMC.GREATER_OF_TWO_HORIZONTAL,
                   default_gmpes_for_site=None,
                   default_gmpes_for_site_weights=None,
@@ -715,7 +715,7 @@ class MultiGMPE(GMPE):
 
         return self
 
-    def get_site_factors(self, sites, rup, dists, imt, default=False):
+    def __get_site_factors__(self, sites, rup, dists, imt, default=False):
         """
         Method for computing site amplification factors from the defalut GMPE
         to be applied to GMPEs which do not have a site term.
@@ -749,7 +749,7 @@ class MultiGMPE(GMPE):
         # If default True, construct new MultiGMPE with default GMPE/weights
         # ---------------------------------------------------------------------
         if default is True:
-            tmp = MultiGMPE.from_list(
+            tmp = MultiGMPE.__from_list__(
                 self.DEFAULT_GMPES_FOR_SITE,
                 self.DEFAULT_GMPES_FOR_SITE_WEIGHTS,
                 self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT)
@@ -772,7 +772,7 @@ class MultiGMPE(GMPE):
         return lamps
 
     @staticmethod
-    def set_sites_depth_parameters(sites, gmpe):
+    def __set_sites_depth_parameters__(sites, gmpe):
         """
         Need to select the appropriate z1pt0 value for different GMPEs.
         Note that these are required site parameters, so even though
@@ -821,7 +821,7 @@ class MultiGMPE(GMPE):
 
         return sites
 
-    def describe(self):
+    def __describe__(self):
         """
         Construct a dictionary that describes the MultiGMPE.
 
@@ -842,14 +842,14 @@ class MultiGMPE(GMPE):
             gmpe_dict['weights'].append(self.WEIGHTS[i])
             if isinstance(self.GMPES[i], MultiGMPE):
                 gmpe_dict['gmpes'].append(
-                    self.GMPES[i].describe()
+                    self.GMPES[i].__describe__()
                 )
             else:
                 gmpe_dict['gmpes'].append(str(self.GMPES[i]))
 
         return gmpe_dict
 
-    def inflatePSSigma(self, gmpe, lmean, lsd, sites, rup, dists, imt,
+    def __inflatePSSigma__(self, gmpe, lmean, lsd, sites, rup, dists, imt,
                        stddev_types):
         """
         If the point-source to finite-fault factors are used, we need to

@@ -113,7 +113,6 @@ def test_wgrw12():
     amps_target = np.log(np.array(
         [0.14134045,   0.6243495,   2.75796695,   6.19604804,
          13.07492182,  25.92605261,  42.65329774]) / 100.0)
-    print(repr(100 * np.exp(amps)))
     np.testing.assert_allclose(amps, amps_target)
     assert((set(dadm) - dadm_target[PGA()]) == set())
 

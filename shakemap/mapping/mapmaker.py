@@ -1277,14 +1277,15 @@ def draw_map(adict, override_scenario=False):
 
     config = adict['config']
     gmice = get_object_from_config('gmice', 'modeling', config)
-    gmice_imts = gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+    gmice_imts = [imt.__name__ for imt in
+                  gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
     gmice_pers = gmice.DEFINED_FOR_SA_PERIODS
 
     oqimt = imt.from_string(imtype)
 
-    if imtype != 'MMI' and (not isinstance(oqimt, tuple(gmice_imts)) or
-                            (isinstance(oqimt, imt.SA) and
-                             oqimt.period not in gmice_pers)):
+    if (imtype != 'MMI' and (imtype not in gmice_imts) and
+                             (('SA' in gmice_imts) and
+                             (oqimt.period not in gmice_pers))):
         my_gmice = None
     else:
         my_gmice = gmice
