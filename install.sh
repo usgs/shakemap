@@ -123,6 +123,9 @@ conda activate base
 
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
+conda clean -y --all
+
+conda install mamba -n base -c conda-forge
 
 # Extra packages to install with dev option
 dev_list=(
@@ -154,7 +157,7 @@ package_list=(
       "lockfile"
       "mapio"
       "matplotlib-base"
-      "numpy"
+      "numpy==1.20"
       "obspy"
       "openmp"
       "pandas"
@@ -186,7 +189,7 @@ conda config --add channels 'defaults'
 conda config --set channel_priority flexible
 
 echo "Creating the $VENV virtual environment:"
-conda create -y -n $VENV ${package_list[*]}
+mamba create -y -n $VENV ${package_list[*]}
 
 # Bail out at this point if the conda create command fails.
 # Clean up zip files we've downloaded
@@ -227,7 +230,7 @@ fi
 
 # Install OQ from github to get NGA East since it isn't in a release yet.
 echo "Installing OpenQuake from github..."
-pip install --upgrade git+https://github.com/gem/oq-engine
+pip install --upgrade git+https://github.com/gem/oq-engine@v3.11.3
 if [ $? -ne 0 ];then
     echo "Failed to pip install OpenQuake. Exiting."
     exit 1
