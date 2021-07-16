@@ -32,12 +32,8 @@ from openquake.hazardlib.gsim.silva_2002 import SilvaEtAl2002MwNSHMP2008
 from openquake.hazardlib.gsim.campbell_2003 import Campbell2003MwNSHMP2008
 from openquake.hazardlib.gsim.tavakoli_pezeshk_2005 import (
     TavakoliPezeshk2005MwNSHMP2008)
-try:
-    from openquake.hazardlib.gsim.atkinson_boore_2006 import (
-        AtkinsonBoore2006Modified2011)
-except ModuleNotFoundError as ex:
-    from openquake.hazardlib.gsim.boore_atkinson_2008 import (
-        AtkinsonBoore2006Modified2011)
+from openquake.hazardlib.gsim.atkinson_boore_2006 import (
+    AtkinsonBoore2006Modified2011)
 from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
 from openquake.hazardlib.gsim.boore_atkinson_2011 import Atkinson2008prime
 from openquake.hazardlib.gsim.somerville_2001 import (
