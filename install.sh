@@ -123,9 +123,6 @@ conda activate base
 
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
-conda clean -y --all
-
-conda install mamba -n base -c conda-forge
 
 # Extra packages to install with dev option
 dev_list=(
@@ -189,7 +186,7 @@ conda config --add channels 'defaults'
 conda config --set channel_priority flexible
 
 echo "Creating the $VENV virtual environment:"
-mamba create -y -n $VENV ${package_list[*]}
+conda create -y -n $VENV ${package_list[*]}
 
 # Bail out at this point if the conda create command fails.
 # Clean up zip files we've downloaded
