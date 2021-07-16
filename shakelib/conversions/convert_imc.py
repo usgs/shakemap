@@ -188,7 +188,10 @@ class ComponentConverter(ABC):
         Returns:
             IMC: One of the OQ IMC types. Returns None if nothing matches.
         """
-        for imc in IMC:
-            if imc.value == imcstring:
-                return imc
+        # *FIX ME* for imc in IMC:
+        for imc in [x for x in vars(IMC) if not x.startswith("__")]:
+            # *FIX ME* if imc.value == imcstring:
+            if getattr(IMC, imc) == imcstring:
+                # *FIX ME* return imc
+                return getattr(IMC, imc)
         return None

@@ -93,55 +93,105 @@ class BeyerBommer2006(ComponentConverter):
         self.__pga_pgv_col_names = ['c12', 'c34', 'R']
         self.__sa_col_names = ['c1', 'c2', 'c3', 'c4', 'R']
         # Possible conversions
-        self.conversion_graph = {IMC.GREATER_OF_TWO_HORIZONTAL: set([
-                IMC.MEDIAN_HORIZONTAL,
-                IMC.GMRotI50,
-                IMC.RotD50,
-                IMC.RANDOM_HORIZONTAL,
-                IMC.HORIZONTAL,
-                IMC.AVERAGE_HORIZONTAL]),
-         IMC.MEDIAN_HORIZONTAL: set([
-                IMC.GREATER_OF_TWO_HORIZONTAL,
-                IMC.GMRotI50,
-                IMC.RotD50,
-                IMC.RANDOM_HORIZONTAL,
-                IMC.HORIZONTAL,
-                IMC.AVERAGE_HORIZONTAL]),
-         IMC.GMRotI50: set([
-                IMC.GREATER_OF_TWO_HORIZONTAL,
-                IMC.MEDIAN_HORIZONTAL,
-                IMC.RotD50,
-                IMC.RANDOM_HORIZONTAL,
-                IMC.HORIZONTAL,
-                IMC.AVERAGE_HORIZONTAL]),
-         IMC.RotD50: set([
-                IMC.GREATER_OF_TWO_HORIZONTAL,
-                IMC.MEDIAN_HORIZONTAL,
-                IMC.GMRotI50,
-                IMC.RANDOM_HORIZONTAL,
-                IMC.HORIZONTAL,
-                IMC.AVERAGE_HORIZONTAL]),
-         IMC.RANDOM_HORIZONTAL: set([
-                IMC.GREATER_OF_TWO_HORIZONTAL,
-                IMC.MEDIAN_HORIZONTAL,
-                IMC.GMRotI50,
-                IMC.RotD50,
-                IMC.HORIZONTAL,
-                IMC.AVERAGE_HORIZONTAL]),
-        IMC.HORIZONTAL: set([
-               IMC.GREATER_OF_TWO_HORIZONTAL,
-               IMC.MEDIAN_HORIZONTAL,
-               IMC.GMRotI50,
-               IMC.RotD50,
-               IMC.RANDOM_HORIZONTAL,
-               IMC.AVERAGE_HORIZONTAL]),
-        IMC.AVERAGE_HORIZONTAL: set([
-               IMC.GREATER_OF_TWO_HORIZONTAL,
-               IMC.MEDIAN_HORIZONTAL,
-               IMC.GMRotI50,
-               IMC.RotD50,
-               IMC.RANDOM_HORIZONTAL,
-               IMC.HORIZONTAL]),}
+        self.conversion_graph = {'Greater of two horizontal': set([
+                'Median horizontal',
+                'Average Horizontal (GMRotI50)',
+                'Average Horizontal (RotD50)',
+                'Random horizontal',
+                'Horizontal',
+                'Average horizontal']),
+         'Median horizontal': set([
+                'Greater of two horizontal',
+                'Average Horizontal (GMRotI50)',
+                'Average Horizontal (RotD50)',
+                'Random horizontal',
+                'Horizontal',
+                'Average horizontal']),
+         'Average Horizontal (GMRotI50)': set([
+                'Greater of two horizontal',
+                'Median horizontal',
+                'Average Horizontal (RotD50)',
+                'Random horizontal',
+                'Horizontal',
+                'Average horizontal']),
+         'Average Horizontal (RotD50)': set([
+                'Greater of two horizontal',
+                'Median horizontal',
+                'Average Horizontal (GMRotI50)',
+                'Random horizontal',
+                'Horizontal',
+                'Average horizontal']),
+         'Random horizontal': set([
+                'Greater of two horizontal',
+                'Median horizontal',
+                'Average Horizontal (GMRotI50)',
+                'Average Horizontal (RotD50)',
+                'Horizontal',
+                'Average horizontal']),
+        'Horizontal': set([
+               'Greater of two horizontal',
+               'Median horizontal',
+               'Average Horizontal (GMRotI50)',
+               'Average Horizontal (RotD50)',
+               'Random horizontal',
+               'Average horizontal']),
+        'Average horizontal': set([
+               'Greater of two horizontal',
+               'Median horizontal',
+               'Average Horizontal (GMRotI50)',
+               'Average Horizontal (RotD50)',
+               'Random horizontal',
+               'Horizontal']),}
+        # *FIX ME*
+        # self.conversion_graph = {IMC.GREATER_OF_TWO_HORIZONTAL: set([
+        #         IMC.MEDIAN_HORIZONTAL,
+        #         IMC.GMRotI50,
+        #         IMC.RotD50,
+        #         IMC.RANDOM_HORIZONTAL,
+        #         IMC.HORIZONTAL,
+        #         IMC.AVERAGE_HORIZONTAL]),
+        #  IMC.MEDIAN_HORIZONTAL: set([
+        #         IMC.GREATER_OF_TWO_HORIZONTAL,
+        #         IMC.GMRotI50,
+        #         IMC.RotD50,
+        #         IMC.RANDOM_HORIZONTAL,
+        #         IMC.HORIZONTAL,
+        #         IMC.AVERAGE_HORIZONTAL]),
+        #  IMC.GMRotI50: set([
+        #         IMC.GREATER_OF_TWO_HORIZONTAL,
+        #         IMC.MEDIAN_HORIZONTAL,
+        #         IMC.RotD50,
+        #         IMC.RANDOM_HORIZONTAL,
+        #         IMC.HORIZONTAL,
+        #         IMC.AVERAGE_HORIZONTAL]),
+        #  IMC.RotD50: set([
+        #         IMC.GREATER_OF_TWO_HORIZONTAL,
+        #         IMC.MEDIAN_HORIZONTAL,
+        #         IMC.GMRotI50,
+        #         IMC.RANDOM_HORIZONTAL,
+        #         IMC.HORIZONTAL,
+        #         IMC.AVERAGE_HORIZONTAL]),
+        #  IMC.RANDOM_HORIZONTAL: set([
+        #         IMC.GREATER_OF_TWO_HORIZONTAL,
+        #         IMC.MEDIAN_HORIZONTAL,
+        #         IMC.GMRotI50,
+        #         IMC.RotD50,
+        #         IMC.HORIZONTAL,
+        #         IMC.AVERAGE_HORIZONTAL]),
+        # IMC.HORIZONTAL: set([
+        #        IMC.GREATER_OF_TWO_HORIZONTAL,
+        #        IMC.MEDIAN_HORIZONTAL,
+        #        IMC.GMRotI50,
+        #        IMC.RotD50,
+        #        IMC.RANDOM_HORIZONTAL,
+        #        IMC.AVERAGE_HORIZONTAL]),
+        # IMC.AVERAGE_HORIZONTAL: set([
+        #        IMC.GREATER_OF_TWO_HORIZONTAL,
+        #        IMC.MEDIAN_HORIZONTAL,
+        #        IMC.GMRotI50,
+        #        IMC.RotD50,
+        #        IMC.RANDOM_HORIZONTAL,
+        #        IMC.HORIZONTAL]),}
         # Check if any imc values are unknown. If they are, convert
         # to AVERAGE_HORIZONTAL
         self.checkUnknown()
