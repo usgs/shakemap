@@ -194,7 +194,7 @@ class ModelModule(CoreModule):
             pgv_imt = imt.from_string('PGV')
             ipe_gmpe = MultiGMPE.__from_config__(self.config,
                                                  filter_imt=pgv_imt)
-            self.ipe = VirtualIPE.fromFuncs(ipe_gmpe, self.gmice)
+            self.ipe = VirtualIPE.__fromFuncs__(ipe_gmpe, self.gmice)
         else:
             ipe = get_object_from_config('ipe', 'modeling', self.config)
             if 'vs30' not in ipe.REQUIRES_SITES_PARAMETERS:
