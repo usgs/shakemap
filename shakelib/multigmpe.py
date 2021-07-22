@@ -12,10 +12,89 @@ from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
     CampbellBozorgnia2014)
 from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
+from openquake.hazardlib.contexts import RuptureContext
 
 from shakelib.conversions.imt.newmark_hall_1982 import NewmarkHall1982
 from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
 from shakelib.sites import Sites
+
+
+def set_sites_depth_parameters(sites, gmpe):
+    """
+    Need to select the appropriate z1pt0 value for different GMPEs.
+    Note that these are required site parameters, so even though
+    OQ has these equations built into the class in most cases.
+    I have submitted an issue to OQ requesting subclasses of these
+    methods that do not require the depth parameters in the
+    SitesContext to make this easier.
+
+    Args:
+        sites:1 An OQ sites context.
+        gmpe: An OQ GMPE instance.
+
+    Returns:
+        An OQ sites context with the depth parameters set for the
+        requested GMPE.
+    """
+    if gmpe == '[MultiGMPE]':
+        return sites
+
+    Sites._addDepthParameters(sites)
+
+    if gmpe == '[AbrahamsonEtAl2014]' or \
+       gmpe == '[AbrahamsonEtAl2014RegTWN]' or \
+       gmpe == '[AbrahamsonEtAl2014RegCHN]':
+        sites.z1pt0 = sites.z1pt0_ask14_cal
+    if gmpe == '[AbrahamsonEtAl2014RegJPN]':
+        sites.z1pt0 = sites.z1pt0_ask14_jpn
+    if gmpe == '[ChiouYoungs2014]' or \
+       isinstance(gmpe, BooreEtAl2014):
+        sites.z1pt0 = sites.z1pt0_cy14_cal
+    if isinstance(gmpe, CampbellBozorgnia2014):
+        if gmpe == '[CampbellBozorgnia2014JapanSite]' or \
+           gmpe == '[CampbellBozorgnia2014HighQJapanSite]' or \
+           gmpe == '[CampbellBozorgnia2014LowQJapanSite]':
+            sites.z2pt5 = sites.z2pt5_cb14_jpn
+        else:
+            sites.z2pt5 = sites.z2pt5_cb14_cal
+    if gmpe == '[ChiouYoungs2008]' or \
+       gmpe == '[Bradley2013]' or \
+       gmpe == '[Bradley2013Volc]':
+        sites.z1pt0 = sites.z1pt0_cy08
+    if gmpe == '[CampbellBozorgnia2008]':
+        sites.z2pt5 = sites.z2pt5_cb07
+    if gmpe == '[AbrahamsonSilva2008]':
+        sites.z1pt0 = gmpe._compute_median_z1pt0(sites.vs30)
+
+    return sites
+
+
+def stuff_context(sites, rup, dists):
+    """
+    Function to fill a rupture context with the contents of all of the
+    other contexts.
+
+    Args:
+        sites (SiteCollection): A SiteCollection object.
+
+        rup (RuptureContext): A RuptureContext object.
+
+        dists (DistanceContext): A DistanceContext object.
+
+    Returns:
+        RuptureContext: A new RuptureContext whose attributes are all of
+        the elements of the three inputs.
+    """
+    ctx = RuptureContext()
+
+    for name in [name for name in vars(sites) if not name.startswith("__")]:
+        setattr(ctx, name, getattr(sites, name))
+    for name in [name for name in vars(rup) if not name.startswith("__")]:
+        setattr(ctx, name, getattr(rup, name))
+    for name in [name for name in vars(dists) if not name.startswith("__")]:
+        setattr(ctx, name, getattr(dists, name))
+
+    return ctx
 
 
 class MultiGMPE(GMPE):
@@ -56,7 +135,7 @@ class MultiGMPE(GMPE):
         """  # noqa
 
         # ---------------------------------------------------------------------
-        # Sort out shapes of sites and dists elements
+        # Sort out shapes of the sites and dists elements
         # Need to turn all 2D arrays into 1D arrays because of
         # inconsistencies in how arrays are handled in OpenQuake.
         # ---------------------------------------------------------------------
@@ -76,7 +155,7 @@ class MultiGMPE(GMPE):
         shapeset = set(shapes)
         if len(shapeset) != 1:
             raise Exception(
-                'All sites and dists elements must have same shape.')
+                'All dists and sites elements must have same shape.')
         else:
             orig_shape = list(shapeset)[0]
 
@@ -85,12 +164,12 @@ class MultiGMPE(GMPE):
             raise Exception("Requested an unavailable stddev_type.")
 
         # Evaluate MultiGMPE:
-        lnmu, lnsd = self.__get_mean_and_stddevs(
+        lnmu, lnsd = self.__get_mean_and_stddevs__(
             sites, rup, dists, imt, stddev_types)
 
         # Check for large-distance cutoff/weights
         if hasattr(self, 'CUTOFF_DISTANCE'):
-            lnmu_large, lnsd_large = self.__get_mean_and_stddevs(
+            lnmu_large, lnsd_large = self.__get_mean_and_stddevs__(
                 sites, rup, dists, imt, stddev_types, large_dist=True)
             # Stomp on lnmu and lnsd at large distances
             dist_cutoff = self.CUTOFF_DISTANCE
@@ -118,7 +197,7 @@ class MultiGMPE(GMPE):
 
         return lnmu, lnsd
 
-    def __get_mean_and_stddevs(self, sites, rup, dists, imt, stddev_types,
+    def __get_mean_and_stddevs__(self, sites, rup, dists, imt, stddev_types,
                                large_dist=False):
 
         # ---------------------------------------------------------------------
@@ -145,7 +224,7 @@ class MultiGMPE(GMPE):
             # Loop over GMPE list
             # -----------------------------------------------------------------
 
-            sites = MultiGMPE.set_sites_depth_parameters(sites, gmpe)
+            set_sites_depth_parameters(sites, gmpe)
 
             # -----------------------------------------------------------------
             # Select the IMT
@@ -155,7 +234,7 @@ class MultiGMPE(GMPE):
                          list(gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES)]
 
             if not isinstance(gmpe, MultiGMPE) and \
-                    (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+                    (imt.string == "PGV") and ("PGV" not in gmpe_imts):
                 timt = SA(1.0)
             else:
                 timt = imt
@@ -182,20 +261,25 @@ class MultiGMPE(GMPE):
                             vs30min = float(v[0])
                             vs30max = float(v[1])
                             sites.vs30 = np.clip(sites.vs30, vs30min, vs30max)
+                            Sites_.addDepthParameters(sites)
 
             # -----------------------------------------------------------------
             # Evaluate
             # -----------------------------------------------------------------
-
-            lmean, lsd = gmpe.get_mean_and_stddevs(sites, rup, dists, timt,
-                                                   stddev_types)
+            if not isinstance(gmpe, MultiGMPE):
+                ctx = stuff_context(sites, rup, dists)
+                lmean, lsd = gmpe.get_mean_and_stddevs(ctx, ctx, ctx, timt,
+                                                       stddev_types)
+            else:
+                lmean, lsd = gmpe.get_mean_and_stddevs(sites, rup, dists, timt,
+                                                       stddev_types)
 
             if not isinstance(gmpe, MultiGMPE):
                 # -------------------------------------------------------------
                 # We may need to inflate the standard deviations to account for
                 # the point-source to finite rupture conversion.
                 # -------------------------------------------------------------
-                lsd_new = self.inflatePSSigma(gmpe, lmean, lsd, sites, rup,
+                lsd_new = self.__inflatePSSigma__(gmpe, lmean, lsd, sites, rup,
                                               dists, timt, stddev_types)
                 for sd in lsd:
                     lsd_new.append(sd)
@@ -205,7 +289,7 @@ class MultiGMPE(GMPE):
                 # If IMT is PGV and PGV is not given by the GMPE, then
                 # convert from PSA10.
                 # -------------------------------------------------------------
-                if (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+                if (imt.string == "PGV") and ("PGV" not in gmpe_imts):
                     nh82 = NewmarkHall1982()
                     lmean = nh82.convertAmps('PSA10', 'PGV', lmean)
                     # Put the extra sigma from NH82 into intra event and total
@@ -217,7 +301,7 @@ class MultiGMPE(GMPE):
                 # -------------------------------------------------------------
                 # -------------------------------------------------------------
                 if self.HAS_SITE[i] is False:
-                    lamps = self.get_site_factors(
+                    lamps = self.__get_site_factors__(
                         sites, rup, dists, timt, default=True)
                     lmean = lmean + lamps
 
@@ -301,7 +385,7 @@ class MultiGMPE(GMPE):
         return lnmu, lnsd_new
 
     @classmethod
-    def from_config(cls, conf, filter_imt=None):
+    def __from_config__(cls, conf, filter_imt=None):
         """
         Construct a MultiGMPE from a config file.
 
@@ -345,11 +429,11 @@ class MultiGMPE(GMPE):
             if set_of_sets is True:
                 mgmpes = []
                 for s in selected_gmpe_sets:
-                    mgmpes.append(cls.__multigmpe_from_gmpe_set(
+                    mgmpes.append(cls.__multigmpe_from_gmpe_set__(
                         conf, s, filter_imt=filter_imt))
-                out = MultiGMPE.from_list(mgmpes, gmpe_set_weights, imc=IMC)
+                out = MultiGMPE.__from_list__(mgmpes, gmpe_set_weights, imc=IMC)
             elif set_of_gmpes is True:
-                out = cls.__multigmpe_from_gmpe_set(
+                out = cls.__multigmpe_from_gmpe_set__(
                     conf,
                     selected_gmpe,
                     filter_imt=filter_imt)
@@ -361,7 +445,7 @@ class MultiGMPE(GMPE):
             modinfo = conf['gmpe_modules'][selected_gmpe]
             mod = import_module(modinfo[1])
             tmpclass = getattr(mod, modinfo[0])
-            out = MultiGMPE.from_list([tmpclass()], [1.0], imc=IMC)
+            out = MultiGMPE.__from_list__([tmpclass()], [1.0], imc=IMC)
         else:
             raise TypeError("conf['modeling']['gmpe'] must be a key in "
                             "conf['gmpe_modules'] or conf['gmpe_sets']")
@@ -388,7 +472,7 @@ class MultiGMPE(GMPE):
 
         return out
 
-    def __multigmpe_from_gmpe_set(conf, set_name, filter_imt=None):
+    def __multigmpe_from_gmpe_set__(conf, set_name, filter_imt=None):
         """
         Private method for constructing a MultiGMPE from a set_name.
 
@@ -498,7 +582,7 @@ class MultiGMPE(GMPE):
         logging.debug('    filtered_gmpes: %s' % filtered_gmpes)
         logging.debug('    filtered_wts: %s' % filtered_wts)
 
-        mgmpe = MultiGMPE.from_list(
+        mgmpe = MultiGMPE.__from_list__(
             filtered_gmpes, filtered_wts,
             default_gmpes_for_site=filtered_site_gmpes,
             default_gmpes_for_site_weights=filtered_site_wts,
@@ -522,7 +606,7 @@ class MultiGMPE(GMPE):
         return mgmpe
 
     @classmethod
-    def from_list(cls, gmpes, weights,
+    def __from_list__(cls, gmpes, weights,
                   imc=const.IMC.GREATER_OF_TWO_HORIZONTAL,
                   default_gmpes_for_site=None,
                   default_gmpes_for_site_weights=None,
@@ -715,7 +799,7 @@ class MultiGMPE(GMPE):
 
         return self
 
-    def get_site_factors(self, sites, rup, dists, imt, default=False):
+    def __get_site_factors__(self, sites, rup, dists, imt, default=False):
         """
         Method for computing site amplification factors from the defalut GMPE
         to be applied to GMPEs which do not have a site term.
@@ -744,12 +828,13 @@ class MultiGMPE(GMPE):
 
         ref_sites = copy.deepcopy(sites)
         ref_sites.vs30 = np.full_like(sites.vs30, self.REFERENCE_VS30)
+        # TODO: Should we reset the Sites depth parameters here? Probably.
 
         # ---------------------------------------------------------------------
         # If default True, construct new MultiGMPE with default GMPE/weights
         # ---------------------------------------------------------------------
         if default is True:
-            tmp = MultiGMPE.from_list(
+            tmp = MultiGMPE.__from_list__(
                 self.DEFAULT_GMPES_FOR_SITE,
                 self.DEFAULT_GMPES_FOR_SITE_WEIGHTS,
                 self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT)
@@ -771,57 +856,7 @@ class MultiGMPE(GMPE):
 
         return lamps
 
-    @staticmethod
-    def set_sites_depth_parameters(sites, gmpe):
-        """
-        Need to select the appropriate z1pt0 value for different GMPEs.
-        Note that these are required site parameters, so even though
-        OQ has these equations built into the class in most cases.
-        I have submitted an issue to OQ requesting subclasses of these
-        methods that do not require the depth parameters in the
-        SitesContext to make this easier.
-
-        Args:
-            sites:1 An OQ sites context.
-            gmpe: An OQ GMPE instance.
-
-        Returns:
-            An OQ sites context with the depth parameters set for the
-            requested GMPE.
-        """
-        if gmpe == '[MultiGMPE]':
-            return sites
-
-        sites = Sites._addDepthParameters(sites)
-
-        if gmpe == '[AbrahamsonEtAl2014]' or \
-           gmpe == '[AbrahamsonEtAl2014RegTWN]' or \
-           gmpe == '[AbrahamsonEtAl2014RegCHN]':
-            sites.z1pt0 = sites.z1pt0_ask14_cal
-        if gmpe == '[AbrahamsonEtAl2014RegJPN]':
-            sites.z1pt0 = sites.z1pt0_ask14_jpn
-        if gmpe == '[ChiouYoungs2014]' or \
-           isinstance(gmpe, BooreEtAl2014):
-            sites.z1pt0 = sites.z1pt0_cy14_cal
-        if isinstance(gmpe, CampbellBozorgnia2014):
-            if gmpe == '[CampbellBozorgnia2014JapanSite]' or \
-               gmpe == '[CampbellBozorgnia2014HighQJapanSite]' or \
-               gmpe == '[CampbellBozorgnia2014LowQJapanSite]':
-                sites.z2pt5 = sites.z2pt5_cb14_jpn
-            else:
-                sites.z2pt5 = sites.z2pt5_cb14_cal
-        if gmpe == '[ChiouYoungs2008]' or \
-           gmpe == '[Bradley2013]' or \
-           gmpe == '[Bradley2013Volc]':
-            sites.z1pt0 = sites.z1pt0_cy08
-        if gmpe == '[CampbellBozorgnia2008]':
-            sites.z2pt5 = sites.z2pt5_cb07
-        if gmpe == '[AbrahamsonSilva2008]':
-            sites.z1pt0 = gmpe._compute_median_z1pt0(sites.vs30)
-
-        return sites
-
-    def describe(self):
+    def __describe__(self):
         """
         Construct a dictionary that describes the MultiGMPE.
 
@@ -842,14 +877,14 @@ class MultiGMPE(GMPE):
             gmpe_dict['weights'].append(self.WEIGHTS[i])
             if isinstance(self.GMPES[i], MultiGMPE):
                 gmpe_dict['gmpes'].append(
-                    self.GMPES[i].describe()
+                    self.GMPES[i].__describe__()
                 )
             else:
                 gmpe_dict['gmpes'].append(str(self.GMPES[i]))
 
         return gmpe_dict
 
-    def inflatePSSigma(self, gmpe, lmean, lsd, sites, rup, dists, imt,
+    def __inflatePSSigma__(self, gmpe, lmean, lsd, sites, rup, dists, imt,
                        stddev_types):
         """
         If the point-source to finite-fault factors are used, we need to
@@ -907,7 +942,8 @@ class MultiGMPE(GMPE):
             # and re-evaluate the GMPE
             rup_dist = getattr(dists, dtype)
             rup_dist += delta_distance
-            tmean, tsd = gmpe.get_mean_and_stddevs(sites, rup, dists, imt,
+            ctx = stuff_context(sites, rup, dists)
+            tmean, tsd = gmpe.get_mean_and_stddevs(ctx, ctx, ctx, imt,
                                                    stddev_types)
             # Find the derivative w.r.t. the rupture distance
             dm_dr = (lmean - tmean) / delta_distance

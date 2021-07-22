@@ -7,7 +7,7 @@ import sys
 # third party imports
 import numpy as np
 from openquake.hazardlib import const
-from openquake.hazardlib.imt import PGA, PGV, SA
+from openquake.hazardlib.imt import IMT, PGA, PGV, SA
 import pytest
 
 # local imports
@@ -177,39 +177,31 @@ def test_bb06():
 
     # Test that an invalid/unknown parameter is changed to AVERAGE_HORIZONTAL
     bb06 = BeyerBommer2006('wrong', imc_out[0])
-    # *FIX ME* assert bb06.imc_in.value == 'Average horizontal'
-    assert bb06.imc_in == 'Average horizontal'
+    assert bb06.imc_in.value == 'Average horizontal'
     assert bb06.imc_out == imc_out[0]
     bb06 = BeyerBommer2006(imc_out[0], 'wrong')
     assert bb06.imc_in == imc_out[0]
-    # *FIX ME* assert bb06.imc_out.value == 'Average horizontal'
-    assert bb06.imc_out == 'Average horizontal'
+    assert bb06.imc_out.value == 'Average horizontal'
     bb06 = BeyerBommer2006('wrong', 'wrong')
-    # *FIX ME* assert bb06.imc_in.value == 'Average horizontal'
-    assert bb06.imc_in == 'Average horizontal'
-    # *FIX ME* assert bb06.imc_out.value == 'Average horizontal'
-    assert bb06.imc_out == 'Average horizontal'
+    assert bb06.imc_in.value == 'Average horizontal'
+    assert bb06.imc_out.value == 'Average horizontal'
 
 
     # Test that the correct input/output imc returns the right path
     bb06 = BeyerBommer2006('Median horizontal', 'Random horizontal')
     assert len(bb06.path) == 2
-    # *FIX ME* assert bb06.path[0].value == 'Median horizontal'
-    assert bb06.path[0] == 'Median horizontal'
-    # *FIX ME* assert bb06.path[-1].value == 'Random horizontal'
-    assert bb06.path[-1] == 'Random horizontal'
+    assert bb06.path[0].value == 'Median horizontal'
+    assert bb06.path[-1].value == 'Random horizontal'
     bb06 = BeyerBommer2006('Average Horizontal (RotD50)', 'Horizontal')
     assert len(bb06.path) == 2
-    # *FIX ME* assert bb06.path[0].value == 'Average Horizontal (RotD50)'
-    assert bb06.path[0] == 'Average Horizontal (RotD50)'
-    # *FIX ME* assert bb06.path[-1].value == 'Horizontal'
-    assert bb06.path[-1] == 'Horizontal'
+    assert bb06.path[0].value == 'Average Horizontal (RotD50)'
+    assert bb06.path[-1].value == 'Horizontal'
 
     # Test exception for unknown imt
     with pytest.raises(ValueError) as e:
-        bb06.convertSigmasOnce('wrong', 0)
+        bb06.convertSigmasOnce(IMT('wrong'), 0)
     with pytest.raises(ValueError) as e:
-        bb06.convertAmpsOnce('wrong', [10.0], None, None)
+        bb06.convertAmpsOnce(IMT('wrong'), [10.0], None, None)
     # Test exception for unknown imc
     with pytest.raises(ValueError) as e:
         bb06._verifyConversion('Wrong', imc_out=None)

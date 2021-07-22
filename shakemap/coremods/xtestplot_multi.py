@@ -96,8 +96,8 @@ class XTestPlotMulti(CoreModule):
             fileimt = oq_to_file(myimt)
             pfile = os.path.join(event_paths[0], 'current', 'products',
                                  self._eventid + '_' + fileimt + '.pdf')
-            plt.savefig(pfile, tight_layout=True)
+            plt.savefig(pfile)
             pfile = os.path.join(event_paths[0], 'current', 'products',
                                  self._eventid + '_' + fileimt + '.png')
-            plt.savefig(pfile, tight_layout=True)
+            plt.savefig(pfile)
             plt.close()

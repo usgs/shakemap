@@ -123,6 +123,7 @@ conda activate base
 
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
+conda clean -y --all
 
 # Extra packages to install with dev option
 dev_list=(
@@ -227,7 +228,7 @@ fi
 
 # Install OQ from github to get NGA East since it isn't in a release yet.
 echo "Installing OpenQuake from github..."
-pip install --upgrade git+https://github.com/gem/oq-engine@v3.11.3
+pip install --upgrade git+https://github.com/gem/oq-engine
 if [ $? -ne 0 ];then
     echo "Failed to pip install OpenQuake. Exiting."
     exit 1

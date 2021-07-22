@@ -241,7 +241,7 @@ class BooreKishida2017(ComponentConverter):
             r1 = self.pars['r1smooth'][1]
             m1 = self.pars['m1smooth'][1]
             m2 = self.pars['m2smooth'][1]
-        elif 'SA' in imt:
+        elif 'SA' in imt.string:
             imt_per = imt.period
             pa = self.pars['per'][2:]
             sigma = np.interp(imt_per, pa, self.pars['sigma'][2:])

@@ -203,15 +203,21 @@ class Sites(object):
                     lats, lons, default=self._defaultVs30)
             sctx.lats = lats
             sctx.lons = lons
+            sctx.sids = np.array(range(np.size(lons))).reshape(lons.shape)
         else:
-            sctx.lats = self._lats.copy()
             sctx.lons = self._lons.copy()
+            sctx.lats = self._lats.copy()
             if rock_vs30 is not None:
                 sctx.vs30 = np.full_like(self._Vs30.getData(), rock_vs30)
             else:
                 sctx.vs30 = self._Vs30.getData().copy()
+            sctx.sids = \
+                np.array(
+                    range(
+                        np.size(sctx.lons)*
+                        np.size(sctx.lats))).reshape(sctx.vs30.shape)
 
-        sctx = Sites._addDepthParameters(sctx)
+        Sites._addDepthParameters(sctx)
 
         # For ShakeMap purposes, vs30 measured is always Fales
         sctx.vs30measured = np.zeros_like(sctx.vs30, dtype=bool)
@@ -288,8 +294,6 @@ class Sites(object):
         sctx.z2pt5_cb14_jpn = Sites._z2pt5_from_vs30_cb14_jpn(sctx.vs30)
         sctx.z1pt0_cy08 = Sites._z1pt0_from_vs30_cy08(sctx.vs30)
         sctx.z2pt5_cb07 = Sites._z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
-
-        return sctx
 
     @staticmethod
     def _z1pt0_from_vs30_cy14_cal(vs30):

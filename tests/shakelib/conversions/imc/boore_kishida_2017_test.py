@@ -7,7 +7,7 @@ import sys
 # third party imports
 import numpy as np
 from openquake.hazardlib import const
-from openquake.hazardlib.imt import PGA, PGV, SA
+from openquake.hazardlib.imt import IMT, PGA, PGV, SA
 import pytest
 
 # local imports
@@ -209,39 +209,29 @@ def test_bk17():
 
     # Test that an invalid/unknown parameter is changed to AVERAGE_HORIZONTAL
     bk17 = BooreKishida2017('wrong', imc_out[0])
-    # *FIX ME* assert bk17.imc_in.value == 'Average horizontal'
-    assert bk17.imc_in == 'Average horizontal'
+    assert bk17.imc_in.value == 'Average horizontal'
     assert bk17.imc_out == imc_out[0]
     bk17 = BooreKishida2017(imc_out[0], 'wrong')
     assert bk17.imc_in == imc_out[0]
-    # *FIX ME* assert bk17.imc_out.value == 'Average horizontal'
-    assert bk17.imc_out == 'Average horizontal'
+    assert bk17.imc_out.value == 'Average horizontal'
     bk17 = BooreKishida2017('wrong', 'wrong')
-    # *FIX ME* assert bk17.imc_in.value == 'Average horizontal'
-    assert bk17.imc_in == 'Average horizontal'
-    # *FIX ME* assert bk17.imc_out.value == 'Average horizontal'
-    assert bk17.imc_out == 'Average horizontal'
+    assert bk17.imc_in.value == 'Average horizontal'
+    assert bk17.imc_out.value == 'Average horizontal'
 
     # Test that the correct input/output imc returns the right path
     bk17 = BooreKishida2017('Average horizontal',
             'Average Horizontal (RotD50)')
     assert len(bk17.path) == 2
-    # *FIX ME* assert bk17.path[0].value == 'Average horizontal'
-    assert bk17.path[0] == 'Average horizontal'
-    # *FIX ME* assert bk17.path[-1].value == 'Average Horizontal (RotD50)'
-    assert bk17.path[-1] == 'Average Horizontal (RotD50)'
+    assert bk17.path[0].value == 'Average horizontal'
+    assert bk17.path[-1].value == 'Average Horizontal (RotD50)'
     bk17 = BooreKishida2017('Average horizontal',
             'Horizontal Maximum Direction (RotD100)')
     assert len(bk17.path) == 3
-    # *FIX ME* assert bk17.path[0].value == 'Average horizontal'
-    assert bk17.path[0] == 'Average horizontal'
-    # *FIX ME* assert bk17.path[-1].value == 'Horizontal Maximum Direction (RotD100)'
-    assert bk17.path[-1] == 'Horizontal Maximum Direction (RotD100)'
-    # *FIX ME* if bk17.path[1].value == 'Greater of two horizontal':
-    if bk17.path[1] == 'Greater of two horizontal':
+    assert bk17.path[0].value == 'Average horizontal'
+    assert bk17.path[-1].value == 'Horizontal Maximum Direction (RotD100)'
+    if bk17.path[1].value == 'Greater of two horizontal':
         correct = True
-    # *FIX ME* elif bk17.path[1].value == 'Average Horizontal (RotD50)':
-    elif bk17.path[1] == 'Average Horizontal (RotD50)':
+    elif bk17.path[1].value == 'Average Horizontal (RotD50)':
         correct = True
     else:
         correct = False
@@ -249,15 +239,11 @@ def test_bk17():
     bk17 = BooreKishida2017('Horizontal',
             'Random horizontal')
     assert len(bk17.path) == 3
-    # *FIX ME* assert bk17.path[0].value == 'Horizontal'
-    assert bk17.path[0] == 'Horizontal'
-    # *FIX ME* assert bk17.path[-1].value == 'Random horizontal'
-    assert bk17.path[-1] == 'Random horizontal'
-    # *FIX ME* if bk17.path[1].value == 'Greater of two horizontal':
-    if bk17.path[1] == 'Greater of two horizontal':
+    assert bk17.path[0].value == 'Horizontal'
+    assert bk17.path[-1].value == 'Random horizontal'
+    if bk17.path[1].value == 'Greater of two horizontal':
         correct = True
-    # *FIX ME* elif bk17.path[1].value == 'Average Horizontal (RotD50)':
-    elif bk17.path[1] == 'Average Horizontal (RotD50)':
+    elif bk17.path[1].value == 'Average Horizontal (RotD50)':
         correct = True
     else:
         correct = False
@@ -285,7 +271,7 @@ def test_bk17():
         bk17.convertAmps(imt_in[0],amps_in, None, None)
     # Test exception for unknown imt
     with pytest.raises(ValueError) as e:
-        bk17.convertAmpsOnce('wrong', [10.0], rrup_in, mags_in[0])
+        bk17.convertAmpsOnce(IMT('wrong'), [10.0], rrup_in, mags_in[0])
     # Test amp conversion for unknown imc
     bk17 = BooreKishida2017('Average horizontal',
             'Average horizontal')

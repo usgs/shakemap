@@ -12,7 +12,7 @@ from shakemap.utils.utils import get_object_from_config
 from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.base import Rupture
-from shakelib.multigmpe import MultiGMPE
+from shakelib.multigmpe import MultiGMPE, set_sites_depth_parameters
 from shakelib.sites import Sites
 from shakelib.station import StationList
 
@@ -196,7 +196,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     (clon, clat) = _rupture_center(rupture)
     origin = rupture.getOrigin()
     if config is not None:
-        gmpe = MultiGMPE.from_config(config)
+        gmpe = MultiGMPE.__from_config__(config)
         gmice = get_object_from_config('gmice', 'modeling', config)
         if imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
             default_imt = imt.SA(1.0)
@@ -243,7 +243,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
             weights = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
             gmice = AK07()
 
-        gmpe = MultiGMPE.from_list(
+        gmpe = MultiGMPE.__from_list__(
             gmpes, weights, default_gmpes_for_site=site_gmpes)
         default_imt = imt.SA(1.0)
 
@@ -252,11 +252,12 @@ def _get_extent_from_multigmpe(rupture, config=None):
 
     # Distance context
     dx = DistancesContext()
+    size = 2000
     # This imposes minimum/ maximum distances of:
     #   80 and 800 km; could make this configurable
     d_min = config['extent']['mmi']['mindist']
     d_max = config['extent']['mmi']['maxdist']
-    dx.rjb = np.logspace(np.log10(d_min), np.log10(d_max), 2000)
+    dx.rjb = np.logspace(np.log10(d_min), np.log10(d_max), size)
     # Details don't matter for this; assuming vertical surface rupturing fault
     # with epicenter at the surface.
     dx.rrup = dx.rjb
@@ -269,11 +270,11 @@ def _get_extent_from_multigmpe(rupture, config=None):
     # Sites context
     sx = SitesContext()
     # Set to soft soil conditions
-    sx.vs30 = np.full_like(dx.rjb, 180)
-    sx = MultiGMPE.set_sites_depth_parameters(sx, gmpe)
-    sx.vs30measured = np.full_like(sx.vs30, False, dtype=bool)
-    sx = Sites._addDepthParameters(sx)
-    sx.backarc = np.full_like(sx.vs30, False, dtype=bool)
+    sx.sids = np.array(range(size))
+    sx.vs30 = np.full(size, 180.0)
+    set_sites_depth_parameters(sx, gmpe)
+    sx.vs30measured = np.full(size, False, dtype=bool)
+    sx.backarc = np.full(size, False, dtype=bool)
 
     # Rupture context
     rx = RuptureContext()

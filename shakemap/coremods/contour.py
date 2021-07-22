@@ -133,7 +133,8 @@ def contour_to_files(container, output_dir, logger, contents,
 
     config = container.getConfig()
     gmice = get_object_from_config('gmice', 'modeling', config)
-    gmice_imts = gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+    gmice_imts = [imt.__name__ for imt in
+                  gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
     gmice_pers = gmice.DEFINED_FOR_SA_PERIODS
 
     imtlist = container.getIMTs()
@@ -177,8 +178,8 @@ def contour_to_files(container, output_dir, logger, contents,
             for fname in flist:
                 os.remove(fname)
 
-        if imtype == 'MMI' or not isinstance(oqimt, tuple(gmice_imts)) or \
-           (isinstance(oqimt, imt.SA) and oqimt.period not in gmice_pers):
+        if imtype == 'MMI' and imtype not in gmice_imts and \
+           ("SA" in gmice_imts and oqimt.period not in gmice_pers):
             my_gmice = None
         else:
             my_gmice = gmice
