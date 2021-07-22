@@ -32,7 +32,8 @@ import pytest
 from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
 from shakelib.distance import Distance
 from shakelib.multigmpe import filter_gmpe_list
-from shakelib.multigmpe import MultiGMPE
+from shakelib.multigmpe import (MultiGMPE, stuff_context,
+                                set_sites_depth_parameters)
 from shakelib.rupture.origin import Origin
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.point_rupture import PointRupture
@@ -52,6 +53,7 @@ def test_basic():
     ASK14 = AbrahamsonEtAl2014()
 
     IMT = imt.SA(1.0)
+    size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
@@ -72,9 +74,10 @@ def test_basic():
     dctx.rx = dctx.rjb
     dctx.ry0 = dctx.rjb
 
+    sctx.sids = np.array(range(size))
     sctx.vs30 = np.ones_like(dctx.rjb) * 275.0
     sctx.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
-    sctx = MultiGMPE.__set_sites_depth_parameters__(sctx, ASK14)
+    set_sites_depth_parameters(sctx, ASK14)
 
     mgmpe = MultiGMPE.__from_list__([ASK14], [1.0], imc=const.IMC.RotD50)
 
@@ -90,7 +93,7 @@ def test_basic():
     CY14 = ChiouYoungs2014()
     mgmpe = MultiGMPE.__from_list__(
         [ASK14, CY14], [0.6, 0.4], imc=const.IMC.RotD50)
-    sctx = MultiGMPE.__set_sites_depth_parameters__(sctx, CY14)
+    set_sites_depth_parameters(sctx, CY14)
     lmean_cy14, sd_cy14 = CY14.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
     lmean_mgmpe, sd_mgmpe = mgmpe.get_mean_and_stddevs(
@@ -103,14 +106,16 @@ def test_basic():
     mgmpe = MultiGMPE.__from_list__(
         [ASK14, C03], [0.6, 0.4], imc=const.IMC.RotD50,
         default_gmpes_for_site=[ASK14])
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_c03, sd_c03 = C03.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(C03.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_c03 = bk17.convertAmps(IMT, lmean_c03, dctx.rrup, rctx.mag)
+    sctx_rock.sids = np.array(range(size))
     sctx_rock.vs30 = np.ones_like(dctx.rjb) * 760.0
     sctx_rock.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
-    sctx_rock = MultiGMPE.__set_sites_depth_parameters__(sctx_rock, ASK14)
+    set_sites_depth_parameters(sctx_rock, ASK14)
     lmean_ask14_rock, sd_ask14_rock = ASK14.get_mean_and_stddevs(
         sctx_rock, rctx, dctx, IMT, [const.StdDev.TOTAL])
     lamp = lmean_ask14 - lmean_ask14_rock
@@ -199,10 +204,13 @@ def test_from_config_set_of_sets():
     Pea11 = PezeshkEtAl2011NEHRPBC()
 
     IMT = imt.SA(1.0)
+    size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
     sctx_rock = SitesContext()
+    sctx.sids = np.array(range(size))
+    sctx_rock.sids = np.array(range(size))
 
     rctx.rake = 0.0
     rctx.dip = 90.0
@@ -211,7 +219,7 @@ def test_from_config_set_of_sets():
     rctx.width = 10.0
     rctx.hypo_depth = 8.0
 
-    dctx.rjb = np.logspace(1, np.log10(800), 100)
+    dctx.rjb = np.logspace(1, np.log10(800), size)
     dctx.rrup = dctx.rjb
     dctx.rjb_var = None
     dctx.rrup_var = None
@@ -224,16 +232,17 @@ def test_from_config_set_of_sets():
     sctx_rock.vs30 = np.ones_like(dctx.rjb) * 760.0
     sctx_rock.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
 
-    sctx = MultiGMPE.__set_sites_depth_parameters__(sctx, ASK14)
-    sctx_rock = MultiGMPE.__set_sites_depth_parameters__(sctx_rock, ASK14)
+    set_sites_depth_parameters(sctx, ASK14)
+    set_sites_depth_parameters(sctx_rock, ASK14)
 
     lmean_ask14, lsd_ask14 = ASK14.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
     lmean_ask14_rock, dummy = ASK14.get_mean_and_stddevs(
         sctx_rock, rctx, dctx, IMT, [const.StdDev.TOTAL])
 
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_c03, lsd_c03 = C03.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(C03.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_c03 = bk17.convertAmps(IMT, lmean_c03, dctx.rrup, rctx.mag)
@@ -321,10 +330,13 @@ def test_from_config_set_of_gmpes():
     Pea11 = PezeshkEtAl2011NEHRPBC()
 
     IMT = imt.SA(1.0)
+    size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
     sctx_rock = SitesContext()
+    sctx.sids = np.array(range(size))
+    sctx_rock.sids = np.array(range(size))
 
     rctx.rake = 0.0
     rctx.dip = 90.0
@@ -333,7 +345,7 @@ def test_from_config_set_of_gmpes():
     rctx.width = 10.0
     rctx.hypo_depth = 8.0
 
-    dctx.rjb = np.logspace(1, np.log10(800), 100)
+    dctx.rjb = np.logspace(1, np.log10(800), size)
     dctx.rrup = dctx.rjb
     dctx.rjb_var = None
     dctx.rrup_var = None
@@ -346,15 +358,16 @@ def test_from_config_set_of_gmpes():
     sctx_rock.vs30 = np.ones_like(dctx.rjb) * 760.0
     sctx_rock.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
 
-    sctx = MultiGMPE.__set_sites_depth_parameters__(sctx, ASK14)
-    sctx_rock = MultiGMPE.__set_sites_depth_parameters__(sctx_rock, ASK14)
+    set_sites_depth_parameters(sctx, ASK14)
+    set_sites_depth_parameters(sctx_rock, ASK14)
 
     lmean_ask14, dummy = ASK14.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
     lmean_ask14_rock, dummy = ASK14.get_mean_and_stddevs(
         sctx_rock, rctx, dctx, IMT, [const.StdDev.TOTAL])
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_c03, dummy = C03.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(C03.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_c03 = bk17.convertAmps(IMT, lmean_c03, dctx.rrup, rctx.mag)
@@ -421,10 +434,13 @@ def test_from_config_set_of_sets_3_sec():
     ASK14 = AbrahamsonEtAl2014()
     Pea11 = PezeshkEtAl2011NEHRPBC()
 
+    size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
     sctx_rock = SitesContext()
+    sctx.sids = np.array(range(size))
+    sctx_rock.sids = np.array(range(size))
 
     rctx.rake = 0.0
     rctx.dip = 90.0
@@ -433,7 +449,7 @@ def test_from_config_set_of_sets_3_sec():
     rctx.width = 10.0
     rctx.hypo_depth = 8.0
 
-    dctx.rjb = np.logspace(1, np.log10(800), 100)
+    dctx.rjb = np.logspace(1, np.log10(800), size)
     dctx.rrup = dctx.rjb
     dctx.rjb_var = None
     dctx.rrup_var = None
@@ -446,8 +462,8 @@ def test_from_config_set_of_sets_3_sec():
     sctx_rock.vs30 = np.ones_like(dctx.rjb) * 760.0
     sctx_rock.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
 
-    sctx = MultiGMPE.__set_sites_depth_parameters__(sctx, ASK14)
-    sctx_rock = MultiGMPE.__set_sites_depth_parameters__(sctx_rock, ASK14)
+    set_sites_depth_parameters(sctx, ASK14)
+    set_sites_depth_parameters(sctx_rock, ASK14)
 
     lmean_ask14, dummy = ASK14.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
@@ -509,10 +525,13 @@ def test_from_config_single_gmpe():
     ASK14 = AbrahamsonEtAl2014()
 
     IMT = imt.SA(1.0)
+    size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
     sctx_rock = SitesContext()
+    sctx.sids = np.array(range(size))
+    sctx_rock.sids = np.array(range(size))
 
     rctx.rake = 0.0
     rctx.dip = 90.0
@@ -521,7 +540,7 @@ def test_from_config_single_gmpe():
     rctx.width = 10.0
     rctx.hypo_depth = 8.0
 
-    dctx.rjb = np.logspace(1, np.log10(800), 100)
+    dctx.rjb = np.logspace(1, np.log10(800), size)
     dctx.rrup = dctx.rjb
     dctx.rjb_var = None
     dctx.rrup_var = None
@@ -534,7 +553,7 @@ def test_from_config_single_gmpe():
     sctx_rock.vs30 = np.ones_like(dctx.rjb) * 760.0
     sctx_rock.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
 
-    sctx = MultiGMPE.__set_sites_depth_parameters__(sctx, ASK14)
+    set_sites_depth_parameters(sctx, ASK14)
 
     lmean_ask14, dummy = ASK14.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
@@ -552,9 +571,11 @@ def test_nga_w2_m8():
     #    - use of the multigmpe class with only a single GMPE
     #    - Some of the sites class depth methods.
     IMT = imt.SA(1.0)
+    size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
+    sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0  # assumed for 'strike slip'
     rctx.dip = 90.0  # assumed for 'strike slip'
@@ -563,7 +584,7 @@ def test_nga_w2_m8():
     rctx.width = 10.0  # req by CB14 but not used for vertical rupture.
     rctx.hypo_depth = 8.0  # given
 
-    dctx.rjb = np.logspace(0, np.log10(300), 100)
+    dctx.rjb = np.logspace(0, np.log10(300), size)
     dctx.rrup = dctx.rjb  # b/c ztor = 0
     dctx.rjb_var = None
     dctx.rrup_var = None
@@ -808,9 +829,11 @@ def test_nga_w2_m6():
     #    - use of the multigmpe class with only a single GMPE
     #    - Some of the sites class depth methods.
     IMT = imt.SA(1.0)
+    size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
+    sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0  # assumed for 'strike slip'
     rctx.dip = 90.0  # assumed for 'strike slip'
@@ -819,7 +842,7 @@ def test_nga_w2_m6():
     rctx.width = 10.0  # req by CB14 but not used for vertical rupture.
     rctx.hypo_depth = 8.0  # given
 
-    dctx.rjb = np.logspace(0, np.log10(300), 100)
+    dctx.rjb = np.logspace(0, np.log10(300), size)
     dctx.rrup = np.sqrt(dctx.rjb**2 + rctx.ztor**2)  # ztor = 3.0
     dctx.rjb_var = None
     dctx.rrup_var = None
@@ -1061,6 +1084,7 @@ def test_multigmpe_get_site_factors():
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
+    sctx.sids = np.array(range(1))
 
     rctx.rake = 0.0
     rctx.dip = 90.0
@@ -1201,7 +1225,7 @@ def test_multigmpe_get_sites_depth_parameters():
                             vs30File=vs30file,
                             padding=True, resample=False)
     sctx = site.getSitesContext()
-    sx1 = MultiGMPE.__set_sites_depth_parameters__(sctx, gmpes[0])
+    set_sites_depth_parameters(sctx, gmpes[0])
     z2pt5d = np.array(
         [[1177.61979893,  1300.11396989,  1168.13802718,  1168.56933015,
           1169.4040603,  1161.16046639,  1148.4288528],
@@ -1217,8 +1241,8 @@ def test_multigmpe_get_sites_depth_parameters():
              1165.96397227,  1172.97688837,  1176.12602836],
             [1575.22288791,  1329.69579201,  1162.02041292,  1155.01082322,
              1165.80081172,  1174.83307617,  1180.5495586]])
-    np.testing.assert_allclose(sx1.z2pt5, z2pt5d, atol=1e-2)
-    sx2 = MultiGMPE.__set_sites_depth_parameters__(sctx, gmpes[1])
+    np.testing.assert_allclose(sctx.z2pt5, z2pt5d, atol=1e-2)
+    set_sites_depth_parameters(sctx, gmpes[1])
     z1pt0d = np.array(
         [[183.2043947,   217.27787758,  180.56690603,  180.68687904,
           180.91907101,  178.625999,    175.08452094],
@@ -1234,7 +1258,7 @@ def test_multigmpe_get_sites_depth_parameters():
              179.96216197,  181.91290358,  182.78888133],
             [293.80330679,  225.506479,    178.86520526,  176.91538893,
              179.91677656,  182.42922842,  184.01934871]])
-    np.testing.assert_allclose(sx2.z1pt0, z1pt0d, atol=1e-2)
+    np.testing.assert_allclose(sctx.z1pt0, z1pt0d, atol=1e-2)
 
 
 def test_point_source_stddev_inflation():
@@ -1251,6 +1275,7 @@ def test_point_source_stddev_inflation():
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
+    sctx.sids = np.array(range(2))
     sctx.lats = np.array([34.1, 34.1])
     sctx.lons = np.array([-118.15, -117.8])
     depths = np.array([0, 0])
@@ -1270,7 +1295,7 @@ def test_point_source_stddev_inflation():
 
     sctx.vs30 = np.ones_like(dctx.rjb) * 275.0
     sctx.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
-    sctx = MultiGMPE.__set_sites_depth_parameters__(sctx, gmpe)
+    set_sites_depth_parameters(sctx, gmpe)
     mgmpe = MultiGMPE.__from_list__([gmpe], wts)
     lnmu, lnsd = mgmpe.get_mean_and_stddevs(
         sctx, rctx, dctx, iimt, stddev_types)
@@ -1523,9 +1548,11 @@ def test_multigmpe_exceptions():
     ASK14 = AbrahamsonEtAl2014()
 
     iimt = imt.SA(1.0)
+    size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
     sctx = SitesContext()
+    sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0
     rctx.dip = 90.0
@@ -1534,7 +1561,7 @@ def test_multigmpe_exceptions():
     rctx.width = 10.0
     rctx.hypo_depth = 8.0
 
-    dctx.rjb = np.logspace(1, np.log10(800), 100)
+    dctx.rjb = np.logspace(1, np.log10(800), size)
     dctx.rrup = dctx.rjb
     dctx.rjb_var = None
     dctx.rrup_var = None
@@ -1544,7 +1571,7 @@ def test_multigmpe_exceptions():
 
     sctx.vs30 = np.ones_like(dctx.rjb) * 275.0
     sctx.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
-    sctx = MultiGMPE.__set_sites_depth_parameters__(sctx, ASK14)
+    set_sites_depth_parameters(sctx, ASK14)
 
     # Check for exception on unequal site/dist lengths
     with pytest.raises(Exception) as a:

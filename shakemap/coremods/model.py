@@ -627,7 +627,7 @@ class ModelModule(CoreModule):
                 lons, lats, vs30, idents = in_sites.item()
                 self.idents = [idents]
             else:
-                lons, lats, vs30, self.idents = zip(in_sites)
+                lons, lats, vs30, self.idents = zip(*in_sites)
             self.lons = np.array(lons).reshape(1, -1)
             self.lats = np.array(lats).reshape(1, -1)
             self.vs30 = np.array(vs30).reshape(1, -1)
@@ -659,6 +659,7 @@ class ModelModule(CoreModule):
             # provided with the site list.
             if np.any(self.vs30 > 0):
                 self.sx_out.vs30 = self.vs30
+                Sites._addDepthParameters(self.sx_out)
         else:
             #
             # GRID: Figure out the grid parameters and get output points
