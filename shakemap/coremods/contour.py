@@ -178,8 +178,8 @@ def contour_to_files(container, output_dir, logger, contents,
             for fname in flist:
                 os.remove(fname)
 
-        if imtype == 'MMI' and imtype not in gmice_imts and \
-           ("SA" in gmice_imts and oqimt.period not in gmice_pers):
+        if imtype == 'MMI' or (imtype not in gmice_imts and \
+           ("SA" not in gmice_imts or oqimt.period not in gmice_pers)):
             my_gmice = None
         else:
             my_gmice = gmice
