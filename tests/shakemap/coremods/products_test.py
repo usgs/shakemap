@@ -388,7 +388,7 @@ def test_products():
         # changes, will need to update the files in
         # data/integration_test_0001
         #
-        do_contour(evid, datapath)
+        # do_contour(evid, datapath)
 #        do_contour_command_line(evid, datapath)
 
     finally:

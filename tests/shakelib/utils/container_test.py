@@ -249,34 +249,31 @@ def test_output_container():
             container.dropIMT('mmi')
 
         # Add imts
-        container.setIMTGrids('mmi',
+        container.setIMTGrids('mmi', 'maximum',
                               mean_mmi_maximum_data, mean_mmi_maximum_metadata,
-                              std_mmi_maximum_data, std_mmi_maximum_metadata,
-                              component='maximum')
-        container.setIMTGrids('mmi',
+                              std_mmi_maximum_data, std_mmi_maximum_metadata)
+        container.setIMTGrids('mmi', 'rotd50',
                               mean_mmi_rotd50_data, mean_mmi_rotd50_metadata,
-                              std_mmi_rotd50_data, std_mmi_rotd50_metadata,
-                              component='rotd50')
-        container.setIMTGrids('pga',
+                              std_mmi_rotd50_data, std_mmi_rotd50_metadata)
+        container.setIMTGrids('pga', 'maximum',
                               mean_pga_maximum_data, mean_pga_maximum_metadata,
-                              std_pga_maximum_data, std_pga_maximum_metadata,
-                              component='maximum')
+                              std_pga_maximum_data, std_pga_maximum_metadata)
 
         # get the maximum MMI imt data
         mmi_max_dict = container.getIMTGrids('mmi', component='maximum')
-        np.testing.assert_array_equal(mmi_max_dict['mean'],
-                                      mean_mmi_maximum_data)
-        np.testing.assert_array_equal(mmi_max_dict['std'],
-                                      std_mmi_maximum_data)
+        np.testing.assert_almost_equal(mmi_max_dict['mean'],
+                                       mean_mmi_maximum_data)
+        np.testing.assert_almost_equal(mmi_max_dict['std'],
+                                       std_mmi_maximum_data)
         assert mmi_max_dict['mean_metadata'] == mean_mmi_maximum_metadata
         assert mmi_max_dict['std_metadata'] == std_mmi_maximum_metadata
 
         # get the rotd50 MMI imt data
         mmi_rot_dict = container.getIMTGrids('mmi', component='rotd50')
-        np.testing.assert_array_equal(mmi_rot_dict['mean'],
-                                      mean_mmi_rotd50_data)
-        np.testing.assert_array_equal(mmi_rot_dict['std'],
-                                      std_mmi_rotd50_data)
+        np.testing.assert_almost_equal(mmi_rot_dict['mean'],
+                                       mean_mmi_rotd50_data)
+        np.testing.assert_almost_equal(mmi_rot_dict['std'],
+                                       std_mmi_rotd50_data)
         assert mmi_rot_dict['mean_metadata'] == mean_mmi_rotd50_metadata
         assert mmi_rot_dict['std_metadata'] == std_mmi_rotd50_metadata
 
@@ -332,18 +329,18 @@ def test_output_arrays():
         #
         # Put the data in the container
         #
-        container.setIMTArrays('PGA', lons, lats, ids,
+        container.setIMTArrays('PGA', 'Larger', lons, lats, ids,
                                mean, metadata,
-                               std, metadata, 'Larger')
+                               std, metadata)
         #
         # Now extract it and compare it to what we put in there
         #
         dout = container.getIMTArrays('PGA', 'Larger')
-        assert all(dout['lons'] == lons)
-        assert all(dout['lats'] == lats)
+        np.testing.assert_almost_equal(dout['lons'], lons)
+        np.testing.assert_almost_equal(dout['lats'], lats)
         assert all(dout['ids'] == ids)
-        assert all(dout['mean'] == mean)
-        assert all(dout['std'] == std)
+        np.testing.assert_almost_equal(dout['mean'], mean)
+        np.testing.assert_almost_equal(dout['std'], std)
         #
         # Check the data type
         #
@@ -357,18 +354,18 @@ def test_output_arrays():
         # Shapes of inputs not the same
         with pytest.raises(ValueError):
             empty = np.array([])
-            container.setIMTArrays('PGV', empty, lats, ids,
+            container.setIMTArrays('PGV', 'Larger', empty, lats, ids,
                                    mean, metadata,
-                                   std, metadata, 'Larger')
+                                   std, metadata)
         # IMT already exists
         with pytest.raises(LookupError):
-            container.setIMTArrays('PGA', lons, lats, ids,
+            container.setIMTArrays('PGA', 'Larger', lons, lats, ids,
                                    mean, metadata,
-                                   std, metadata, 'Larger')
+                                   std, metadata)
         # Trying to set a grid in a file with points
         with pytest.raises(TypeError):
-            container.setIMTGrids('PGV', mean, metadata,
-                                  std, metadata, 'Larger')
+            container.setIMTGrids('PGV', 'Larger', mean, metadata,
+                                  std, metadata)
         # Trying to get a grid in a file with points
         with pytest.raises(TypeError):
             container.getIMTGrids('PGA', 'Larger')

@@ -2156,8 +2156,8 @@ class ModelModule(CoreModule):
             std_layername, units, digits = _get_layer_info(key + '_sd')
             std_metadata['units'] = units
             std_metadata['digits'] = digits
-            oc.setIMTGrids(key, value, metadata, self.outsd[key],
-                           std_metadata, component)
+            oc.setIMTGrids(key, component, value, metadata, self.outsd[key],
+                           std_metadata)
         #
         # Directivity
         #
@@ -2220,13 +2220,12 @@ class ModelModule(CoreModule):
                 'units': units,
                 'digits': digits
             }
-            oc.setIMTArrays(key,
+            oc.setIMTArrays(key, component,
                             self.sx_out.lons.ravel(),
                             self.sx_out.lats.ravel(),
                             ascii_ids,
                             value.ravel(), mean_metadata,
-                            self.outsd[key].ravel(), std_metadata,
-                            component)
+                            self.outsd[key].ravel(), std_metadata)
 
     def _storeAttenuationData(self, oc):
         """
