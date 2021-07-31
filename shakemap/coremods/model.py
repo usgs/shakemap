@@ -1760,7 +1760,7 @@ class ModelModule(CoreModule):
                     _string_round(self.nominal_bias[myimt], 3)
             else:
                 info[op][gm][myimt]['bias'] = None
-            if myimt == 'MMI' or myimt == 'PGV':
+            if myimt == 'MMI':
                 info[op][gm][myimt]['max_grid'] = \
                     _string_round(np.max(self.outgrid[myimt]), 3)
                 info[op][gm][myimt]['max'] = \
