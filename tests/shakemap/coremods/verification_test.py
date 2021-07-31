@@ -19,7 +19,6 @@ from impactutils.io.smcontainers import ShakeMapOutputContainer
 # the two xtestplot functions
 ########################################################################
 
-
 #
 # Compute the bias (u_dB), the std of the bias (sigma_dW), the
 # the conditional mean at the observation point (u_z), and the
@@ -29,17 +28,29 @@ from impactutils.io.smcontainers import ShakeMapOutputContainer
 se = np.array([0.0, 0.75, 1.5, 3.0, 6.0])
 sigma = 0.8
 tau = 0.6
-omega = np.sqrt(sigma**2 / (sigma**2 + se**2))
-num = omega**2 / sigma**2
-den = 1.0 / ((1.0 / tau**2) + num)
-u_dB = num * den
-sigma_dW = np.sqrt(sigma**2 + den)
-u_z = u_dB + (1 - u_dB) * sigma_dW**2 / (sigma_dW**2 + se**2)
-s_z = np.sqrt(sigma_dW**2 * se**2 / (sigma_dW**2 + se**2))
+# New-style bias and MVN
+s_w2w2_inv = 1.0 / (sigma**2 + se**2)
+den = 1.0 / (1.0 + tau * s_w2w2_inv * tau)
+num = tau * s_w2w2_inv * (1.0) * den
+u_dB = tau * num
+sigma_dW = np.sqrt(sigma**2 + tau**2 * den)
+u_z = 0 + u_dB + sigma**2 * s_w2w2_inv * (1 - u_dB)
+s_z = np.sqrt(sigma**2 - sigma**2 * s_w2w2_inv * sigma**2 +
+              (tau - sigma**2 * s_w2w2_inv * tau)**2 * den)
+
+# omega = np.sqrt(sigma**2 / (sigma**2 + se**2))
+# num = omega**2 / sigma**2
+# den = 1.0 / ((1.0 / tau**2) + num)
+# u_dB = num * den
+# sigma_dW = np.sqrt(sigma**2 + den)
+# u_z = u_dB + (1 - u_dB) * sigma_dW**2 / (sigma_dW**2 + se**2)
+# s_z = np.sqrt(sigma_dW**2 * se**2 / (sigma_dW**2 + se**2))
+
 # print('bias: ', u_dB)
 # print('bias std: ', sigma_dW)
 # print('u|z: ', u_z)
 # print('s|z: ', s_z)
+# exit()
 
 
 def run_event(evid):
@@ -64,7 +75,7 @@ def test_verification_0001():
     try:
         imtdict = run_event(evid)
         assert np.allclose(np.zeros_like(imtdict['mean']), imtdict['mean'])
-        assert np.min(imtdict['std']) == 0
+        np.testing.assert_almost_equal(np.min(imtdict['std']), 0)
         assert np.max(imtdict['std']) > 0.8 and np.max(imtdict['std']) < 1.0
     finally:
         data_file = os.path.join(datapath, evid, 'current', 'shake_data.hdf')
@@ -80,7 +91,7 @@ def test_verification_0002():
         assert np.allclose([np.min(imtdict['mean'])], [-1.0])
         assert np.allclose([np.max(imtdict['mean'])], [1.0])
         assert np.allclose([np.min(np.abs(imtdict['mean']))], [0.0])
-        assert np.min(imtdict['std']) == 0
+        np.testing.assert_almost_equal(np.min(imtdict['std']), 0)
         assert np.max(imtdict['std']) > 0.8 and np.max(imtdict['std']) < 1.0
     finally:
         data_file = os.path.join(datapath, evid, 'current', 'shake_data.hdf')

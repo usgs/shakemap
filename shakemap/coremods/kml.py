@@ -252,7 +252,8 @@ def create_kmz(container, datadir, logger, contents):
     # create intensity overlay
     logger.debug('Creating intensity overlay...')
     overlay_image = create_overlay(container, datadir, document)
-    kmz_contents += [overlay_image]
+    if overlay_image is not None:
+        kmz_contents += [overlay_image]
     logger.debug('Created intensity overlay image %s' % overlay_image)
 
     # create station kml
@@ -360,7 +361,10 @@ def create_epicenter(container, document):
 
 def create_polygons(container, document):
 
-    component = container.getComponents('MMI')[0]
+    component = container.getComponents('MMI')
+    if len(component) == 0:
+        return
+    component = component[0]
     gdict = container.getIMTGrids("MMI", component)
     fgrid = median_filter(gdict['mean'], size=10)
     cont_min = np.floor(np.min(fgrid)) - 0.5
@@ -543,6 +547,8 @@ def create_overlay(container, datadir, document):
     # create the overlay image file
     overlay_img_file = os.path.join(datadir, OVERLAY_IMG)
     geodict = create_overlay_image(container, overlay_img_file)
+    if geodict is None:
+        return None
     box = skml.LatLonBox(north=geodict.ymax, south=geodict.ymin,
                          east=geodict.xmax, west=geodict.xmin)
     icon = skml.Icon(refreshinterval=300,
@@ -567,7 +573,10 @@ def create_overlay_image(container, filename):
         GeoDict: GeoDict object for the intensity grid.
     """
     # extract the intensity data from the container
-    comp = container.getComponents('MMI')[0]
+    comp = container.getComponents('MMI')
+    if len(comp) == 0:
+        return None
+    comp = comp[0]
     imtdict = container.getIMTGrids('MMI', comp)
     mmigrid = imtdict['mean']
     gd = GeoDict(imtdict['mean_metadata'])

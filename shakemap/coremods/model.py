@@ -293,7 +293,7 @@ class ModelModule(CoreModule):
             self.dir_results = []
             # But if we want to save the results that were actually used for
             # each IMT, so we use a dictionary. This uses keys that are
-            # the same ass self.outgrid.
+            # the same as self.outgrid.
             self.dir_output = {}
         else:
             self.do_directivity = False
@@ -370,16 +370,14 @@ class ModelModule(CoreModule):
         # used to compute the bias and do the interpolation, they are filled
         # in the _fillDataArrays method
         #
-        self.sta_period_ix = {}
         self.sta_lons_rad = {}
         self.sta_lats_rad = {}
         self.sta_resids = {}
         self.sta_phi = {}
-        self.sta_sig_extra = {}
-        self.sta_sig_total = {}
         self.sta_tau = {}
+        self.sta_sig_extra = {}
         self.sta_imtstr = {}
-        self.sta_rrups = {}
+        self.sigma22inv_phi = {}
 
         self._fillDataArrays()
 
@@ -392,6 +390,8 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
+        self.outphi = {}    # Holds the intra-event standard deviation arrays
+        self.outtau = {}    # Holds the inter-event standard deviation arrays
 
         #
         # Places to put the results for the attenuation plots
@@ -604,8 +604,8 @@ class ModelModule(CoreModule):
                                      self.sx_out.lats)
             self.sx_out.lons = lons.copy()
             self.sx_out.lats = lats.copy()
-            self.lons = lons.ravel()
-            self.lats = lats.ravel()
+            self.lons = lons.flatten()
+            self.lats = lats.flatten()
             self.depths = np.zeros_like(lats)
             dist_obj_out = Distance.fromSites(self.default_gmpe,
                                               self.sites_obj_out,
@@ -691,8 +691,8 @@ class ModelModule(CoreModule):
                                      self.sx_out.lats)
             self.sx_out.lons = lons.copy()
             self.sx_out.lats = lats.copy()
-            self.lons = lons.ravel()
-            self.lats = lats.ravel()
+            self.lons = lons.flatten()
+            self.lats = lats.flatten()
             self.depths = np.zeros_like(lats)
             dist_obj_out = Distance.fromSites(self.default_gmpe,
                                               self.sites_obj_out,
@@ -718,8 +718,8 @@ class ModelModule(CoreModule):
             np.zeros_like(self.atten_coords['lons']),
             rupture=self.point_source).getDistanceContext()
 
-        self.lons_out_rad = np.radians(self.lons)
-        self.lats_out_rad = np.radians(self.lats)
+        self.lons_out_rad = np.radians(self.lons).flatten()
+        self.lats_out_rad = np.radians(self.lats).flatten()
         self.flip_lons = False
         if self.W > 0 and self.E < 0:
             self.flip_lons = True
@@ -832,7 +832,8 @@ class ModelModule(CoreModule):
             # -----------------------------------------------------------------
             # Do the predictions and other bookkeeping for each IMT
             # -----------------------------------------------------------------
-            for imtstr in dfn.imts:
+            imt_set = self.imt_out_set | set(dfn.imts)
+            for imtstr in imt_set:
                 oqimt = imt.from_string(imtstr)
                 gmpe = None
                 not_supported = False
@@ -886,6 +887,12 @@ class ModelModule(CoreModule):
                 else:
                     df[imtstr + '_pred_tau'] = pstddev[1]
                     df[imtstr + '_pred_phi'] = pstddev[2]
+                #
+                # If we're just computing the predictions of an output
+                # IMT, then we can skip the residual and outlier stuff
+                #
+                if imtstr not in df:
+                    continue
                 #
                 # Compute the total residual
                 #
@@ -1123,19 +1130,68 @@ class ModelModule(CoreModule):
     def _fillDataArrays(self):
         """
         For each IMT get lists of the amplitudes that can contribute
-        to the bias and the interpolation. Keep lists of, IMT, period
+        to the bias and the interpolation. Keep lists of IMT, period
         index, lons, lats, residuals, tau, phi, additional uncertainty,
         and rupture distance.
         """
         #
         # Get the valid imts for each station
         #
+        first = 0
         imtsets = {}
         sasets = {}
-        for ndf in self.dataframes:
-            imtsets[ndf], sasets[ndf] = _get_imt_lists(getattr(self, ndf))
+        full_lon_array = np.array([])
+        full_lat_array = np.array([])
 
-        for imtstr in self.combined_imt_set:
+        per_list_ix = []
+        sta_list_ix = []
+        pred_list_full = []
+        sig_list_full = []
+        resid_list_full = []
+        extra_sig_list_full = []
+        nsta = 0
+
+        for ndf in ('df1', 'df2'):
+            df = getattr(self, ndf, None)
+            if df is None:
+                continue
+            sdf = df.df
+            imtsets[ndf], sasets[ndf] = _get_imt_lists(df)
+            full_lon_array = np.hstack((full_lon_array, sdf['lon_rad']))
+            full_lat_array = np.hstack((full_lat_array, sdf['lat_rad']))
+
+            nsta = np.size(df.df['lon'])
+
+            for i in range(nsta):
+                for imtstr in imtsets[ndf][i]:
+                    if imtstr in ("PGV", "MMI"):
+                        continue
+                    per_list_ix.append(self.imt_per_ix[imtstr])
+                    sta_list_ix.append(i + first)
+                    pred_list_full.append(sdf[imtstr + '_pred'][i])
+                    sig_list_full.append(sdf[imtstr + '_pred_sigma'][i])
+                    resid_list_full.append(sdf[imtstr + '_residual'][i])
+                    extra_sig_list_full.append(sdf[imtstr + '_sd'][i])
+            first = nsta
+
+        per_array_ix = np.array(per_list_ix).reshape((-1, 1))
+        sta_array_ix = np.array(sta_list_ix)
+        pred_array_full = np.array(pred_list_full).reshape((-1, 1))
+        sig_array_full = np.array(sig_list_full)
+        resid_array_full = np.array(resid_list_full).reshape((-1, 1))
+        extra_sig_array_full = np.array(extra_sig_list_full)
+        nimt = np.size(per_array_ix)
+        #
+        # Find the distances among all of the stations
+        #
+        nsta = np.size(full_lon_array)
+        if nsta > 0:
+            dist_matrix_full = np.empty((nsta, nsta), dtype=np.float64)
+            geodetic_distance_fast(full_lon_array, full_lat_array,
+                                   full_lon_array, full_lat_array,
+                                   dist_matrix_full)
+
+        for imtstr in self.imt_out_set:
             #
             # Fill the station arrays; here we use lists and append to
             # them because it is much faster than appending to a numpy
@@ -1143,7 +1199,6 @@ class ModelModule(CoreModule):
             # arrays:
             #
             imtlist = []    # The input IMT
-            period_ix = []  # The index of the (pseudo-)period of the input IMT
             lons_rad = []   # longitude (in radians) of the input station
             lats_rad = []   # latitude (in radians) of the input station
             resids = []     # The residual of the input IMT
@@ -1151,45 +1206,128 @@ class ModelModule(CoreModule):
             phi = []        # The within-event stddev of the input IMT
             sig_extra = []  # Additional stddev of the input IMT
             rrups = []      # The rupture distance of the input station
-            for ndf in self.dataframes:
-                sdf = getattr(self, ndf).df
+            step = 0
+            for ndf in ('df1', 'df2'):
+                tdf = getattr(self, ndf, None)
+                if tdf is None:
+                    continue
+                sdf = tdf.df
                 for i in range(np.size(sdf['lon'])):
                     #
-                    # Each station can provide 0, 1, or 2 IMTs:
+                    # If the output IMT is in the input, we're done
                     #
-                    for imtin in _get_nearest_imts(imtstr, imtsets[ndf][i],
-                                                   sasets[ndf][i]):
-                        imtlist.append(imtin)
-                        period_ix.append(self.imt_per_ix[imtin])
+                    if imtstr in imtsets[ndf][i]:
+                        imtlist.append(imtstr)
                         lons_rad.append(sdf['lon_rad'][i])
                         lats_rad.append(sdf['lat_rad'][i])
-                        resids.append(sdf[imtin + '_residual'][i])
-                        tau.append(sdf[imtin + '_pred_tau'][i])
-                        phi.append(sdf[imtin + '_pred_phi'][i])
-                        sig_extra.append(sdf[imtin + '_sd'][i])
-                        rrups.append(sdf['rrup'][i])
+                        resids.append(sdf[imtstr + '_residual'][i])
+                        tau.append(sdf[imtstr + '_pred_tau'][i])
+                        phi.append(sdf[imtstr + '_pred_phi'][i])
+                        sig_extra.append(sdf[imtstr + '_sd'][i])
+                        continue
+                    #
+                    # There are no alternatives for PGV or MMI -- if we
+                    # didn't create them when we had the chance, then
+                    # we can't do it here
+                    #
+                    if imtstr in ("PGV", "MMI"):
+                        continue
+                    #
+                    # Find the correlation between the output IMT at this
+                    # location and every IMT in the input
+                    #
+                    t1_ix = np.full(nimt,
+                                    self.imt_per_ix[imtstr]).reshape((-1, 1))
+                    h = dist_matrix_full[i + step,
+                                         sta_list_ix].copy().reshape((-1, 1))
+                    self.ccf.getCorrelation(t1_ix, per_array_ix, h)
+                    #
+                    # Cull the low-correlation IMTs
+                    #
+                    ix_good = np.where(h > 0.05)[0]
+                    sta_ix_good = sta_array_ix[ix_good]
+                    ngood = np.size(ix_good)
+                    if ngood > 20:
+                        ix_good = (np.argsort(h)[::-1])[0:20, 0]
+                        sta_ix_good = sta_array_ix[ix_good]
+                        ngood = 20
+                    #
+                    # MVN the remainder to this location and IMT
+                    #
+                    if ngood == 0:
+                        continue
+                    matrix22 = np.empty((ngood, ngood), dtype=np.double)
+                    geodetic_distance_fast(full_lon_array[sta_ix_good],
+                                           full_lat_array[sta_ix_good],
+                                           full_lon_array[sta_ix_good],
+                                           full_lat_array[sta_ix_good],
+                                           matrix22)
+                    ones = np.ones((1, ngood), dtype=np.long)
+                    t1_ix = per_array_ix[ix_good] * ones
+                    t2_ix = per_array_ix[ix_good].T * ones.T
+                    self.ccf.getCorrelation(t1_ix, t2_ix, matrix22)
+                    corr_adj22 = np.ones_like(matrix22)
+                    make_sigma_matrix(matrix22, corr_adj22,
+                                      sig_array_full[ix_good],
+                                      sig_array_full[ix_good])
+                    np.fill_diagonal(matrix22, np.diag(matrix22) +
+                                     extra_sig_array_full[ix_good])
+
+                    sigma22inv = np.linalg.pinv(matrix22)
+
+                    dist12 = h[ix_good].copy().reshape((-1, 1))
+                    t11_ix = np.ones(ngood, dtype=np.long).reshape((-1, 1)) * \
+                        self.imt_per_ix[imtstr]
+                    t21_ix = per_array_ix[ix_good]
+                    self.ccf.getCorrelation(t11_ix, t21_ix, dist12)
+                    sigma12 = (dist12.reshape((-1,)) *
+                               sdf[imtstr + '_pred_sigma'][i] *
+                               sig_array_full[ix_good]).reshape((1, -1))
+
+                    rcmatrix = sigma12.dot(sigma22inv)
+
+                    mu = (sdf[imtstr + '_pred'][i] + rcmatrix.dot(
+                          resid_array_full[ix_good]))[0, 0]
+                    sd = (sdf[imtstr + '_pred_sigma'][i] -
+                          rcmatrix.dot(sigma12.T))[0, 0]
+
+                    #
+                    # Save the result
+                    #
+
+                    imtlist.append(imtstr)
+                    lons_rad.append(sdf['lon_rad'][i])
+                    lats_rad.append(sdf['lat_rad'][i])
+                    resids.append(mu - sdf[imtstr + '_pred'][i])
+                    tau.append(sdf[imtstr + '_pred_tau'][i])
+                    phi.append(sdf[imtstr + '_pred_phi'][i])
+                    sig_extra.append(sd)
+                #
+                # We may be switching to the second dataframe, but the
+                # distance matrix has both sandwitched together, so we
+                # need to add the length of the first to our indexing
+                # into it
+                #
+                step = np.size(sdf['lon'])
+
             self.sta_imtstr[imtstr] = imtlist.copy()
-            self.sta_period_ix[imtstr] = np.array(period_ix).reshape((-1, 1))
-            self.sta_lons_rad[imtstr] = np.array(lons_rad).reshape((-1, 1))
-            self.sta_lats_rad[imtstr] = np.array(lats_rad).reshape((-1, 1))
+            self.sta_lons_rad[imtstr] = np.array(lons_rad)
+            self.sta_lats_rad[imtstr] = np.array(lats_rad)
             if self.flip_lons:
                 self.sta_lons_rad[imtstr][self.sta_lons_rad[imtstr] < 0] += \
                     2 * np.pi
             self.sta_resids[imtstr] = np.array(resids).reshape((-1, 1))
             self.sta_tau[imtstr] = np.array(tau).reshape((-1, 1))
             self.sta_phi[imtstr] = np.array(phi).reshape((-1, 1))
-            self.sta_sig_extra[imtstr] = np.array(sig_extra).reshape((-1, 1))
-            self.sta_sig_total[imtstr] = np.sqrt(
-                self.sta_phi[imtstr]**2 + self.sta_sig_extra[imtstr]**2)
-            self.sta_rrups[imtstr] = np.array(rrups)
+            self.sta_sig_extra[imtstr] = np.array(sig_extra)
 
     def _computeBias(self):
         """
-        Compute a bias for all of the IMTs in the inputs and outputs
+        Compute a bias for all of the IMTs in the outputs
         """
-        for imtstr in self.combined_imt_set:
+        for imtstr in self.imt_out_set:
             time1 = time.time()
-            if np.size(self.sta_lons_rad) == 0:
+            if np.size(self.sta_lons_rad[imtstr]) == 0:
                 self.bias_num[imtstr] = 0.0
                 self.bias_den[imtstr] = 0.0
                 continue
@@ -1197,75 +1335,48 @@ class ModelModule(CoreModule):
             # Get the index of the (pseudo-) period of the output IMT
             #
             outperiod_ix = self.imt_per_ix[imtstr]
+            sta_lons_rad = self.sta_lons_rad[imtstr]
+            sta_lats_rad = self.sta_lats_rad[imtstr]
+            sta_tau = self.sta_tau[imtstr]
+            sta_phi = self.sta_phi[imtstr]
+            sta_resids = self.sta_resids[imtstr]
+            sta_sig_extra = self.sta_sig_extra[imtstr]
             #
-            # Get the distance-limited set of data for use in computing
-            # the bias
+            # Build the covariance matrix of the residuals and its inverse
+            # We need this whether or not we actually compute the bias
             #
-            dix = self.sta_rrups[imtstr] <= self.bias_max_range
-            sta_phi_dl = self.sta_phi[imtstr][dix].reshape((-1, 1))
-            sta_tau_dl = self.sta_tau[imtstr][dix].reshape((-1, 1))
-            sta_sig_total_dl = self.sta_sig_total[imtstr][dix].reshape((-1, 1))
-            sta_lons_rad_dl = self.sta_lons_rad[imtstr][dix].ravel()
-            sta_lats_rad_dl = self.sta_lats_rad[imtstr][dix].ravel()
-            sta_period_ix_dl = self.sta_period_ix[imtstr][dix].reshape((-1, 1))
-            sta_resids_dl = self.sta_resids[imtstr][dix].reshape((-1, 1))
-            if np.size(sta_lons_rad_dl) == 0:
-                self.bias_num[imtstr] = 0.0
-                self.bias_den[imtstr] = 0.0
-                continue
-            #
-            # This builds the omega factors to apply to the covariance
-            #
-            corr_adj = sta_phi_dl / sta_sig_total_dl
-            corr_adj22 = corr_adj * corr_adj.T
-            np.fill_diagonal(corr_adj22, 1.0)
-            #
-            # Build the covariance matrix of the residuals
-            #
-            nsta = np.size(sta_lons_rad_dl)
+            nsta = np.size(sta_lons_rad)
             matrix22 = np.empty((nsta, nsta), dtype=np.double)
-            geodetic_distance_fast(sta_lons_rad_dl,
-                                   sta_lats_rad_dl,
-                                   sta_lons_rad_dl,
-                                   sta_lats_rad_dl, matrix22)
-            ones = np.ones((1, nsta), dtype=np.long)
-            t1_22 = sta_period_ix_dl * ones
-            t2_22 = sta_period_ix_dl.T * ones.T
-            self.ccf.getCorrelation(t1_22, t2_22, matrix22)
-            sta_phi_dl_flat = sta_phi_dl.ravel()
+            geodetic_distance_fast(sta_lons_rad, sta_lats_rad,
+                                   sta_lons_rad, sta_lats_rad, matrix22)
+            t1_22 = np.full_like(matrix22, outperiod_ix, dtype=np.long)
+            self.ccf.getCorrelation(t1_22, t1_22, matrix22)
+            sta_phi_flat = sta_phi.flatten()
+            corr_adj22 = np.ones_like(matrix22)
             make_sigma_matrix(matrix22, corr_adj22,
-                              sta_phi_dl_flat,
-                              sta_phi_dl_flat)
+                              sta_phi_flat,
+                              sta_phi_flat)
+            np.fill_diagonal(matrix22, np.diag(matrix22) + sta_sig_extra**2)
             sigma22inv = np.linalg.pinv(matrix22)
+            self.sigma22inv_phi[imtstr] = sigma22inv
             #
             # Compute the bias numerator and denominator pieces
             #
             if self.do_bias and (not isinstance(self.rupture_obj, PointRupture)
                                  or self.rx.mag <= self.bias_max_mag):
-                #
-                # Get the correlation between the inputs and outputs
-                #
-                out_ix_arr = np.full_like(sta_period_ix_dl, outperiod_ix)
-                Z = np.zeros_like(out_ix_arr, dtype=float)
-                self.ccf.getCorrelation(sta_period_ix_dl, out_ix_arr, Z)
-                #
-                # Scale the correlation factor (Z) by the correlation
-                # adjustment due to observational uncertainty
-                #
-                Z *= corr_adj
-                #
-                # Compute the bias denominator and numerator terms
-                #
-                ztmp = Z.T.dot(sigma22inv)
-                self.bias_num[imtstr] = ztmp.dot(Z * sta_resids_dl)[0][0]
-                self.bias_den[imtstr] = ztmp.dot(Z)[0][0]
+                var_H_y2 = 1.0 / (1.0 + sta_tau.T.dot(sigma22inv.dot(sta_tau)))
+                mu_H_y2 = sta_tau.T.dot(sigma22inv.dot(sta_resids)) * var_H_y2
+                self.bias_num[imtstr] = mu_H_y2[0][0]
+                self.bias_den[imtstr] = var_H_y2[0][0]
             else:
                 self.bias_num[imtstr] = 0.0
                 self.bias_den[imtstr] = 0.0
 
-            nom_tau = np.mean(sta_tau_dl.ravel())
-            nom_variance = 1.0 / ((1.0 / nom_tau**2) + self.bias_den[imtstr])
-            self.nominal_bias[imtstr] = self.bias_num[imtstr] * nom_variance
+            mu_B2_y2 = sta_tau * self.bias_num[imtstr]
+            self.nominal_bias[imtstr] = np.mean(mu_B2_y2)
+            var_B2B2_y2 = sta_tau**2 * self.bias_den[imtstr]
+            nom_variance = np.mean(var_B2B2_y2)
+
             bias_time = time.time() - time1
             #
             # Write the nominal values of the bias and its stddev to log
@@ -1273,7 +1384,7 @@ class ModelModule(CoreModule):
             self.logger.debug(
                 '%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
                 % (imtstr, self.nominal_bias[imtstr], np.sqrt(nom_variance),
-                   np.size(sta_lons_rad_dl), bias_time))
+                   nsta, bias_time))
 
     def _computeDirectivityPredictionLocations(self):
         """
@@ -1325,7 +1436,6 @@ class ModelModule(CoreModule):
         # Get the index of the (pesudo-) period of the output IMT
         #
         outperiod_ix = self.imt_per_ix[imtstr]
-
         #
         # Get the predictions at the output points
         #
@@ -1345,7 +1455,6 @@ class ModelModule(CoreModule):
                                                       mag=self.rx.mag)
             else:
                 pout_mean = self.sim_df[imtstr]
-
         #
         # While we have the gmpe for this IMT, we should make
         # the attenuation curves
@@ -1362,16 +1471,6 @@ class ModelModule(CoreModule):
                                   oqimt, self.apply_gafs)
         self.atten_soil_mean[imtstr] = x_mean
         self.atten_soil_sd[imtstr] = x_sd[0]
-
-        #
-        # If there are no data, just use the unbiased prediction
-        # and the total stddev
-        #
-        if np.size(self.sta_lons_rad[imtstr]) == 0:
-            self.outgrid[imtstr] = pout_mean
-            self.outsd[imtstr] = pout_sd[0]
-            return
-
         #
         # Get an array of the within-event standard deviations for the
         # output IMT at the output points
@@ -1387,125 +1486,82 @@ class ModelModule(CoreModule):
             self.psd[imtstr] = np.sqrt(pout_sd[0]**2 - self.tsd[imtstr]**2)
             self.psd_raw[imtstr] = np.sqrt(pout_sd[1]**2 - self.tsd[imtstr]**2)
         else:
+            self.tsd[imtstr] = pout_sd[1]
             self.psd[imtstr] = pout_sd[2]
             self.psd_raw[imtstr] = pout_sd[5]
-            self.tsd[imtstr] = pout_sd[1]
-        pout_sd2 = np.power(self.psd[imtstr], 2.0)
+        #
+        # If there are no data, just use the unbiased prediction
+        # and the stddev
+        #
+        if np.size(self.sta_lons_rad[imtstr]) == 0:
+            self.outgrid[imtstr] = pout_mean
+            self.outsd[imtstr] = pout_sd[0]
+            self.outphi[imtstr] = self.psd[imtstr]
+            self.outtau[imtstr] = self.tsd[imtstr]
+            return
 
-        #
-        # Bias the predictions, and add the residual variance to
-        # phi
-        #
-        out_bias_var = 1.0 / ((1.0 / self.tsd[imtstr]**2) +
-                              self.bias_den[imtstr])
-        out_bias = self.bias_num[imtstr] * out_bias_var
-        pout_mean += out_bias.reshape(pout_mean.shape)
-        self.psd[imtstr] = np.sqrt(self.psd[imtstr]**2 + out_bias_var)
-        pout_sd2 += out_bias_var.reshape(pout_sd2.shape)
-        self.psd_raw[imtstr] = np.sqrt(
-            self.psd_raw[imtstr]**2 + out_bias_var.reshape(pout_sd2.shape))
+        pout_sd2_phi = np.power(self.psd[imtstr], 2.0)
 
+        sta_phi = self.sta_phi[imtstr]
+        sta_tau = self.sta_tau[imtstr]
+        sta_lons_rad = self.sta_lons_rad[imtstr]
+        sta_lats_rad = self.sta_lats_rad[imtstr]
         #
-        # Unbias the station residuals and compute the
-        # new phi that includes the variance of the bias
+        # Compute the biased residuals and output means
         #
-        for i in range(np.size(self.sta_lons_rad[imtstr])):
-            imtin = self.sta_imtstr[imtstr][i]
-            in_bias_var = 1.0 / ((1.0 / self.sta_tau[imtstr][i, 0]**2) +
-                                 self.bias_den[imtin])
-            in_bias = self.bias_num[imtin] * in_bias_var
-            self.sta_resids[imtstr][i, 0] -= in_bias
-            self.sta_phi[imtstr][i, 0] = np.sqrt(
-                self.sta_phi[imtstr][i, 0]**2 + in_bias_var)
-
-        #
-        # Update the omega factors to account for the bias and the
-        # new value of phi
-        #
-        corr_adj = self.sta_phi[imtstr] / np.sqrt(
-            self.sta_phi[imtstr]**2 + self.sta_sig_extra[imtstr]**2)
-        corr_adj22 = corr_adj * corr_adj.T
-        np.fill_diagonal(corr_adj22, 1.0)
-
-        sta_lons_rad_flat = self.sta_lons_rad[imtstr].ravel()
-        sta_lats_rad_flat = self.sta_lats_rad[imtstr].ravel()
-        #
-        # Re-build the covariance matrix of the residuals with
-        # the full set of data
-        #
-        nsta = np.size(sta_lons_rad_flat)
-        matrix22 = np.empty((nsta, nsta), dtype=np.double)
-        geodetic_distance_fast(sta_lons_rad_flat,
-                               sta_lats_rad_flat,
-                               sta_lons_rad_flat,
-                               sta_lats_rad_flat,
-                               matrix22)
-        ones = np.ones((1, nsta), dtype=np.long)
-        t1_22 = self.sta_period_ix[imtstr] * ones
-        t2_22 = self.sta_period_ix[imtstr].T * ones.T
-        self.ccf.getCorrelation(t1_22, t2_22, matrix22)
-
-        #
-        # Rebuild sigma22_inv now that we have updated phi and
-        # the correlation adjustment factors
-        #
-        sta_phi_flat = self.sta_phi[imtstr].ravel()
-        make_sigma_matrix(matrix22, corr_adj22, sta_phi_flat, sta_phi_flat)
-        sigma22inv = np.linalg.pinv(matrix22)
-
+        biased_resids = (self.sta_resids[imtstr] -
+                         sta_tau * self.bias_num[imtstr])
+        biased_mu = pout_mean + self.tsd[imtstr] * self.bias_num[imtstr]
         #
         # Now do the MVN itself...
         #
         dtime = mtime = ddtime = ctime = stime = atime = 0
 
+        nsta = np.size(sta_lons_rad)
         ampgrid = np.zeros_like(pout_mean)
-        sdgrid = np.zeros_like(pout_mean)
-        corr_adj12 = corr_adj.T * np.ones((self.smnx, 1))
+        sdgrid_phi = np.zeros_like(pout_mean)
+        sdgrid_tau = np.zeros_like(pout_mean)
         # Stuff that doesn't change within the loop:
-        lons_out_rad_flat = self.lons_out_rad.ravel()
-        lats_out_rad_flat = self.lats_out_rad.ravel()
+        lons_out_rad = self.lons_out_rad
+        lats_out_rad = self.lats_out_rad
         d12_cols = self.smnx
         t2_12 = np.full((d12_cols, nsta), outperiod_ix, dtype=np.long)
-        t1_12 = self.sta_period_ix[imtstr].T * np.ones((d12_cols, 1),
-                                                       dtype=np.long)
+        corr_adj12 = np.ones_like(t2_12, dtype=np.float64)
         # sdsta is the standard deviation of the stations
-        sdsta = self.sta_phi[imtstr].ravel()
-        matrix12 = np.empty(t2_12.shape, dtype=np.double)
-        rcmatrix = np.empty(t2_12.shape, dtype=np.double)
+        sdsta_phi = self.sta_phi[imtstr].flatten()
+        matrix12_phi = np.empty(t2_12.shape, dtype=np.double)
+        rcmatrix_phi = np.empty(t2_12.shape, dtype=np.double)
         for iy in range(self.smny):
             ss = iy * self.smnx
             se = (iy + 1) * self.smnx
             time4 = time.time()
-            geodetic_distance_fast(
-                sta_lons_rad_flat,
-                sta_lats_rad_flat,
-                lons_out_rad_flat[ss:se],
-                lats_out_rad_flat[ss:se],
-                matrix12)
+            geodetic_distance_fast(sta_lons_rad, sta_lats_rad,
+                                   lons_out_rad[ss:se], lats_out_rad[ss:se],
+                                   matrix12_phi)
             ddtime += time.time() - time4
             time4 = time.time()
-            self.ccf.getCorrelation(t1_12, t2_12, matrix12)
+            self.ccf.getCorrelation(t2_12, t2_12, matrix12_phi)
             ctime += time.time() - time4
             time4 = time.time()
             # sdarr is the standard deviation of the output sites
-            sdarr = self.psd[imtstr][iy, :].ravel()
-            make_sigma_matrix(matrix12, corr_adj12, sdsta, sdarr)
+            sdarr_phi = self.psd[imtstr][iy, :]
+            make_sigma_matrix(matrix12_phi, corr_adj12, sdsta_phi, sdarr_phi)
             stime += time.time() - time4
             time4 = time.time()
             #
             # Sigma12 * Sigma22^-1 is known as the 'regression
             # coefficient' matrix (rcmatrix)
             #
-            np.dot(matrix12, sigma22inv, out=rcmatrix)
+            np.dot(matrix12_phi, self.sigma22inv_phi[imtstr], out=rcmatrix_phi)
             dtime += time.time() - time4
             time4 = time.time()
 
             #
             # This is the MVN solution for the conditional mean
+            # we only do it for the total sigma solution
             #
-            adj_resid = corr_adj * self.sta_resids[imtstr]
-            ampgrid[iy, :] = \
-                pout_mean[iy, :] + rcmatrix.dot(adj_resid).reshape((-1,))
+            ampgrid[iy, :] = biased_mu[iy, :] + \
+                rcmatrix_phi.dot(biased_resids).reshape((-1,))
             atime += time.time() - time4
             time4 = time.time()
             #
@@ -1515,9 +1571,11 @@ class ModelModule(CoreModule):
             # sdgrid[ss:se] = pout_sd2[ss:se] -
             #       np.diag(rcmatrix.dot(sigma21))
             #
-            make_sd_array(sdgrid, pout_sd2, iy, rcmatrix, matrix12)
+            make_sd_array(sdgrid_phi, pout_sd2_phi, iy, rcmatrix_phi,
+                          matrix12_phi)
+            c = self.tsd[imtstr][iy, :] - rcmatrix_phi.dot(sta_tau).ravel()
+            sdgrid_tau[iy, :] = c**2 * self.bias_den[imtstr]
             mtime += time.time() - time4
-
         #
         # This processing can result in MMI values that go beyond
         # the 1 to 10 bounds of MMI, so we apply that constraint again
@@ -1526,7 +1584,9 @@ class ModelModule(CoreModule):
         if imtstr == 'MMI':
             ampgrid = np.clip(ampgrid, 1.0, 10.0)
         self.outgrid[imtstr] = ampgrid
-        self.outsd[imtstr] = sdgrid
+        self.outsd[imtstr] = np.sqrt(sdgrid_phi**2 + sdgrid_tau)
+        self.outphi[imtstr] = sdgrid_phi
+        self.outtau[imtstr] = np.sqrt(sdgrid_tau)
 
         self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
         self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
@@ -1700,7 +1760,7 @@ class ModelModule(CoreModule):
                     _string_round(self.nominal_bias[myimt], 3)
             else:
                 info[op][gm][myimt]['bias'] = None
-            if myimt == 'MMI' or myimt == 'PGV':
+            if myimt == 'MMI':
                 info[op][gm][myimt]['max_grid'] = \
                     _string_round(np.max(self.outgrid[myimt]), 3)
                 info[op][gm][myimt]['max'] = \
@@ -1827,18 +1887,17 @@ class ModelModule(CoreModule):
                     'features': []}
         sjdict = {}
         # ---------------------------------------------------------------------
-        # Compute a bias for all the IMTs in the data frames
+        # Compute a bias for all the output IMTs in the data frames
         # ---------------------------------------------------------------------
         for ndf in self.dataframes:
             sdf = getattr(self, ndf).df
-            imts = getattr(self, ndf).imts
-            for myimt in imts:
+            for myimt in self.imt_out_set:
                 mybias_var = 1.0 / \
                     ((1.0 / sdf[myimt + '_pred_tau']**2) +
                      self.bias_den[myimt])
                 mybias = self.bias_num[myimt] * mybias_var
-                sdf[myimt + '_bias'] = mybias.ravel()
-                sdf[myimt + '_bias_sigma'] = np.sqrt(mybias_var.ravel())
+                sdf[myimt + '_bias'] = mybias.flatten()
+                sdf[myimt + '_bias_sigma'] = np.sqrt(mybias_var.flatten())
 
         # ---------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
@@ -1985,8 +2044,12 @@ class ModelModule(CoreModule):
                 mysigma_rock = sdf[key + '_sigma_rock'][six]
                 mysigma_soil = sdf[key + '_sigma_soil'][six]
                 imt_name = key.lower().replace('_pred', '')
-                mybias = sdf[imt_name.upper() + '_bias'][six]
-                mybias_sigma = sdf[imt_name.upper() + '_bias_sigma'][six]
+                if imt_name.upper() in self.imt_out_set:
+                    mybias = sdf[imt_name.upper() + '_bias'][six]
+                    mybias_sigma = sdf[imt_name.upper() + '_bias_sigma'][six]
+                else:
+                    mybias = 'null'
+                    mybias_sigma = 'null'
                 station['properties']['predictions'].append({
                     'name': imt_name,
                     'value': _round_float(value, 4),
@@ -2156,12 +2219,12 @@ class ModelModule(CoreModule):
             metadata['units'] = units
             metadata['digits'] = digits
 
-            # set the uncertainty grid
+            # set the mean and uncertainty grids
             std_layername, units, digits = _get_layer_info(key + '_sd')
             std_metadata['units'] = units
             std_metadata['digits'] = digits
-            oc.setIMTGrids(key, value, metadata, self.outsd[key],
-                           std_metadata, component)
+            oc.setIMTGrids(key, component, value, metadata, self.outsd[key],
+                           std_metadata, self.outphi[key], self.outtau[key])
         #
         # Directivity
         #
@@ -2183,7 +2246,7 @@ class ModelModule(CoreModule):
             'units': 'm/s',
             'digits': 4
         }
-        oc.setArray([], 'vs30', self.sx_out.vs30.ravel(),
+        oc.setArray([], 'vs30', self.sx_out.vs30.flatten(),
                     metadata=vs30_metadata)
         #
         # Store the distances
@@ -2196,20 +2259,20 @@ class ModelModule(CoreModule):
             dm_arr = getattr(self.dx_out, dm, None)
             if dm_arr is None:
                 continue
-            oc.setArray(['distances'], dm, dm_arr.ravel(),
+            oc.setArray(['distances'], dm, dm_arr.flatten(),
                         metadata=distance_metadata)
             if dm in ('rrup', 'rjb'):
                 dm_var = getattr(self.dx_out, dm + '_var', None)
                 if dm_var is None:
                     dm_var = np.zeros_like(dm_arr)
                 oc.setArray(['distances'], dm + '_std',
-                            np.sqrt(dm_var).ravel(),
+                            np.sqrt(dm_var).flatten(),
                             metadata=distance_metadata)
         #
         # Store the IMTs
         #
         ascii_ids = np.array(
-            [np.char.encode(x, encoding='ascii') for x in self.idents]).ravel()
+            [np.char.encode(x, encoding='ascii') for x in self.idents]).flatten()
         component = self.config['interp']['component']
         for key, value in self.outgrid.items():
             # set the data grid
@@ -2224,13 +2287,14 @@ class ModelModule(CoreModule):
                 'units': units,
                 'digits': digits
             }
-            oc.setIMTArrays(key,
-                            self.sx_out.lons.ravel(),
-                            self.sx_out.lats.ravel(),
+            oc.setIMTArrays(key, component,
+                            self.sx_out.lons.flatten(),
+                            self.sx_out.lats.flatten(),
                             ascii_ids,
-                            value.ravel(), mean_metadata,
-                            self.outsd[key].ravel(), std_metadata,
-                            component)
+                            value.flatten(), mean_metadata,
+                            self.outsd[key].flatten(), std_metadata,
+                            self.outphi[key].flatten(),
+                            self.outtau[key].flatten())
 
     def _storeAttenuationData(self, oc):
         """
@@ -2463,7 +2527,7 @@ def _get_period_arrays(*args):
             elif imtstr in ('PGV', 'MMI'):
                 period = 1.0
             else:
-                period = float(imtstr.replace('SA(', '').replace(')', ''))
+                period = _get_period_from_imt(imtstr)
             imt_per.add(period)
             imt_per_ix[imtstr] = period
     imt_per = sorted(imt_per)
@@ -2553,7 +2617,7 @@ def _get_sa_bracket(myimt, saset):
     """
     For a given SA IMT, look through the input SAs and return a tuple of
     a) a pair of IMT strings representing the periods bracketing the given
-    period; or c) the single IMT representing the first or last period in
+    period; or b) the single IMT representing the first or last period in
     the input list if the given period is off the end of the list.
 
     Args:
@@ -2667,9 +2731,6 @@ def _get_map_grade(do_grid, outsd, psd, moutgrid):
     return mean_rat, mygrade
 
 
-# we need a way to get units information about intensity measure types
-# and translate between openquake naming convention and ShakeMap grid naming
-# convention.
 def _get_layer_info(layer):
     """
     We need a way to get units information about intensity measure types

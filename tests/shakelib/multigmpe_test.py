@@ -38,7 +38,7 @@ from shakelib.rupture.origin import Origin
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.point_rupture import PointRupture
 import shakelib.sites as sites
-from shakelib.sites import Sites
+from shakelib.sites import Sites, SMSitesContext
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
@@ -56,8 +56,8 @@ def test_basic():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
-    sctx_rock = SitesContext()
+    sctx = SMSitesContext()
+    sctx_rock = SMSitesContext()
 
     rctx.rake = 0.0
     rctx.dip = 90.0
@@ -81,8 +81,9 @@ def test_basic():
 
     mgmpe = MultiGMPE.__from_list__([ASK14], [1.0], imc=const.IMC.RotD50)
 
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_ask14, sd_ask14 = ASK14.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     lmean_mgmpe, sd_mgmpe = mgmpe.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
 
@@ -94,8 +95,9 @@ def test_basic():
     mgmpe = MultiGMPE.__from_list__(
         [ASK14, CY14], [0.6, 0.4], imc=const.IMC.RotD50)
     set_sites_depth_parameters(sctx, CY14)
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_cy14, sd_cy14 = CY14.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     lmean_mgmpe, sd_mgmpe = mgmpe.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
     lmean_target = 0.6 * lmean_ask14 + 0.4 * lmean_cy14
@@ -116,8 +118,9 @@ def test_basic():
     sctx_rock.vs30 = np.ones_like(dctx.rjb) * 760.0
     sctx_rock.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
     set_sites_depth_parameters(sctx_rock, ASK14)
+    ctx = stuff_context(sctx_rock, rctx, dctx)
     lmean_ask14_rock, sd_ask14_rock = ASK14.get_mean_and_stddevs(
-        sctx_rock, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     lamp = lmean_ask14 - lmean_ask14_rock
     lmean_target = 0.6 * lmean_ask14 + 0.4 * (lmean_c03 + lamp)
     lmean_mgmpe, sd_mgmpe = mgmpe.get_mean_and_stddevs(
@@ -207,8 +210,8 @@ def test_from_config_set_of_sets():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
-    sctx_rock = SitesContext()
+    sctx = SMSitesContext()
+    sctx_rock = SMSitesContext()
     sctx.sids = np.array(range(size))
     sctx_rock.sids = np.array(range(size))
 
@@ -235,10 +238,12 @@ def test_from_config_set_of_sets():
     set_sites_depth_parameters(sctx, ASK14)
     set_sites_depth_parameters(sctx_rock, ASK14)
 
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_ask14, lsd_ask14 = ASK14.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
+    ctx = stuff_context(sctx_rock, rctx, dctx)
     lmean_ask14_rock, dummy = ASK14.get_mean_and_stddevs(
-        sctx_rock, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
 
     ctx = stuff_context(sctx, rctx, dctx)
     lmean_c03, lsd_c03 = C03.get_mean_and_stddevs(
@@ -248,8 +253,9 @@ def test_from_config_set_of_sets():
     lmean_c03 = bk17.convertAmps(IMT, lmean_c03, dctx.rrup, rctx.mag)
     lsd_c03 = bk17.convertSigmas(IMT, lsd_c03[0])
 
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_pea11, lsd_pea11 = Pea11.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(Pea11.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_pea11 = bk17.convertAmps(IMT, lmean_pea11, dctx.rrup, rctx.mag)
@@ -333,8 +339,8 @@ def test_from_config_set_of_gmpes():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
-    sctx_rock = SitesContext()
+    sctx = SMSitesContext()
+    sctx_rock = SMSitesContext()
     sctx.sids = np.array(range(size))
     sctx_rock.sids = np.array(range(size))
 
@@ -361,18 +367,21 @@ def test_from_config_set_of_gmpes():
     set_sites_depth_parameters(sctx, ASK14)
     set_sites_depth_parameters(sctx_rock, ASK14)
 
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_ask14, dummy = ASK14.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
+    ctx = stuff_context(sctx_rock, rctx, dctx)
     lmean_ask14_rock, dummy = ASK14.get_mean_and_stddevs(
-        sctx_rock, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     ctx = stuff_context(sctx, rctx, dctx)
     lmean_c03, dummy = C03.get_mean_and_stddevs(
         ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(C03.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_c03 = bk17.convertAmps(IMT, lmean_c03, dctx.rrup, rctx.mag)
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_pea11, dummy = Pea11.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(Pea11.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_pea11 = bk17.convertAmps(IMT, lmean_pea11, dctx.rrup, rctx.mag)
@@ -437,8 +446,8 @@ def test_from_config_set_of_sets_3_sec():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
-    sctx_rock = SitesContext()
+    sctx = SMSitesContext()
+    sctx_rock = SMSitesContext()
     sctx.sids = np.array(range(size))
     sctx_rock.sids = np.array(range(size))
 
@@ -465,17 +474,20 @@ def test_from_config_set_of_sets_3_sec():
     set_sites_depth_parameters(sctx, ASK14)
     set_sites_depth_parameters(sctx_rock, ASK14)
 
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_ask14, dummy = ASK14.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
+    ctx = stuff_context(sctx_rock, rctx, dctx)
     lmean_ask14_rock, dummy = ASK14.get_mean_and_stddevs(
-        sctx_rock, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
 #    lmean_c03, dummy = C03.get_mean_and_stddevs(
 #        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
 #    bk17 = BooreKishida2017(C03.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
 #                            const.IMC.RotD50)
 #    lmean_c03 = bk17.convertAmps(IMT, lmean_c03, dctx.rrup, rctx.mag)
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_pea11, dummy = Pea11.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(Pea11.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_pea11 = bk17.convertAmps(IMT, lmean_pea11, dctx.rrup, rctx.mag)
@@ -528,8 +540,8 @@ def test_from_config_single_gmpe():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
-    sctx_rock = SitesContext()
+    sctx = SMSitesContext()
+    sctx_rock = SMSitesContext()
     sctx.sids = np.array(range(size))
     sctx_rock.sids = np.array(range(size))
 
@@ -555,8 +567,9 @@ def test_from_config_single_gmpe():
 
     set_sites_depth_parameters(sctx, ASK14)
 
+    ctx = stuff_context(sctx, rctx, dctx)
     lmean_ask14, dummy = ASK14.get_mean_and_stddevs(
-        sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
+        ctx, ctx, ctx, IMT, [const.StdDev.TOTAL])
 
     lmean_target = lmean_ask14
 
@@ -574,7 +587,7 @@ def test_nga_w2_m8():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
+    sctx = SMSitesContext()
     sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0  # assumed for 'strike slip'
@@ -832,7 +845,7 @@ def test_nga_w2_m6():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
+    sctx = SMSitesContext()
     sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0  # assumed for 'strike slip'
@@ -1083,7 +1096,7 @@ def test_multigmpe_get_site_factors():
 
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
+    sctx = SMSitesContext()
     sctx.sids = np.array(range(1))
 
     rctx.rake = 0.0
@@ -1274,7 +1287,7 @@ def test_point_source_stddev_inflation():
 
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
+    sctx = SMSitesContext()
     sctx.sids = np.array(range(2))
     sctx.lats = np.array([34.1, 34.1])
     sctx.lons = np.array([-118.15, -117.8])
@@ -1551,7 +1564,7 @@ def test_multigmpe_exceptions():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SitesContext()
+    sctx = SMSitesContext()
     sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0

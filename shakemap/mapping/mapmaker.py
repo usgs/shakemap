@@ -889,7 +889,8 @@ def _get_shaded(ptopo, contour_colormap):
     return draped_hsv
 
 
-def _draw_title(imt, adict, uncertainty=False):
+def _draw_title(imt, adict, uncertainty=False,
+                uncertainty_string='Total Uncertainty'):
     """Draw the map title.
     Args:
         imt (str): IMT that is being drawn on the map ('MMI', 'PGV',
@@ -897,6 +898,7 @@ def _draw_title(imt, adict, uncertainty=False):
         adict (dict): The dictionary containing the key geographic
             and ShakeMap data. See draw_map() for a descritption.
         uncertainty (bool): Is this an uncertainty map?
+        uncertainty_string (str): The string to put on an uncertainty map.
     """
     # Add a title
     tdict = adict['tdict']
@@ -936,7 +938,7 @@ def _draw_title(imt, adict, uncertainty=False):
         fmt = ('%s %s\n%s %s: %s\n %s %s %s%.1f %s %s '
                '%s: %.1f%s\n%s:%s')
     tstr = fmt % (imtstr, adict['operator'],
-                  "Uncertainty" if uncertainty else "",
+                  uncertainty_string if uncertainty else "",
                   tdict['title_parts']['shakemap'],
                   eloc, timestr,
                   tdict['title_parts']['timezone'],
@@ -1488,7 +1490,7 @@ def draw_map(adict, override_scenario=False):
     return (fig, fig2)
 
 
-def draw_uncertainty_map(adict, override_scenario=False):
+def draw_uncertainty_map(adict, key, override_scenario=False):
     """Draw basic uncertainty maps.
 
     Args:
@@ -1516,6 +1518,8 @@ def draw_uncertainty_map(adict, override_scenario=False):
             'license_text' (str): License text to display at bottom of map
             'license_logo' (str): Path to license logo image to display
                 next to license text
+        key (str): key into adict[imtdict] for the data to use; one of:
+            'std', 'phi', or 'tau'.
         override_scenario (bool): Turn off scenario watermark.
 
     Returns:
@@ -1524,7 +1528,7 @@ def draw_uncertainty_map(adict, override_scenario=False):
     """
     imtype = adict['imtype']
     imtdict = adict['imtdict']      # mmidict
-    imtdata = np.nan_to_num(imtdict['std'])  # mmidata
+    imtdata = np.nan_to_num(imtdict[key])  # mmidata
     gd = GeoDict(imtdict['mean_metadata'])
     imtgrid = Grid2D(imtdata, gd)   # mmigrid
 
@@ -1677,7 +1681,13 @@ def draw_uncertainty_map(adict, override_scenario=False):
     stations = adict['stationdict']
     _draw_stations(ax, stations, imtype, None, geoproj, fill=False)
 
-    _draw_title(imtype, adict, uncertainty=True)
+    if key == 'std':
+        ustr = "Total Uncertainty"
+    elif key == 'phi':
+        ustr = "Within-event Uncertainty"
+    else:
+        ustr = "Between-event Uncertainty"
+    _draw_title(imtype, adict, uncertainty=True, uncertainty_string=ustr)
 
     process_time = info['processing']['shakemap_versions']['process_time']
     map_version = int(info['processing']['shakemap_versions']['map_version'])
