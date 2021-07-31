@@ -46,12 +46,12 @@ class UncertaintymapsModule(CoreModule):
 
     command_name = 'uncertaintymaps'
     targets = [
-        r'products/intensity_uncertainty\.jpg',
-        r'products/intensity_uncertainty\.pdf',
-        r'products/pga_uncertainty\.jpg', r'products/pga_uncertainty\.pdf',
-        r'products/pgv_uncertainty\.jpg', r'products/pgv_uncertainty\.pdf',
-        r'products/psa_uncertainty.*p.*\.jpg',
-        r'products/psa_uncertainty.*p.*\.pdf']
+        r'products/intensity_sigma\.jpg',
+        r'products/intensity_sigma\.pdf',
+        r'products/pga_sigma\.jpg', r'products/pga_sigma\.pdf',
+        r'products/pgv_sigma\.jpg', r'products/pgv_sigma\.pdf',
+        r'products/psa_sigma.*p.*\.jpg',
+        r'products/psa_sigma.*p.*\.pdf']
     dependencies = [('products/shake_result.hdf', True)]
     configs = ['products.conf']
 
@@ -283,15 +283,39 @@ class UncertaintymapsModule(CoreModule):
                  'license_text': ltext,
                  }
             alist.append(d)
-            fileimt = oq_to_file(imtype) + '_uncertainty'
-            self.contents.addFile(fileimt + 'UncertaintyMap',
-                                  fileimt.upper() + ' Uncertainty Map',
-                                  'Map of ' + imtype + ' uncertainty.',
-                                  fileimt + '.jpg', 'image/jpeg')
-            self.contents.addFile(fileimt + 'UncertaintyMap',
-                                  fileimt.upper() + ' Uncertainty Map',
-                                  'Map of ' + imtype + ' uncertainty.',
-                                  fileimt + '.pdf', 'application/pdf')
+
+            #
+            # Populate the contents.xml
+            #
+            for key in ('std', 'phi', 'tau'):
+                if key not in d['imtdict'] or d['imtdict'][key] is None:
+                    continue
+
+                if key == 'std':
+                    ext = '_sigma'
+                    utype = ' Total'
+                elif key == 'phi':
+                    ext = '_phi'
+                    utype = ' Within-event'
+                else:
+                    ext = '_tau'
+                    utype = ' Between-event'
+
+                if imtype == 'MMI':
+                    fileimt = 'intensity'
+                else:
+                    fileimt = oq_to_file(imtype)
+
+                self.contents.addFile(
+                    fileimt + ext + 'UncertaintyMap',
+                    fileimt.upper() + utype + ' Uncertainty Map',
+                    'Map of ' + imtype + utype + ' uncertainty.',
+                    fileimt + ext + '.jpg', 'image/jpeg')
+                self.contents.addFile(
+                    fileimt + ext + 'UncertaintyMap',
+                    fileimt.upper() + utype + ' Uncertainty Map',
+                    'Map of ' + imtype + utype + ' uncertainty.',
+                    fileimt + ext + '.pdf', 'application/pdf')
 
         if max_workers > 0:
             with cf.ProcessPoolExecutor(max_workers=max_workers) as ex:
@@ -308,22 +332,33 @@ def make_map(adict):
 
     imtype = adict['imtype']
 
-    fig1 = draw_uncertainty_map(adict)
+    for key in ('std', 'phi', 'tau'):
+        if key not in adict['imtdict'] or adict['imtdict'][key] is None:
+            continue
 
-    if imtype == 'MMI':
+        fig1 = draw_uncertainty_map(adict, key)
+
+        if key == 'std':
+            ext = '_sigma'
+        elif key == 'phi':
+            ext = '_phi'
+        else:
+            ext = '_tau'
+
+        if imtype == 'MMI':
+            fileimt = 'intensity'
+        else:
+            fileimt = oq_to_file(imtype)
+
         # save to pdf/jpeg
-        pdf_file = os.path.join(adict['datadir'], 'intensity_uncertainty.pdf')
-        jpg_file = os.path.join(adict['datadir'], 'intensity_uncertainty.jpg')
-    else:
-        fileimt = oq_to_file(imtype)
         pdf_file = os.path.join(adict['datadir'],
-                                '%s_uncertainty.pdf' % (fileimt))
+                                fileimt + ext + '.pdf')
         jpg_file = os.path.join(adict['datadir'],
-                                '%s_uncertainty.jpg' % (fileimt))
+                                fileimt + ext + '.jpg')
 
-    fig1.savefig(pdf_file, bbox_inches='tight', dpi=adict['pdf_dpi'])
-    fig1.savefig(jpg_file, bbox_inches='tight', dpi=adict['img_dpi'])
-    plt.close(fig1)
+        fig1.savefig(pdf_file, bbox_inches='tight', dpi=adict['pdf_dpi'])
+        fig1.savefig(jpg_file, bbox_inches='tight', dpi=adict['img_dpi'])
+        plt.close(fig1)
 
 
 def get_text_strings(stringfile):
