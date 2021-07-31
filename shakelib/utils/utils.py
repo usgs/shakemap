@@ -4,7 +4,6 @@ import logging
 from openquake.hazardlib import imt
 from openquake.hazardlib import const
 from openquake.hazardlib.geo.utils import OrthographicProjection
-from openquake.hazardlib.gsim.base import SitesContext
 from openquake.hazardlib.gsim.base import DistancesContext
 from openquake.hazardlib.gsim.base import RuptureContext
 
@@ -13,7 +12,7 @@ from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.base import Rupture
 from shakelib.multigmpe import MultiGMPE, set_sites_depth_parameters
-from shakelib.sites import Sites
+from shakelib.sites import Sites, SMSitesContext
 from shakelib.station import StationList
 
 from strec.gmreg import Regionalizer
@@ -268,7 +267,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     dx.rvolc = np.zeros_like(dx.rjb)
 
     # Sites context
-    sx = SitesContext()
+    sx = SMSitesContext()
     # Set to soft soil conditions
     sx.sids = np.array(range(size))
     sx.vs30 = np.full(size, 180.0)
