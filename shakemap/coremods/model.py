@@ -1627,9 +1627,17 @@ class ModelModule(CoreModule):
         #
         if imtstr == 'MMI':
             ampgrid = np.clip(ampgrid, 1.0, 10.0)
+        #
+        # The conditional mean
+        #
         self.outgrid[imtstr] = ampgrid
+        #
+        # The outputs are the conditional total stddev, the conditional
+        # between-event stddev (tau), and the prior within-event stddev (phi)
+        #
         self.outsd[imtstr] = np.sqrt(sdgrid_phi**2 + sdgrid_tau)
-        self.outphi[imtstr] = sdgrid_phi
+        # self.outphi[imtstr] = sdgrid_phi
+        self.outphi[imtstr] = self.psd[imtstr]
         self.outtau[imtstr] = np.sqrt(sdgrid_tau)
 
         self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
