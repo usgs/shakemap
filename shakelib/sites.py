@@ -13,14 +13,6 @@ import numpy as np
 from shakelib.utils.exception import ShakeLibException
 
 
-class SMSitesContext(SitesContext):
-    """
-    Dummy class to provide a len() operator to the OpenQuake SitesContext.
-    """
-    def __len__(self):
-        return len(self.sids)
-
-
 class Sites(object):
     """
     An object to encapsulate information used to generate a GEM
@@ -190,7 +182,7 @@ class Sites(object):
                 dimensionality.
 
         """  # noqa
-        sctx = SMSitesContext()
+        sctx = SitesContext()
 
         if lldict is not None:
             lats = lldict['lats']
