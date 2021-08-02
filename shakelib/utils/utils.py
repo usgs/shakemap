@@ -4,6 +4,7 @@ import logging
 from openquake.hazardlib import imt
 from openquake.hazardlib import const
 from openquake.hazardlib.geo.utils import OrthographicProjection
+from openquake.hazardlib.gsim.base import SitesContext
 from openquake.hazardlib.gsim.base import DistancesContext
 from openquake.hazardlib.gsim.base import RuptureContext
 
