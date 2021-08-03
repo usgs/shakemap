@@ -1267,8 +1267,7 @@ class ModelModule(CoreModule):
                     t1_ix = per_array_ix[ix_good] * ones
                     t2_ix = per_array_ix[ix_good].T * ones.T
                     self.ccf.getCorrelation(t1_ix, t2_ix, matrix22)
-                    corr_adj22 = np.ones_like(matrix22)
-                    make_sigma_matrix(matrix22, corr_adj22,
+                    make_sigma_matrix(matrix22,
                                       sig_array_full[ix_good],
                                       sig_array_full[ix_good])
                     np.fill_diagonal(matrix22, np.diag(matrix22) +
@@ -1380,10 +1379,7 @@ class ModelModule(CoreModule):
                 t1_22 = np.full_like(matrix22, outperiod_ix, dtype=np.long)
                 self.ccf.getCorrelation(t1_22, t1_22, matrix22)
                 sta_phi_flat = sta_phi_dl.flatten()
-                corr_adj22 = np.ones_like(matrix22)
-                make_sigma_matrix(matrix22, corr_adj22,
-                                  sta_phi_flat,
-                                  sta_phi_flat)
+                make_sigma_matrix(matrix22, sta_phi_flat, sta_phi_flat)
                 np.fill_diagonal(matrix22,
                                  np.diag(matrix22) + sta_sig_extra_dl**2)
                 sigma22inv = np.linalg.pinv(matrix22)
@@ -1546,8 +1542,7 @@ class ModelModule(CoreModule):
         t1_22 = np.full_like(matrix22, outperiod_ix, dtype=np.long)
         self.ccf.getCorrelation(t1_22, t1_22, matrix22)
         sta_phi_flat = sta_phi.flatten()
-        corr_adj22 = np.ones_like(matrix22)
-        make_sigma_matrix(matrix22, corr_adj22, sta_phi_flat, sta_phi_flat)
+        make_sigma_matrix(matrix22, sta_phi_flat, sta_phi_flat)
         np.fill_diagonal(matrix22, np.diag(matrix22) + sta_sig_extra**2)
         sigma22inv = np.linalg.pinv(matrix22)
         #
@@ -1570,7 +1565,6 @@ class ModelModule(CoreModule):
         lats_out_rad = self.lats_out_rad
         d12_cols = self.smnx
         t2_12 = np.full((d12_cols, nsta), outperiod_ix, dtype=np.long)
-        corr_adj12 = np.ones_like(t2_12, dtype=np.float64)
         # sdsta is the standard deviation of the stations
         sdsta_phi = self.sta_phi[imtstr].flatten()
         matrix12_phi = np.empty(t2_12.shape, dtype=np.double)
@@ -1589,7 +1583,7 @@ class ModelModule(CoreModule):
             time4 = time.time()
             # sdarr is the standard deviation of the output sites
             sdarr_phi = self.psd[imtstr][iy, :]
-            make_sigma_matrix(matrix12_phi, corr_adj12, sdsta_phi, sdarr_phi)
+            make_sigma_matrix(matrix12_phi, sdsta_phi, sdarr_phi)
             stime += time.time() - time4
             time4 = time.time()
             #
