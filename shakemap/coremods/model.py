@@ -627,7 +627,10 @@ class ModelModule(CoreModule):
                 lons, lats, vs30, idents = in_sites.item()
                 self.idents = [idents]
             else:
-                lons, lats, vs30, self.idents = zip(*in_sites)
+                try:
+                    lons, lats, vs30, self.idents = zip(*in_sites)
+                except Exception:
+                    lons, lats, vs30, self.idents = zip(in_sites)
             self.lons = np.array(lons).reshape(1, -1)
             self.lats = np.array(lats).reshape(1, -1)
             self.vs30 = np.array(vs30).reshape(1, -1)
@@ -1275,7 +1278,9 @@ class ModelModule(CoreModule):
 
                     sigma22inv = np.linalg.pinv(matrix22)
 
+                    h = dist_matrix_full[i + step, sta_list_ix]
                     dist12 = h[ix_good].copy().reshape((-1, 1))
+
                     t11_ix = np.ones(ngood, dtype=np.long).reshape((-1, 1)) * \
                         self.imt_per_ix[imtstr]
                     t21_ix = per_array_ix[ix_good]
@@ -1288,7 +1293,7 @@ class ModelModule(CoreModule):
 
                     mu = (sdf[imtstr + '_pred'][i] + rcmatrix.dot(
                           resid_array_full[ix_good]))[0, 0]
-                    sd = (sdf[imtstr + '_pred_sigma'][i] -
+                    sd = np.sqrt(sdf[imtstr + '_pred_sigma'][i]**2 -
                           rcmatrix.dot(sigma12.T))[0, 0]
                     #
                     # Save the result
