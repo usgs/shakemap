@@ -17,7 +17,7 @@ filepath='current/products'
 
 plotfiles=""
 
-for i in 01 02 03 04 05 06 07 08a 08b 08c 08d 08e 09 10 11
+for i in 01 02 03 04 04b 05 06 07 08a 08b 08c 08d 08e 09 10 11
 do
     vtest="verification_test_00$i"
     `shake $vtest assemble model`
