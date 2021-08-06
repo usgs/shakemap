@@ -2402,6 +2402,14 @@ class ModelModule(CoreModule):
         if 'MMI' in oqimt:
             pe = self.ipe
             sd_types = self.ipe_stddev_types
+
+            if not self.use_simulations:
+                if not hasattr(self, '_info'):
+                    self._info = {
+                        'multigmpe': {}
+                    }
+            else:
+                self._info = {}
         else:
             pe = gmpe
             sd_types = self.gmpe_stddev_types
