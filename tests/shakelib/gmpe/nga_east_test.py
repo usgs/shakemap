@@ -10,6 +10,7 @@ import openquake.hazardlib.imt as imt
 from openquake.hazardlib.const import StdDev
 
 from shakelib.gmpe.nga_east import NGAEast
+from shakelib.multigmpe import stuff_context
 
 home_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(home_dir, 'nga_east_data')
@@ -47,9 +48,11 @@ def update_results():
             result[ikey][str(mag)] = {}
             for vs30 in VS30:
                 sx.vs30 = np.full_like(dx.rrup, vs30)
+                sx.sids = np.array(list(range(len(sx.vs30))))
                 result[ikey][str(mag)][str(vs30)] = {}
+                ctx = stuff_context(sx, rx, dx)
                 lmean, lsd = gmpe.get_mean_and_stddevs(
-                    sx, rx, dx, i, stddev_types)
+                    ctx, ctx, ctx, i, stddev_types)
                 result[ikey][str(mag)][str(vs30)]['lmean'] = lmean.tolist()
                 result[ikey][str(mag)][str(vs30)]['lsd'] = lsd[0].tolist()
     # Save results
@@ -71,8 +74,10 @@ def test_nga_east():
             rx.mag = mag
             for vs30 in VS30:
                 sx.vs30 = np.full_like(dx.rrup, vs30)
+                sx.sids = np.array(list(range(len(sx.vs30))))
+                ctx = stuff_context(sx, rx, dx)
                 lmean, lsd = gmpe.get_mean_and_stddevs(
-                    sx, rx, dx, i, stddev_types)
+                    ctx, ctx, ctx, i, stddev_types)
                 tmean = np.array(target[ikey][str(mag)][str(vs30)]['lmean'])
                 np.testing.assert_allclose(lmean, tmean, rtol=1e-6, atol=1e-6)
                 tsd = np.array(target[ikey][str(mag)][str(vs30)]['lsd'])

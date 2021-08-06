@@ -18,42 +18,42 @@ class Dummy(object):
     pass
 
 
-def make_generic_amps():
-    imts = ['PGA', 'SA(0.3)', 'SA(1.0)', 'SA(3.0)']
-    install_path, _ = get_config_paths()
-    geodict = {'dx': 0.016666666666666666,
-               'dy': 0.016666666666666666,
-               'nx': 301,
-               'ny': 151,
-               'xmax': -116.0,
-               'xmin': -121.0,
-               'ymax': 35.5,
-               'ymin': 33.0}
-    gd = GeoDict(geodict)
-
-    # make east-west file (1s on the left, 0s on the right)
-    data = np.ones((gd.ny, gd.nx))
-    data[:, 151:] = 0
-    outfolder = os.path.join(install_path, 'data', 'GenericAmpFactors')
-    east_west_file = os.path.join(outfolder, 'Test_basin_east_west.hdf')
-    east_west = GridHDFContainer.create(east_west_file)
-    for imt in imts:
-        grid = Grid2D(data, gd)
-        east_west.setGrid(imt, grid)
-    east_west.close()
-
-    # make east-west file (1s on the left, 0s on the right)
-    data = np.ones((gd.ny, gd.nx))
-    data[76:151, :] = 0
-    outfolder = os.path.join(install_path, 'data', 'GenericAmpFactors')
-    north_south_file = os.path.join(outfolder, 'Test_basin_north_south.hdf')
-    north_south = GridHDFContainer.create(north_south_file)
-    for imt in imts:
-        grid = Grid2D(data, gd)
-        north_south.setGrid(imt, grid)
-    north_south.close()
-
-    return (east_west_file, north_south_file)
+# def make_generic_amps():
+#     imts = ['PGA', 'SA(0.3)', 'SA(1.0)', 'SA(3.0)']
+#     install_path, _ = get_config_paths()
+#     geodict = {'dx': 0.016666666666666666,
+#                'dy': 0.016666666666666666,
+#                'nx': 301,
+#                'ny': 151,
+#                'xmax': -116.0,
+#                'xmin': -121.0,
+#                'ymax': 35.5,
+#                'ymin': 33.0}
+#     gd = GeoDict(geodict)
+#
+#     # make east-west file (1s on the left, 0s on the right)
+#     data = np.ones((gd.ny, gd.nx))
+#     data[:, 151:] = 0
+#     outfolder = os.path.join(install_path, 'data', 'GenericAmpFactors')
+#     east_west_file = os.path.join(outfolder, 'Test_basin_east_west.hdf')
+#     east_west = GridHDFContainer.create(east_west_file)
+#     for imt in imts:
+#         grid = Grid2D(data, gd)
+#         east_west.setGrid(imt, grid)
+#     east_west.close()
+#
+#     # make east-west file (1s on the left, 0s on the right)
+#     data = np.ones((gd.ny, gd.nx))
+#     data[76:151, :] = 0
+#     outfolder = os.path.join(install_path, 'data', 'GenericAmpFactors')
+#     north_south_file = os.path.join(outfolder, 'Test_basin_north_south.hdf')
+#     north_south = GridHDFContainer.create(north_south_file)
+#     for imt in imts:
+#         grid = Grid2D(data, gd)
+#         north_south.setGrid(imt, grid)
+#     north_south.close()
+#
+#     return (east_west_file, north_south_file)
 
 
 def test_generic_amp():
@@ -80,10 +80,10 @@ def test_generic_amp():
         gaf = get_generic_amp_factors(sx, 'PGA')
         assert gaf is None
         shutil.move(tmpout, outfolder)
-        gaf = get_generic_amp_factors(sx, 'PGA')
-        assert gaf is None
+        # gaf = get_generic_amp_factors(sx, 'PGA')
+        # assert gaf is None
 
-        east_west_file, north_south_file = make_generic_amps()
+        # east_west_file, north_south_file = make_generic_amps()
 
         gaf = get_generic_amp_factors(sx, 'PGA')
         gaf_target = np.array(
@@ -168,8 +168,9 @@ def test_generic_amp():
     except Exception:
         assert 1 == 2
     finally:
-        os.remove(east_west_file)
-        os.remove(north_south_file)
+        pass
+        # os.remove(east_west_file)
+        # os.remove(north_south_file)
 
 
 if __name__ == '__main__':
