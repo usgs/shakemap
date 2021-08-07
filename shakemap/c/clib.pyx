@@ -10,27 +10,23 @@ from libc.math cimport (sqrt,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def make_sigma_matrix(double[:, ::1]corr12, double[:, ::1]corr_adj12,
-                      double[:]sdsta, double[:]sdarr):
+def make_sigma_matrix(double[:, ::1]corr12, double[:]sdsta, double[:]sdarr):
     cdef Py_ssize_t ny = corr12.shape[0]
     cdef Py_ssize_t nx = corr12.shape[1]
 
     cdef double *c12p
-    cdef double *cap
     cdef double sdval
     cdef double tmp
     cdef Py_ssize_t x, y
 
     for y in prange(ny, nogil=True, schedule=dynamic):
         c12p = &corr12[y, 0]
-        cap = &corr_adj12[y, 0]
         sdval = sdarr[y]
         for x in range(nx):
             # Putting these operations all on one line seems to
             # allow the compiler to do things that result in the
             # output matrix being very slightly asymmetric.
             tmp = sdsta[x] * sdval
-            tmp = cap[x] * tmp
             c12p[x] = c12p[x] * tmp
     return
 

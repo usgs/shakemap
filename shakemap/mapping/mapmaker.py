@@ -1715,7 +1715,7 @@ def draw_uncertainty_map(adict, key, override_scenario=False):
     bottom, top = cax.get_ylim()
     plt.xlim(cax_xmin, cax_xmax)
     plt.ylim(bottom, top)
-    plt.colorbar(orientation='horizontal')
+    plt.colorbar(ax=cax, orientation='horizontal')
 
     plt.draw()
 

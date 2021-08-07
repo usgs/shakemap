@@ -1,0 +1,8 @@
+The codes in this directory may prove of some use to someone. They
+demonstrate access to some ShakeMap output files, and could be modified
+to do more interesting things.
+
+hdf2dict.py: Reads shake_result.hdf and outputs a dictionary of some MMI
+             grids and metadata.
+json2dict.py: Reads stationlist.json and outputs a dictionary of some MMI
+              station data.

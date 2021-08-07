@@ -38,7 +38,7 @@ from shakelib.rupture.origin import Origin
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.point_rupture import PointRupture
 import shakelib.sites as sites
-from shakelib.sites import Sites, SMSitesContext
+from shakelib.sites import Sites
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
@@ -56,8 +56,8 @@ def test_basic():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
-    sctx_rock = SMSitesContext()
+    sctx = SitesContext()
+    sctx_rock = SitesContext()
 
     rctx.rake = 0.0
     rctx.dip = 90.0
@@ -210,8 +210,8 @@ def test_from_config_set_of_sets():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
-    sctx_rock = SMSitesContext()
+    sctx = SitesContext()
+    sctx_rock = SitesContext()
     sctx.sids = np.array(range(size))
     sctx_rock.sids = np.array(range(size))
 
@@ -339,8 +339,8 @@ def test_from_config_set_of_gmpes():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
-    sctx_rock = SMSitesContext()
+    sctx = SitesContext()
+    sctx_rock = SitesContext()
     sctx.sids = np.array(range(size))
     sctx_rock.sids = np.array(range(size))
 
@@ -446,8 +446,8 @@ def test_from_config_set_of_sets_3_sec():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
-    sctx_rock = SMSitesContext()
+    sctx = SitesContext()
+    sctx_rock = SitesContext()
     sctx.sids = np.array(range(size))
     sctx_rock.sids = np.array(range(size))
 
@@ -540,8 +540,8 @@ def test_from_config_single_gmpe():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
-    sctx_rock = SMSitesContext()
+    sctx = SitesContext()
+    sctx_rock = SitesContext()
     sctx.sids = np.array(range(size))
     sctx_rock.sids = np.array(range(size))
 
@@ -587,7 +587,7 @@ def test_nga_w2_m8():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
+    sctx = SitesContext()
     sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0  # assumed for 'strike slip'
@@ -845,7 +845,7 @@ def test_nga_w2_m6():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
+    sctx = SitesContext()
     sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0  # assumed for 'strike slip'
@@ -1096,7 +1096,7 @@ def test_multigmpe_get_site_factors():
 
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
+    sctx = SitesContext()
     sctx.sids = np.array(range(1))
 
     rctx.rake = 0.0
@@ -1287,7 +1287,7 @@ def test_point_source_stddev_inflation():
 
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
+    sctx = SitesContext()
     sctx.sids = np.array(range(2))
     sctx.lats = np.array([34.1, 34.1])
     sctx.lons = np.array([-118.15, -117.8])
@@ -1564,7 +1564,7 @@ def test_multigmpe_exceptions():
     size = 100
     rctx = RuptureContext()
     dctx = DistancesContext()
-    sctx = SMSitesContext()
+    sctx = SitesContext()
     sctx.sids = np.array(range(size))
 
     rctx.rake = 0.0

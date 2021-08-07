@@ -376,8 +376,8 @@ class ModelModule(CoreModule):
         self.sta_phi = {}
         self.sta_tau = {}
         self.sta_sig_extra = {}
+        self.sta_rrups = {}
         self.sta_imtstr = {}
-        self.sigma22inv_phi = {}
 
         self._fillDataArrays()
 
@@ -627,7 +627,10 @@ class ModelModule(CoreModule):
                 lons, lats, vs30, idents = in_sites.item()
                 self.idents = [idents]
             else:
-                lons, lats, vs30, self.idents = zip(*in_sites)
+                try:
+                    lons, lats, vs30, self.idents = zip(*in_sites)
+                except Exception:
+                    lons, lats, vs30, self.idents = zip(in_sites)
             self.lons = np.array(lons).reshape(1, -1)
             self.lats = np.array(lats).reshape(1, -1)
             self.vs30 = np.array(vs30).reshape(1, -1)
@@ -1224,6 +1227,7 @@ class ModelModule(CoreModule):
                         tau.append(sdf[imtstr + '_pred_tau'][i])
                         phi.append(sdf[imtstr + '_pred_phi'][i])
                         sig_extra.append(sdf[imtstr + '_sd'][i])
+                        rrups.append(sdf['rrup'][i])
                         continue
                     #
                     # There are no alternatives for PGV or MMI -- if we
@@ -1266,8 +1270,7 @@ class ModelModule(CoreModule):
                     t1_ix = per_array_ix[ix_good] * ones
                     t2_ix = per_array_ix[ix_good].T * ones.T
                     self.ccf.getCorrelation(t1_ix, t2_ix, matrix22)
-                    corr_adj22 = np.ones_like(matrix22)
-                    make_sigma_matrix(matrix22, corr_adj22,
+                    make_sigma_matrix(matrix22,
                                       sig_array_full[ix_good],
                                       sig_array_full[ix_good])
                     np.fill_diagonal(matrix22, np.diag(matrix22) +
@@ -1275,7 +1278,9 @@ class ModelModule(CoreModule):
 
                     sigma22inv = np.linalg.pinv(matrix22)
 
+                    h = dist_matrix_full[i + step, sta_list_ix]
                     dist12 = h[ix_good].copy().reshape((-1, 1))
+
                     t11_ix = np.ones(ngood, dtype=np.long).reshape((-1, 1)) * \
                         self.imt_per_ix[imtstr]
                     t21_ix = per_array_ix[ix_good]
@@ -1288,13 +1293,11 @@ class ModelModule(CoreModule):
 
                     mu = (sdf[imtstr + '_pred'][i] + rcmatrix.dot(
                           resid_array_full[ix_good]))[0, 0]
-                    sd = (sdf[imtstr + '_pred_sigma'][i] -
+                    sd = np.sqrt(sdf[imtstr + '_pred_sigma'][i]**2 -
                           rcmatrix.dot(sigma12.T))[0, 0]
-
                     #
                     # Save the result
                     #
-
                     imtlist.append(imtstr)
                     lons_rad.append(sdf['lon_rad'][i])
                     lats_rad.append(sdf['lat_rad'][i])
@@ -1302,6 +1305,7 @@ class ModelModule(CoreModule):
                     tau.append(sdf[imtstr + '_pred_tau'][i])
                     phi.append(sdf[imtstr + '_pred_phi'][i])
                     sig_extra.append(sd)
+                    rrups.append(sdf['rrup'][i])
                 #
                 # We may be switching to the second dataframe, but the
                 # distance matrix has both sandwitched together, so we
@@ -1320,6 +1324,7 @@ class ModelModule(CoreModule):
             self.sta_tau[imtstr] = np.array(tau).reshape((-1, 1))
             self.sta_phi[imtstr] = np.array(phi).reshape((-1, 1))
             self.sta_sig_extra[imtstr] = np.array(sig_extra)
+            self.sta_rrups[imtstr] = np.array(rrups)
 
     def _computeBias(self):
         """
@@ -1335,46 +1340,70 @@ class ModelModule(CoreModule):
             # Get the index of the (pseudo-) period of the output IMT
             #
             outperiod_ix = self.imt_per_ix[imtstr]
-            sta_lons_rad = self.sta_lons_rad[imtstr]
-            sta_lats_rad = self.sta_lats_rad[imtstr]
-            sta_tau = self.sta_tau[imtstr]
-            sta_phi = self.sta_phi[imtstr]
-            sta_resids = self.sta_resids[imtstr]
-            sta_sig_extra = self.sta_sig_extra[imtstr]
+            #
+            # Get the distance-limited set of data for use in computing
+            # the bias
+            #
+            dix = self.sta_rrups[imtstr] <= self.bias_max_range
+            sta_lons_rad_dl = self.sta_lons_rad[imtstr][dix]
+            sta_lats_rad_dl = self.sta_lats_rad[imtstr][dix]
+            sta_tau_dl = self.sta_tau[imtstr][dix]
+            sta_phi_dl = self.sta_phi[imtstr][dix]
+            sta_resids_dl = self.sta_resids[imtstr][dix]
+            sta_sig_extra_dl = self.sta_sig_extra[imtstr][dix]
             #
             # Build the covariance matrix of the residuals and its inverse
             # We need this whether or not we actually compute the bias
             #
-            nsta = np.size(sta_lons_rad)
-            matrix22 = np.empty((nsta, nsta), dtype=np.double)
-            geodetic_distance_fast(sta_lons_rad, sta_lats_rad,
-                                   sta_lons_rad, sta_lats_rad, matrix22)
-            t1_22 = np.full_like(matrix22, outperiod_ix, dtype=np.long)
-            self.ccf.getCorrelation(t1_22, t1_22, matrix22)
-            sta_phi_flat = sta_phi.flatten()
-            corr_adj22 = np.ones_like(matrix22)
-            make_sigma_matrix(matrix22, corr_adj22,
-                              sta_phi_flat,
-                              sta_phi_flat)
-            np.fill_diagonal(matrix22, np.diag(matrix22) + sta_sig_extra**2)
-            sigma22inv = np.linalg.pinv(matrix22)
-            self.sigma22inv_phi[imtstr] = sigma22inv
-            #
-            # Compute the bias numerator and denominator pieces
-            #
+            nsta = np.size(sta_lons_rad_dl)
+            if nsta == 0:
+                self.bias_num[imtstr] = 0.0
+                self.bias_den[imtstr] = 0.0
+                self.nominal_bias[imtstr] = 0.0
+                nom_variance = 0.0
+                bias_time = time.time() - time1
+                #
+                # Write the nominal values of the bias and its stddev to log
+                #
+                self.logger.debug(
+                    '%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
+                    % (imtstr, self.nominal_bias[imtstr],
+                       np.sqrt(nom_variance),
+                       nsta, bias_time))
+                continue
+
             if self.do_bias and (not isinstance(self.rupture_obj, PointRupture)
                                  or self.rx.mag <= self.bias_max_mag):
-                var_H_y2 = 1.0 / (1.0 + sta_tau.T.dot(sigma22inv.dot(sta_tau)))
-                mu_H_y2 = sta_tau.T.dot(sigma22inv.dot(sta_resids)) * var_H_y2
+                #
+                # Make the distance-limited version of sigma22inv
+                #
+                matrix22 = np.empty((nsta, nsta), dtype=np.double)
+                geodetic_distance_fast(sta_lons_rad_dl, sta_lats_rad_dl,
+                                       sta_lons_rad_dl, sta_lats_rad_dl,
+                                       matrix22)
+                t1_22 = np.full_like(matrix22, outperiod_ix, dtype=np.long)
+                self.ccf.getCorrelation(t1_22, t1_22, matrix22)
+                sta_phi_flat = sta_phi_dl.flatten()
+                make_sigma_matrix(matrix22, sta_phi_flat, sta_phi_flat)
+                np.fill_diagonal(matrix22,
+                                 np.diag(matrix22) + sta_sig_extra_dl**2)
+                sigma22inv = np.linalg.pinv(matrix22)
+                #
+                # Compute the bias numerator and denominator pieces
+                #
+                var_H_y2 = 1.0 / (1.0 +
+                                  sta_tau_dl.T.dot(sigma22inv.dot(sta_tau_dl)))
+                mu_H_y2 = \
+                    sta_tau_dl.T.dot(sigma22inv.dot(sta_resids_dl)) * var_H_y2
                 self.bias_num[imtstr] = mu_H_y2[0][0]
                 self.bias_den[imtstr] = var_H_y2[0][0]
             else:
                 self.bias_num[imtstr] = 0.0
                 self.bias_den[imtstr] = 0.0
 
-            mu_B2_y2 = sta_tau * self.bias_num[imtstr]
+            mu_B2_y2 = self.sta_tau[imtstr] * self.bias_num[imtstr]
             self.nominal_bias[imtstr] = np.mean(mu_B2_y2)
-            var_B2B2_y2 = sta_tau**2 * self.bias_den[imtstr]
+            var_B2B2_y2 = self.sta_tau[imtstr]**2 * self.bias_den[imtstr]
             nom_variance = np.mean(var_B2B2_y2)
 
             bias_time = time.time() - time1
@@ -1493,7 +1522,8 @@ class ModelModule(CoreModule):
         # If there are no data, just use the unbiased prediction
         # and the stddev
         #
-        if np.size(self.sta_lons_rad[imtstr]) == 0:
+        nsta = np.size(self.sta_lons_rad[imtstr])
+        if nsta == 0:
             self.outgrid[imtstr] = pout_mean
             self.outsd[imtstr] = pout_sd[0]
             self.outphi[imtstr] = self.psd[imtstr]
@@ -1506,6 +1536,20 @@ class ModelModule(CoreModule):
         sta_tau = self.sta_tau[imtstr]
         sta_lons_rad = self.sta_lons_rad[imtstr]
         sta_lats_rad = self.sta_lats_rad[imtstr]
+        sta_sig_extra = self.sta_sig_extra[imtstr]
+        #
+        # Compute the full Sigma22inv matrix
+        #
+        matrix22 = np.empty((nsta, nsta), dtype=np.double)
+        geodetic_distance_fast(sta_lons_rad, sta_lats_rad,
+                               sta_lons_rad, sta_lats_rad,
+                               matrix22)
+        t1_22 = np.full_like(matrix22, outperiod_ix, dtype=np.long)
+        self.ccf.getCorrelation(t1_22, t1_22, matrix22)
+        sta_phi_flat = sta_phi.flatten()
+        make_sigma_matrix(matrix22, sta_phi_flat, sta_phi_flat)
+        np.fill_diagonal(matrix22, np.diag(matrix22) + sta_sig_extra**2)
+        sigma22inv = np.linalg.pinv(matrix22)
         #
         # Compute the biased residuals and output means
         #
@@ -1526,7 +1570,6 @@ class ModelModule(CoreModule):
         lats_out_rad = self.lats_out_rad
         d12_cols = self.smnx
         t2_12 = np.full((d12_cols, nsta), outperiod_ix, dtype=np.long)
-        corr_adj12 = np.ones_like(t2_12, dtype=np.float64)
         # sdsta is the standard deviation of the stations
         sdsta_phi = self.sta_phi[imtstr].flatten()
         matrix12_phi = np.empty(t2_12.shape, dtype=np.double)
@@ -1545,14 +1588,14 @@ class ModelModule(CoreModule):
             time4 = time.time()
             # sdarr is the standard deviation of the output sites
             sdarr_phi = self.psd[imtstr][iy, :]
-            make_sigma_matrix(matrix12_phi, corr_adj12, sdsta_phi, sdarr_phi)
+            make_sigma_matrix(matrix12_phi, sdsta_phi, sdarr_phi)
             stime += time.time() - time4
             time4 = time.time()
             #
             # Sigma12 * Sigma22^-1 is known as the 'regression
             # coefficient' matrix (rcmatrix)
             #
-            np.dot(matrix12_phi, self.sigma22inv_phi[imtstr], out=rcmatrix_phi)
+            np.dot(matrix12_phi, sigma22inv, out=rcmatrix_phi)
             dtime += time.time() - time4
             time4 = time.time()
 
@@ -1583,9 +1626,17 @@ class ModelModule(CoreModule):
         #
         if imtstr == 'MMI':
             ampgrid = np.clip(ampgrid, 1.0, 10.0)
+        #
+        # The conditional mean
+        #
         self.outgrid[imtstr] = ampgrid
+        #
+        # The outputs are the conditional total stddev, the conditional
+        # between-event stddev (tau), and the prior within-event stddev (phi)
+        #
         self.outsd[imtstr] = np.sqrt(sdgrid_phi**2 + sdgrid_tau)
-        self.outphi[imtstr] = sdgrid_phi
+        # self.outphi[imtstr] = sdgrid_phi
+        self.outphi[imtstr] = self.psd[imtstr]
         self.outtau[imtstr] = np.sqrt(sdgrid_tau)
 
         self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
@@ -2351,6 +2402,14 @@ class ModelModule(CoreModule):
         if 'MMI' in oqimt:
             pe = self.ipe
             sd_types = self.ipe_stddev_types
+
+            if not self.use_simulations:
+                if not hasattr(self, '_info'):
+                    self._info = {
+                        'multigmpe': {}
+                    }
+            else:
+                self._info = {}
         else:
             pe = gmpe
             sd_types = self.gmpe_stddev_types
