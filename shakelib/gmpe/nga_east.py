@@ -135,6 +135,11 @@ class NGAEast(GMPE):
 
         # Is magnitude less than 4? If so, we will need to set it to 4.0 and
         # then extrapolate the tables at the end.
+        # But... in the brave new world of new OpenQuake, sites, rx, and
+        # dists are all exactly the same object, so when we copy rx to
+        # rup, and change it, as well as when we change the distances
+        # below, we need to do it all in rup, then pass rup as all three
+        # contexts when we call the gmpe.get_mean_and_stddevs()
         rup = copy.deepcopy(rx)
         if rup.mag < 4.0:
             is_small_mag = True
@@ -184,8 +189,8 @@ class NGAEast(GMPE):
         for i in range(len(stddev_types)):
             stddevs.append(np.full_like(sites.vs30, 0))
 
-        # Apply max distance to dists.rrup
-        np.clip(dists.rrup, 0, MAX_RRUP)
+        # Apply max distance to dists.rrup -->> now rup.rrup
+        np.clip(rup.rrup, 0, MAX_RRUP)
 
         # Since we will be dropping the models that don't have PGV,
         # we now also need to track the total sum of weights for when
@@ -204,7 +209,7 @@ class NGAEast(GMPE):
                 except Exception:
                     logging.error("Unexpected error:", sys.exc_info()[0])
             tmean, tstddevs = gm.get_mean_and_stddevs(
-                sites, rup, dists, imt, stddev_types)
+                rup, rup, rup, imt, stddev_types)
             mean += tmean * total_gmpe_weights[i]
             for j, sd in enumerate(tstddevs):
                 stddevs[j] += sd * total_gmpe_weights[i]
@@ -219,19 +224,19 @@ class NGAEast(GMPE):
                 stddevs[j] = stddevs[j] / np.sum(twts)
 
         # Zero out values at distances beyond the range for which NGA East
-        # was defined.
-        mean[dists.rrup > MAX_RRUP] = -999.0
+        # was defined. -->> was dists.rrup, now rup.rrup
+        mean[rup.rrup > MAX_RRUP] = -999.0
 
         # Do we need to extrapolate for small magnitude factor?
         if is_small_mag:
             if is_pga:
                 slopes = np.interp(
-                    np.log(dists.rrup),
+                    np.log(rup.rrup),
                     np.log(self.SMALL_M_DIST),
                     self.SMALL_M_SLOPE_PGA)
             elif is_pgv:
                 slopes = np.interp(
-                    np.log(dists.rrup),
+                    np.log(rup.rrup),
                     np.log(self.SMALL_M_DIST),
                     self.SMALL_M_SLOPE_PGV)
             else:
@@ -240,7 +245,7 @@ class NGAEast(GMPE):
                     np.log(self.SMALL_M_PER),
                     self.SMALL_M_SLOPE, kx=1, ky=1)
                 slopes = interp_obj.ev(
-                    np.log(dists.rrup),
+                    np.log(rup.rrup),
                     np.log(imt.period)
                 )
             mean = mean + slopes * delta_mag
