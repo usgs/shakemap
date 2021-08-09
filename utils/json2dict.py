@@ -49,19 +49,21 @@ def get_station_dict(filename):
         if not properties['intensity_flag'] == '0':
             continue
         intensity = properties['intensity']
-        intensitylist.append(intensity)
-        extra_sigma_list.append(properties['intensity_stddev'])
+        if intensity is None or intensity == 'null':
+            continue
+        intensitylist.append(float(intensity))
+        extra_sigma_list.append(float(properties['intensity_stddev']))
         for pred in properties['predictions']:
             if not pred['name'] == 'mmi':
                 continue
-            residuallist.append(intensity - pred['value'])
-            philist.append(pred['phi'])
-            taulist.append(pred['tau'])
-            bias_list.append(pred['bias'])
-            bias_sigma_list.append(pred['bias_sigma'])
+            residuallist.append(float(intensity) - float(pred['value']))
+            philist.append(float(pred['phi']))
+            taulist.append(float(pred['tau']))
+            bias_list.append(float(pred['bias']))
+            bias_sigma_list.append(float(pred['bias_sigma']))
             break
-        lonlist.append(station['geometry']['coordinates'][0])
-        latlist.append(station['geometry']['coordinates'][1])
+        lonlist.append(float(station['geometry']['coordinates'][0]))
+        latlist.append(float(station['geometry']['coordinates'][1]))
 
     sdict = {
         'lons': np.array(lonlist),
