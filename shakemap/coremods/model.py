@@ -52,13 +52,6 @@ from shakemap.c.clib import (make_sigma_matrix,
 from shakelib.directivity.rowshandel2013 import Rowshandel2013
 
 #
-# TODO: Some constants; these should maybe be in a configuration
-# or in a constants module or be GMICE-specific.
-#
-# default_mmi_stddev: the standard deviation of MMI values if it
-#                     is not specified in the input
-# min_mmi_convert: the minimum MMI to convert to PGM -- low
-#                  intensities don't convert very accurately
 # default_stddev_inter: This is a stand-in for tau when the gmpe set
 #                       doesn't provide it. It is an educated guess based
 #                       on the NGA-west, Akkar et al, and BC Hydro gmpes.
@@ -72,8 +65,6 @@ from shakelib.directivity.rowshandel2013 import Rowshandel2013
 #                       within-event stddev (phi).
 #
 SM_CONSTS = {
-    'default_mmi_stddev': 0.3,
-    'min_mmi_convert': 4.0,
     'default_stddev_inter': 0.55,
     'default_stddev_inter_mmi': 0.55
 }
@@ -960,7 +951,7 @@ class ModelModule(CoreModule):
                 # the default value
                 #
                 if imtstr == 'MMI' and all(df['MMI_sd'] == 0):
-                    df['MMI_sd'][:] = SM_CONSTS['default_mmi_stddev']
+                    df['MMI_sd'][:] = self.config['data']['default_mmi_stddev']
             #
             # Get the lons/lats in radians while we're at it
             #
@@ -1007,8 +998,8 @@ class ModelModule(CoreModule):
                 df2[imtstr], _ = self.gmice.getGMfromMI(df2['MMI'], oqimt,
                                                         dists=df2['rrup'],
                                                         mag=self.rx.mag)
-                df2[imtstr][df2['MMI'] < SM_CONSTS['min_mmi_convert']] = \
-                    np.nan
+                df2[imtstr][df2['MMI'] < \
+                            self.config['data']['min_mmi_convert']] = np.nan
                 np.seterr(invalid='warn')
                 df2[imtstr + '_sd'] = \
                     np.full_like(df2['MMI'], self.gmice.getMI2GMsd()[oqimt])
