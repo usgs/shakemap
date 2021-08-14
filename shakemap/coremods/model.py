@@ -317,7 +317,7 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         self._deriveIMTsFromMMI()
         # ---------------------------------------------------------------------
-
+        # Now make MMI from the station data where possible
         # ---------------------------------------------------------------------
         self._deriveMMIFromIMTs()
 
@@ -358,18 +358,16 @@ class ModelModule(CoreModule):
         # the additional sigma (if any) of the point-source to finite
         # rupture approximation.
         # ---------------------------------------------------------------------
-        self.nominal_bias = {}
-        self.bias_num = {}  # The numerator term of the bias
-        self.bias_den = {}  # The denominator of the bias (w/o the tau term)
+        self.nominal_bias = {}  # holds an average bias for each IMT
         self.psd_raw = {}   # raw phi (intra-event stddev) of the output points
         self.psd = {}       # phi (intra-event stddev) of the output points
         self.tsd = {}       # tau (inter-event stddev) of the output points
-
         #
         # These are arrays (keyed by IMT) of the station data that will be
         # used to compute the bias and do the interpolation, they are filled
         # in the _fillDataArrays method
         #
+        self.sta_per_ix = {}
         self.sta_lons_rad = {}
         self.sta_lats_rad = {}
         self.sta_resids = {}
@@ -377,17 +375,34 @@ class ModelModule(CoreModule):
         self.sta_tau = {}
         self.sta_sig_extra = {}
         self.sta_rrups = {}
-        self.sta_imtstr = {}
+        #
+        # These are useful matrices that we compute in the bias function
+        # that we can reuse in the MVN function
+        #
+        self.T_D = {}
+        self.cov_WD_WD_inv = {}
+        self.mu_H_yD = {}
+        self.cov_HH_yD = {}
+        #
+        # Some variables and arrays used in both the bias and MVN functions
+        #
+        self.no_native_flag = {}
+        self.imt_types = {}
+        self.len_types = {}
+        self.imt_Y_ind = {}
 
+        # ---------------------------------------------------------------------
+        # Do some prep, the bias, and the directivity prep
+        # ---------------------------------------------------------------------
         self._fillDataArrays()
 
         self._computeBias()
 
         self._computeDirectivityPredictionLocations()
 
-        # ---------------------------------------------------------------------
-        # Now do the MVN with the intra-event residuals
-        # ---------------------------------------------------------------------
+        #
+        # These hold the main outputs of the MVN
+        #
         self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
         self.outphi = {}    # Holds the intra-event standard deviation arrays
@@ -401,6 +416,9 @@ class ModelModule(CoreModule):
         self.atten_rock_sd = {}
         self.atten_soil_sd = {}
 
+        # ---------------------------------------------------------------------
+        # Now do the MVN with the intra-event residuals
+        # ---------------------------------------------------------------------
         self.logger.debug('Doing MVN...')
         if self.max_workers > 0:
             with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
@@ -426,16 +444,16 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         oc.setConfig(self.config)
 
-        #
+        # ---------------------------------------------------------------------
         # We're going to need masked arrays of the output grids later, so
         # make them now.
-        #
+        # ---------------------------------------------------------------------
         moutgrid = self._getMaskedGrids(landmask)
 
-        #
+        # ---------------------------------------------------------------------
         # Get the info dictionary that will become info.json, and
         # store it in the output container
-        #
+        # ---------------------------------------------------------------------
         info = self._getInfo(moutgrid)
         oc.setMetadata(info)
 
@@ -1137,62 +1155,13 @@ class ModelModule(CoreModule):
         index, lons, lats, residuals, tau, phi, additional uncertainty,
         and rupture distance.
         """
-        #
-        # Get the valid imts for each station
-        #
-        first = 0
         imtsets = {}
         sasets = {}
-        full_lon_array = np.array([])
-        full_lat_array = np.array([])
-
-        per_list_ix = []
-        sta_list_ix = []
-        pred_list_full = []
-        sig_list_full = []
-        resid_list_full = []
-        extra_sig_list_full = []
-        nsta = 0
-
         for ndf in ('df1', 'df2'):
             df = getattr(self, ndf, None)
             if df is None:
                 continue
-            sdf = df.df
             imtsets[ndf], sasets[ndf] = _get_imt_lists(df)
-            full_lon_array = np.hstack((full_lon_array, sdf['lon_rad']))
-            full_lat_array = np.hstack((full_lat_array, sdf['lat_rad']))
-
-            nsta = np.size(df.df['lon'])
-
-            for i in range(nsta):
-                for imtstr in imtsets[ndf][i]:
-                    if imtstr in ("PGV", "MMI"):
-                        continue
-                    per_list_ix.append(self.imt_per_ix[imtstr])
-                    sta_list_ix.append(i + first)
-                    pred_list_full.append(sdf[imtstr + '_pred'][i])
-                    sig_list_full.append(sdf[imtstr + '_pred_sigma'][i])
-                    resid_list_full.append(sdf[imtstr + '_residual'][i])
-                    extra_sig_list_full.append(sdf[imtstr + '_sd'][i])
-            first = nsta
-
-        per_array_ix = np.array(per_list_ix).reshape((-1, 1))
-        sta_array_ix = np.array(sta_list_ix)
-        pred_array_full = np.array(pred_list_full).reshape((-1, 1))
-        sig_array_full = np.array(sig_list_full)
-        resid_array_full = np.array(resid_list_full).reshape((-1, 1))
-        extra_sig_array_full = np.array(extra_sig_list_full)
-        nimt = np.size(per_array_ix)
-        #
-        # Find the distances among all of the stations
-        #
-        nsta = np.size(full_lon_array)
-        if nsta > 0:
-            dist_matrix_full = np.empty((nsta, nsta), dtype=np.float64)
-            geodetic_distance_fast(full_lon_array, full_lat_array,
-                                   full_lon_array, full_lat_array,
-                                   dist_matrix_full)
 
         for imtstr in self.imt_out_set:
             #
@@ -1201,7 +1170,6 @@ class ModelModule(CoreModule):
             # array; after the loop, the lists are converted to numpy
             # arrays:
             #
-            imtlist = []    # The input IMT
             lons_rad = []   # longitude (in radians) of the input station
             lats_rad = []   # latitude (in radians) of the input station
             resids = []     # The residual of the input IMT
@@ -1209,7 +1177,7 @@ class ModelModule(CoreModule):
             phi = []        # The within-event stddev of the input IMT
             sig_extra = []  # Additional stddev of the input IMT
             rrups = []      # The rupture distance of the input station
-            step = 0
+            per_ix = []
             for ndf in ('df1', 'df2'):
                 tdf = getattr(self, ndf, None)
                 if tdf is None:
@@ -1217,104 +1185,20 @@ class ModelModule(CoreModule):
                 sdf = tdf.df
                 for i in range(np.size(sdf['lon'])):
                     #
-                    # If the output IMT is in the input, we're done
+                    # Each station can provide 0, 1, or 2 IMTs:
                     #
-                    if imtstr in imtsets[ndf][i]:
-                        imtlist.append(imtstr)
+                    for imtin in _get_nearest_imts(imtstr, imtsets[ndf][i],
+                                                   sasets[ndf][i]):
+                        per_ix.append(self.imt_per_ix[imtin])
                         lons_rad.append(sdf['lon_rad'][i])
                         lats_rad.append(sdf['lat_rad'][i])
-                        resids.append(sdf[imtstr + '_residual'][i])
-                        tau.append(sdf[imtstr + '_pred_tau'][i])
-                        phi.append(sdf[imtstr + '_pred_phi'][i])
-                        sig_extra.append(sdf[imtstr + '_sd'][i])
+                        resids.append(sdf[imtin + '_residual'][i])
+                        tau.append(sdf[imtin + '_pred_tau'][i])
+                        phi.append(sdf[imtin + '_pred_phi'][i])
+                        sig_extra.append(sdf[imtin + '_sd'][i])
                         rrups.append(sdf['rrup'][i])
-                        continue
-                    #
-                    # There are no alternatives for PGV or MMI -- if we
-                    # didn't create them when we had the chance, then
-                    # we can't do it here
-                    #
-                    if imtstr in ("PGV", "MMI"):
-                        continue
-                    #
-                    # Find the correlation between the output IMT at this
-                    # location and every IMT in the input
-                    #
-                    t1_ix = np.full(nimt,
-                                    self.imt_per_ix[imtstr]).reshape((-1, 1))
-                    h = dist_matrix_full[i + step,
-                                         sta_list_ix].copy().reshape((-1, 1))
-                    self.ccf.getCorrelation(t1_ix, per_array_ix, h)
-                    #
-                    # Cull the low-correlation IMTs
-                    #
-                    ix_good = np.where(h > 0.05)[0]
-                    sta_ix_good = sta_array_ix[ix_good]
-                    ngood = np.size(ix_good)
-                    if ngood > 20:
-                        ix_good = (np.argsort(h)[::-1])[0:20, 0]
-                        sta_ix_good = sta_array_ix[ix_good]
-                        ngood = 20
-                    #
-                    # MVN the remainder to this location and IMT
-                    #
-                    if ngood == 0:
-                        continue
-                    matrix22 = np.empty((ngood, ngood), dtype=np.double)
-                    geodetic_distance_fast(full_lon_array[sta_ix_good],
-                                           full_lat_array[sta_ix_good],
-                                           full_lon_array[sta_ix_good],
-                                           full_lat_array[sta_ix_good],
-                                           matrix22)
-                    ones = np.ones((1, ngood), dtype=np.long)
-                    t1_ix = per_array_ix[ix_good] * ones
-                    t2_ix = per_array_ix[ix_good].T * ones.T
-                    self.ccf.getCorrelation(t1_ix, t2_ix, matrix22)
-                    make_sigma_matrix(matrix22,
-                                      sig_array_full[ix_good],
-                                      sig_array_full[ix_good])
-                    np.fill_diagonal(matrix22, np.diag(matrix22) +
-                                     extra_sig_array_full[ix_good])
 
-                    sigma22inv = np.linalg.pinv(matrix22)
-
-                    h = dist_matrix_full[i + step, sta_list_ix]
-                    dist12 = h[ix_good].copy().reshape((-1, 1))
-
-                    t11_ix = np.ones(ngood, dtype=np.long).reshape((-1, 1)) * \
-                        self.imt_per_ix[imtstr]
-                    t21_ix = per_array_ix[ix_good]
-                    self.ccf.getCorrelation(t11_ix, t21_ix, dist12)
-                    sigma12 = (dist12.reshape((-1,)) *
-                               sdf[imtstr + '_pred_sigma'][i] *
-                               sig_array_full[ix_good]).reshape((1, -1))
-
-                    rcmatrix = sigma12.dot(sigma22inv)
-
-                    mu = (sdf[imtstr + '_pred'][i] + rcmatrix.dot(
-                          resid_array_full[ix_good]))[0, 0]
-                    sd = np.sqrt(sdf[imtstr + '_pred_sigma'][i]**2 -
-                          rcmatrix.dot(sigma12.T))[0, 0]
-                    #
-                    # Save the result
-                    #
-                    imtlist.append(imtstr)
-                    lons_rad.append(sdf['lon_rad'][i])
-                    lats_rad.append(sdf['lat_rad'][i])
-                    resids.append(mu - sdf[imtstr + '_pred'][i])
-                    tau.append(sdf[imtstr + '_pred_tau'][i])
-                    phi.append(sdf[imtstr + '_pred_phi'][i])
-                    sig_extra.append(sd)
-                    rrups.append(sdf['rrup'][i])
-                #
-                # We may be switching to the second dataframe, but the
-                # distance matrix has both sandwitched together, so we
-                # need to add the length of the first to our indexing
-                # into it
-                #
-                step = np.size(sdf['lon'])
-
-            self.sta_imtstr[imtstr] = imtlist.copy()
+            self.sta_per_ix[imtstr] = np.array(per_ix)
             self.sta_lons_rad[imtstr] = np.array(lons_rad)
             self.sta_lats_rad[imtstr] = np.array(lats_rad)
             if self.flip_lons:
@@ -1332,33 +1216,32 @@ class ModelModule(CoreModule):
         """
         for imtstr in self.imt_out_set:
             time1 = time.time()
-            if np.size(self.sta_lons_rad[imtstr]) == 0:
-                self.bias_num[imtstr] = 0.0
-                self.bias_den[imtstr] = 0.0
-                continue
             #
             # Get the index of the (pseudo-) period of the output IMT
             #
             outperiod_ix = self.imt_per_ix[imtstr]
             #
-            # Get the distance-limited set of data for use in computing
+            # Get the data and distance-limited residuals for computing
             # the bias
             #
-            dix = self.sta_rrups[imtstr] <= self.bias_max_range
-            sta_lons_rad_dl = self.sta_lons_rad[imtstr][dix]
-            sta_lats_rad_dl = self.sta_lats_rad[imtstr][dix]
-            sta_tau_dl = self.sta_tau[imtstr][dix]
-            sta_phi_dl = self.sta_phi[imtstr][dix]
-            sta_resids_dl = self.sta_resids[imtstr][dix]
-            sta_sig_extra_dl = self.sta_sig_extra[imtstr][dix]
+            sta_per_ix = self.sta_per_ix[imtstr]
+            sta_lons_rad = self.sta_lons_rad[imtstr]
+            sta_lats_rad = self.sta_lats_rad[imtstr]
+            sta_tau = self.sta_tau[imtstr]
+            sta_phi = self.sta_phi[imtstr]
+            sta_sig_extra = self.sta_sig_extra[imtstr]
+
+            dix = self.sta_rrups[imtstr] > self.bias_max_range
+            sta_resids_dl = self.sta_resids[imtstr].copy()
+            if len(dix) > 0:
+                sta_resids_dl[dix] = 0.0
             #
-            # Build the covariance matrix of the residuals and its inverse
-            # We need this whether or not we actually compute the bias
+            # If there are no stations, bail out
             #
-            nsta = np.size(sta_lons_rad_dl)
+            nsta = np.size(sta_lons_rad)
             if nsta == 0:
-                self.bias_num[imtstr] = 0.0
-                self.bias_den[imtstr] = 0.0
+                self.mu_H_yD[imtstr] = 0.0
+                self.cov_HH_yD[imtstr] = 0.0
                 self.nominal_bias[imtstr] = 0.0
                 nom_variance = 0.0
                 bias_time = time.time() - time1
@@ -1371,40 +1254,98 @@ class ModelModule(CoreModule):
                        np.sqrt(nom_variance),
                        nsta, bias_time))
                 continue
+            #
+            # Set up the IMT indices
+            #
+            imt_types = np.sort(np.unique(sta_per_ix))
+            len_types = len(imt_types)
+            self.imt_types[imtstr] = imt_types
+            self.len_types[imtstr] = len_types
+            sa_inds = {}
+            for i in range(len_types):
+                sa_inds[imt_types[i]] = np.where(sta_per_ix == imt_types[i])[0]
 
+            if outperiod_ix not in imt_types:
+                self.no_native_flag[imtstr] = True
+                imt_types_alt = np.sort(
+                    np.concatenate([imt_types, np.array([outperiod_ix])]))
+                self.imt_Y_ind[imtstr] = \
+                    np.where(outperiod_ix == imt_types_alt)[0][0]
+            else:
+                self.no_native_flag[imtstr] = False
+            #
+            # Build T_D and corr_HH_D
+            #
+            if self.no_native_flag[imtstr] is False:
+                T_D = np.zeros((nsta, len_types))
+                for i in range(len_types):
+                    T_D[sa_inds[imt_types[i]], i] = \
+                        sta_tau[sa_inds[imt_types[i]], 0]
+                corr_HH_D = np.zeros((len_types, len_types))
+                ones = np.ones(len_types, dtype=np.long).reshape((-1, 1))
+                t1 = imt_types.reshape((1, -1)) * ones
+                t2 = imt_types.reshape((-1, 1)) * ones.T
+                self.ccf.getCorrelation(t1, t2, corr_HH_D)
+            else:
+                T_D = np.zeros((nsta, len_types + 1))
+                for i in range(len_types + 1):
+                    if i == self.imt_Y_ind[imtstr]:
+                        continue
+                    if i < self.imt_Y_ind[imtstr]:
+                        T_D[sa_inds[imt_types[i]], i] = \
+                            sta_tau[sa_inds[imt_types[i]], 0]
+                    else:
+                        T_D[sa_inds[imt_types[i-1]], i] = \
+                            sta_tau[sa_inds[imt_types[i-1]], 0]
+                corr_HH_D = np.zeros((len_types+1, len_types+1))
+                ones = np.ones(len_types+1, dtype=np.long).reshape((-1, 1))
+                t1 = imt_types_alt.reshape((1, -1)) * ones
+                t2 = imt_types_alt.reshape((-1, 1)) * ones.T
+                self.ccf.getCorrelation(t1, t2, corr_HH_D)
+            #
+            # Make cov_WD_WD_inv (Sigma_22_inv)
+            #
+            matrix22 = np.empty((nsta, nsta), dtype=np.double)
+            geodetic_distance_fast(sta_lons_rad, sta_lats_rad,
+                                   sta_lons_rad, sta_lats_rad,
+                                   matrix22)
+            ones = np.ones(nsta, dtype=np.long).reshape((-1, 1))
+            t1_22 = sta_per_ix.reshape((1, -1)) * ones
+            t2_22 = sta_per_ix.reshape((-1, 1)) * ones.T
+            self.ccf.getCorrelation(t1_22, t2_22, matrix22)
+            sta_phi_flat = sta_phi.flatten()
+            make_sigma_matrix(matrix22, sta_phi_flat, sta_phi_flat)
+            np.fill_diagonal(matrix22,
+                             np.diag(matrix22) + sta_sig_extra**2)
+            cov_WD_WD_inv = np.linalg.pinv(matrix22)
+            #
+            # Hold on to some things we'll need later
+            #
+            self.T_D[imtstr] = T_D
+            self.cov_WD_WD_inv[imtstr] = cov_WD_WD_inv
+            #
+            # Compute the bias mu_H_yD and cov_HH_yD pieces
+            #
+            cov_HH_yD = np.linalg.pinv(
+                np.linalg.multi_dot([T_D.T, cov_WD_WD_inv, T_D]) +
+                np.linalg.pinv(corr_HH_D))
+            mu_H_yD = np.linalg.multi_dot([cov_HH_yD, T_D.T, cov_WD_WD_inv,
+                                          sta_resids_dl])
             if self.do_bias and (not isinstance(self.rupture_obj, PointRupture)
                                  or self.rx.mag <= self.bias_max_mag):
-                #
-                # Make the distance-limited version of sigma22inv
-                #
-                matrix22 = np.empty((nsta, nsta), dtype=np.double)
-                geodetic_distance_fast(sta_lons_rad_dl, sta_lats_rad_dl,
-                                       sta_lons_rad_dl, sta_lats_rad_dl,
-                                       matrix22)
-                t1_22 = np.full_like(matrix22, outperiod_ix, dtype=np.long)
-                self.ccf.getCorrelation(t1_22, t1_22, matrix22)
-                sta_phi_flat = sta_phi_dl.flatten()
-                make_sigma_matrix(matrix22, sta_phi_flat, sta_phi_flat)
-                np.fill_diagonal(matrix22,
-                                 np.diag(matrix22) + sta_sig_extra_dl**2)
-                sigma22inv = np.linalg.pinv(matrix22)
-                #
-                # Compute the bias numerator and denominator pieces
-                #
-                var_H_y2 = 1.0 / (1.0 +
-                                  sta_tau_dl.T.dot(sigma22inv.dot(sta_tau_dl)))
-                mu_H_y2 = \
-                    sta_tau_dl.T.dot(sigma22inv.dot(sta_resids_dl)) * var_H_y2
-                self.bias_num[imtstr] = mu_H_y2[0][0]
-                self.bias_den[imtstr] = var_H_y2[0][0]
+                self.mu_H_yD[imtstr] = mu_H_yD
+                self.cov_HH_yD[imtstr] = cov_HH_yD
             else:
-                self.bias_num[imtstr] = 0.0
-                self.bias_den[imtstr] = 0.0
-
-            mu_B2_y2 = self.sta_tau[imtstr] * self.bias_num[imtstr]
-            self.nominal_bias[imtstr] = np.mean(mu_B2_y2)
-            var_B2B2_y2 = self.sta_tau[imtstr]**2 * self.bias_den[imtstr]
-            nom_variance = np.mean(var_B2B2_y2)
+                self.mu_H_yD[imtstr] = np.zeros_like(mu_H_yD)
+                self.cov_HH_yD[imtstr] = np.zeros_like(cov_HH_yD)
+            #
+            # Get the nominal bias and variance
+            #
+            delta_B_yD = T_D.dot(mu_H_yD)
+            self.nominal_bias[imtstr] = np.mean(delta_B_yD)
+            sig_B_yD = np.sqrt(np.diag(
+                np.linalg.multi_dot([T_D, cov_HH_yD, T_D.T])))
+            nom_variance = np.mean(sig_B_yD)
 
             bias_time = time.time() - time1
             #
@@ -1474,8 +1415,8 @@ class ModelModule(CoreModule):
         else:
             gmpe = self.ipe
 
-        pout_mean, pout_sd = self._gmas(
-            gmpe, self.sx_out, self.dx_out, oqimt, self.apply_gafs)
+        pout_mean, pout_sd = self._gmas(gmpe, self.sx_out, self.dx_out,
+                                        oqimt, self.apply_gafs)
 
         if self.use_simulations:
             if imtstr == 'MMI':
@@ -1532,46 +1473,45 @@ class ModelModule(CoreModule):
 
         pout_sd2_phi = np.power(self.psd[imtstr], 2.0)
 
+        sta_per_ix = self.sta_per_ix[imtstr]
         sta_phi = self.sta_phi[imtstr]
-        sta_tau = self.sta_tau[imtstr]
         sta_lons_rad = self.sta_lons_rad[imtstr]
         sta_lats_rad = self.sta_lats_rad[imtstr]
-        sta_sig_extra = self.sta_sig_extra[imtstr]
-        #
-        # Compute the full Sigma22inv matrix
-        #
-        matrix22 = np.empty((nsta, nsta), dtype=np.double)
-        geodetic_distance_fast(sta_lons_rad, sta_lats_rad,
-                               sta_lons_rad, sta_lats_rad,
-                               matrix22)
-        t1_22 = np.full_like(matrix22, outperiod_ix, dtype=np.long)
-        self.ccf.getCorrelation(t1_22, t1_22, matrix22)
-        sta_phi_flat = sta_phi.flatten()
-        make_sigma_matrix(matrix22, sta_phi_flat, sta_phi_flat)
-        np.fill_diagonal(matrix22, np.diag(matrix22) + sta_sig_extra**2)
-        sigma22inv = np.linalg.pinv(matrix22)
-        #
-        # Compute the biased residuals and output means
-        #
-        biased_resids = (self.sta_resids[imtstr] -
-                         sta_tau * self.bias_num[imtstr])
-        biased_mu = pout_mean + self.tsd[imtstr] * self.bias_num[imtstr]
+
+        len_output = np.size(self.tsd[imtstr])
+        if self.no_native_flag[imtstr] is False:
+            T_Y0 = np.zeros((len_output, self.len_types[imtstr]))
+            T_Y0[:, np.where(outperiod_ix == self.imt_types[imtstr])[0][0]] = \
+                self.tsd[imtstr].ravel()
+        else:
+            T_Y0 = np.zeros((len_output, self.len_types[imtstr]+1))
+            T_Y0[:, self.imt_Y_ind[imtstr]] = self.tsd[imtstr].ravel()
+
+        T_D = self.T_D[imtstr]
+        cov_WD_WD_inv = self.cov_WD_WD_inv[imtstr]
         #
         # Now do the MVN itself...
         #
         dtime = mtime = ddtime = ctime = stime = atime = 0
 
-        nsta = np.size(sta_lons_rad)
+        C = np.empty_like(T_Y0[0:self.smnx, :])
+        C_tmp1 = np.empty_like(C)
+        C_tmp2 = np.empty_like(C)
+        s_tmp1 = np.empty((self.smnx), dtype=np.float64).reshape((-1, 1))
+        s_tmp2 = np.empty((self.smnx), dtype=np.float64).reshape((-1, 1))
+        s_tmp3 = np.empty((self.smnx), dtype=np.float64)
         ampgrid = np.zeros_like(pout_mean)
-        sdgrid_phi = np.zeros_like(pout_mean)
+        sig_WY_WY_WD = np.zeros_like(pout_mean)
         sdgrid_tau = np.zeros_like(pout_mean)
         # Stuff that doesn't change within the loop:
         lons_out_rad = self.lons_out_rad
         lats_out_rad = self.lats_out_rad
         d12_cols = self.smnx
+        ones = np.ones(d12_cols, dtype=np.long).reshape((-1, 1))
+        t1_12 = sta_per_ix.reshape((1, -1)) * ones
         t2_12 = np.full((d12_cols, nsta), outperiod_ix, dtype=np.long)
         # sdsta is the standard deviation of the stations
-        sdsta_phi = self.sta_phi[imtstr].flatten()
+        sdsta_phi = sta_phi.flatten()
         matrix12_phi = np.empty(t2_12.shape, dtype=np.double)
         rcmatrix_phi = np.empty(t2_12.shape, dtype=np.double)
         for iy in range(self.smny):
@@ -1583,7 +1523,7 @@ class ModelModule(CoreModule):
                                    matrix12_phi)
             ddtime += time.time() - time4
             time4 = time.time()
-            self.ccf.getCorrelation(t2_12, t2_12, matrix12_phi)
+            self.ccf.getCorrelation(t1_12, t2_12, matrix12_phi)
             ctime += time.time() - time4
             time4 = time.time()
             # sdarr is the standard deviation of the output sites
@@ -1595,17 +1535,8 @@ class ModelModule(CoreModule):
             # Sigma12 * Sigma22^-1 is known as the 'regression
             # coefficient' matrix (rcmatrix)
             #
-            np.dot(matrix12_phi, sigma22inv, out=rcmatrix_phi)
+            np.dot(matrix12_phi, cov_WD_WD_inv, out=rcmatrix_phi)
             dtime += time.time() - time4
-            time4 = time.time()
-
-            #
-            # This is the MVN solution for the conditional mean
-            # we only do it for the total sigma solution
-            #
-            ampgrid[iy, :] = biased_mu[iy, :] + \
-                rcmatrix_phi.dot(biased_resids).reshape((-1,))
-            atime += time.time() - time4
             time4 = time.time()
             #
             # We only want the diagonal elements of the conditional
@@ -1614,10 +1545,31 @@ class ModelModule(CoreModule):
             # sdgrid[ss:se] = pout_sd2[ss:se] -
             #       np.diag(rcmatrix.dot(sigma21))
             #
-            make_sd_array(sdgrid_phi, pout_sd2_phi, iy, rcmatrix_phi,
+            make_sd_array(sig_WY_WY_WD, pout_sd2_phi, iy, rcmatrix_phi,
                           matrix12_phi)
-            c = self.tsd[imtstr][iy, :] - rcmatrix_phi.dot(sta_tau).ravel()
-            sdgrid_tau[iy, :] = c**2 * self.bias_den[imtstr]
+
+            C = T_Y0[ss:se, :] - np.dot(rcmatrix_phi, T_D, out=C_tmp1)
+            #
+            # This is the MVN solution for the conditional mean
+            #
+            ampgrid[iy, :] = pout_mean[iy, :] + \
+                np.dot(C, self.mu_H_yD[imtstr], out=s_tmp1).reshape((-1,)) + \
+                np.dot(rcmatrix_phi, self.sta_resids[imtstr],
+                       out=s_tmp2).reshape((-1,))
+            atime += time.time() - time4
+            time4 = time.time()
+
+            #
+            # We're doing this, but the code below is faster and uses
+            # less memory:
+            #
+            # sdgrid_tau[iy, :] = np.diag(
+            #     C.dot(self.cov_HH_yD[imtstr].dot(C.T)))
+            #
+            np.dot(C, self.cov_HH_yD[imtstr], C_tmp1)
+            sdgrid_tau[iy, :] = np.sum(np.multiply(C_tmp1, C, out=C_tmp2),
+                                       out=s_tmp3, axis=1)
+
             mtime += time.time() - time4
         #
         # This processing can result in MMI values that go beyond
@@ -1634,8 +1586,8 @@ class ModelModule(CoreModule):
         # The outputs are the conditional total stddev, the conditional
         # between-event stddev (tau), and the prior within-event stddev (phi)
         #
-        self.outsd[imtstr] = np.sqrt(sdgrid_phi**2 + sdgrid_tau)
-        # self.outphi[imtstr] = sdgrid_phi
+        self.outsd[imtstr] = np.sqrt(sig_WY_WY_WD**2 + sdgrid_tau)
+        # self.outphi[imtstr] = sig_WY_WY_WD
         self.outphi[imtstr] = self.psd[imtstr]
         self.outtau[imtstr] = np.sqrt(sdgrid_tau)
 
@@ -1943,12 +1895,11 @@ class ModelModule(CoreModule):
         for ndf in self.dataframes:
             sdf = getattr(self, ndf).df
             for myimt in self.imt_out_set:
-                mybias_var = 1.0 / \
-                    ((1.0 / sdf[myimt + '_pred_tau']**2) +
-                     self.bias_den[myimt])
-                mybias = self.bias_num[myimt] * mybias_var
+                mybias = sdf[myimt + '_pred_tau'] * self.mu_H_yD[myimt][0]
+                mybias_sig = np.sqrt(
+                    sdf[myimt + '_pred_tau']**2 * self.cov_HH_yD[myimt][0, 0])
                 sdf[myimt + '_bias'] = mybias.flatten()
-                sdf[myimt + '_bias_sigma'] = np.sqrt(mybias_var.flatten())
+                sdf[myimt + '_bias_sigma'] = mybias_sig.flatten()
 
         # ---------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
@@ -2631,38 +2582,22 @@ def _get_nearest_imts(imtstr, imtset, saset):
     #
     if imtstr == 'PGA':
         #
-        # Use the highest frequency in the inputs, otherwise use PGV
+        # Use the highest frequency in the inputs
         #
         if len(saset):
             return (sorted(saset, key=_get_period_from_imt)[0], )
-        elif 'PGV' in imtset:
-            return ('PGV', )
         else:
             return ()
     elif imtstr == 'PGV':
         #
-        # Use 1.0 sec SA (or its bracket) if it's there, otherwise
-        # use PGA
+        # PGV has no surrogate
         #
-        if 'SA(1.0)' in saset:
-            return ('SA(1.0)', )
-        sa_tuple = _get_sa_bracket('SA(1.0)', saset)
-        if sa_tuple != ():
-            return sa_tuple
-        if 'PGA' in imtset:
-            return ('PGA', )
-        else:
-            return ()
+        return ()
     elif imtstr == 'MMI':
         #
-        # Use PGV if it's there, otherwise use 1.0 sec SA (or its
-        # bracket)
+        # MMI has no surrogate
         #
-        if 'PGV' in imtset:
-            return ('PGV', )
-        if 'SA(1.0)' in saset:
-            return ('SA(1.0)', )
-        return _get_sa_bracket('SA(1.0)', saset)
+        return ()
     elif imtstr.startswith('SA('):
         #
         # We know the actual IMT isn't here, so get the bracket
