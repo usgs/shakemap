@@ -98,6 +98,55 @@ class ModelModule(CoreModule):
     def __init__(self, eventid):
         super(ModelModule, self).__init__(eventid)
         self.contents = Contents(None, None, eventid)
+        #
+        # Set up a bunch of dictionaries that will be keyed to IMTs
+        #
+        self.nominal_bias = {}  # holds an average bias for each IMT
+        self.psd_raw = {}   # raw phi (intra-event stddev) of the output points
+        self.psd = {}       # phi (intra-event stddev) of the output points
+        self.tsd = {}       # tau (inter-event stddev) of the output points
+        #
+        # These are arrays (keyed by IMT) of the station data that will be
+        # used to compute the bias and do the interpolation, they are filled
+        # in the _fillDataArrays method
+        #
+        self.sta_per_ix = {}
+        self.sta_lons_rad = {}
+        self.sta_lats_rad = {}
+        self.sta_resids = {}
+        self.sta_phi = {}
+        self.sta_tau = {}
+        self.sta_sig_extra = {}
+        self.sta_rrups = {}
+        #
+        # These are useful matrices that we compute in the bias function
+        # that we can reuse in the MVN function
+        #
+        self.T_D = {}
+        self.cov_WD_WD_inv = {}
+        self.mu_H_yD = {}
+        self.cov_HH_yD = {}
+        #
+        # Some variables and arrays used in both the bias and MVN functions
+        #
+        self.no_native_flag = {}
+        self.imt_types = {}
+        self.len_types = {}
+        self.imt_Y_ind = {}
+        #
+        # These hold the main outputs of the MVN
+        #
+        self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
+        self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
+        self.outphi = {}    # Holds the intra-event standard deviation arrays
+        self.outtau = {}    # Holds the inter-event standard deviation arrays
+        #
+        # Places to put the results for the attenuation plots
+        #
+        self.atten_rock_mean = {}
+        self.atten_soil_mean = {}
+        self.atten_rock_sd = {}
+        self.atten_soil_sd = {}
 
     def parseArgs(self, arglist):
         """
@@ -349,38 +398,6 @@ class ModelModule(CoreModule):
         # the additional sigma (if any) of the point-source to finite
         # rupture approximation.
         # ---------------------------------------------------------------------
-        self.nominal_bias = {}  # holds an average bias for each IMT
-        self.psd_raw = {}   # raw phi (intra-event stddev) of the output points
-        self.psd = {}       # phi (intra-event stddev) of the output points
-        self.tsd = {}       # tau (inter-event stddev) of the output points
-        #
-        # These are arrays (keyed by IMT) of the station data that will be
-        # used to compute the bias and do the interpolation, they are filled
-        # in the _fillDataArrays method
-        #
-        self.sta_per_ix = {}
-        self.sta_lons_rad = {}
-        self.sta_lats_rad = {}
-        self.sta_resids = {}
-        self.sta_phi = {}
-        self.sta_tau = {}
-        self.sta_sig_extra = {}
-        self.sta_rrups = {}
-        #
-        # These are useful matrices that we compute in the bias function
-        # that we can reuse in the MVN function
-        #
-        self.T_D = {}
-        self.cov_WD_WD_inv = {}
-        self.mu_H_yD = {}
-        self.cov_HH_yD = {}
-        #
-        # Some variables and arrays used in both the bias and MVN functions
-        #
-        self.no_native_flag = {}
-        self.imt_types = {}
-        self.len_types = {}
-        self.imt_Y_ind = {}
 
         # ---------------------------------------------------------------------
         # Do some prep, the bias, and the directivity prep
@@ -390,22 +407,6 @@ class ModelModule(CoreModule):
         self._computeBias()
 
         self._computeDirectivityPredictionLocations()
-
-        #
-        # These hold the main outputs of the MVN
-        #
-        self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
-        self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
-        self.outphi = {}    # Holds the intra-event standard deviation arrays
-        self.outtau = {}    # Holds the inter-event standard deviation arrays
-
-        #
-        # Places to put the results for the attenuation plots
-        #
-        self.atten_rock_mean = {}
-        self.atten_soil_mean = {}
-        self.atten_rock_sd = {}
-        self.atten_soil_sd = {}
 
         # ---------------------------------------------------------------------
         # Now do the MVN with the intra-event residuals
