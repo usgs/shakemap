@@ -34,7 +34,7 @@ from shakelib.distance import (Distance,
                                get_distance_measures)
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
-from shakelib.utils.utils import get_extent
+from shakelib.utils.utils import get_extent, thirty_sec_min, thirty_sec_max
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.utils.containers import ShakeMapInputContainer
 from impactutils.io.smcontainers import ShakeMapOutputContainer
@@ -645,10 +645,10 @@ class ModelModule(CoreModule):
             self.lats = np.array(lats).reshape(1, -1)
             self.vs30 = np.array(vs30).reshape(1, -1)
             self.depths = np.zeros_like(self.lats)
-            self.W = np.min(self.lons)
-            self.E = np.max(self.lons)
-            self.S = np.min(self.lats)
-            self.N = np.max(self.lats)
+            self.W = thirty_sec_min(np.min(self.lons))
+            self.E = thirty_sec_max(np.max(self.lons))
+            self.S = thirty_sec_min(np.min(self.lats))
+            self.N = thirty_sec_max(np.max(self.lats))
             self.smnx = np.size(self.lons)
             self.smny = 1
             dist_obj_out = Distance(
