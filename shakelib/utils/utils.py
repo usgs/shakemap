@@ -149,7 +149,7 @@ def get_extent(rupture=None, config=None):
         extent = _get_extent_from_multigmpe(rupture, config)
 
     if offsets is None:
-        xmin, ymin, xmax, ymax = extent
+        xmin, xmax, ymin, ymax = extent
         return (thirty_sec_min(xmin), thirty_sec_max(xmax),
                 thirty_sec_min(ymin), thirty_sec_max(ymax))
 
