@@ -14,7 +14,7 @@ from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
 from openquake.hazardlib.contexts import RuptureContext
 
-from shakelib.conversions.imt.newmark_hall_1982 import NewmarkHall1982
+from shakelib.conversions.imt.abrahamson_bhasin_2020 import AbrahamsonBhasin2020
 from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
 from shakelib.sites import Sites
 
@@ -235,7 +235,8 @@ class MultiGMPE(GMPE):
 
             if not isinstance(gmpe, MultiGMPE) and \
                     (imt.string == "PGV") and ("PGV" not in gmpe_imts):
-                timt = SA(1.0)
+                ab2020 = AbrahamsonBhasin2020(rup.mag)
+                timt = SA(ab2020.getTref())
             else:
                 timt = imt
 
@@ -287,16 +288,11 @@ class MultiGMPE(GMPE):
 
                 # -------------------------------------------------------------
                 # If IMT is PGV and PGV is not given by the GMPE, then
-                # convert from PSA10.
+                # convert from the appropriate PSA
                 # -------------------------------------------------------------
                 if (imt.string == "PGV") and ("PGV" not in gmpe_imts):
-                    nh82 = NewmarkHall1982()
-                    lmean = nh82.convertAmps('PSA10', 'PGV', lmean)
-                    # Put the extra sigma from NH82 into intra event and total
-                    for j, stddev_type in enumerate(stddev_types):
-                        if stddev_type == const.StdDev.INTER_EVENT:
-                            continue
-                        lsd[j] = nh82.convertSigmas('PSA10', 'PGV', lsd[j])
+                    lmean, lsd = ab2020.getPGVandSTDDEVS(
+                        lmean, lsd, stddev_types, ctx.rrup, ctx.vs30)
 
                 # -------------------------------------------------------------
                 # -------------------------------------------------------------

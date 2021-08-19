@@ -19,6 +19,8 @@ from openquake.hazardlib import imt as IMT
 from openquake.hazardlib.gsim.usgs_ceus_2019 import NGAEastUSGSGMPE
 from openquake.hazardlib.gsim.gmpe_table import _return_tables
 
+from shakelib.conversions.imt.abrahamson_bhasin_2020 import AbrahamsonBhasin2020
+
 # Max distance for evaluating NGAEast. This *should* be 1500, but due to what
 # appears to be a floating point precision issue, we get a division by zero
 # error at a value of 1500 returning nans. So we have to cap the distance at a
@@ -192,11 +194,13 @@ class NGAEast(GMPE):
         # Apply max distance to dists.rrup -->> now rup.rrup
         np.clip(rup.rrup, 0, MAX_RRUP)
 
-        # Since we will be dropping the models that don't have PGV,
-        # we now also need to track the total sum of weights for when
-        # the imt is PGV so that we can re-distribute the weights.
+        #
+        # Some models don't have PGV terms, so we will make PSA for them
+        # and then use the conditional conversion to get PGV
+        #
         if is_pgv:
-            twts = []
+            ab2020 = AbrahamsonBhasin2020(rup.mag)
+            vimt = IMT.SA(ab2020.getTref())
 
         # Loop over gmpes
         for i, gm in enumerate(self.gmpes):
@@ -205,23 +209,28 @@ class NGAEast(GMPE):
                 try:
                     _ = _return_tables(gm, rup.mag, imt, "IMLs")
                 except KeyError:
-                    continue
+                    #
+                    # No table for PGV, compute vimt, then convert to PGV
+                    #
+                    vmean, vstddevs = gm.get_mean_and_stddevs(
+                        rup, rup, rup, vimt, stddev_types)
+                    tmean, tstddevs = ab2020.getPGVandSTDDEVS(
+                        vmean, vstddevs, stddev_types, rup.rrup, rup.vs30)
                 except Exception:
                     logging.error("Unexpected error:", sys.exc_info()[0])
-            tmean, tstddevs = gm.get_mean_and_stddevs(
-                rup, rup, rup, imt, stddev_types)
+                else:
+                    #
+                    # Table exists for PGV, proceed normally
+                    #
+                    tmean, tstddevs = gm.get_mean_and_stddevs(
+                        rup, rup, rup, imt, stddev_types)
+            else:
+                tmean, tstddevs = gm.get_mean_and_stddevs(
+                    rup, rup, rup, imt, stddev_types)
+
             mean += tmean * total_gmpe_weights[i]
             for j, sd in enumerate(tstddevs):
                 stddevs[j] += sd * total_gmpe_weights[i]
-            if is_pgv:
-                twts.append(total_gmpe_weights[i])
-
-        if is_pgv:
-            # Rescale the PGV wieghts so that they sum to 1 after dropping
-            # the models that are not defined for PGV.
-            mean = mean / np.sum(twts)
-            for j, sd in enumerate(stddevs):
-                stddevs[j] = stddevs[j] / np.sum(twts)
 
         # Zero out values at distances beyond the range for which NGA East
         # was defined. -->> was dists.rrup, now rup.rrup
