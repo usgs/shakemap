@@ -209,9 +209,12 @@ def main(args):
     event_path = os.path.join(data_path, args.eventid, 'current')
     cancel_file = os.path.join(event_path, CANCEL_FILE)
     if os.path.isfile(cancel_file):
-        logger.error(
-            'Event %s has been canceled: aborting run' % args.eventid)
-        return
+        if _config_['process_canceled']:
+            os.remove(cancel_file)
+        else:
+            logger.error(
+                'Event %s has been canceled: aborting run' % args.eventid)
+            return
 
     #
     # Build the database of commands, targets, and dependencies
