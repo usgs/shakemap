@@ -34,7 +34,7 @@ from shakelib.distance import (Distance,
                                get_distance_measures)
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
-from shakelib.utils.utils import get_extent
+from shakelib.utils.utils import get_extent, thirty_sec_min, thirty_sec_max
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.utils.containers import ShakeMapInputContainer
 from impactutils.io.smcontainers import ShakeMapOutputContainer
@@ -98,6 +98,55 @@ class ModelModule(CoreModule):
     def __init__(self, eventid):
         super(ModelModule, self).__init__(eventid)
         self.contents = Contents(None, None, eventid)
+        #
+        # Set up a bunch of dictionaries that will be keyed to IMTs
+        #
+        self.nominal_bias = {}  # holds an average bias for each IMT
+        self.psd_raw = {}   # raw phi (intra-event stddev) of the output points
+        self.psd = {}       # phi (intra-event stddev) of the output points
+        self.tsd = {}       # tau (inter-event stddev) of the output points
+        #
+        # These are arrays (keyed by IMT) of the station data that will be
+        # used to compute the bias and do the interpolation, they are filled
+        # in the _fillDataArrays method
+        #
+        self.sta_per_ix = {}
+        self.sta_lons_rad = {}
+        self.sta_lats_rad = {}
+        self.sta_resids = {}
+        self.sta_phi = {}
+        self.sta_tau = {}
+        self.sta_sig_extra = {}
+        self.sta_rrups = {}
+        #
+        # These are useful matrices that we compute in the bias function
+        # that we can reuse in the MVN function
+        #
+        self.T_D = {}
+        self.cov_WD_WD_inv = {}
+        self.mu_H_yD = {}
+        self.cov_HH_yD = {}
+        #
+        # Some variables and arrays used in both the bias and MVN functions
+        #
+        self.no_native_flag = {}
+        self.imt_types = {}
+        self.len_types = {}
+        self.imt_Y_ind = {}
+        #
+        # These hold the main outputs of the MVN
+        #
+        self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
+        self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
+        self.outphi = {}    # Holds the intra-event standard deviation arrays
+        self.outtau = {}    # Holds the inter-event standard deviation arrays
+        #
+        # Places to put the results for the attenuation plots
+        #
+        self.atten_rock_mean = {}
+        self.atten_soil_mean = {}
+        self.atten_rock_sd = {}
+        self.atten_soil_sd = {}
 
     def parseArgs(self, arglist):
         """
@@ -349,38 +398,6 @@ class ModelModule(CoreModule):
         # the additional sigma (if any) of the point-source to finite
         # rupture approximation.
         # ---------------------------------------------------------------------
-        self.nominal_bias = {}  # holds an average bias for each IMT
-        self.psd_raw = {}   # raw phi (intra-event stddev) of the output points
-        self.psd = {}       # phi (intra-event stddev) of the output points
-        self.tsd = {}       # tau (inter-event stddev) of the output points
-        #
-        # These are arrays (keyed by IMT) of the station data that will be
-        # used to compute the bias and do the interpolation, they are filled
-        # in the _fillDataArrays method
-        #
-        self.sta_per_ix = {}
-        self.sta_lons_rad = {}
-        self.sta_lats_rad = {}
-        self.sta_resids = {}
-        self.sta_phi = {}
-        self.sta_tau = {}
-        self.sta_sig_extra = {}
-        self.sta_rrups = {}
-        #
-        # These are useful matrices that we compute in the bias function
-        # that we can reuse in the MVN function
-        #
-        self.T_D = {}
-        self.cov_WD_WD_inv = {}
-        self.mu_H_yD = {}
-        self.cov_HH_yD = {}
-        #
-        # Some variables and arrays used in both the bias and MVN functions
-        #
-        self.no_native_flag = {}
-        self.imt_types = {}
-        self.len_types = {}
-        self.imt_Y_ind = {}
 
         # ---------------------------------------------------------------------
         # Do some prep, the bias, and the directivity prep
@@ -390,22 +407,6 @@ class ModelModule(CoreModule):
         self._computeBias()
 
         self._computeDirectivityPredictionLocations()
-
-        #
-        # These hold the main outputs of the MVN
-        #
-        self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
-        self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
-        self.outphi = {}    # Holds the intra-event standard deviation arrays
-        self.outtau = {}    # Holds the inter-event standard deviation arrays
-
-        #
-        # Places to put the results for the attenuation plots
-        #
-        self.atten_rock_mean = {}
-        self.atten_soil_mean = {}
-        self.atten_rock_sd = {}
-        self.atten_soil_sd = {}
 
         # ---------------------------------------------------------------------
         # Now do the MVN with the intra-event residuals
@@ -644,10 +645,10 @@ class ModelModule(CoreModule):
             self.lats = np.array(lats).reshape(1, -1)
             self.vs30 = np.array(vs30).reshape(1, -1)
             self.depths = np.zeros_like(self.lats)
-            self.W = np.min(self.lons)
-            self.E = np.max(self.lons)
-            self.S = np.min(self.lats)
-            self.N = np.max(self.lats)
+            self.W = thirty_sec_min(np.min(self.lons))
+            self.E = thirty_sec_max(np.max(self.lons))
+            self.S = thirty_sec_min(np.min(self.lats))
+            self.N = thirty_sec_max(np.max(self.lats))
             self.smnx = np.size(self.lons)
             self.smny = 1
             dist_obj_out = Distance(
@@ -1492,7 +1493,7 @@ class ModelModule(CoreModule):
         s_tmp2 = np.empty((self.smnx), dtype=np.float64).reshape((-1, 1))
         s_tmp3 = np.empty((self.smnx), dtype=np.float64)
         ampgrid = np.zeros_like(pout_mean)
-        sig_WY_WY_WD = np.zeros_like(pout_mean)
+        cov_WY_WY_WD = np.zeros_like(pout_mean)
         sdgrid_tau = np.zeros_like(pout_mean)
         # Stuff that doesn't change within the loop:
         lons_out_rad = self.lons_out_rad
@@ -1517,7 +1518,8 @@ class ModelModule(CoreModule):
             self.ccf.getCorrelation(t1_12, t2_12, matrix12_phi)
             ctime += time.time() - time4
             time4 = time.time()
-            # sdarr is the standard deviation of the output sites
+            # sdarr_phi is the standard deviation of the within-event
+            # residuals at the output sites
             sdarr_phi = self.psd[imtstr][iy, :]
             make_sigma_matrix(matrix12_phi, sdsta_phi, sdarr_phi)
             stime += time.time() - time4
@@ -1536,26 +1538,42 @@ class ModelModule(CoreModule):
             # sdgrid[ss:se] = pout_sd2[ss:se] -
             #       np.diag(rcmatrix.dot(sigma21))
             #
-            make_sd_array(sig_WY_WY_WD, pout_sd2_phi, iy, rcmatrix_phi,
+            # make_sd_array is a Cython function that is optimized to find
+            # the diagonal of the covariance matrix.
+            #
+            make_sd_array(cov_WY_WY_WD, pout_sd2_phi, iy, rcmatrix_phi,
                           matrix12_phi)
-
+            #
+            # Equation B32 of Engler et al. (2021)
+            #
             C = T_Y0[ss:se, :] - np.dot(rcmatrix_phi, T_D, out=C_tmp1)
             #
             # This is the MVN solution for the conditional mean
+            # It is an implementation of the equation just below
+            # equation B25 in Engler et al. (2021):
             #
-            ampgrid[iy, :] = pout_mean[iy, :] + \
-                np.dot(C, self.mu_H_yD[imtstr], out=s_tmp1).reshape((-1,)) + \
-                np.dot(rcmatrix_phi, self.sta_resids[imtstr],
-                       out=s_tmp2).reshape((-1,))
+            # mu_Y_yD = mu_Y + C mu_H_yD + cov_WY_WD cov_WD_WD^-1 zeta
+            #
+            # but we break it up for efficiency.
+            #
+            s_tmp1r = np.dot(C, self.mu_H_yD[imtstr],
+                             out=s_tmp1).reshape((-1,))
+            s_tmp2r = np.dot(rcmatrix_phi, self.sta_resids[imtstr],
+                            out=s_tmp2).reshape((-1,))
+            ampgrid[iy, :] = np.add(np.add(pout_mean[iy, :], s_tmp1r,
+                                           out=s_tmp1r), s_tmp2r, out=s_tmp2r)
             atime += time.time() - time4
             time4 = time.time()
-
             #
-            # We're doing this, but the code below is faster and uses
-            # less memory:
+            # We're doing this:
             #
             # sdgrid_tau[iy, :] = np.diag(
             #     C.dot(self.cov_HH_yD[imtstr].dot(C.T)))
+            #
+            # to find the between-event part of the diagonal of the conditional
+            # covariance.  This is the second term of equation B27 of Engler
+            # et al. (2021). The code below is faster and uses less memory than
+            # actually implementing the above equation.
             #
             np.dot(C, self.cov_HH_yD[imtstr], C_tmp1)
             sdgrid_tau[iy, :] = np.sum(np.multiply(C_tmp1, C, out=C_tmp2),
@@ -1577,10 +1595,11 @@ class ModelModule(CoreModule):
         # The outputs are the conditional total stddev, the conditional
         # between-event stddev (tau), and the prior within-event stddev (phi)
         #
-        self.outsd[imtstr] = np.sqrt(sig_WY_WY_WD**2 + sdgrid_tau)
-        # self.outphi[imtstr] = sig_WY_WY_WD
+        self.outsd[imtstr] = np.sqrt(np.add(
+            cov_WY_WY_WD, sdgrid_tau, out=cov_WY_WY_WD), out=cov_WY_WY_WD)
+        # self.outphi[imtstr] = np.sqrt(cov_WY_WY_WD)
         self.outphi[imtstr] = self.psd[imtstr]
-        self.outtau[imtstr] = np.sqrt(sdgrid_tau)
+        self.outtau[imtstr] = np.sqrt(sdgrid_tau, out=sdgrid_tau)
 
         self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
         self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))

@@ -88,7 +88,7 @@ def get_extent(rupture=None, config=None):
           file, or
         - it can be based on the MultiGMPE for the event.
 
-    All methods except for the first requires a rupture object.
+    All methods except for the first require a rupture object.
 
     If no config is provided then a rupture is required and the extent is based
     on a generic set of active/stable.
@@ -98,8 +98,8 @@ def get_extent(rupture=None, config=None):
         config (ConfigObj): ShakeMap config object.
 
     Returns:
-        tuple: lonmin, lonmax, latmin, latmax rounded to the nearest
-        arc-minute..
+        tuple: lonmin, lonmax, latmin, latmax rounded outward to the 9nearest
+        30 arc seconds.
 
     """
 
@@ -128,7 +128,8 @@ def get_extent(rupture=None, config=None):
     # -------------------------------------------------------------------------
     if len(bounds):
         xmin, ymin, xmax, ymax = bounds
-        return (xmin, xmax, ymin, ymax)
+        return (thirty_sec_min(xmin), thirty_sec_max(xmax),
+                thirty_sec_min(ymin), thirty_sec_max(ymax))
 
     if not rupture or not isinstance(rupture, Rupture):
         raise TypeError('get_extent() requires a rupture object if the extent '
@@ -148,7 +149,9 @@ def get_extent(rupture=None, config=None):
         extent = _get_extent_from_multigmpe(rupture, config)
 
     if offsets is None:
-        return extent
+        xmin, xmax, ymin, ymax = extent
+        return (thirty_sec_min(xmin), thirty_sec_max(xmax),
+                thirty_sec_min(ymin), thirty_sec_max(ymax))
 
     # -------------------------------------------------------------------------
     # Apply relative offsets
@@ -163,7 +166,8 @@ def get_extent(rupture=None, config=None):
     ymin += yspan * offsets[1]
     ymax += yspan * offsets[1]
 
-    return (xmin, xmax, ymin, ymax)
+    return (thirty_sec_min(xmin), thirty_sec_max(xmax),
+            thirty_sec_min(ymin), thirty_sec_max(ymax))
 
 
 def _get_extent_from_spans(rupture, spans=[]):
@@ -377,6 +381,20 @@ def _round_coord(coord):
     mm = coord / dm
     imm = int(mm + 0.5)
     return imm * dm
+
+
+def thirty_sec_min(coord):
+    """
+    Round a number to the floor of 30 arc-seconds
+    """
+    return np.floor(coord * 120.0) / 120.0
+
+
+def thirty_sec_max(coord):
+    """
+    Round a number to the ceiling of 30 arc-seconds
+    """
+    return np.ceil(coord * 120.0) / 120.0
 
 
 def is_stable(lon, lat):

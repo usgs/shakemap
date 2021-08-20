@@ -153,5 +153,5 @@ def make_sd_array(double[:, ::1]sdgrid, double[:, ::1]pout_sd2, long iy,
         sdg[y] = pop[y] - tmp
         if sdg[y] < 0:
             sdg[y] = 0
-        sdg[y] = sqrt(sdg[y])
+        # sdg[y] = sqrt(sdg[y])
     return

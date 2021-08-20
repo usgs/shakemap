@@ -193,7 +193,7 @@ def test_extent_config():
         }
     }}
     extent = get_extent(rupture, config)
-    cmp_extent = (-99.416, -95.416, 32.679, 38.679)
+    cmp_extent = (-99.4166667, -95.4083333, 32.675, 38.6833333)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
 
@@ -206,7 +206,7 @@ def test_extent_config():
         'relative_offset': [0.25, 0.5],
     }}
     extent = get_extent(rupture, config)
-    cmp_extent = (-98.416, -94.416, 35.679, 41.679)
+    cmp_extent = (-98.4166667, -94.4083333, 35.675, 41.6833333)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
 
