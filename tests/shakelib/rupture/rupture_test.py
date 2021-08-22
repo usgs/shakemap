@@ -198,12 +198,12 @@ def test_rupture_from_dict():
     assert rup_from_dict.lats == 37.3
     assert rup_from_dict.lons == -122.5
 
-    assert rup_original.getLength() is None
-    assert rup_original.getWidth() == constants.DEFAULT_WIDTH
-    assert rup_original.getArea() is None
+    assert rup_original.getLength() == 44.668359215096281
+    assert rup_original.getWidth() == 16.982436524617452
+    assert rup_original.getArea() == 758.57757502918355
     assert rup_original.getStrike() == constants.DEFAULT_STRIKE
     assert rup_original.getDip() == constants.DEFAULT_DIP
-    assert rup_original.getDepthToTop() == constants.DEFAULT_ZTOR
+    assert rup_original.getDepthToTop() == 0.0
     assert rup_original.getQuadrilaterals() is None
     assert rup_original.depths == 5.0
     # No mech, no tectonic region
