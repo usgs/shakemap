@@ -44,7 +44,7 @@
         "MMI": "Mapa de Intensidades Macrosísmicas",
         "PGV": "Mapa de Velocidad Máxima (PGV)",
         "PGA": "Mapa de Aceleración Máxima (PGA)",
-        "SA": " Segundos Mapa de Aceleración Espectral"
+        "SA": "{period} Segundos Mapa de Aceleración Espectral"
     },
     "units": {
          "PGV": "(cm/s)",

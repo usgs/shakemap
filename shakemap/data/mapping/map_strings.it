@@ -44,7 +44,7 @@
         "MMI": "Mappa Intensità Macrosismica",
         "PGV": "Mappa Della Velocità di Picco Al Suolo",
         "PGA": "Mappa Dell'Accelerazione di Picco Al Suolo",
-        "SA": " Secondi. Mappa Dell' Accelerazione Spettrale di Picco"
+        "SA": "{period} Secondi. Mappa Dell' Accelerazione Spettrale di Picco"
     },
     "units": {
          "PGV": "(cm/s)",
