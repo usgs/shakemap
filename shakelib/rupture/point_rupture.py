@@ -62,27 +62,37 @@ class PointRupture(Rupture):
                 d['metadata'][k] = v
 
         self._geojson = d
+        #
+        # Use Wells and Coppersmith (1994) to compute some basic
+        # fault parameter based on the magnitude. Use the "All"
+        # fault type since if this is a point rupture we probably
+        # don't know much.
+        #
+        width = -1.01 + 0.32 * origin.mag
+        self.faultWidth = np.power(10.0, width)
+        area = -3.49 + 0.91 * origin.mag
+        self.faultArea = np.power(10.0, area)
+        self.faultLength = self.faultArea / self.faultWidth
 
     def getLength(self):
         """
-        Rupture length, which is None for a PointRupture.
-        Could potentially put in a default value based on magnitude.
+        Return the W&C value based on magnitude
         """
-        return None
+        return self.faultLength
 
     def getWidth(self):
         """
         Rupture width.
-        Could potentially put in a default value based on magnitude.
+        Return the W&C value based on magnitude
         """
-        return constants.DEFAULT_WIDTH
+        return self.faultWidth
 
     def getArea(self):
         """
-        Rupture area, which is None for a PointRupture.
-        Could potentially put in a default value based on magnitude.
+        Rupture area
+        Return the W&C value based on magnitude
         """
-        return None
+        return self.faultArea
 
     def getStrike(self):
         """
@@ -101,9 +111,13 @@ class PointRupture(Rupture):
     def getDepthToTop(self):
         """
         Depth to top of rupture.
-        Could get from hypo/magnitude?
+        Use the Kaklamanos et al. (2011) formula:
+            ztor = max((Zhyp - 0.6W * sin(delta)), 0)
+        with the width coming from W&C 1994 as above.
+        The default dip is 90, so we're reduced to:
         """
-        return constants.DEFAULT_ZTOR
+        ztor = max(self._origin.depth - 0.6 * self.faultWidth, 0)
+        return ztor
 
     def getQuadrilaterals(self):
         return None

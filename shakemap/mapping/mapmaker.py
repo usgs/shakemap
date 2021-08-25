@@ -928,7 +928,7 @@ def _draw_title(imt, adict, uncertainty=False,
     eid = edict['event_id']
     if imt.startswith('SA('):
         period = imt.replace('SA(', '').replace(')', '')
-        imtstr = period + tdict['IMTYPES']['SA']
+        imtstr = tdict['IMTYPES']['SA'].format(period=period)
     else:
         imtstr = tdict['IMTYPES'][imt]
     if len(eid) <= 20:

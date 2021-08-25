@@ -359,10 +359,18 @@ class Queue(object):
                 event['repeats'] = rep_list
                 self.ampHandler.insertEvent(event, update=True)
                 if event['lastrun'] == 0:
-                    # This is a delayed first run
-                    self.logger.info('Queueing event %s after network delay' %
-                                     eventid)
-                    self.dispatchEvent(event, 'Event added')
+                    # This is a delayed first run or possibly just a very
+                    # old event being updated
+                    event_dir = os.path.join(self.data_path, eventid,
+                                             'current')
+                    if not os.path.isdir(event_dir):
+                        self.logger.info('Queueing event %s after network '
+                                         'delay' % eventid)
+                        self.dispatchEvent(event, 'Event added')
+                    else:
+                        self.logger.info('Queueing old event %s for update' %
+                                         eventid)
+                        self.dispatchEvent(event, 'Event updated')
                 else:
                     self.logger.info('Queueing repeat of event %s' % eventid)
                     self.dispatchEvent(event, 'Scheduled repeat')
@@ -667,7 +675,7 @@ class Queue(object):
         if existing:
             self.dispatchEvent(data, 'cancel')
             existing['repeats'] = None
-            self.ampHandler.insertEvent(existing, update=True)            
+            self.ampHandler.insertEvent(existing, update=True)
             return
 
         if 'alt_eventids' in data:
@@ -678,7 +686,7 @@ class Queue(object):
                 if existing:
                     self.dispatchEvent(existing, 'cancel')
                     existing['repeats'] = None
-                    self.ampHandler.insertEvent(existing, update=True)                    
+                    self.ampHandler.insertEvent(existing, update=True)
                     return
 
         self.logger.info('cancel is for unprocessed event %s: ignoring' %

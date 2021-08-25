@@ -3,7 +3,7 @@
         "MMI": "Carte d'intensité macrosismique",
         "PGV": "Carte de vitesse maximale du sol",
         "PGA": "Carte d'accélération maximale du sol",
-        "SA": " seconde - Carte d'accélération spectrale"
+        "SA": "{period} seconde - Carte d'accélération spectrale"
     },
     "units": {
          "PGV": "(cm/s)",

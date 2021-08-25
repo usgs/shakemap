@@ -1011,7 +1011,28 @@ class StationList(object):
 
 
 def get_imt_period(imt):
+    """
+    Get the period from a string like psa3p0, psa3.0, or psa30 (the first
+    being favored). Return the floating point period.
 
+    Args:
+        imt (str): a string starting with "psa" and ending with something
+            that can reasonably be converted to a floating point number.
+
+    Returns:
+        float: The period of the psa input.
+
+    TODO: Could do a lot more error checking here, but I guess we're
+    assuming that the people who send us data aren't idiots.
+    """
+    # Updated 'psa2p5' style
+    p = re.search(r'(?<=psa).*', imt)
+    if 'p' in p.group(0):
+        return float(p.group(0).replace('p', '.'))
+    # Weird, but we'll allow it psa2.5 style
+    if '.' in p.group(0):
+        return float(p.group(0))
+    # Old school psa25 style
     p = re.search(r'(?<=psa)\d+', imt)
     return float(p.group(0)[:-1] + '.' + p.group(0)[-1])
 
