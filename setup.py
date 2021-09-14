@@ -43,6 +43,8 @@ setup(name='shakemap',
       url='http://github.com/usgs/shakemap',
       packages=[
           'shakemap',
+          'shakemap.coremods',
+          'shakemap.mapping',
           'shakemap.utils',
           'shakelib',
           'shakelib.conversions',
