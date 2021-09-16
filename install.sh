@@ -106,6 +106,10 @@ else
     echo "conda detected, installing $VENV environment..."
 fi
 
+echo "Installing mamba from conda-forge"
+
+conda install mamba -y -n base -c conda-forge
+
 echo "Installing packages from conda-forge"
 
 # Choose an environment file based on platform
@@ -187,7 +191,7 @@ conda config --add channels 'defaults'
 conda config --set channel_priority flexible
 
 echo "Creating the $VENV virtual environment:"
-conda create -y -n $VENV ${package_list[*]}
+mamba create -y -n $VENV ${package_list[*]}
 
 # Bail out at this point if the conda create command fails.
 # Clean up zip files we've downloaded
