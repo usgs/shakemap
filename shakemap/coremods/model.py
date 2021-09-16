@@ -1905,9 +1905,14 @@ class ModelModule(CoreModule):
         for ndf in self.dataframes:
             sdf = getattr(self, ndf).df
             for myimt in self.imt_out_set:
-                mybias = sdf[myimt + '_pred_tau'] * self.mu_H_yD[myimt][0]
-                mybias_sig = np.sqrt(
-                    sdf[myimt + '_pred_tau']**2 * self.cov_HH_yD[myimt][0, 0])
+                if type(self.mu_H_yD[myimt]) is float:
+                    mybias = sdf[myimt + '_pred_tau'] * self.mu_H_yD[myimt]
+                    mybias_sig = np.sqrt(sdf[myimt + '_pred_tau']**2 *
+                                         self.cov_HH_yD[myimt])
+                else:
+                    mybias = sdf[myimt + '_pred_tau'] * self.mu_H_yD[myimt][0]
+                    mybias_sig = np.sqrt(sdf[myimt + '_pred_tau']**2 *
+                                         self.cov_HH_yD[myimt][0, 0])
                 sdf[myimt + '_bias'] = mybias.flatten()
                 sdf[myimt + '_bias_sigma'] = mybias_sig.flatten()
 
