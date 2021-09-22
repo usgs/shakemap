@@ -144,7 +144,7 @@ dev_list=(
 package_list=(
       "python=$py_ver"
       "$CC_PKG"
-      "cartopy>=0.18"
+      "cartopy>=0.20"
       "configobj>=5.0.6"
       "cython>=0.29.23"
       "defusedxml>=0.7.1"
