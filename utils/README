@@ -6,3 +6,6 @@ hdf2dict.py: Reads shake_result.hdf and outputs a dictionary of some MMI
              grids and metadata.
 json2dict.py: Reads stationlist.json and outputs a dictionary of some MMI
               station data.
+get_sm_stations.pm: (REQURIES libcomcat) Gets station information for an 
+                    event and outputs a CSV file with lon, lat, rjb, repi,
+                    pga_percent_g, pgv_cm_s
