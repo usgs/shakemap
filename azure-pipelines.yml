@@ -25,6 +25,9 @@ jobs:
           #MacOS_10_15_Python37:
           #imageName: 'macOS-10.15'
           #python.version: '3.7'
+      MacOS_11_Python38:
+        imageName: 'macos-11'
+        python.version: '3.8'
       MacOS_10_15_Python38:
         imageName: 'macOS-10.15'
         python.version: '3.8'
@@ -59,7 +62,7 @@ jobs:
           echo "MacOS 10.14"
         else
           export CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
-          echo "MacOS 10.15"
+          echo "MacOS 10.15 or MacOS 11"
         fi
       fi
       echo $(Agent.NAME)
