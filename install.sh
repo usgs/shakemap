@@ -35,13 +35,13 @@ while getopts p:d FLAG; do
   esac
 done
 
-if [ $py_ver == '3.8' ] && [ "$unamestr" == 'Linux' ]; then
-    echo "WARNING: ShakeMap on Python v3.8 on some versions of Linux "
-    echo "may fail in unexpected ways. We are enforcing the use "
-    echo "of Python v3.7 until this warning disappears."
-    echo ""
-    py_ver=3.7
-fi
+#if [ $py_ver == '3.8' ] && [ "$unamestr" == 'Linux' ]; then
+#    echo "WARNING: ShakeMap on Python v3.8 on some versions of Linux "
+#    echo "may fail in unexpected ways. We are enforcing the use "
+#    echo "of Python v3.7 until this warning disappears."
+#    echo ""
+#    py_ver=3.7
+#fi
 
 echo "Using python version $py_ver"
 echo ""
@@ -144,7 +144,7 @@ dev_list=(
 package_list=(
       "python=$py_ver"
       "$CC_PKG"
-      "cartopy>=0.18"
+      "cartopy>=0.20"
       "configobj>=5.0.6"
       "cython>=0.29.23"
       "defusedxml>=0.7.1"
@@ -171,6 +171,7 @@ package_list=(
       "python-daemon>=2.3.0"
       "pytest-faulthandler>=2.0.1"
       "pytest-azurepipelines>=0.8.0"
+      "rasterio==1.2.5"
       "scikit-image>=0.16.2"
       "scipy>=1.4.1"
       "shapely>=1.7.1"

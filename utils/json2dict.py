@@ -28,7 +28,8 @@ def get_station_dict(filename):
         'tau': An array of between-event stddev of the predictions
         'extra_sigma': An array of the additional stddev of the observations
         'bias': An array of the bias of the data at the observation points
-        'lats': An array of the stddev of the bias at the observation points
+        'bias_stddev': An array of the stddev of the bias at the observation
+                       points
     """
     lonlist = []
     latlist = []

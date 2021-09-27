@@ -22,15 +22,15 @@ jobs:
       Linux_Python38:
         imageName: 'ubuntu-latest'
         python.version: '3.8'
-      MacOS_10_15_Python37:
-        imageName: 'macOS-10.15'
-        python.version: '3.7'
+          #MacOS_10_15_Python37:
+          #imageName: 'macOS-10.15'
+          #python.version: '3.7'
       MacOS_10_15_Python38:
         imageName: 'macOS-10.15'
         python.version: '3.8'
-      MacOS_10_14_Python37:
-        imageName: 'macOS-10.14'
-        python.version: '3.7'
+          #MacOS_10_14_Python37:
+          #imageName: 'macOS-10.14'
+          #python.version: '3.7'
       MacOS_10_14_Python38:
         imageName: 'macOS-10.14'
         python.version: '3.8'

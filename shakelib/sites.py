@@ -223,7 +223,8 @@ class Sites(object):
 
         # Backarc should be a numpy array
         if lldict is not None:
-            backarcgrid = Grid2D(self._backarc, self._Vs30.getGeoDict())
+            tgd = self._Vs30.getGeoDict()
+            backarcgrid = Grid2D(self._backarc, tgd)
             sctx.backarc = backarcgrid.getValue(lats, lons, default=False)
         else:
             sctx.backarc = self._backarc.copy()
