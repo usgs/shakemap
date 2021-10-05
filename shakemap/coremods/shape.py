@@ -126,7 +126,7 @@ def create_polygons(container, datadir, logger, max_workers, method='pcontour'):
                                              ('PARAMVALUE', 'float:14.4')]),
                   'geometry': 'Polygon'}
     elif method == 'skimage':
-        schema = {'properties': OrderedDict([('value', 'float:2.1'),
+        schema = {'properties': OrderedDict([('value', 'float:14.4'),
                                              ('units', 'str'),
                                              ('color', 'str'),
                                              ('weight', 'float:13.3')]),
