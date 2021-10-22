@@ -22,8 +22,9 @@ source $prof
 VENV=shakemap
 
 developer=0
+openquake_deps=0
 py_ver=3.8
-while getopts p:d FLAG; do
+while getopts p:d:q FLAG; do
   case $FLAG in
     p)
         py_ver=$OPTARG
@@ -31,6 +32,10 @@ while getopts p:d FLAG; do
     d)
         echo "Installing developer packages."
         developer=1
+      ;;
+    q)
+        echo "Installing full OpenQuake dependencies."
+        openquake_deps=1
       ;;
   esac
 done
@@ -140,6 +145,14 @@ dev_list=(
     "sphinx-argparse>=0.2.5"
 )
 
+openquake_list=(
+      "decorator>=4.3"
+      "django>=3.2"
+      "requests>=2.20"
+      "setuptools"
+      "toml"
+)
+
 # Required package list:
 package_list=(
       "python=$py_ver"
@@ -171,6 +184,7 @@ package_list=(
       "python-daemon>=2.3.0"
       "pytest-faulthandler>=2.0.1"
       "pytest-azurepipelines>=0.8.0"
+      "pyzmq<20.0"
       "rasterio==1.2.5"
       "scikit-image>=0.16.2"
       "scipy>=1.4.1"
@@ -183,6 +197,11 @@ package_list=(
 
 if [ $developer == 1 ]; then
     package_list=( "${package_list[@]}" "${dev_list[@]}" )
+    echo ${package_list[*]}
+fi
+
+if [ $openquake_deps == 1 ]; then
+    package_list=( "${package_list[@]}" "${openquake_list[@]}" )
     echo ${package_list[*]}
 fi
 
@@ -233,7 +252,7 @@ fi
 
 # Install OQ from github to get NGA East since it isn't in a release yet.
 echo "Installing OpenQuake from github..."
-pip install --upgrade https://github.com/gem/oq-engine/archive/refs/tags/v3.12.0.tar.gz
+pip install --upgrade --no-dependencies https://github.com/gem/oq-engine/archive/refs/tags/v3.12.0.tar.gz
 if [ $? -ne 0 ];then
     echo "Failed to pip install OpenQuake. Exiting."
     exit 1
