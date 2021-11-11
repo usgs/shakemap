@@ -170,7 +170,7 @@ package_list=(
       "ipython>=7.22.0"
       "libcomcat>=2.0.12"
       "lockfile>=0.12.2"
-      "mapio>=0.7.27"
+      "mapio>0.7.27"
       "matplotlib-base>=3.4.2"
       "numpy==1.20"
       "obspy>=1.2.2"
