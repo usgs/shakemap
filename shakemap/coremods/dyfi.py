@@ -158,6 +158,8 @@ def _parse_dyfi_detail(detail):
         df = _parse_geocoded_csv(bytes_geo)
         return None, "Only cdi_geo.txt found, ignoring."
 
+    return df, ""
+
 
 def _parse_geocoded_csv(bytes_data):
     # the dataframe we want has columns:
