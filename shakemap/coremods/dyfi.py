@@ -137,20 +137,17 @@ def _parse_dyfi_detail(detail):
     df_10k = pd.DataFrame({"a": []})
     df_1k = pd.DataFrame({"a": []})
 
-    # get 10km data set, if exists
-    if len(dyfi.getContentsMatching("dyfi_geo_10km.geojson")):
-        bytes_10k, _ = dyfi.getContentBytes("dyfi_geo_10km.geojson")
-        df_10k = _parse_geocoded_json(bytes_10k)
-
     # get 1km data set, if exists
     if len(dyfi.getContentsMatching("dyfi_geo_1km.geojson")):
         bytes_1k, _ = dyfi.getContentBytes("dyfi_geo_1km.geojson")
         df_1k = _parse_geocoded_json(bytes_1k)
+        return df_1k, ""
 
-    if len(df_1k) >= len(df_10k):
-        df = df_1k
-    else:
-        df = df_10k
+    # get 10km data set, if exists
+    if len(dyfi.getContentsMatching("dyfi_geo_10km.geojson")):
+        bytes_10k, _ = dyfi.getContentBytes("dyfi_geo_10km.geojson")
+        df_10k = _parse_geocoded_json(bytes_10k)
+        return None, "Only 10km dataset found, ignoring."
 
     if not len(df):
         # try to get a text file data set
@@ -159,6 +156,7 @@ def _parse_dyfi_detail(detail):
 
         bytes_geo, _ = dyfi.getContentBytes("cdi_geo.txt")
         df = _parse_geocoded_csv(bytes_geo)
+        return None, "Only cdi_geo.txt found, ignoring."
 
     return df, ""
 
