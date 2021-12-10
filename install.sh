@@ -252,7 +252,7 @@ fi
 
 # Install OQ from github to get NGA East since it isn't in a release yet.
 echo "Installing OpenQuake from github..."
-pip install --upgrade --no-dependencies https://github.com/gem/oq-engine/archive/refs/tags/v3.12.0.tar.gz
+pip install --upgrade --no-dependencies https://github.com/gem/oq-engine/archive/engine-3.12.zip
 if [ $? -ne 0 ];then
     echo "Failed to pip install OpenQuake. Exiting."
     exit 1
