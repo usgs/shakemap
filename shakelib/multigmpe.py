@@ -12,6 +12,7 @@ from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
     CampbellBozorgnia2014)
 from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
+from openquake.hazardlib.valid import gsim
 from openquake.hazardlib.contexts import RuptureContext
 
 from shakelib.conversions.imt.abrahamson_bhasin_2020 import AbrahamsonBhasin2020
@@ -95,6 +96,16 @@ def stuff_context(sites, rup, dists):
         setattr(ctx, name, getattr(dists, name))
 
     return ctx
+
+
+def get_gmpe_from_name(name, conf):
+
+    # Only import the NullGMPE when we're testing
+    # We'll want to import any other GMPEs we add at the top of this module
+    # so that gsim() picks them up; anything in OQ is already included
+    if name == 'NullGMPE':
+       mod = import_module(conf['gmpe_modules'][name][1])
+    return gsim(name)
 
 
 class MultiGMPE(GMPE):
@@ -439,9 +450,11 @@ class MultiGMPE(GMPE):
                                 % selected_gmpe)
         elif selected_gmpe in conf['gmpe_modules'].keys():
             modinfo = conf['gmpe_modules'][selected_gmpe]
-            mod = import_module(modinfo[1])
-            tmpclass = getattr(mod, modinfo[0])
-            out = MultiGMPE.__from_list__([tmpclass()], [1.0], imc=IMC)
+            # mod = import_module(modinfo[1])
+            # tmpclass = getattr(mod, modinfo[0])
+            # out = MultiGMPE.__from_list__([tmpclass()], [1.0], imc=IMC)
+            out = MultiGMPE.__from_list__(
+                [get_gmpe_from_name(modinfo[0], conf)], [1.0], imc=IMC)
         else:
             raise TypeError("conf['modeling']['gmpe'] must be a key in "
                             "conf['gmpe_modules'] or conf['gmpe_sets']")
@@ -531,9 +544,13 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
         gmpes = []
         for g in selected_gmpes:
-            mod = import_module(conf['gmpe_modules'][g][1])
-            tmpclass = getattr(mod, conf['gmpe_modules'][g][0])
-            gmpes.append(tmpclass())
+            # This is the old school way of importing the modules; I'm
+            # leaving it in here temporarily just for documentation.
+            # mod = import_module(conf['gmpe_modules'][g][1])
+            # tmpclass = getattr(mod, conf['gmpe_modules'][g][0])
+            # gmpes.append(tmpclass())
+            gmpe_name = conf['gmpe_modules'][g][0]
+            gmpes.append(get_gmpe_from_name(gmpe_name, conf))
 
         # ---------------------------------------------------------------------
         # Filter out GMPEs not applicable to this period
@@ -552,9 +569,13 @@ class MultiGMPE(GMPE):
                 selected_site_gmpes = [selected_site_gmpes]
             site_gmpes = []
             for g in selected_site_gmpes:
-                mod = import_module(conf['gmpe_modules'][g][1])
-                tmpclass = getattr(mod, conf['gmpe_modules'][g][0])
-                site_gmpes.append(tmpclass())
+                # This is the old school way of importing the modules; I'm
+                # leaving it in here temporarily just for documentation.
+                # mod = import_module(conf['gmpe_modules'][g][1])
+                # tmpclass = getattr(mod, conf['gmpe_modules'][g][0])
+                # site_gmpes.append(tmpclass())
+                gmpe_name = conf['gmpe_modules'][g][0]
+                site_gmpes.append(get_gmpe_from_name(gmpe_name, conf))
         else:
             site_gmpes = None
 
@@ -669,7 +690,8 @@ class MultiGMPE(GMPE):
 
         for g in gmpes:
             if not isinstance(g, GMPE):
-                raise Exception("\"%s\" is not a GMPE instance." % g)
+                raise Exception("\"%s\" is a %s not a GMPE instance."
+            % (g, type(g)))
 
         self = cls()
         self.GMPES = gmpes

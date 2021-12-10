@@ -3,6 +3,7 @@ import logging
 
 from openquake.hazardlib import imt
 from openquake.hazardlib import const
+from openquake.hazardlib.valid import gsim
 from openquake.hazardlib.geo.utils import OrthographicProjection
 from openquake.hazardlib.gsim.base import SitesContext
 from openquake.hazardlib.gsim.base import DistancesContext
@@ -19,25 +20,9 @@ from shakelib.station import StationList
 from strec.gmreg import Regionalizer
 
 # ACR GMPE/GMICE
-from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
-from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
-    CampbellBozorgnia2014)
-from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from shakelib.gmice.wgrw12 import WGRW12
 
 # SCR GMPE/GMICE
-from openquake.hazardlib.gsim.frankel_1996 import FrankelEtAl1996MwNSHMP2008
-from openquake.hazardlib.gsim.toro_1997 import ToroEtAl1997MwNSHMP2008
-from openquake.hazardlib.gsim.silva_2002 import SilvaEtAl2002MwNSHMP2008
-from openquake.hazardlib.gsim.campbell_2003 import Campbell2003MwNSHMP2008
-from openquake.hazardlib.gsim.tavakoli_pezeshk_2005 import (
-    TavakoliPezeshk2005MwNSHMP2008)
-from openquake.hazardlib.gsim.atkinson_boore_2006 import (
-    AtkinsonBoore2006Modified2011)
-from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
-from openquake.hazardlib.gsim.boore_atkinson_2011 import Atkinson2008prime
-from openquake.hazardlib.gsim.somerville_2001 import (
-    SomervilleEtAl2001NSHMP2008)
 from shakelib.gmice.ak07 import AK07
 
 
@@ -224,23 +209,23 @@ def _get_extent_from_multigmpe(rupture, config=None):
         # as defaults...
         stable = is_stable(origin.lon, origin.lat)
         if not stable:
-            ASK14 = AbrahamsonEtAl2014()
-            CB14 = CampbellBozorgnia2014()
-            CY14 = ChiouYoungs2014()
+            ASK14 = gsim('AbrahamsonEtAl2014')
+            CB14 = gsim('CampbellBozorgnia2014')
+            CY14 = gsim('ChiouYoungs2014')
             gmpes = [ASK14, CB14, CY14]
             site_gmpes = None
             weights = [1/3.0, 1/3.0, 1/3.0]
             gmice = WGRW12()
         else:
-            Fea96 = FrankelEtAl1996MwNSHMP2008()
-            Tea97 = ToroEtAl1997MwNSHMP2008()
-            Sea02 = SilvaEtAl2002MwNSHMP2008()
-            C03 = Campbell2003MwNSHMP2008()
-            TP05 = TavakoliPezeshk2005MwNSHMP2008()
-            AB06p = AtkinsonBoore2006Modified2011()
-            Pea11 = PezeshkEtAl2011()
-            Atk08p = Atkinson2008prime()
-            Sea01 = SomervilleEtAl2001NSHMP2008()
+            Fea96 = gsim('FrankelEtAl1996MwNSHMP2008')
+            Tea97 = gsim('ToroEtAl1997MwNSHMP2008')
+            Sea02 = gsim('SilvaEtAl2002MwNSHMP2008')
+            C03 = gsim('Campbell2003MwNSHMP2008')
+            TP05 = gsim('TavakoliPezeshk2005MwNSHMP2008')
+            AB06p = gsim('AtkinsonBoore2006Modified2011')
+            Pea11 = gsim('PezeshkEtAl2011')
+            Atk08p = gsim('Atkinson2008prime')
+            Sea01 = gsim('SomervilleEtAl2001NSHMP2008')
             gmpes = [Fea96, Tea97, Sea02, C03,
                      TP05, AB06p, Pea11, Atk08p, Sea01]
             site_gmpes = [AB06p]
