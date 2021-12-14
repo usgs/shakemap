@@ -14,7 +14,6 @@ from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.base import Rupture
 from shakelib.multigmpe import MultiGMPE, set_sites_depth_parameters
-from shakelib.sites import Sites
 from shakelib.station import StationList
 
 from strec.gmreg import Regionalizer
