@@ -42,11 +42,11 @@ def set_sites_depth_parameters(sites, gmpe):
 
     Sites._addDepthParameters(sites)
 
-    if gmpe == '[AbrahamsonEtAl2014]' or \
-       gmpe == '[AbrahamsonEtAl2014RegTWN]' or \
-       gmpe == '[AbrahamsonEtAl2014RegCHN]':
+    if gmpe == "[AbrahamsonEtAl2014]" or \
+       gmpe == "[AbrahamsonEtAl2014]\nregion = 'TWN'" or \
+       gmpe == "[AbrahamsonEtAl2014]\nregion = 'CHN'":
         sites.z1pt0 = sites.z1pt0_ask14_cal
-    if gmpe == '[AbrahamsonEtAl2014RegJPN]':
+    if gmpe == "[AbrahamsonEtAl2014]\nregion = 'JPN'":
         sites.z1pt0 = sites.z1pt0_ask14_jpn
     if gmpe == '[ChiouYoungs2014]' or \
        isinstance(gmpe, BooreEtAl2014):
@@ -192,7 +192,7 @@ class MultiGMPE(GMPE):
         # Undo reshapes of inputs
         for k, v in dists.__dict__.items():
             if k == '_slots_':
-                continue
+               continue
             if (k != 'lons') and (k != 'lats') and v is not None:
                 dists.__dict__[k] = np.reshape(dists.__dict__[k], orig_shape)
         for k, v in sites.__dict__.items():
@@ -273,7 +273,7 @@ class MultiGMPE(GMPE):
                             vs30min = float(v[0])
                             vs30max = float(v[1])
                             sites.vs30 = np.clip(sites.vs30, vs30min, vs30max)
-                            Sites_.addDepthParameters(sites)
+                            Sites._addDepthParameters(sites)
 
             # -----------------------------------------------------------------
             # Evaluate
