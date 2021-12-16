@@ -19,6 +19,9 @@ from shakelib.conversions.imt.abrahamson_bhasin_2020 import AbrahamsonBhasin2020
 from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
 from shakelib.sites import Sites
 
+# Special case GMPEs:
+from shakelib.gmpe.nga_east import NGAEast
+
 
 def set_sites_depth_parameters(sites, gmpe):
     """
@@ -104,7 +107,7 @@ def get_gmpe_from_name(name, conf):
     # We'll want to import any other GMPEs we add at the top of this module
     # so that gsim() picks them up; anything in OQ is already included
     if name == 'NullGMPE':
-       mod = import_module(conf['gmpe_modules'][name][1])
+        mod = import_module(conf['gmpe_modules'][name][1])
     return gsim(name)
 
 
