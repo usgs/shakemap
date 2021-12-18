@@ -47,8 +47,7 @@ class Distance(object):
 
         self._rupture = rupture
 
-        self._distance_context = self._calcDistanceContext(
-            gmpe, lat, lon, dep)
+        self._distance_context = self._calcDistanceContext(gmpe, lat, lon, dep)
 
     @classmethod
     def fromSites(cls, gmpe, sites, rup):
@@ -101,26 +100,28 @@ class Distance(object):
             gmpe = [gmpe]
 
         # require rhypo always
-        requires = set(['repi', 'rhypo', 'rrup', 'rjb'])
+        requires = set(["repi", "rhypo", "rrup", "rjb"])
 
         for ig in gmpe:
             if not isinstance(ig, GMPE):
                 raise TypeError(
-                    'getDistanceContext() cannot work with objects of '
-                    'type "%s"' % type(ig))
+                    "getDistanceContext() cannot work with objects of "
+                    'type "%s"' % type(ig)
+                )
             requires = requires | ig.REQUIRES_DISTANCES
 
         context = base.DistancesContext()
 
         if isinstance(self._rupture, EdgeRupture):
-            ddict = get_distance(list(requires), lat, lon, dep, self._rupture,
-                                 dx=self._rupture._mesh_dx)
+            ddict = get_distance(
+                list(requires), lat, lon, dep, self._rupture, dx=self._rupture._mesh_dx
+            )
         else:
             ddict = get_distance(list(requires), lat, lon, dep, self._rupture)
         for method in requires:
             (context.__dict__)[method] = ddict[method]
-            if method in ('rrup', 'rjb'):
-                (context.__dict__)[method + '_var'] = ddict[method + '_var']
+            if method in ("rrup", "rjb"):
+                (context.__dict__)[method + "_var"] = ddict[method + "_var"]
 
         return context
 
@@ -135,8 +136,7 @@ def get_distance_measures():
         A list of strings.
     """
 
-    return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T',
-            'rvolc']
+    return ["repi", "rhypo", "rjb", "rrup", "rx", "ry", "ry0", "U", "T", "rvolc"]
 
 
 def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
@@ -201,39 +201,38 @@ def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
     methods_available = set(get_distance_measures())
     if not set(methods).issubset(methods_available):
         raise NotImplementedError(
-            'One or more requested distance method is not '
-            'valid or is not implemented yet')
+            "One or more requested distance method is not "
+            "valid or is not implemented yet"
+        )
 
     # Check dimensions of site coordinates
     if (lat.shape != lon.shape) or (lat.shape != dep.shape):
-        raise ShakeLibException('lat, lon, and dep must have the same shape.')
+        raise ShakeLibException("lat, lon, and dep must have the same shape.")
 
     # -------------------------------------------------------------------------
     # Point distances
     # -------------------------------------------------------------------------
-    if 'rhypo' in methods:
-        distdict['rhypo'] = rupture.computeRhyp(lon, lat, dep)
+    if "rhypo" in methods:
+        distdict["rhypo"] = rupture.computeRhyp(lon, lat, dep)
 
-    if 'repi' in methods:
-        distdict['repi'] = rupture.computeRepi(lon, lat, dep)
+    if "repi" in methods:
+        distdict["repi"] = rupture.computeRepi(lon, lat, dep)
 
     # -------------------------------------------------------------------------
     # Rupture distances
     # -------------------------------------------------------------------------
-    gc2_distances = set(['rx', 'ry', 'ry0', 'U', 'T'])
-    if 'rrup' in methods:
-        distdict['rrup'], distdict['rrup_var'] = rupture.computeRrup(lon, lat,
-                                                                     dep)
+    gc2_distances = set(["rx", "ry", "ry0", "U", "T"])
+    if "rrup" in methods:
+        distdict["rrup"], distdict["rrup_var"] = rupture.computeRrup(lon, lat, dep)
 
-    if 'rjb' in methods:
-        distdict['rjb'], distdict['rjb_var'] = rupture.computeRjb(lon, lat,
-                                                                  dep)
+    if "rjb" in methods:
+        distdict["rjb"], distdict["rjb_var"] = rupture.computeRjb(lon, lat, dep)
 
     # If any of the GC2-related distances are requested, may as well do all
     if len(set(methods).intersection(gc2_distances)) > 0:
         distdict.update(rupture.computeGC2(lon, lat, dep))
 
-    if 'rvolc' in methods:
-        distdict['rvolc'] = np.zeros_like(lon)
+    if "rvolc" in methods:
+        distdict["rvolc"] = np.zeros_like(lon)
 
     return distdict

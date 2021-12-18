@@ -18,7 +18,7 @@ class SleepModule(CoreModule):
     sleep -- Sleep for a number of seconds.
     """
 
-    command_name = 'sleep'
+    command_name = "sleep"
 
     def __init__(self, eventid, seconds=None):
         """
@@ -45,10 +45,13 @@ class SleepModule(CoreModule):
         Set up the object to accept the --seconds flag.
         """
         parser = argparse.ArgumentParser(
-            prog=self.__class__.command_name,
-            description=inspect.getdoc(self.__class__))
-        parser.add_argument('-s', '--seconds', help='Specify the number of '
-                            'seconds that the module should sleep.')
+            prog=self.__class__.command_name, description=inspect.getdoc(self.__class__)
+        )
+        parser.add_argument(
+            "-s",
+            "--seconds",
+            help="Specify the number of " "seconds that the module should sleep.",
+        )
         #
         # This line should be in any modules that overrides this
         # one. It will collect up everything after the current
@@ -57,8 +60,7 @@ class SleepModule(CoreModule):
         # will not work as it will suck up any later modules'
         # options that are the same as this one's.
         #
-        parser.add_argument('rem', nargs=argparse.REMAINDER,
-                            help=argparse.SUPPRESS)
+        parser.add_argument("rem", nargs=argparse.REMAINDER, help=argparse.SUPPRESS)
         args = parser.parse_args(arglist)
         self.seconds = int(args.seconds)
         return args.rem

@@ -35,9 +35,7 @@ class VirtualIPE(GMPE):
     DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([MMI])
     #: The OpenQuake standard deviation types that may be produced (will
     #: depend on the GMPE provided).
-    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
-        const.StdDev.TOTAL
-    ])
+    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([const.StdDev.TOTAL])
     #: Distance measures required (will depend on the GMPE provided).
     REQUIRES_DISTANCES = None
     #: OpenQuake IMC used (will depend on the GMPE, but "Larger" is
@@ -68,32 +66,39 @@ class VirtualIPE(GMPE):
         self.gmpe = gmpe
         self.gmice = gmice
 
-        if (gmpe.ALL_GMPES_HAVE_PGV is True and
-                PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES):
+        if (
+            gmpe.ALL_GMPES_HAVE_PGV is True
+            and PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+        ):
             self.imt = PGV()
-        elif (PGA in gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES and
-              PGA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES):
+        elif (
+            PGA in gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+            and PGA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+        ):
             self.imt = PGA()
-        elif (SA in gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES and
-              SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES):
+        elif (
+            SA in gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+            and SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+        ):
             self.imt = SA(1.0)
         else:
             raise ShakeLibException(
-                'The supplied GMPE and GMICE do not have a common IMT'
+                "The supplied GMPE and GMICE do not have a common IMT"
             )
 
-        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = \
+        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = (
             gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES.copy()
+        )
 
         self.REQUIRES_DISTANCES = gmpe.REQUIRES_DISTANCES.copy()
-        self.REQUIRES_RUPTURE_PARAMETERS = \
-            gmpe.REQUIRES_RUPTURE_PARAMETERS.copy()
-        self.REQUIRES_SITES_PARAMETERS = \
-            gmpe.REQUIRES_SITES_PARAMETERS.copy()
-        self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
-            copy.copy(gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT)
-        self.DEFINED_FOR_TECTONIC_REGION_TYPE = \
-            copy.copy(gmpe.DEFINED_FOR_TECTONIC_REGION_TYPE)
+        self.REQUIRES_RUPTURE_PARAMETERS = gmpe.REQUIRES_RUPTURE_PARAMETERS.copy()
+        self.REQUIRES_SITES_PARAMETERS = gmpe.REQUIRES_SITES_PARAMETERS.copy()
+        self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = copy.copy(
+            gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
+        )
+        self.DEFINED_FOR_TECTONIC_REGION_TYPE = copy.copy(
+            gmpe.DEFINED_FOR_TECTONIC_REGION_TYPE
+        )
 
         return self
 
@@ -128,8 +133,7 @@ class VirtualIPE(GMPE):
         #
         # Get the mean ground motions and stddev for the preferred IMT
         #
-        mgm, sdev = self.gmpe.get_mean_and_stddevs(sx, rx, dx, self.imt,
-                                                   stddev_types)
+        mgm, sdev = self.gmpe.get_mean_and_stddevs(sx, rx, dx, self.imt, stddev_types)
 
         if fd is not None:
             mgm = mgm + fd
@@ -137,7 +141,7 @@ class VirtualIPE(GMPE):
         #
         # Get the MMI and the dMMI/dPGM from the GMICE
         #
-        if hasattr(dx, 'rrup'):
+        if hasattr(dx, "rrup"):
             dist4gmice = dx.rrup
         else:
             dist4gmice = dx.rhypo
@@ -152,10 +156,10 @@ class VirtualIPE(GMPE):
         ntypes = len(stddev_types)
         nsd = len(sdev)
         mmi_sd = [None] * nsd
-        gm2mi_var = (self.gmice.getGM2MIsd()[self.imt])**2
+        gm2mi_var = (self.gmice.getGM2MIsd()[self.imt]) ** 2
         dmda *= dmda
         for i in range(nsd):
-            gm_var_in_mmi = dmda * sdev[i]**2
+            gm_var_in_mmi = dmda * sdev[i] ** 2
             if stddev_types[i % ntypes] == const.StdDev.INTER_EVENT:
                 mmi_sd[i] = np.sqrt(gm_var_in_mmi)
             else:

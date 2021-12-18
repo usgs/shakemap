@@ -18,15 +18,13 @@ import shlex
 
 # local imports
 import shakemap
-from shakemap.utils.config import (get_config_paths,
-                                   get_configspec,
-                                   config_error)
+from shakemap.utils.config import get_config_paths, get_configspec, config_error
 from shakemap.utils.logging import get_logger
 from shakemap.utils.dependencies import CommandDatabase
 from shakemap.utils.exception import TerminateShakeMap
 from shakelib.rupture.origin import read_event_file
 
-CANCEL_FILE = 'CANCELED'
+CANCEL_FILE = "CANCELED"
 
 
 def _get_config():
@@ -34,8 +32,8 @@ def _get_config():
     Read the config file and return the resulting structure.
     """
     install_path, data_path = get_config_paths()
-    config_file = os.path.join(install_path, 'config', 'shake.conf')
-    spec_file = get_configspec('shake')
+    config_file = os.path.join(install_path, "config", "shake.conf")
+    spec_file = get_configspec("shake")
     config = ConfigObj(config_file, configspec=spec_file)
     results = config.validate(Validator())
     if not isinstance(results, bool) or not results:
@@ -53,12 +51,13 @@ def _get_command_classes(config):
             is a subclass of shakemap.coremods.base.CoreModule.
     """
     coremods = {}
-    for modname in config['coremods']:
+    for modname in config["coremods"]:
         mod = importlib.import_module(modname)
         cm = {
             name: importlib.import_module(name)
-            for finder, name, ispkg
-            in pkgutil.iter_modules(mod.__path__, mod.__name__ + ".")
+            for finder, name, ispkg in pkgutil.iter_modules(
+                mod.__path__, mod.__name__ + "."
+            )
         }
         coremods.update(cm)
 
@@ -67,14 +66,17 @@ def _get_command_classes(config):
         for m in inspect.getmembers(module, inspect.isclass):
             if m[1].__module__ == name:
                 core_class = getattr(module, m[0])
-                if not hasattr(core_class, 'command_name'):
+                if not hasattr(core_class, "command_name"):
                     continue
                 cmd = core_class.command_name
 
                 if not cmd:
                     continue
-                classes[cmd] = {'class': core_class, 'module': module,
-                                'mfile': module.__file__}
+                classes[cmd] = {
+                    "class": core_class,
+                    "module": module,
+                    "mfile": module.__file__,
+                }
 
     ordered_classes = OrderedDict()
     for k in sorted(classes.keys()):
@@ -101,16 +103,16 @@ def _format_error_info(exception, eventid):
 
     """
     # try to get the basic earthquake info - if it fails, move on.
-    eqinfo = 'Not available'
+    eqinfo = "Not available"
     install_path, data_path = get_config_paths()
-    datadir = os.path.join(data_path, eventid, 'current')
+    datadir = os.path.join(data_path, eventid, "current")
     if os.path.isdir(datadir):
-        datafile = os.path.join(datadir, 'event.xml')
+        datafile = os.path.join(datadir, "event.xml")
         if os.path.isfile(datafile):
             edict = read_event_file(datafile)
-            mag = edict['mag']
-            loc = edict['locstring']
-            eqinfo = 'M%.1f %s' % (mag, loc)
+            mag = edict["mag"]
+            loc = edict["locstring"]
+            eqinfo = "M%.1f %s" % (mag, loc)
 
     stringio = io.StringIO()
     ex_type, ex, tb = sys.exc_info()
@@ -118,8 +120,7 @@ def _format_error_info(exception, eventid):
     stack_trace = stringio.getvalue()
     stringio.close()
     hostname = socket.gethostname()
-    fmt = ('\nEarthquake: %s\nHost: %s\nEvent ID: %s\nException: %s\n'
-           'Stack Trace: %s')
+    fmt = "\nEarthquake: %s\nHost: %s\nEvent ID: %s\nException: %s\n" "Stack Trace: %s"
     error_msg = fmt % (eqinfo, hostname, eventid, str(exception), stack_trace)
     return error_msg
 
@@ -131,52 +132,68 @@ def get_parser():
     Returns:
         ArgumentParser: argparse argument parser.
     """
-    description = '''
+    description = """
     Run specified ShakeMap modules.
-    '''
+    """
 
-    epilog = 'Available modules:\n'
+    epilog = "Available modules:\n"
     for key, core_class in _classes_.items():
-        if key.startswith('xtest'):
+        if key.startswith("xtest"):
             continue
-        epilog += '    - %s\n' % inspect.getdoc(core_class['class'])
+        epilog += "    - %s\n" % inspect.getdoc(core_class["class"])
 
-    epilog += '\nUse "shake help command" to see the options for a '\
-              'specific command.\n'
+    epilog += (
+        '\nUse "shake help command" to see the options for a ' "specific command.\n"
+    )
 
     parser = argparse.ArgumentParser(
         description=description,
         epilog=epilog,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('eventid',
-                        help='The id of the event to process.')
-    parser.add_argument('cmds', nargs=argparse.REMAINDER,
-                        help='The modules to run.')
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("eventid", help="The id of the event to process.")
+    parser.add_argument("cmds", nargs=argparse.REMAINDER, help="The modules to run.")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-d', '--debug', action='store_true',
-                       help='Print all informational messages.')
-    group.add_argument('-q', '--quiet', action='store_true',
-                       help='Print only errors.')
-    parser.add_argument('-l', '--log', action='store_true',
-                        help='Log all output.')
-    parser.add_argument('-f', '--force', action='store_true',
-                        help='Force the command(s) to run regardless of out '
-                             'of date dependencies.')
-    parser.add_argument('-c', '--cancel', action='store_true',
-                        help='Cancel shakemap; execute cancel_modules list in '
-                             'shake.conf.')
-    group.add_argument('-y', '--dryrun', action='store_true',
-                       help='Print a command line that would be executed if '
-                            'the process was called without this flag, and '
-                            'then exit without other action.')
+    group.add_argument(
+        "-d", "--debug", action="store_true", help="Print all informational messages."
+    )
+    group.add_argument("-q", "--quiet", action="store_true", help="Print only errors.")
+    parser.add_argument("-l", "--log", action="store_true", help="Log all output.")
     parser.add_argument(
-        '-a', '--autorun', action='store_true',
-        help='No-op; we are keeping this argument for backward compatibility '
-        'but it no longer does anything. It is now the default behavior to '
-        'use the autorun_modules in shake.conf when no modules are specified.')
-    parser.add_argument('-v', '--version', action='version',
-                        version='ShakeMap version %s' % shakemap.__version__,
-                        help='Print the version of ShakeMap and quit.')
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force the command(s) to run regardless of out " "of date dependencies.",
+    )
+    parser.add_argument(
+        "-c",
+        "--cancel",
+        action="store_true",
+        help="Cancel shakemap; execute cancel_modules list in " "shake.conf.",
+    )
+    group.add_argument(
+        "-y",
+        "--dryrun",
+        action="store_true",
+        help="Print a command line that would be executed if "
+        "the process was called without this flag, and "
+        "then exit without other action.",
+    )
+    parser.add_argument(
+        "-a",
+        "--autorun",
+        action="store_true",
+        help="No-op; we are keeping this argument for backward compatibility "
+        "but it no longer does anything. It is now the default behavior to "
+        "use the autorun_modules in shake.conf when no modules are specified.",
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version="ShakeMap version %s" % shakemap.__version__,
+        help="Print the version of ShakeMap and quit.",
+    )
     return parser
 
 
@@ -192,28 +209,28 @@ def main(args):
     log_option = None
     log_file = None
     if args.debug:
-        log_option = 'debug'
+        log_option = "debug"
     if args.quiet:
-        log_option = 'quiet'
+        log_option = "quiet"
     if args.log:
-        log_file = 'log'
+        log_file = "log"
 
     logger = get_logger(args.eventid, log_option=log_option, log_file=log_file)
 
     if args.autorun:
         logger.warning(
-            'The -a (--autorun) option is deprecated. It is now the default '
-            'behavior to use the autorun_modules in shake.conf when no '
-            'modules are specified.')
+            "The -a (--autorun) option is deprecated. It is now the default "
+            "behavior to use the autorun_modules in shake.conf when no "
+            "modules are specified."
+        )
 
-    event_path = os.path.join(data_path, args.eventid, 'current')
+    event_path = os.path.join(data_path, args.eventid, "current")
     cancel_file = os.path.join(event_path, CANCEL_FILE)
     if os.path.isfile(cancel_file):
-        if _config_['process_canceled']:
+        if _config_["process_canceled"]:
             os.remove(cancel_file)
         else:
-            logger.error(
-                'Event %s has been canceled: aborting run' % args.eventid)
+            logger.error("Event %s has been canceled: aborting run" % args.eventid)
             return
 
     #
@@ -229,70 +246,72 @@ def main(args):
             if not args.cancel:
                 # cancel option was not set
                 if args.dryrun is False:
-                    logger.info(
-                        'No modules specified, checking for autoun_modules...')
-                args.cmds = shlex.split(_config_['autorun_modules'])
+                    logger.info("No modules specified, checking for autoun_modules...")
+                args.cmds = shlex.split(_config_["autorun_modules"])
                 if len(args.cmds):
                     if args.dryrun is False:
-                        logger.info('Autorun modules found: %s' % args.cmds)
+                        logger.info("Autorun modules found: %s" % args.cmds)
                 else:
                     logger.warning(
-                        'No modules specified, and no autorun_modules '
-                        'configured. Nothing to do! -- Exiting --')
+                        "No modules specified, and no autorun_modules "
+                        "configured. Nothing to do! -- Exiting --"
+                    )
                     sys.exit(0)
             else:
                 # cancel option was set
-                logger.info('Cancelling shakemap, using cancel_modules...')
-                with open(cancel_file, 'wt') as f:
-                    f.write('\n')
+                logger.info("Cancelling shakemap, using cancel_modules...")
+                with open(cancel_file, "wt") as f:
+                    f.write("\n")
 
-                args.cmds = shlex.split(_config_['cancel_modules'])
+                args.cmds = shlex.split(_config_["cancel_modules"])
                 if len(args.cmds):
-                    logger.info('Cancel modules found: %s' % args.cmds)
+                    logger.info("Cancel modules found: %s" % args.cmds)
                 else:
                     logger.warning(
-                        'Cancel option specified, but no cancel_modules '
-                        'configured. Nothing to do! -- Exiting --')
+                        "Cancel option specified, but no cancel_modules "
+                        "configured. Nothing to do! -- Exiting --"
+                    )
                     sys.exit(0)
 
         arglist = args.cmds.copy()
-        logger.debug('arglist: %s' % arglist)
+        logger.debug("arglist: %s" % arglist)
 
         if args.dryrun is True:
 
             cmdlist = ""
             for item in arglist:
-                if ' ' in item:
+                if " " in item:
                     cmdlist += "'%s' " % item
                 else:
-                    cmdlist += item + ' '
+                    cmdlist += item + " "
             print("Dryrun. The following command would be run:")
             print("shake %s %s" % (args.eventid, cmdlist))
             sys.exit(0)
 
-        oldcmd = ''
-        while(len(arglist) > 0):
+        oldcmd = ""
+        while len(arglist) > 0:
             cmd = arglist.pop(0)
 
-            if cmd.startswith('-'):
-                raise KeyError('Command "%s" cannot process option "%s"' %
-                               (oldcmd, cmd))
+            if cmd.startswith("-"):
+                raise KeyError(
+                    'Command "%s" cannot process option "%s"' % (oldcmd, cmd)
+                )
 
             if cmd not in _classes_:
                 raise KeyError('Command "%s" not found in ShakeMap.' % cmd)
 
-            cmd_class = _classes_[cmd]['class']
+            cmd_class = _classes_[cmd]["class"]
             cmd_obj = cmd_class(args.eventid)
             cmd_list[cmd] = cmd_obj
 
-            if args.eventid.lower() == 'help':
-                arglist = ['-h']
+            if args.eventid.lower() == "help":
+                arglist = ["-h"]
 
             arglist = cmd_obj.parseArgs(arglist)
             oldcmd = cmd
 
         for cmd, obj in cmd_list.items():
-            logger.info('Running command %s' % cmd)
+            logger.info("Running command %s" % cmd)
             status = cdb.getDependencyStatus(cmd)
             while len(status) > 0:
                 if len(status) == 1 and status[0] == cmd:
@@ -302,15 +321,16 @@ def main(args):
                 # is a model.conf, then select doesn't need to be run.
                 # So drop it and continue the checking process.
                 #
-                if status[0] == 'select':
-                    if os.path.isfile(os.path.join(event_path, 'model.conf')):
-                        status.remove('select')
+                if status[0] == "select":
+                    if os.path.isfile(os.path.join(event_path, "model.conf")):
+                        status.remove("select")
                         continue
                 logger.warning(
                     "Out of date dependencies. The following commands "
                     "should be rerun before '%s' (use --force to "
                     "ignore this warning and attempt to run the "
-                    "module anyway):" % cmd)
+                    "module anyway):" % cmd
+                )
                 if cmd in status:
                     status.remove(cmd)
                 logger.warning(", ".join(status))
@@ -318,21 +338,19 @@ def main(args):
                     logger.warning("Exiting.")
                     sys.exit(0)
                 else:
-                    logger.warning(
-                        'Running "%s" because of --force option.' % cmd)
+                    logger.warning('Running "%s" because of --force option.' % cmd)
                 break
             t1 = time.time()
             try:
                 obj.execute()
             except TerminateShakeMap as e:
-                logger.warning(
-                    "ShakeMap terminated in module %s: %s" % (cmd, str(e)))
+                logger.warning("ShakeMap terminated in module %s: %s" % (cmd, str(e)))
                 break
             t2 = time.time()
             elapsed = t2 - t1
             logger.info(
-                'Finished running command %s: Elapsed %.2f secs'
-                % (cmd, elapsed))
+                "Finished running command %s: Elapsed %.2f secs" % (cmd, elapsed)
+            )
             # create/update the contents.xml file
             obj.writeContents()
             cdb.updateCommand(cmd)
@@ -345,11 +363,11 @@ def main(args):
     logger.info("shake finished with event %s" % args.eventid)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = get_parser()
     pargs = parser.parse_args()
 
-    if pargs.eventid.lower() == 'help' and len(pargs.cmds) == 0:
+    if pargs.eventid.lower() == "help" and len(pargs.cmds) == 0:
         parser.print_help()
     else:
         main(pargs)

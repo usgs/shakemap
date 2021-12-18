@@ -33,13 +33,12 @@ class NewmarkHall1982(IMTConverter):
         Newmark, N. M., & Hall, W. J. (1982). Earthquake spectra and design.
         Earthquake Engineering Research Institute, El Cerrito, California.
     """
+
     def __init__(self):
         super().__init__()
         # output_input dictionary where the key is the output
         # and the value is a list of the possible inputs
-        self.output_input = {
-            'PGV': ['PSA10']
-        }
+        self.output_input = {"PGV": ["PSA10"]}
         self._lnfact = np.log(37.27 * 2.54)
         self.conversion_factor = np.exp(self._lnfact)
         self._lnsigma = 0.5146578
@@ -66,12 +65,12 @@ class NewmarkHall1982(IMTConverter):
         imt_in = imt_in.upper().strip()
         imt_out = imt_out.upper().strip()
         conversion_factor = self._lnfact
-        if imt_in == 'PSA10' and imt_out == 'PGV':
-            new_imt = self._convertToPGV(imt,
-                    conversion_factor)
+        if imt_in == "PSA10" and imt_out == "PGV":
+            new_imt = self._convertToPGV(imt, conversion_factor)
         else:
-            raise ValueError('No conversion available from %r to %r' % (imt_in,
-                    imt_out))
+            raise ValueError(
+                "No conversion available from %r to %r" % (imt_in, imt_out)
+            )
         return new_imt
 
     def convertSigmas(self, imt_in, imt_out, sigma):
@@ -91,8 +90,7 @@ class NewmarkHall1982(IMTConverter):
         """
         self._verifyConversion(imt_in, imt_out)
         lnsigma = self._lnsigma
-        sigmaTot = np.sqrt((sigma ** 2) +
-                           (lnsigma ** 2))
+        sigmaTot = np.sqrt((sigma ** 2) + (lnsigma ** 2))
         return sigmaTot
 
     def getLnSigma(self):

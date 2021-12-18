@@ -45,8 +45,10 @@ def replace_dyfi(stationfile, dyfi_xml):
     # reach into the internal database and find the instrumented stations
     conn = stations.db
     cursor = stations.cursor
-    query1 = ('SELECT id from station WHERE instrumented = '
-              '0 and (network = "DYFI" or network="CIIM")')
+    query1 = (
+        "SELECT id from station WHERE instrumented = "
+        '0 and (network = "DYFI" or network="CIIM")'
+    )
     cursor.execute(query1)
     rows = cursor.fetchall()
     for row in rows:
@@ -94,30 +96,36 @@ def get_extent(rupture=None, config=None):
     bounds = []
     offsets = None
     if config is not None:
-        if 'extent' in config:
-            if 'magnitude_spans' in config['extent']:
-                if len(config['extent']['magnitude_spans']):
-                    if isinstance(config['extent']['magnitude_spans'], dict):
-                        spans = config['extent']['magnitude_spans']
-            if 'bounds' in config['extent']:
-                if 'extent' in config['extent']['bounds']:
-                    if config['extent']['bounds']['extent'][0] != -999.0:
-                        bounds = config['extent']['bounds']['extent']
-            if 'relative_offset' in config['extent']:
-                if isinstance(config['extent']['relative_offset'], list):
-                    offsets = config['extent']['relative_offset']
+        if "extent" in config:
+            if "magnitude_spans" in config["extent"]:
+                if len(config["extent"]["magnitude_spans"]):
+                    if isinstance(config["extent"]["magnitude_spans"], dict):
+                        spans = config["extent"]["magnitude_spans"]
+            if "bounds" in config["extent"]:
+                if "extent" in config["extent"]["bounds"]:
+                    if config["extent"]["bounds"]["extent"][0] != -999.0:
+                        bounds = config["extent"]["bounds"]["extent"]
+            if "relative_offset" in config["extent"]:
+                if isinstance(config["extent"]["relative_offset"], list):
+                    offsets = config["extent"]["relative_offset"]
 
     # -------------------------------------------------------------------------
     # Simplest option: extent was specified in the config, use that and exit.
     # -------------------------------------------------------------------------
     if len(bounds):
         xmin, ymin, xmax, ymax = bounds
-        return (thirty_sec_min(xmin), thirty_sec_max(xmax),
-                thirty_sec_min(ymin), thirty_sec_max(ymax))
+        return (
+            thirty_sec_min(xmin),
+            thirty_sec_max(xmax),
+            thirty_sec_min(ymin),
+            thirty_sec_max(ymax),
+        )
 
     if not rupture or not isinstance(rupture, Rupture):
-        raise TypeError('get_extent() requires a rupture object if the extent '
-                        'is not specified in the config object.')
+        raise TypeError(
+            "get_extent() requires a rupture object if the extent "
+            "is not specified in the config object."
+        )
 
     # -------------------------------------------------------------------------
     # Second simplest option: spans are hardcoded based on magnitude
@@ -134,8 +142,12 @@ def get_extent(rupture=None, config=None):
 
     if offsets is None:
         xmin, xmax, ymin, ymax = extent
-        return (thirty_sec_min(xmin), thirty_sec_max(xmax),
-                thirty_sec_min(ymin), thirty_sec_max(ymax))
+        return (
+            thirty_sec_min(xmin),
+            thirty_sec_max(xmax),
+            thirty_sec_min(ymin),
+            thirty_sec_max(ymax),
+        )
 
     # -------------------------------------------------------------------------
     # Apply relative offsets
@@ -150,8 +162,12 @@ def get_extent(rupture=None, config=None):
     ymin += yspan * offsets[1]
     ymax += yspan * offsets[1]
 
-    return (thirty_sec_min(xmin), thirty_sec_max(xmax),
-            thirty_sec_min(ymin), thirty_sec_max(ymax))
+    return (
+        thirty_sec_min(xmin),
+        thirty_sec_max(xmax),
+        thirty_sec_min(ymin),
+        thirty_sec_max(ymax),
+    )
 
 
 def _get_extent_from_spans(rupture, spans=[]):
@@ -167,10 +183,10 @@ def _get_extent_from_spans(rupture, spans=[]):
     ymax = None
     for spankey, span in spans.items():
         if mag > span[0] and mag <= span[1]:
-            ymin = clat - span[2]/2
-            ymax = clat + span[2]/2
-            xmin = clon - span[3]/2
-            xmax = clon + span[3]/2
+            ymin = clat - span[2] / 2
+            ymax = clat + span[2] / 2
+            xmin = clon - span[3] / 2
+            xmax = clon + span[3] / 2
             break
     if xmin is not None:
         return (xmin, xmax, ymin, ymax)
@@ -185,7 +201,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     origin = rupture.getOrigin()
     if config is not None:
         gmpe = MultiGMPE.__from_config__(config)
-        gmice = get_object_from_config('gmice', 'modeling', config)
+        gmice = get_object_from_config("gmice", "modeling", config)
         if imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
             default_imt = imt.SA(1.0)
         elif imt.PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
@@ -195,47 +211,41 @@ def _get_extent_from_multigmpe(rupture, config=None):
     else:
         # Put in some default values for conf
         config = {
-            'extent': {
-                'mmi': {
-                    'threshold': 4.5,
-                    'mindist': 100,
-                    'maxdist': 1000
-                }
-            }
+            "extent": {"mmi": {"threshold": 4.5, "mindist": 100, "maxdist": 1000}}
         }
 
         # Generic GMPEs choices based only on active vs stable
         # as defaults...
         stable = is_stable(origin.lon, origin.lat)
         if not stable:
-            ASK14 = gsim('AbrahamsonEtAl2014')
-            CB14 = gsim('CampbellBozorgnia2014')
-            CY14 = gsim('ChiouYoungs2014')
+            ASK14 = gsim("AbrahamsonEtAl2014")
+            CB14 = gsim("CampbellBozorgnia2014")
+            CY14 = gsim("ChiouYoungs2014")
             gmpes = [ASK14, CB14, CY14]
             site_gmpes = None
-            weights = [1/3.0, 1/3.0, 1/3.0]
+            weights = [1 / 3.0, 1 / 3.0, 1 / 3.0]
             gmice = WGRW12()
         else:
-            Fea96 = gsim('FrankelEtAl1996MwNSHMP2008')
-            Tea97 = gsim('ToroEtAl1997MwNSHMP2008')
-            Sea02 = gsim('SilvaEtAl2002MwNSHMP2008')
-            C03 = gsim('Campbell2003MwNSHMP2008')
-            TP05 = gsim('TavakoliPezeshk2005MwNSHMP2008')
-            AB06p = gsim('AtkinsonBoore2006Modified2011')
-            Pea11 = gsim('PezeshkEtAl2011')
-            Atk08p = gsim('Atkinson2008prime')
-            Sea01 = gsim('SomervilleEtAl2001NSHMP2008')
-            gmpes = [Fea96, Tea97, Sea02, C03,
-                     TP05, AB06p, Pea11, Atk08p, Sea01]
+            Fea96 = gsim("FrankelEtAl1996MwNSHMP2008")
+            Tea97 = gsim("ToroEtAl1997MwNSHMP2008")
+            Sea02 = gsim("SilvaEtAl2002MwNSHMP2008")
+            C03 = gsim("Campbell2003MwNSHMP2008")
+            TP05 = gsim("TavakoliPezeshk2005MwNSHMP2008")
+            AB06p = gsim("AtkinsonBoore2006Modified2011")
+            Pea11 = gsim("PezeshkEtAl2011")
+            Atk08p = gsim("Atkinson2008prime")
+            Sea01 = gsim("SomervilleEtAl2001NSHMP2008")
+            gmpes = [Fea96, Tea97, Sea02, C03, TP05, AB06p, Pea11, Atk08p, Sea01]
             site_gmpes = [AB06p]
             weights = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
             gmice = AK07()
 
         gmpe = MultiGMPE.__from_list__(
-            gmpes, weights, default_gmpes_for_site=site_gmpes)
+            gmpes, weights, default_gmpes_for_site=site_gmpes
+        )
         default_imt = imt.SA(1.0)
 
-    min_mmi = config['extent']['mmi']['threshold']
+    min_mmi = config["extent"]["mmi"]["threshold"]
     sd_types = [const.StdDev.TOTAL]
 
     # Distance context
@@ -243,8 +253,8 @@ def _get_extent_from_multigmpe(rupture, config=None):
     size = 2000
     # This imposes minimum/ maximum distances of:
     #   80 and 800 km; could make this configurable
-    d_min = config['extent']['mmi']['mindist']
-    d_max = config['extent']['mmi']['maxdist']
+    d_min = config["extent"]["mmi"]["mindist"]
+    d_max = config["extent"]["mmi"]["maxdist"]
     dx.rjb = np.logspace(np.log10(d_min), np.log10(d_max), size)
     # Details don't matter for this; assuming vertical surface rupturing fault
     # with epicenter at the surface.
@@ -269,13 +279,12 @@ def _get_extent_from_multigmpe(rupture, config=None):
     rx.mag = origin.mag
     rx.rake = 0.0
     # From WC94...
-    rx.width = 10**(-0.76 + 0.27*rx.mag)
+    rx.width = 10 ** (-0.76 + 0.27 * rx.mag)
     rx.dip = 90.0
     rx.ztor = origin.depth
     rx.hypo_depth = origin.depth
 
-    gmpe_imt_mean, _ = gmpe.get_mean_and_stddevs(
-        sx, rx, dx, default_imt, sd_types)
+    gmpe_imt_mean, _ = gmpe.get_mean_and_stddevs(sx, rx, dx, default_imt, sd_types)
 
     # Convert to MMI
     gmpe_to_mmi, _ = gmice.getMIfromGM(gmpe_imt_mean, default_imt)
@@ -291,8 +300,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     proj = OrthographicProjection(clon - 4, clon + 4, clat + 4, clat - 4)
     if isinstance(rupture, (QuadRupture, EdgeRupture)):
         ruptx, rupty = proj(
-            rupture.lons[~np.isnan(rupture.lons)],
-            rupture.lats[~np.isnan(rupture.lats)]
+            rupture.lons[~np.isnan(rupture.lons)], rupture.lats[~np.isnan(rupture.lats)]
         )
     else:
         ruptx, rupty = proj(clon, clat)
@@ -327,10 +335,13 @@ def _get_extent_from_multigmpe(rupture, config=None):
     # output grid register with common grid resolutions (60c, 30c,
     # 15c, 7.5c)
     #
-    logging.debug("Extent: %f, %f, %f, %f" %
-                  (lonmin, lonmax, latmin, latmax))
-    return _round_coord(lonmin[0]), _round_coord(lonmax[0]), \
-        _round_coord(latmin[0]), _round_coord(latmax[0])
+    logging.debug("Extent: %f, %f, %f, %f" % (lonmin, lonmax, latmin, latmax))
+    return (
+        _round_coord(lonmin[0]),
+        _round_coord(lonmax[0]),
+        _round_coord(latmin[0]),
+        _round_coord(latmax[0]),
+    )
 
 
 def _rupture_center(rupture):
@@ -395,4 +406,4 @@ def is_stable(lon, lat):
     """
     reg = Regionalizer.load()
     region_info = reg.getRegions(lat, lon, 0)
-    return region_info['TectonicRegion'] == 'Stable'
+    return region_info["TectonicRegion"] == "Stable"

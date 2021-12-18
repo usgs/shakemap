@@ -14,22 +14,16 @@ class NullGMPE(GMPE):
     This is a GMPE for testing. It returns the mean and stddevs
     specified in the constructor.
     """
+
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.ACTIVE_SHALLOW_CRUST
-    DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
-        PGA,
-        PGV,
-        SA
-    ])
-    DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
-        const.IMC.GREATER_OF_TWO_HORIZONTAL
-    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
-        const.StdDev.TOTAL,
-        const.StdDev.INTER_EVENT,
-        const.StdDev.INTRA_EVENT
-    ])
-    REQUIRES_SITES_PARAMETERS = set(('vs30',))
+    DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([PGA, PGV, SA])
+    DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = const.IMC.GREATER_OF_TWO_HORIZONTAL
+    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set(
+        [const.StdDev.TOTAL, const.StdDev.INTER_EVENT, const.StdDev.INTRA_EVENT]
+    )
+    REQUIRES_SITES_PARAMETERS = set(("vs30",))
     REQUIRES_RUPTURE_PARAMETERS = set(())
-    REQUIRES_DISTANCES = set(('rjb',))
+    REQUIRES_DISTANCES = set(("rjb",))
 
     def __init__(self, mean=0, phi=0.8, tau=0.6):
         """
@@ -50,7 +44,7 @@ class NullGMPE(GMPE):
         self.mean = mean
         self.phi = phi
         self.tau = tau
-        self.sigma = np.sqrt(phi**2 + tau**2)
+        self.sigma = np.sqrt(phi ** 2 + tau ** 2)
 
     def get_mean_and_stddevs(self, sites, rup, dists, imt, stddev_types):
         """
@@ -67,8 +61,9 @@ class NullGMPE(GMPE):
         stddevs = []
         for stddev_type in stddev_types:
             if stddev_type == const.StdDev.TOTAL:
-                stddevs.append(np.full_like(
-                    dists.rjb, np.sqrt(self.phi**2 + self.tau**2)))
+                stddevs.append(
+                    np.full_like(dists.rjb, np.sqrt(self.phi ** 2 + self.tau ** 2))
+                )
             elif stddev_type == const.StdDev.INTRA_EVENT:
                 stddevs.append(np.full_like(dists.rjb, self.phi))
             elif stddev_type == const.StdDev.INTER_EVENT:
@@ -76,13 +71,16 @@ class NullGMPE(GMPE):
 
         return mean, stddevs
 
-#
-# Dummy COEFFS table so MultiGMPE won't complain
-#
-    COEFFS = CoeffsTable(sa_damping=5, table="""\
+    #
+    # Dummy COEFFS table so MultiGMPE won't complain
+    #
+    COEFFS = CoeffsTable(
+        sa_damping=5,
+        table="""\
 IMT     c1
 pga    0.
 pgv    0.
 0.01   0.
 10     0.
-""")
+""",
+    )

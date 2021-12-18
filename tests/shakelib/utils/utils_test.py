@@ -17,28 +17,28 @@ from shakelib.station import StationList
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))
-datadir = os.path.join(homedir, 'utils_data')
+datadir = os.path.join(homedir, "utils_data")
 
 
 def test_replace_dyfi():
-    stationfile = os.path.join(datadir, 'nepal_dat.xml')
-    dyfifile = os.path.join(datadir, 'nepal_dyfi_dat.xml')
+    stationfile = os.path.join(datadir, "nepal_dat.xml")
+    dyfifile = os.path.join(datadir, "nepal_dyfi_dat.xml")
 
     original_stations = StationList.loadFromFiles([stationfile])
     dyfi_stations = StationList.loadFromFiles([dyfifile])
     dcursor = dyfi_stations.cursor
-    dcursor.execute('SELECT count(*) from station')
+    dcursor.execute("SELECT count(*) from station")
     ndyfi1 = dcursor.fetchone()[0]
 
     original_cursor = original_stations.cursor
-    original_cursor.execute('SELECT count(*) from station')
+    original_cursor.execute("SELECT count(*) from station")
 
-    original_cursor.execute(
-        'SELECT count(*) from station WHERE instrumented=0')
+    original_cursor.execute("SELECT count(*) from station WHERE instrumented=0")
     noriginal_mmi = original_cursor.fetchone()[0]
 
     original_cursor.execute(
-        'SELECT count(*) from station WHERE instrumented=0 and network="DYFI"')
+        'SELECT count(*) from station WHERE instrumented=0 and network="DYFI"'
+    )
     noriginal_dyfi = original_cursor.fetchone()[0]
 
     noriginal_observed = noriginal_mmi - noriginal_dyfi
@@ -46,13 +46,15 @@ def test_replace_dyfi():
     stations = replace_dyfi(stationfile, dyfifile)
 
     scursor = stations.cursor
-    scursor.execute('SELECT count(*) from station where '
-                    'instrumented=0 and network != "DYFI"')
+    scursor.execute(
+        "SELECT count(*) from station where " 'instrumented=0 and network != "DYFI"'
+    )
     nobserved = scursor.fetchone()[0]
 
     assert nobserved == noriginal_observed
     scursor.execute(
-        'SELECT count(*) from station where instrumented=0 and network="DYFI"')
+        'SELECT count(*) from station where instrumented=0 and network="DYFI"'
+    )
     ndyfi = scursor.fetchone()[0]
     assert ndyfi == ndyfi1
 
@@ -62,7 +64,7 @@ def test_get_extent_small_point():
     # Do a point rupture
     # Small magnitude
     #
-    eventfile = os.path.join(datadir, 'event_wenchuan_small.xml')
+    eventfile = os.path.join(datadir, "event_wenchuan_small.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
     W, E, S, N = get_extent(rupture)
@@ -76,9 +78,9 @@ def test_get_extent_small_complex():
     #
     # Do a complex rupture
     #
-    eventfile = os.path.join(datadir, 'event_wenchuan.xml')
+    eventfile = os.path.join(datadir, "event_wenchuan.xml")
     origin = Origin.fromFile(eventfile)
-    faultfile = os.path.join(datadir, 'Hartzell11_fault.txt')
+    faultfile = os.path.join(datadir, "Hartzell11_fault.txt")
     rupture = get_rupture(origin, faultfile)
     W, E, S, N = get_extent(rupture)
     np.testing.assert_allclose(W, 95.28333333333333)
@@ -101,7 +103,7 @@ def test_get_extent_aspect():
     #
     # Test ruptures with weird aspect ratios
     #
-    eventfile = os.path.join(datadir, 'event_wenchuan.xml')
+    eventfile = os.path.join(datadir, "event_wenchuan.xml")
     origin = Origin.fromFile(eventfile)
     #
     # Long horizontal rupture
@@ -146,7 +148,7 @@ def test_get_extent_stable_small():
     # Do an event in a stable region
     # Small magnitude
     #
-    eventfile = os.path.join(datadir, 'event_oklahoma.xml')
+    eventfile = os.path.join(datadir, "event_oklahoma.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
     W, E, S, N = get_extent(rupture)
@@ -161,7 +163,7 @@ def test_get_extent_stable_large():
     # Do an event in a stable region
     # Large magnitude
     #
-    eventfile = os.path.join(datadir, 'event_oklahoma_large.xml')
+    eventfile = os.path.join(datadir, "event_oklahoma_large.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
     W, E, S, N = get_extent(rupture)
@@ -182,53 +184,41 @@ def test_is_stable():
 
 
 def test_extent_config():
-    eventfile = os.path.join(datadir, 'event_oklahoma_large.xml')
+    eventfile = os.path.join(datadir, "event_oklahoma_large.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
 
-    config = {'extent': {
-        'magnitude_spans': {
-            'span1': [0, 6, 4, 3],
-            'span2': [6, 10, 6, 4]
-        }
-    }}
+    config = {
+        "extent": {"magnitude_spans": {"span1": [0, 6, 4, 3], "span2": [6, 10, 6, 4]}}
+    }
     extent = get_extent(rupture, config)
     cmp_extent = (-99.4166667, -95.4083333, 32.675, 38.6833333)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
-
     # Test for relative_offset
-    config = {'extent': {
-        'magnitude_spans': {
-            'span1': [0, 6, 4, 3],
-            'span2': [6, 10, 6, 4]
-        },
-        'relative_offset': [0.25, 0.5],
-    }}
+    config = {
+        "extent": {
+            "magnitude_spans": {"span1": [0, 6, 4, 3], "span2": [6, 10, 6, 4]},
+            "relative_offset": [0.25, 0.5],
+        }
+    }
     extent = get_extent(rupture, config)
     cmp_extent = (-98.4166667, -94.4083333, 35.675, 41.6833333)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
-
-    config = {
-        'extent': {
-            'bounds': {
-                'extent': [-100, 32, -95, 37]
-            }
-        }
-    }
+    config = {"extent": {"bounds": {"extent": [-100, 32, -95, 37]}}}
     extent = get_extent(rupture, config)
     cmp_extent = [-100, -95, 32, 37]
     np.testing.assert_almost_equal(extent, cmp_extent)
 
 
 def test_exception():
-    exception = ShakeLibException('Test exception')
+    exception = ShakeLibException("Test exception")
     # Check __str__ override is correct
     assert str(exception) == "'Test exception'"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_replace_dyfi()
     test_get_extent_small_point()
     test_get_extent_small_complex()

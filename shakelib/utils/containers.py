@@ -6,9 +6,11 @@
 from impactutils.io.smcontainers import ShakeMapContainerBase
 
 # local imports
-from shakelib.rupture.factory import (rupture_from_dict,
-                                      get_rupture,
-                                      rupture_from_dict_and_origin)
+from shakelib.rupture.factory import (
+    rupture_from_dict,
+    get_rupture,
+    rupture_from_dict_and_origin,
+)
 from shakelib.rupture.origin import Origin
 from shakelib.station import StationList
 
@@ -25,10 +27,19 @@ class ShakeMapInputContainer(ShakeMapContainerBase):
      - version history
 
     """
+
     @classmethod
-    def createFromInput(cls, filename, config, eventfile, version_history,
-                        rupturefile=None, sourcefile=None, momentfile=None,
-                        datafiles=None):
+    def createFromInput(
+        cls,
+        filename,
+        config,
+        eventfile,
+        version_history,
+        rupturefile=None,
+        sourcefile=None,
+        momentfile=None,
+        datafiles=None,
+    ):
         """
         Instantiate an InputContainer from ShakeMap input data.
 
@@ -52,8 +63,9 @@ class ShakeMapInputContainer(ShakeMapContainerBase):
         container.setConfig(config)
 
         # create an origin from the event file
-        origin = Origin.fromFile(eventfile, sourcefile=sourcefile,
-                                 momentfile=momentfile)
+        origin = Origin.fromFile(
+            eventfile, sourcefile=sourcefile, momentfile=momentfile
+        )
 
         # create a rupture object from the origin and the rupture file
         # (if present).
@@ -79,13 +91,13 @@ class ShakeMapInputContainer(ShakeMapContainerBase):
             TypeError: If input object or dictionary does not
                 represent a Rupture object.
         """
-        if 'rupture' in self.getDictionaries():
-            self.dropDictionary([], 'rupture')
+        if "rupture" in self.getDictionaries():
+            self.dropDictionary([], "rupture")
         if isinstance(rupture, dict):
             try:
                 rupture_from_dict(rupture)
             except Exception:
-                fmt = 'Input dict does not represent a rupture object.'
+                fmt = "Input dict does not represent a rupture object."
                 raise TypeError(fmt)
             rupdict = rupture
         else:
@@ -102,8 +114,8 @@ class ShakeMapInputContainer(ShakeMapContainerBase):
             AttributeError: If rupture object has not been set in
                 the container.
         """
-        if 'rupture' not in self.getDictionaries():
-            raise AttributeError('Rupture dictionary not set in container.')
+        if "rupture" not in self.getDictionaries():
+            raise AttributeError("Rupture dictionary not set in container.")
         rupture_dict = self.getRuptureDict()
         rupture = rupture_from_dict(rupture_dict)
         return rupture
@@ -118,13 +130,13 @@ class ShakeMapInputContainer(ShakeMapContainerBase):
             TypeError: If input object or dictionary is not a StationList
                 object.
         """
-        if 'stations' in self.getStrings():
-            self.dropString([], 'stations')
+        if "stations" in self.getStrings():
+            self.dropString([], "stations")
         if not isinstance(stationlist, StationList):
-            fmt = 'Input object is not a StationList.'
+            fmt = "Input object is not a StationList."
             raise TypeError(fmt)
         sql_string = stationlist.dumpToSQL()
-        self.setString([], 'stations', sql_string)
+        self.setString([], "stations", sql_string)
 
     def getStationList(self):
         """
@@ -136,9 +148,9 @@ class ShakeMapInputContainer(ShakeMapContainerBase):
             AttributeError: If stationlist object has not been set in
                 the container.
         """
-        if 'stations' not in self.getStrings():
-            raise AttributeError('StationList object not set in container.')
-        sql_string = self.getString([], 'stations')
+        if "stations" not in self.getStrings():
+            raise AttributeError("StationList object not set in container.")
+        sql_string = self.getString([], "stations")
         stationlist = StationList.loadFromSQL(sql_string)
         return stationlist
 

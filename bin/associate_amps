@@ -10,16 +10,16 @@ from shakemap.utils.config import get_config_paths
 from shakemap.utils.amps import AmplitudeHandler
 from shakemap.utils.logging import get_generic_logger
 
-LOGFILE = 'associate.log'
+LOGFILE = "associate.log"
 
 
 def get_parser():
-    description = '''Associate any un-associated amplitudes with existing
+    description = """Associate any un-associated amplitudes with existing
     ShakeMap events.
 
     Amplitude data will be written to event data directories in ShakeMap
     station XML format.
-    '''
+    """
     parser = argparse.ArgumentParser(description=description)
     return parser
 
@@ -27,11 +27,11 @@ def get_parser():
 def main(args):
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
-        print('%s is not a valid directory.' % data_path)
+        print("%s is not a valid directory." % data_path)
         sys.exit(1)
 
     # set up a daily rotating file handler logger
-    logfile = os.path.join(install_path, 'logs', LOGFILE)
+    logfile = os.path.join(install_path, "logs", LOGFILE)
     logger = get_generic_logger(logfile=logfile)
 
     # what to do if the database is locked by another process?
@@ -39,12 +39,12 @@ def main(args):
 
     # scan the event table and find any data that is associated with each event
 
-    logger.info('Searching for amp data to associate.')
+    logger.info("Searching for amp data to associate.")
     associated = handler.associateAll(pretty_print=True)
-    logger.info('Found amplitude data for %i events.' % (len(associated)))
+    logger.info("Found amplitude data for %i events." % (len(associated)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = get_parser()
     pargs, unknown = parser.parse_known_args()
     main(pargs)

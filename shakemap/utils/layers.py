@@ -24,6 +24,7 @@ from shakemap.utils.config import path_macro_sub
 # conversion here.
 # ##########################################################################
 
+
 def validate_config(mydict, install_path, data_path, global_data_path):
     """Recursively validate select.conf.
 
@@ -34,24 +35,23 @@ def validate_config(mydict, install_path, data_path, global_data_path):
     """
     for key in mydict:
         if isinstance(mydict[key], dict):
-            validate_config(mydict[key], install_path, data_path,
-                            global_data_path)
+            validate_config(mydict[key], install_path, data_path, global_data_path)
             continue
-        if key == 'horizontal_buffer' or key == 'vertical_buffer':
+        if key == "horizontal_buffer" or key == "vertical_buffer":
             mydict[key] = config.cfg_float(mydict[key])
-        elif key == 'use_slab':
+        elif key == "use_slab":
             mydict[key] = config.cfg_bool(mydict[key])
-        elif key == 'gmpe':
+        elif key == "gmpe":
             mydict[key] = config.gmpe_list(mydict[key], 1)
-        elif key == 'min_depth' or key == 'max_depth':
+        elif key == "min_depth" or key == "max_depth":
             mydict[key] = config.cfg_float_list(mydict[key])
-        elif key == 'layer_dir':
-            mydict[key] = path_macro_sub(mydict[key], ip=install_path,
-                                         dp=data_path, gp=global_data_path)
-        elif key in ('x1', 'x2', 'p1', 'p2', 'p_kagan_default',
-                     'default_slab_depth'):
+        elif key == "layer_dir":
+            mydict[key] = path_macro_sub(
+                mydict[key], ip=install_path, dp=data_path, gp=global_data_path
+            )
+        elif key in ("x1", "x2", "p1", "p2", "p_kagan_default", "default_slab_depth"):
             mydict[key] = float(mydict[key])
-        elif key in ('ipe', 'gmice', 'ccf'):
+        elif key in ("ipe", "gmice", "ccf"):
             pass
         else:
             raise ValidateError('Invalid entry in config: "%s"' % (key))
@@ -75,11 +75,14 @@ def nearest_edge(elon, elat, poly):
     elon_arr = np.array([elon])
     elat_arr = np.array([elat])
     x, y = poly.exterior.xy
-    nearest = 99999.
+    nearest = 99999.0
     for ix in range(1, len(x) - 1):
-        dd = min_distance_to_segment(np.array(x[ix - 1:ix + 1]),
-                                     np.array(y[ix - 1:ix + 1]),
-                                     elon_arr, elat_arr)
+        dd = min_distance_to_segment(
+            np.array(x[ix - 1 : ix + 1]),
+            np.array(y[ix - 1 : ix + 1]),
+            elon_arr,
+            elat_arr,
+        )
         if np.abs(dd[0]) < nearest:
             nearest = np.abs(dd[0])
     return nearest
@@ -109,14 +112,15 @@ def dist_to_layer(elon, elat, geom):
     elif isinstance(geom, MultiPolygon):
         plist = list(geom.geoms)
     else:
-        raise TypeError('Invalid geometry type in layer: %s' % type(geom))
+        raise TypeError("Invalid geometry type in layer: %s" % type(geom))
 
     project = partial(
         pyproj.transform,
-        pyproj.Proj(proj='latlong', datum='WGS84'),
-        pyproj.Proj(proj='aeqd  +lat_0=%f +lon_0=%f +datum=WGS84' % (elat, elon)))
+        pyproj.Proj(proj="latlong", datum="WGS84"),
+        pyproj.Proj(proj="aeqd  +lat_0=%f +lon_0=%f +datum=WGS84" % (elat, elon)),
+    )
     ep = Point(0.0, 0.0)
-    min_dist = 99999.
+    min_dist = 99999.0
     for poly in plist:
         nearest = nearest_edge(elon, elat, poly)
         if nearest < 5000:
@@ -153,11 +157,11 @@ def get_layer_distances(elon, elat, layer_dir):
         nearest polygon in the layer. The distance will be zero if the
         point lies inside the polygon.
     """
-    layer_files = glob.glob(os.path.join(layer_dir, '*.wkt'))
+    layer_files = glob.glob(os.path.join(layer_dir, "*.wkt"))
     dist_dict = {}
     for file in layer_files:
         layer_name = os.path.splitext(os.path.basename(file))[0]
-        with open(file, 'r') as fd:
+        with open(file, "r") as fd:
             data = fd.read()
         geom = shapely.wkt.loads(data)
         dist_dict[layer_name] = dist_to_layer(elon, elat, geom)
@@ -167,18 +171,17 @@ def get_layer_distances(elon, elat, layer_dir):
 def update_config_regions(lat, lon, config):
     min_dist_to_layer = 999999.9
     inside_layer_name = None
-    if 'layers' in config and 'layer_dir' in config['layers']:
-        layer_dir = config['layers']['layer_dir']
+    if "layers" in config and "layer_dir" in config["layers"]:
+        layer_dir = config["layers"]["layer_dir"]
         if layer_dir:
             geo_layers = get_layer_distances(lon, lat, layer_dir)
         else:
             geo_layers = {}
-        for layer in config['layers']:
-            if layer == 'layer_dir':
+        for layer in config["layers"]:
+            if layer == "layer_dir":
                 continue
             if layer not in geo_layers:
-                logging.warn('Error: cannot find layer %s in %s' %
-                             (layer, layer_dir))
+                logging.warn("Error: cannot find layer %s in %s" % (layer, layer_dir))
                 continue
             ldist = geo_layers[layer]
             if ldist < min_dist_to_layer:
@@ -189,9 +192,9 @@ def update_config_regions(lat, lon, config):
     if inside_layer_name is None:
         return config
     else:
-        layer_config = config['layers'][inside_layer_name]
+        layer_config = config["layers"][inside_layer_name]
         for region, rdict in layer_config.items():
-            if region == 'horizontal_buffer':
+            if region == "horizontal_buffer":
                 continue
-            config['tectonic_regions'][region].update(rdict)
+            config["tectonic_regions"][region].update(rdict)
     return config

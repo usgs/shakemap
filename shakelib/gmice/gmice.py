@@ -27,7 +27,7 @@ class GMICE(ABC):
 
     @staticmethod
     def getDistanceType():
-        return 'rrup'
+        return "rrup"
 
     def supports(self, imt):
         """Determine whether input IMT is supported by GMICE instance.
@@ -100,7 +100,7 @@ class GMICE(ABC):
         if "PGV" not in df:
             return None
         oqimt = imt.from_string("PGV")
-        return self.getMIfromGM(df['PGV'], oqimt, dists, mag)[0]
+        return self.getMIfromGM(df["PGV"], oqimt, dists, mag)[0]
 
     def getPreferredSD(self):
         """

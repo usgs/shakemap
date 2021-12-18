@@ -74,10 +74,10 @@ def test_generic_amp():
         sx.lats = lats
 
         install_path, _ = get_config_paths()
-        outfolder = os.path.join(install_path, 'data', 'GenericAmpFactors')
-        tmpout = os.path.join(install_path, 'data', 'ga_tmp')
+        outfolder = os.path.join(install_path, "data", "GenericAmpFactors")
+        tmpout = os.path.join(install_path, "data", "ga_tmp")
         shutil.move(outfolder, tmpout)
-        gaf = get_generic_amp_factors(sx, 'PGA')
+        gaf = get_generic_amp_factors(sx, "PGA")
         assert gaf is None
         shutil.move(tmpout, outfolder)
         # gaf = get_generic_amp_factors(sx, 'PGA')
@@ -85,84 +85,427 @@ def test_generic_amp():
 
         # east_west_file, north_south_file = make_generic_amps()
 
-        gaf = get_generic_amp_factors(sx, 'PGA')
+        gaf = get_generic_amp_factors(sx, "PGA")
         gaf_target = np.array(
-          [1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  2.,  2.,
-           2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  0.,  0.,  0.,  1.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  1.,  1.,
-           1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.,  0.])
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+            ]
+        )
         if do_test is True:
             assert np.allclose(gaf, gaf_target)
         else:
-            print('PGA:')
+            print("PGA:")
             print(repr(gaf))
 
-        gaf = get_generic_amp_factors(sx, 'PGV')
+        gaf = get_generic_amp_factors(sx, "PGV")
         gaf_target = np.array(
-          [1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  2.,  2.,
-           2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  0.,  0.,  0.,  1.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  1.,  1.,
-           1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.,  0.])
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+            ]
+        )
         if do_test is True:
             assert np.allclose(gaf, gaf_target)
         else:
-            print('PGV:')
+            print("PGV:")
             print(repr(gaf))
 
-        gaf = get_generic_amp_factors(sx, 'SA(0.3)')
+        gaf = get_generic_amp_factors(sx, "SA(0.3)")
         gaf_target = np.array(
-          [1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  2.,  2.,
-           2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  0.,  0.,  0.,  1.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  1.,  1.,
-           1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.,  0.])
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+            ]
+        )
         if do_test is True:
             assert np.allclose(gaf, gaf_target)
         else:
-            print('SA(0.3):')
+            print("SA(0.3):")
             print(repr(gaf))
 
-        gaf = get_generic_amp_factors(sx, 'SA(2.0)')
+        gaf = get_generic_amp_factors(sx, "SA(2.0)")
         gaf_target = np.array(
-          [1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  2.,  2.,
-           2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  0.,  0.,  0.,  1.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  1.,  1.,
-           1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.,  0.])
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+            ]
+        )
         if do_test is True:
             assert np.allclose(gaf, gaf_target)
         else:
-            print('SA(2.0):')
+            print("SA(2.0):")
             print(repr(gaf))
 
-        gaf = get_generic_amp_factors(sx, 'SA(4.0)')
+        gaf = get_generic_amp_factors(sx, "SA(4.0)")
         gaf_target = np.array(
-          [1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  2.,  2.,
-           2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  0.,  0.,  0.,  1.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  1.,  1.,
-           1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.,  0.])
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+            ]
+        )
         if do_test is True:
             assert np.allclose(gaf, gaf_target)
         else:
-            print('SA(4.0):')
+            print("SA(4.0):")
             print(repr(gaf))
 
-        gaf = get_generic_amp_factors(sx, 'SA(0.1)')
+        gaf = get_generic_amp_factors(sx, "SA(0.1)")
         gaf_target = np.array(
-          [1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  2.,  2.,
-           2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  2.,  0.,  0.,  0.,  1.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  1.,  1.,
-           1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.,  0.])
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                2.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+            ]
+        )
         if do_test is True:
             assert np.allclose(gaf, gaf_target)
         else:
-            print('SA(0.1):')
+            print("SA(0.1):")
             print(repr(gaf))
 
-        gaf = get_generic_amp_factors(sx, 'XXXX')
+        gaf = get_generic_amp_factors(sx, "XXXX")
         gaf_target = np.array(
-          [0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-           0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.])
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            ]
+        )
         assert np.allclose(gaf, gaf_target)
 
     except Exception:
@@ -173,6 +516,6 @@ def test_generic_amp():
         # os.remove(north_south_file)
 
 
-if __name__ == '__main__':
-    os.environ['CALLED_FROM_PYTEST'] = 'True'
+if __name__ == "__main__":
+    os.environ["CALLED_FROM_PYTEST"] = "True"
     test_generic_amp()

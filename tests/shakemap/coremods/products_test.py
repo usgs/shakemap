@@ -39,7 +39,7 @@ from mapio.shake import ShakeGrid
 # Using a closure here because pep8 complains about assigning a lambda
 #
 def rounder(digits):
-    fmt = '%%.%dg' % digits
+    fmt = "%%.%dg" % digits
 
     def doround(x):
         return float(fmt % x)
@@ -66,20 +66,19 @@ def ordered(obj):
 def check_failures(evid, datapath, module):
 
     # Non-existent event (should fail)
-    mod = module('not_an_event')
+    mod = module("not_an_event")
     with pytest.raises(NotADirectoryError):
         mod.execute()
 
     # Would succeed but we remove event.xml (should fail)
-    event_file = os.path.join(datapath, evid, 'current', 'products',
-                              'shake_result.hdf')
-    os.rename(event_file, event_file + '_safe')
+    event_file = os.path.join(datapath, evid, "current", "products", "shake_result.hdf")
+    os.rename(event_file, event_file + "_safe")
     try:
         mod = module(evid)
         with pytest.raises(FileNotFoundError):
             mod.execute()
     finally:
-        os.rename(event_file + '_safe', event_file)
+        os.rename(event_file + "_safe", event_file)
 
 
 #
@@ -94,18 +93,18 @@ def do_rupture(evid, datapath, oc):
     mod.execute()
     mod.writeContents()
 
-    ifile = os.path.join(datapath, evid, 'current', 'products', 'rupture.json')
-    with open(ifile, 'r') as infile:
+    ifile = os.path.join(datapath, evid, "current", "products", "rupture.json")
+    with open(ifile, "r") as infile:
         rupj = json.load(infile)
-    ffile = os.path.join(datapath, evid, 'current', 'boat_fault.txt')
+    ffile = os.path.join(datapath, evid, "current", "boat_fault.txt")
     fcoords = []
-    with open(ffile, 'r') as infile:
+    with open(ffile, "r") as infile:
         for line in infile:
-            if line.startswith('#'):
+            if line.startswith("#"):
                 continue
             lat, lon, depth = line.split()
             fcoords.append((float(lat), float(lon), float(depth)))
-    jcoords = rupj['features'][0]['geometry']['coordinates'][0][0]
+    jcoords = rupj["features"][0]["geometry"]["coordinates"][0][0]
     for ix, ftup in enumerate(fcoords):
         assert np.allclose(ftup, jcoords[ix])
 
@@ -122,8 +121,8 @@ def do_info(evid, datapath, oc):
     mod.execute()
     mod.writeContents()
 
-    ifile = os.path.join(datapath, evid, 'current', 'products', 'info.json')
-    with open(ifile, 'r') as infile:
+    ifile = os.path.join(datapath, evid, "current", "products", "info.json")
+    with open(ifile, "r") as infile:
         fjson = json.loads(infile.read())
         cjson = oc.getMetadata()
         assert fjson == cjson
@@ -141,19 +140,19 @@ def do_raster(evid, datapath, oc):
     mod.execute()
     mod.writeContents()
 
-    driver = gdal.GetDriverByName('ENVI')
+    driver = gdal.GetDriverByName("ENVI")
     driver.Register()
 
     imts = oc.getIMTs()
 
-    rzip = os.path.join(datapath, evid, 'current', 'products', 'raster.zip')
+    rzip = os.path.join(datapath, evid, "current", "products", "raster.zip")
     with tempfile.TemporaryDirectory() as tmpdirname:
-        with zipfile.ZipFile(rzip, 'r') as zip_ref:
+        with zipfile.ZipFile(rzip, "r") as zip_ref:
             zip_ref.extractall(tmpdirname)
             for imt in imts:
-                component, imt = imt.split('/')
+                component, imt = imt.split("/")
                 fname = oq_to_file(imt)
-                fname = os.path.join(tmpdirname, fname + '_mean.flt')
+                fname = os.path.join(tmpdirname, fname + "_mean.flt")
                 rin = gdal.Open(fname, GA_ReadOnly)
                 if rin is None:
                     raise RuntimeError("Couldn't open %s" % fname)
@@ -162,11 +161,11 @@ def do_raster(evid, datapath, oc):
                 band = rin.GetRasterBand(1)
                 rgrid = band.ReadAsArray(0, 0, cols, rows)
                 comp = oc.getComponents(imt)
-                cdata = oc.getIMTGrids(imt, comp[0])['mean']
+                cdata = oc.getIMTGrids(imt, comp[0])["mean"]
                 assert np.allclose(cdata, rgrid)
 
                 fname = oq_to_file(imt)
-                fname = os.path.join(tmpdirname, fname + '_std.flt')
+                fname = os.path.join(tmpdirname, fname + "_std.flt")
                 rin = gdal.Open(fname, GA_ReadOnly)
                 if rin is None:
                     raise RuntimeError("Couldn't open %s" % fname)
@@ -175,7 +174,7 @@ def do_raster(evid, datapath, oc):
                 band = rin.GetRasterBand(1)
                 rgrid = band.ReadAsArray(0, 0, cols, rows)
                 comp = oc.getComponents(imt)
-                cdata = oc.getIMTGrids(imt, comp[0])['std']
+                cdata = oc.getIMTGrids(imt, comp[0])["std"]
                 assert np.allclose(cdata, rgrid)
 
 
@@ -197,22 +196,22 @@ def do_gridxml(evid, datapath, oc):
     #
     imts = oc.getIMTs()
 
-    gxml = os.path.join(datapath, evid, 'current', 'products', 'grid.xml')
+    gxml = os.path.join(datapath, evid, "current", "products", "grid.xml")
     g2d = ShakeGrid.load(gxml)
     layers = g2d.getData()
     for imt in imts:
-        component, imt = imt.split('/')
+        component, imt = imt.split("/")
         comp = oc.getComponents(imt)
-        cdata = oc.getIMTGrids(imt, comp[0])['mean']
+        cdata = oc.getIMTGrids(imt, comp[0])["mean"]
         #
         # Do the same conversion to the container data as is
         # done to the file data
         #
-        digits = oc.getIMTGrids(imt, comp[0])['mean_metadata']['digits']
+        digits = oc.getIMTGrids(imt, comp[0])["mean_metadata"]["digits"]
         vfunc = rounder(digits)
-        if imt == 'MMI':
+        if imt == "MMI":
             cdata = vfunc(cdata)
-        elif imt == 'PGV':
+        elif imt == "PGV":
             cdata = vfunc(np.exp(cdata))
         else:
             cdata = vfunc(100 * np.exp(cdata))
@@ -224,22 +223,21 @@ def do_gridxml(evid, datapath, oc):
     #
     # Do the uncertainty grids
     #
-    uxml = os.path.join(datapath, evid, 'current', 'products',
-                        'uncertainty.xml')
+    uxml = os.path.join(datapath, evid, "current", "products", "uncertainty.xml")
     u2d = ShakeGrid.load(uxml)
     ulayers = u2d.getData()
 
     for imt in imts:
-        component, imt = imt.split('/')
+        component, imt = imt.split("/")
         comp = oc.getComponents(imt)
-        cdata = oc.getIMTGrids(imt, comp[0])['std']
+        cdata = oc.getIMTGrids(imt, comp[0])["std"]
         #
         # The stddevs just get rounded
         #
-        digits = oc.getIMTGrids(imt, comp[0])['std_metadata']['digits']
+        digits = oc.getIMTGrids(imt, comp[0])["std_metadata"]["digits"]
         vfunc = rounder(digits)
         cdata = vfunc(cdata)
-        lname = 'std' + _oq_to_gridxml(imt).lower()
+        lname = "std" + _oq_to_gridxml(imt).lower()
         layer = ulayers[lname]
         gdata = layer.getData()
         assert np.allclose(gdata, cdata)
@@ -253,14 +251,17 @@ def do_contour(evid, datapath):
     mod.execute()
     mod.writeContents()
 
-    tfiles = glob.glob(os.path.join(datapath, '..', '..', 'shakemap',
-                                    'coremods', 'data', evid, 'cont_*.json'))
+    tfiles = glob.glob(
+        os.path.join(
+            datapath, "..", "..", "shakemap", "coremods", "data", evid, "cont_*.json"
+        )
+    )
     for ifile in tfiles:
-        with open(ifile, 'r') as if1:
+        with open(ifile, "r") as if1:
             cjson = json.load(if1)
         fname = os.path.basename(ifile)
-        jfile = os.path.join(datapath, evid, 'current', 'products', fname)
-        with open(jfile, 'r') as if2:
+        jfile = os.path.join(datapath, evid, "current", "products", fname)
+        with open(jfile, "r") as if2:
             fjson = json.load(if2)
         assert ordered(fjson) == ordered(cjson)
 
@@ -269,8 +270,7 @@ def do_contour_command_line(evid, datapath):
     #
     # Now run from the command line to exercise the argument parsing
     #
-    cp = subprocess.run(['shake', '--force', evid, 'contour', '-f', '10'],
-                        shell=False)
+    cp = subprocess.run(["shake", "--force", evid, "contour", "-f", "10"], shell=False)
     assert not cp.returncode
 
 
@@ -278,8 +278,8 @@ def test_points():
     installpath, datapath = get_config_paths()
 
     # An event with points rather than grid (should raise exception)
-    evid = 'northridge_points'
-    assemble = AssembleModule(evid, comment='Test comment.')
+    evid = "northridge_points"
+    assemble = AssembleModule(evid, comment="Test comment.")
     assemble.execute()
     del assemble
     model = ModelModule(evid)
@@ -301,20 +301,21 @@ def test_products():
     # Use a real event for checks of products against the contents of
     # the output container
     #
-    evid = 'integration_test_0001'
+    evid = "integration_test_0001"
     try:
         #
         # Make sure an output file exists
         #
-        assemble = AssembleModule(evid, comment='Test comment.')
+        assemble = AssembleModule(evid, comment="Test comment.")
         assemble.execute()
         del assemble
         model = ModelModule(evid)
         model.execute()
         del model
 
-        res_file = os.path.join(datapath, evid, 'current', 'products',
-                                'shake_result.hdf')
+        res_file = os.path.join(
+            datapath, evid, "current", "products", "shake_result.hdf"
+        )
         oc = ShakeMapOutputContainer.load(res_file)
 
         #
@@ -351,9 +352,9 @@ def test_products():
         #
         # PlotRegr gets tested in the model tests for event 72282711
         #
-#        mod = PlotRegr(evid)
-#        mod.execute()
-#        mod.writeContents()
+        #        mod = PlotRegr(evid)
+        #        mod.execute()
+        #        mod.writeContents()
 
         check_failures(evid, datapath, KMLModule)
         mod = KMLModule(evid)
@@ -391,16 +392,16 @@ def test_products():
         # wide distribution. At that point, I'll update the data files
         # and the test results.
         # do_contour(evid, datapath)
-#        do_contour_command_line(evid, datapath)
+    #        do_contour_command_line(evid, datapath)
 
     finally:
         pass
-        data_file = os.path.join(datapath, evid, 'current', 'shake_data.hdf')
+        data_file = os.path.join(datapath, evid, "current", "shake_data.hdf")
         if os.path.isfile(data_file):
             os.remove(data_file)
 
 
-if __name__ == '__main__':
-    os.environ['CALLED_FROM_PYTEST'] = 'True'
+if __name__ == "__main__":
+    os.environ["CALLED_FROM_PYTEST"] = "True"
     test_products()
     test_points()

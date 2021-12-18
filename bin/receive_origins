@@ -28,7 +28,7 @@ from shakemap.utils.logging import get_generic_logger
 from shakemap.utils.utils import get_network_name
 from shakelib.rupture import constants
 
-LOGFILE = 'origins.log'
+LOGFILE = "origins.log"
 
 
 def get_parser():
@@ -37,93 +37,97 @@ def get_parser():
     Returns:
         ArgumentParser: argparse instance for this script.
     """
-    description = '''
+    description = """
     Insert strong motion unassociated peak amplitude files into a database.
-    '''
+    """
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--type', help='Product type')
-    parser.add_argument('--status', help='Event status')
-    parser.add_argument('--action', help='Event action type')
-    parser.add_argument('--property-title', nargs='*', help='Event location')
-    parser.add_argument('--property-event-type', nargs='*',
-                        help='Event type (earthquake, explosion, etc.)')
+    parser.add_argument("--type", help="Product type")
+    parser.add_argument("--status", help="Event status")
+    parser.add_argument("--action", help="Event action type")
+    parser.add_argument("--property-title", nargs="*", help="Event location")
+    parser.add_argument(
+        "--property-event-type",
+        nargs="*",
+        help="Event type (earthquake, explosion, etc.)",
+    )
 
-    parser.add_argument('--preferred-eventid',
-                        help='Event ID (i.e., us2008abcd)')
-    parser.add_argument('--preferred-eventsource',
-                        help='Event source ("us", "nc", etc.)')
-    parser.add_argument('--preferred-eventsourcecode',
-                        help='Event source code (i.e., 2008abcd')
-    parser.add_argument('--preferred-magnitude', type=float,
-                        help='Event magnitude')
-    parser.add_argument('--preferred-latitude', type=float,
-                        help='Event latitude')
-    parser.add_argument('--preferred-longitude', type=float,
-                        help='Event longitude')
-    parser.add_argument('--preferred-depth', type=float, help='Event depth')
-    parser.add_argument('--preferred-eventtime', help='Event time')
-    parser.add_argument('--eventids', type=str, help='Alternate event IDs')
+    parser.add_argument("--preferred-eventid", help="Event ID (i.e., us2008abcd)")
+    parser.add_argument(
+        "--preferred-eventsource", help='Event source ("us", "nc", etc.)'
+    )
+    parser.add_argument(
+        "--preferred-eventsourcecode", help="Event source code (i.e., 2008abcd"
+    )
+    parser.add_argument("--preferred-magnitude", type=float, help="Event magnitude")
+    parser.add_argument("--preferred-latitude", type=float, help="Event latitude")
+    parser.add_argument("--preferred-longitude", type=float, help="Event longitude")
+    parser.add_argument("--preferred-depth", type=float, help="Event depth")
+    parser.add_argument("--preferred-eventtime", help="Event time")
+    parser.add_argument("--eventids", type=str, help="Alternate event IDs")
 
     return parser
 
 
 def main(args):
-    """Main method for script.
-
-    """
+    """Main method for script."""
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
-        print('%s is not a valid directory.' % data_path)
+        print("%s is not a valid directory." % data_path)
         sys.exit(1)
 
     config = queue.get_config(install_path)
 
     # set up a daily rotating file handler logger
-    logfile = os.path.join(install_path, 'logs', LOGFILE)
+    logfile = os.path.join(install_path, "logs", LOGFILE)
     logger = get_generic_logger(logfile=logfile)
 
-    if args.type != 'origin' and args.type != 'trump-origin':
-        logger.info('No action on product type %s' % args.type)
+    if args.type != "origin" and args.type != "trump-origin":
+        logger.info("No action on product type %s" % args.type)
         sys.exit(0)
 
-    if args.status not in ['UPDATE', 'DELETE']:
-        logger.info('No action on status %s' % args.status)
+    if args.status not in ["UPDATE", "DELETE"]:
+        logger.info("No action on status %s" % args.status)
         sys.exit(0)
 
-    if args.action not in ['EVENT_ADDED', 'EVENT_UPDATED']:
-        logger.info('No action on action %s' % args.action)
+    if args.action not in ["EVENT_ADDED", "EVENT_UPDATED"]:
+        logger.info("No action on action %s" % args.action)
         sys.exit(0)
 
     if not args.property_event_type:
-        args.property_event_type = ''
-    args.property_event_type = ' '.join(args.property_event_type)
-    if args.property_event_type != 'earthquake':
-        logger.info('No action on event types of %s' %
-                    args.property_event_type)
+        args.property_event_type = ""
+    args.property_event_type = " ".join(args.property_event_type)
+    if args.property_event_type != "earthquake":
+        logger.info("No action on event types of %s" % args.property_event_type)
         sys.exit(0)
 
     if not args.preferred_eventid:
-        logger.info('No event ID, skipping')
+        logger.info("No event ID, skipping")
         sys.exit(0)
 
-    if args.preferred_eventsource in ('pt', 'at', 'dr', 'ew'):
-        logger.info('Undesirable eventsource: %s' % args.preferred_eventsource)
+    if args.preferred_eventsource in ("pt", "at", "dr", "ew"):
+        logger.info("Undesirable eventsource: %s" % args.preferred_eventsource)
         sys.exit(0)
 
-    if args.status == 'DELETE':
-        event = {'id': args.preferred_eventid,
-                 'netid': args.preferred_eventsource,
-                 'alt_eventids': args.eventids}
-        queue.send_queue('cancel', event, config['port'])
-        logger.info('Sending cancel event %s to queue.' %
-                    args.preferred_eventid)
+    if args.status == "DELETE":
+        event = {
+            "id": args.preferred_eventid,
+            "netid": args.preferred_eventsource,
+            "alt_eventids": args.eventids,
+        }
+        queue.send_queue("cancel", event, config["port"])
+        logger.info("Sending cancel event %s to queue." % args.preferred_eventid)
         sys.exit(0)
 
-    if not args.preferred_eventtime or not args.preferred_latitude \
-       or not args.preferred_longitude or not args.preferred_depth \
-       or not args.preferred_magnitude:
-        logger.info('Missing event parameters for event %s, skipping',
-                    args.preferred_eventid)
+    if (
+        not args.preferred_eventtime
+        or not args.preferred_latitude
+        or not args.preferred_longitude
+        or not args.preferred_depth
+        or not args.preferred_magnitude
+    ):
+        logger.info(
+            "Missing event parameters for event %s, skipping", args.preferred_eventid
+        )
         sys.exit(0)
 
     fails = 0
@@ -132,33 +136,39 @@ def main(args):
             detail = get_event_by_id(args.preferred_eventid)
         except Exception as e:
             fails += 1
-            logger.warn('Libcomcat error: %s' % (str(e)))
-            logger.warn('Error retrieving event data from comcat for event '
-                        '%s, will try %d more times' % (args.preferred_eventid,
-                                                        3 - fails))
+            logger.warn("Libcomcat error: %s" % (str(e)))
+            logger.warn(
+                "Error retrieving event data from comcat for event "
+                "%s, will try %d more times" % (args.preferred_eventid, 3 - fails)
+            )
             time.sleep(20)
             continue
         else:
             break
     if fails == 3:
-        logger.warn('Unable to retrieve event data from comcat for event %s'
-                    % (args.preferred_eventid))
+        logger.warn(
+            "Unable to retrieve event data from comcat for event %s"
+            % (args.preferred_eventid)
+        )
         dt = datetime.strptime(args.preferred_eventtime, constants.TIMEFMT)
         event_age = (datetime.utcnow() - dt).total_seconds()
         if event_age > 86400:
             # If the event is more than a day old, and -- lacking an
             # authoritative event id -- we just assume that we've run it
             # before (or not) based on better information
-            logger.warn("Event %s is older than cutoff, skipping" %
-                        (args.preferred_eventid))
+            logger.warn(
+                "Event %s is older than cutoff, skipping" % (args.preferred_eventid)
+            )
             sys.exit(0)
         else:
             # Let's run the event
             pass
     else:
         if detail.id != args.preferred_eventid:
-            logger.info('Event id %s is not authoritative; (authoritative=%s)'
-                        % (args.preferred_eventid, detail.id))
+            logger.info(
+                "Event id %s is not authoritative; (authoritative=%s)"
+                % (args.preferred_eventid, detail.id)
+            )
             sys.exit(0)
 
     # We've weeded out the messages we don't want, so construct an event
@@ -167,82 +177,91 @@ def main(args):
         fails = 0
         while fails < 3:
             try:
-                gs = GeoServe(args.preferred_latitude,
-                              args.preferred_longitude,
-                              maxradius=250, minpop=1000)
+                gs = GeoServe(
+                    args.preferred_latitude,
+                    args.preferred_longitude,
+                    maxradius=250,
+                    minpop=1000,
+                )
             except Exception as e:
                 fails += 1
                 places = []
-                logger.warn('Error in GeoServe getPlaces: %s' % str(e))
-                logger.warn('Failure communicating with comcat; will try '
-                            '%d more times' % (3 - fails))
+                logger.warn("Error in GeoServe getPlaces: %s" % str(e))
+                logger.warn(
+                    "Failure communicating with comcat; will try "
+                    "%d more times" % (3 - fails)
+                )
                 time.sleep(20)
             else:
                 places = gs.getPlaces()
                 break
         if fails < 3:
             if len(places):
-                props = places[0]['properties']
-                if props['country_code'] == 'US':
-                    country = ''
+                props = places[0]["properties"]
+                if props["country_code"] == "US":
+                    country = ""
                 else:
-                    country = props['country_code']
-                azimuth = props['azimuth'] + 180
+                    country = props["country_code"]
+                azimuth = props["azimuth"] + 180
                 if azimuth > 360:
                     azimuth = azimuth - 360
-                location = '%d km %s of %s, %s, %s' % (
-                    int(props['distance']),
-                    get_compass_dir_azimuth(azimuth,
-                                            resolution='meteorological'),
-                    props['name'], props['admin1_name'], country)
+                location = "%d km %s of %s, %s, %s" % (
+                    int(props["distance"]),
+                    get_compass_dir_azimuth(azimuth, resolution="meteorological"),
+                    props["name"],
+                    props["admin1_name"],
+                    country,
+                )
             else:
                 region = gs.getRegions()
                 if region is not None:
                     try:
-                        location = region['fe']['features'][0]['properties'][
-                                          'name']
+                        location = region["fe"]["features"][0]["properties"]["name"]
                     except KeyError:
-                        location = ''
+                        location = ""
                     except IndexError:
-                        location = ''
+                        location = ""
                 else:
-                    location = ''
+                    location = ""
         else:
-            location = ''
+            location = ""
     else:
-        location = ' '.join(args.property_title)
+        location = " ".join(args.property_title)
 
     if not args.preferred_eventsource:
-        args.preferred_eventsource = ''
-        network = ''
+        args.preferred_eventsource = ""
+        network = ""
     else:
         network = get_network_name(args.preferred_eventsource)
-        if network == 'unknown':
-            network = ''
-    if args.action == 'EVENT_ADDED':
+        if network == "unknown":
+            network = ""
+    if args.action == "EVENT_ADDED":
         action = "Event added"
     else:
         action = "Origin updated"
-    event = {'id': args.preferred_eventid,
-             'netid': args.preferred_eventsource,
-             'network': network,
-             'time': args.preferred_eventtime,
-             'lat': args.preferred_latitude,
-             'lon': args.preferred_longitude,
-             'depth': args.preferred_depth,
-             'mag': args.preferred_magnitude,
-             'locstring': location,
-             'alt_eventids': args.eventids,
-             'action': action}
-    logger.info('Sending event %s to queue.' % args.preferred_eventid)
+    event = {
+        "id": args.preferred_eventid,
+        "netid": args.preferred_eventsource,
+        "network": network,
+        "time": args.preferred_eventtime,
+        "lat": args.preferred_latitude,
+        "lon": args.preferred_longitude,
+        "depth": args.preferred_depth,
+        "mag": args.preferred_magnitude,
+        "locstring": location,
+        "alt_eventids": args.eventids,
+        "action": action,
+    }
+    logger.info("Sending event %s to queue." % args.preferred_eventid)
 
     # Poke the queue to run shake on this event.
-    queue.send_queue('origin', event, config['port'])
+    queue.send_queue("origin", event, config["port"])
 
 
-if __name__ == '__main__':
-    clean_argv = ' '.join([x.replace('"', '').replace('=', ' ', 1)
-                           for x in sys.argv]).split()
+if __name__ == "__main__":
+    clean_argv = " ".join(
+        [x.replace('"', "").replace("=", " ", 1) for x in sys.argv]
+    ).split()
     parser = get_parser()
     pargs, unknown = parser.parse_known_args(clean_argv)
     main(pargs)

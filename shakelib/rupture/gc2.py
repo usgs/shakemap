@@ -75,8 +75,8 @@ def _computeGC2(rupture, lon, lat, depth):
 
         # Need to get index of first and last quad
         # for each segment
-        iq0 = np.zeros(n_groups, dtype='int16')
-        iq1 = np.zeros(n_groups, dtype='int16')
+        iq0 = np.zeros(n_groups, dtype="int16")
+        iq1 = np.zeros(n_groups, dtype="int16")
         for k in uind:
             ii = [i for i, j in enumerate(group_ind) if j == uind[k]]
             iq0[k] = int(np.min(ii))
@@ -87,8 +87,7 @@ def _computeGC2(rupture, lon, lat, depth):
         # including trace orientations (i.e., flipped).
         # ---------------------------------------------------------------------
 
-        it_seg = it.product(it.combinations(uind, 2),
-                            it.product([0, 1], [0, 1]))
+        it_seg = it.product(it.combinations(uind, 2), it.product([0, 1], [0, 1]))
 
         # Placeholder for the trace pair/orientation that gives the
         # largest distance.
@@ -108,8 +107,9 @@ def _computeGC2(rupture, lon, lat, depth):
             else:
                 P1 = quadlist[iq0[s1ind]][1]
 
-            dist = geodetic.distance(P0.longitude, P0.latitude, 0.0,
-                                     P1.longitude, P1.latitude, 0.0)
+            dist = geodetic.distance(
+                P0.longitude, P0.latitude, 0.0, P1.longitude, P1.latitude, 0.0
+            )
             if dist > dist_save:
                 dist_save = dist
                 A0 = P0
@@ -209,8 +209,9 @@ def _computeGC2(rupture, lon, lat, depth):
 
         # Case 1:
         ix = t_i != 0
-        w_i[ix] = (1.0 / t_i[ix]) * (np.arctan(
-            (l_i[i] - u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix]))
+        w_i[ix] = (1.0 / t_i[ix]) * (
+            np.arctan((l_i[i] - u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix])
+        )
 
         # Case 2:
         ix = (t_i == 0) & ((u_i < 0) | (u_i > l_i[i]))
@@ -248,18 +249,18 @@ def _computeGC2(rupture, lon, lat, depth):
     # Dictionary for holding the distances
     distdict = dict()
 
-    distdict['T'] = copy.deepcopy(GC2T).reshape(oldshape)
-    distdict['U'] = copy.deepcopy(GC2U).reshape(oldshape)
+    distdict["T"] = copy.deepcopy(GC2T).reshape(oldshape)
+    distdict["U"] = copy.deepcopy(GC2U).reshape(oldshape)
 
     # Take care of Rx
     Rx = copy.deepcopy(GC2T)  # preserve sign (no absolute value)
     Rx = Rx.reshape(oldshape)
-    distdict['rx'] = Rx
+    distdict["rx"] = Rx
 
     # Ry
     Ry = GC2U - s_i / 2.0
     Ry = Ry.reshape(oldshape)
-    distdict['ry'] = Ry
+    distdict["ry"] = Ry
 
     # Ry0
     Ry0 = np.zeros_like(GC2U)
@@ -270,7 +271,7 @@ def _computeGC2(rupture, lon, lat, depth):
     ix = GC2U > s_i
     Ry0[ix] = GC2U[ix] - s_i
     Ry0 = Ry0.reshape(oldshape)
-    distdict['ry0'] = Ry0
+    distdict["ry0"] = Ry0
 
     return distdict
 

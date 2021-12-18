@@ -8,11 +8,8 @@ import glob
 
 # third party libraries
 import numpy as np
-from configobj import (ConfigObj,
-                       flatten_errors,
-                       get_extra_values)
-from validate import (Validator,
-                      ValidateError)
+from configobj import ConfigObj, flatten_errors, get_extra_values
+from validate import Validator, ValidateError
 
 
 def get_data_path():
@@ -25,7 +22,7 @@ def get_data_path():
         str: The full path to the data directory.
 
     """
-    return pkg_resources.resource_filename('shakemap', 'data')
+    return pkg_resources.resource_filename("shakemap", "data")
 
 
 def get_configspec(config=None):
@@ -40,8 +37,8 @@ def get_configspec(config=None):
 
     """
     if config is None:
-        return os.path.join(get_data_path(), 'modelspec.conf')
-    fname = os.path.join(get_data_path(), '%sspec.conf' % config)
+        return os.path.join(get_data_path(), "modelspec.conf")
+    fname = os.path.join(get_data_path(), "%sspec.conf" % config)
     if not os.path.isfile(fname):
         raise FileNotFoundError('No file "%s" exists.' % fname)
     return fname
@@ -65,31 +62,31 @@ def get_config_paths():
         FileNotFoundError -- if the profile file can't be found.
         ValueError -- If the correct profile can't be foun in profiles.conf.
     """
-    if 'CALLED_FROM_PYTEST' in os.environ:
-        base_path = os.path.join(get_data_path(), '..', '..', 'tests', 'data')
-        install = os.path.join(base_path, 'install')
-        data = os.path.join(base_path, 'eventdata')
+    if "CALLED_FROM_PYTEST" in os.environ:
+        base_path = os.path.join(get_data_path(), "..", "..", "tests", "data")
+        install = os.path.join(base_path, "install")
+        data = os.path.join(base_path, "eventdata")
     else:
         config_file = os.path.join(
-            os.path.expanduser('~'),
-            '.shakemap',
-            'profiles.conf')
+            os.path.expanduser("~"), ".shakemap", "profiles.conf"
+        )
 
         if not os.path.isfile(config_file):
-            raise FileNotFoundError("Can't find a profile file: "
-                                    "have you run sm_profile?")
-        config = ConfigObj(config_file, encoding='utf-8-sig')
+            raise FileNotFoundError(
+                "Can't find a profile file: " "have you run sm_profile?"
+            )
+        config = ConfigObj(config_file, encoding="utf-8-sig")
 
         config = check_profile_config(config)
 
-        profile_name = config['profile']
-        if not profile_name or profile_name == 'None':
+        profile_name = config["profile"]
+        if not profile_name or profile_name == "None":
             raise ValueError("No profile set in the profiles.conf file")
-        if not config['profiles'] or profile_name not in config['profiles']:
+        if not config["profiles"] or profile_name not in config["profiles"]:
             raise ValueError("Profile %s not found in list of profiles")
-        profile = config['profiles'][profile_name]
-        install = profile['install_path']
-        data = profile['data_path']
+        profile = config["profiles"][profile_name]
+        install = profile["install_path"]
+        data = profile["data_path"]
     return (install, data)
 
 
@@ -99,29 +96,27 @@ def get_model_config(install_path, datadir, logger):
     #
     spec_file = get_configspec()
     validator = get_custom_validator()
-    logger.debug('Looking for configuration files...')
+    logger.debug("Looking for configuration files...")
     modules = ConfigObj(
-        os.path.join(install_path, 'config', 'modules.conf'),
-        configspec=spec_file)
+        os.path.join(install_path, "config", "modules.conf"), configspec=spec_file
+    )
     gmpe_sets = ConfigObj(
-        os.path.join(install_path, 'config', 'gmpe_sets.conf'),
-        configspec=spec_file)
+        os.path.join(install_path, "config", "gmpe_sets.conf"), configspec=spec_file
+    )
     global_config = ConfigObj(
-        os.path.join(install_path, 'config', 'model.conf'),
-        configspec=spec_file)
+        os.path.join(install_path, "config", "model.conf"), configspec=spec_file
+    )
 
     #
     # this is the event specific model.conf (may not be present)
     # prefer model.conf to model_select.conf
     #
-    event_config_file = os.path.join(datadir, 'model.conf')
-    event_config_zc_file = os.path.join(datadir, 'model_select.conf')
+    event_config_file = os.path.join(datadir, "model.conf")
+    event_config_zc_file = os.path.join(datadir, "model_select.conf")
     if os.path.isfile(event_config_file):
-        event_config = ConfigObj(event_config_file,
-                                 configspec=spec_file)
+        event_config = ConfigObj(event_config_file, configspec=spec_file)
     elif os.path.isfile(event_config_zc_file):
-        event_config = ConfigObj(event_config_zc_file,
-                                 configspec=spec_file)
+        event_config = ConfigObj(event_config_zc_file, configspec=spec_file)
     else:
         event_config = ConfigObj()
 
@@ -141,7 +136,7 @@ def get_model_config(install_path, datadir, logger):
     return global_config
 
 
-def path_macro_sub(s, ip='', dp='', gp='', ei=''):
+def path_macro_sub(s, ip="", dp="", gp="", ei=""):
     """
     Replace macros with current paths:
 
@@ -170,10 +165,10 @@ def path_macro_sub(s, ip='', dp='', gp='', ei=''):
         str: A new string with the sub-string replacements.
     """
 
-    s = s.replace('<INSTALL_DIR>', ip)
-    s = s.replace('<DATA_DIR>', dp)
-    s = s.replace('<GLOBAL_DATA>', gp)
-    s = s.replace('<EVENT_ID>', ei)
+    s = s.replace("<INSTALL_DIR>", ip)
+    s = s.replace("<DATA_DIR>", dp)
+    s = s.replace("<GLOBAL_DATA>", gp)
+    s = s.replace("<EVENT_ID>", ei)
     return s
 
 
@@ -187,15 +182,15 @@ def get_custom_validator():
 
     """
     fdict = {
-        'file_type': file_type,
-        'directory_type': directory_type,
-        'annotatedfloat_type': annotatedfloat_type,
-        'nanfloat_type': nanfloat_type,
-        'nanfloat_list': nanfloat_list,
-        'gmpe_list': gmpe_list,
-        'weight_list': weight_list,
-        'extent_list': extent_list,
-        'status_string': status_string,
+        "file_type": file_type,
+        "directory_type": directory_type,
+        "annotatedfloat_type": annotatedfloat_type,
+        "nanfloat_type": nanfloat_type,
+        "nanfloat_list": nanfloat_list,
+        "gmpe_list": gmpe_list,
+        "weight_list": weight_list,
+        "extent_list": extent_list,
+        "status_string": status_string,
     }
     validator = Validator(fdict)
     return validator
@@ -222,17 +217,21 @@ def config_error(config, results):
     errs = 0
     for (section_list, key, _) in flatten_errors(config, results):
         if key is not None:
-            logging.error('The "%s" key in the section "%s" failed validation'
-                          % (key, ', '.join(section_list)))
+            logging.error(
+                'The "%s" key in the section "%s" failed validation'
+                % (key, ", ".join(section_list))
+            )
             errs += 1
         else:
-            logging.error('The following section was missing:%s '
-                          % ', '.join(section_list))
+            logging.error(
+                "The following section was missing:%s " % ", ".join(section_list)
+            )
             errs += 1
     if errs:
-        raise RuntimeError('There %s %d %s in configuration.'
-                           % ('was' if errs == 1 else 'were', errs,
-                              'error' if errs == 1 else 'errors'))
+        raise RuntimeError(
+            "There %s %d %s in configuration."
+            % ("was" if errs == 1 else "were", errs, "error" if errs == 1 else "errors")
+        )
 
 
 def check_extra_values(config, logger):
@@ -259,20 +258,24 @@ def check_extra_values(config, logger):
         # the_value may be a section or a value
         the_value = the_section[name]
 
-        section_or_value = 'value'
+        section_or_value = "value"
         if isinstance(the_value, dict):
             # Sections are subclasses of dict
-            section_or_value = 'section'
+            section_or_value = "section"
 
-        section_string = ', '.join(sections) or "top level"
-        logger.warning('Extra entry in section: %s: %s %r is not in spec.' %
-                       (section_string, section_or_value, name))
+        section_string = ", ".join(sections) or "top level"
+        logger.warning(
+            "Extra entry in section: %s: %s %r is not in spec."
+            % (section_string, section_or_value, name)
+        )
         warnings += 1
     if warnings:
-        logger.warning('The extra value(s) may be the result of deprecated '
-                       'entries or other changes to the config files; please '
-                       'check the conifg files in shakemap/data for the most '
-                       'up to date specs.')
+        logger.warning(
+            "The extra value(s) may be the result of deprecated "
+            "entries or other changes to the config files; please "
+            "check the conifg files in shakemap/data for the most "
+            "up to date specs."
+        )
 
 
 def check_config(config, logger):
@@ -289,39 +292,46 @@ def check_config(config, logger):
         Nothing: Nothing.
 
     """
-    if config['modeling']['gmpe'] not in config['gmpe_sets']:
-        logger.error('Configuration error: gmpe %s not in gmpe_sets' %
-                     (config['modeling']['gmpe']))
+    if config["modeling"]["gmpe"] not in config["gmpe_sets"]:
+        logger.error(
+            "Configuration error: gmpe %s not in gmpe_sets"
+            % (config["modeling"]["gmpe"])
+        )
         raise ValidateError()
-    if config['modeling']['gmice'] not in config['gmice_modules']:
-        logger.error('Configuration error: gmice %s not in gmice_modules' %
-                     (config['modeling']['gmice']))
+    if config["modeling"]["gmice"] not in config["gmice_modules"]:
+        logger.error(
+            "Configuration error: gmice %s not in gmice_modules"
+            % (config["modeling"]["gmice"])
+        )
         raise ValidateError()
-    if config['modeling']['ipe'] not in config['ipe_modules']:
-        logger.error('Configuration error: ipe %s not in ipe_modules' %
-                     (config['modeling']['ipe']))
+    if config["modeling"]["ipe"] not in config["ipe_modules"]:
+        logger.error(
+            "Configuration error: ipe %s not in ipe_modules"
+            % (config["modeling"]["ipe"])
+        )
         raise ValidateError()
-    if config['modeling']['ccf'] not in config['ccf_modules']:
-        logger.error('Configuration error: ccf %s not in ccf_modules' %
-                     (config['modeling']['ccf']))
+    if config["modeling"]["ccf"] not in config["ccf_modules"]:
+        logger.error(
+            "Configuration error: ccf %s not in ccf_modules"
+            % (config["modeling"]["ccf"])
+        )
         raise ValidateError()
 
 
 def check_all_configs(configdir):
     data_path = get_data_path()
-    specfiles = glob.glob(os.path.join(data_path, '*spec*.conf'))
+    specfiles = glob.glob(os.path.join(data_path, "*spec*.conf"))
     missing_files = []
     issues = {}
     exceptions = []
     val = get_custom_validator()
     for tspecfile in specfiles:
         _, specfile = os.path.split(tspecfile)
-        configfile = os.path.join(configdir, specfile.replace('spec', ''))
+        configfile = os.path.join(configdir, specfile.replace("spec", ""))
         if not os.path.isfile(configfile):
             missing_files.append(configfile)
             continue
-        config = ConfigObj(configfile, configspec=tspecfile,
-                           interpolation=False)
+        config = ConfigObj(configfile, configspec=tspecfile, interpolation=False)
         try:
             results = config.validate(val, preserve_errors=True)
         except Exception as e:
@@ -372,12 +382,12 @@ def annotatedfloat_type(value):
         out = float(value)
     except ValueError:
         try:
-            if value.endswith('c'):
-                out = float(value.replace('c', '')) / 3600.0
-            elif value.endswith('m'):
-                out = float(value.replace('m', '')) / 60.0
-            elif value.endswith('d'):
-                out = float(value.replace('d', ''))
+            if value.endswith("c"):
+                out = float(value.replace("c", "")) / 3600.0
+            elif value.endswith("m"):
+                out = float(value.replace("m", "")) / 60.0
+            elif value.endswith("d"):
+                out = float(value.replace("d", ""))
             else:
                 raise ValidateError(value)
         except Exception:
@@ -399,29 +409,35 @@ def weight_list(value, min):
 
     """
 
-    if isinstance(value, str) and value == 'None':
+    if isinstance(value, str) and value == "None":
         if int(min) == 0:
             return []
         else:
-            logging.error("list must contain at least %d entr%s" %
-                          (min, "ies" if int(min) != 1 else "y"))
+            logging.error(
+                "list must contain at least %d entr%s"
+                % (min, "ies" if int(min) != 1 else "y")
+            )
             raise ValidateError()
     if isinstance(value, str):
-        if value.startswith('[') and value.endswith(']'):
-            value = value.replace('[', '')
-            value = value.replace(']', '')
+        if value.startswith("[") and value.endswith("]"):
+            value = value.replace("[", "")
+            value = value.replace("]", "")
         if not value:
             if int(min) == 0:
                 value = []
             else:
-                logging.error("list must contain at least %d entr%s" %
-                              (min, "ies" if int(min) != 1 else "y"))
+                logging.error(
+                    "list must contain at least %d entr%s"
+                    % (min, "ies" if int(min) != 1 else "y")
+                )
                 raise ValidateError()
         else:
             value = [value]
     if len(value) < int(min):
-        logging.error("list must contain at least %d entr%s" %
-                      (min, "ies" if int(min) != 1 else "y"))
+        logging.error(
+            "list must contain at least %d entr%s"
+            % (min, "ies" if int(min) != 1 else "y")
+        )
         raise ValidateError()
     try:
         out = [float(a) for a in value]
@@ -452,7 +468,7 @@ def nanfloat_list(value, min):
 
     """
     min = int(min)
-    if isinstance(value, str) and (value == 'None' or value == '[]'):
+    if isinstance(value, str) and (value == "None" or value == "[]"):
         value = []
     if isinstance(value, str):
         value = [value]
@@ -486,7 +502,7 @@ def gmpe_list(value, min):
 
     """
 
-    if value == 'None' or value == '[]':
+    if value == "None" or value == "[]":
         value = []
     if isinstance(value, str):
         value = [value]
@@ -517,7 +533,7 @@ def extent_list(value):
 
     """
 
-    if isinstance(value, str) and (value == 'None' or value == '[]'):
+    if isinstance(value, str) and (value == "None" or value == "[]"):
         return []
     if isinstance(value, list) and not value:
         return []
@@ -532,13 +548,20 @@ def extent_list(value):
     except ValueError:
         logging.error("%s is not a list of 4 floats" % value)
         raise ValidateError()
-    if out[0] < -360.0 or out[0] > 360.0 or \
-       out[2] < -360.0 or out[2] > 360.0 or \
-       out[1] < -90.0 or out[1] > 90.0 or \
-       out[3] < -90.0 or out[3] > 90.0:
-        logging.error("Invalid extent: %s "
-                      "(-360 <= longitude <= 360, -90 <= latitude <= 90)"
-                      % value)
+    if (
+        out[0] < -360.0
+        or out[0] > 360.0
+        or out[2] < -360.0
+        or out[2] > 360.0
+        or out[1] < -90.0
+        or out[1] > 90.0
+        or out[3] < -90.0
+        or out[3] > 90.0
+    ):
+        logging.error(
+            "Invalid extent: %s "
+            "(-360 <= longitude <= 360, -90 <= latitude <= 90)" % value
+        )
         raise ValidateError()
 
     return out
@@ -557,10 +580,10 @@ def file_type(value):
         str: The input string.
 
     """
-    if not value or value == 'None':
-        return ''
+    if not value or value == "None":
+        return ""
     ip, dp = get_config_paths()
-    gp = os.path.join(os.path.expanduser('~'), 'shakemap_data')
+    gp = os.path.join(os.path.expanduser("~"), "shakemap_data")
     value = path_macro_sub(value, ip=ip, dp=dp, gp=gp)
     if not os.path.isfile(value):
         logging.error("file '%s' is not a valid file" % value)
@@ -581,10 +604,10 @@ def directory_type(value):
         str: The input string.
 
     """
-    if not value or value == 'None':
-        return ''
+    if not value or value == "None":
+        return ""
     ip, dp = get_config_paths()
-    gp = os.path.join(os.path.expanduser('~'), 'shakemap_data')
+    gp = os.path.join(os.path.expanduser("~"), "shakemap_data")
     value = path_macro_sub(value, ip=ip, dp=dp, gp=gp)
     if not os.path.isdir(value):
         raise ValidateError(value)
@@ -605,8 +628,8 @@ def status_string(value, min):
 
     """
     if not value:
-        return 'automatic'
-    if value not in ('automatic', 'released', 'reviewed'):
+        return "automatic"
+    if value not in ("automatic", "released", "reviewed"):
         raise ValidateError(value)
     return value
 
@@ -627,7 +650,7 @@ def cfg_float_list(value):
     Raises:
         ValidateError
     """
-    if not value or value == 'None':
+    if not value or value == "None":
         logging.error("'%s' is not a list of at least 1 float" % (value))
         raise ValidateError()
     if isinstance(value, str):
@@ -660,7 +683,7 @@ def cfg_float(value):
     Raises:
         ValidateError
     """
-    if not isinstance(value, (str, float)) or not value or value == 'None':
+    if not isinstance(value, (str, float)) or not value or value == "None":
         logging.error("'%s' is not a float" % (value))
         raise ValidateError()
     try:
@@ -685,11 +708,11 @@ def cfg_bool(value):
     Raises:
         ValidateError
     """
-    if not isinstance(value, (str, bool)) or not value or value == 'None':
+    if not isinstance(value, (str, bool)) or not value or value == "None":
         logging.error("'%s' is not a bool" % (value))
         raise ValidateError()
     try:
-        if value.lower() in ['true', 't', 'yes', 'y', '1']:
+        if value.lower() in ["true", "t", "yes", "y", "1"]:
             bval = True
         else:
             bval = False
@@ -709,25 +732,25 @@ def check_profile_config(config):
         config (ConfigObj): The ConfigObj instance.
     """
     # Check that at least one profile exists
-    if 'profiles' not in config:
-        logging.error('There are currently no profiles. Use "sm_profile '
-                      '-c <profile>" to create one.')
+    if "profiles" not in config:
+        logging.error(
+            'There are currently no profiles. Use "sm_profile '
+            '-c <profile>" to create one.'
+        )
         sys.exit(1)
     # Check that the paths for each profile exist
-    for profile in config['profiles'].keys():
-        data_exists = os.path.isdir(config['profiles'][profile]['data_path'])
+    for profile in config["profiles"].keys():
+        data_exists = os.path.isdir(config["profiles"][profile]["data_path"])
         delete_profile = False
         if not data_exists:
-            logging.warn('Data path for profile %s does not exist.' % profile)
+            logging.warn("Data path for profile %s does not exist." % profile)
             delete_profile = True
-        install_exists = os.path.isdir(
-            config['profiles'][profile]['install_path'])
+        install_exists = os.path.isdir(config["profiles"][profile]["install_path"])
         if not install_exists:
-            logging.warn(
-                'Install path for profile %s does not exist.' % profile)
+            logging.warn("Install path for profile %s does not exist." % profile)
             delete_profile = True
         if delete_profile:
-            logging.warn('    Deleting profile %s.' % profile)
-            del config['profiles'][profile]
+            logging.warn("    Deleting profile %s." % profile)
+            del config["profiles"][profile]
             config.write()
     return config

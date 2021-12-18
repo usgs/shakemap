@@ -55,7 +55,7 @@ class IMTConverter(ABC):
             imt_in = self.output_input[imt_out]
             return imt_in
         except KeyError:
-            logging.info('No available conversion to %r' % imt_out)
+            logging.info("No available conversion to %r" % imt_out)
             return None
 
     def _verifyConversion(self, imt_in, imt_out):
@@ -75,5 +75,6 @@ class IMTConverter(ABC):
         imt_in = imt_in.upper().strip()
         imt_out = imt_out.upper().strip()
         if imt_in not in valid_inputs and imt_in != imt_out:
-            raise ValueError('No conversion available from %r to %r'
-                             % (imt_in, imt_out))
+            raise ValueError(
+                "No conversion available from %r to %r" % (imt_in, imt_out)
+            )

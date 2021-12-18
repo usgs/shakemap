@@ -13,7 +13,7 @@ from shakelib.gmpe.nga_east import NGAEast
 from shakelib.multigmpe import stuff_context
 
 home_dir = os.path.dirname(os.path.abspath(__file__))
-data_dir = os.path.join(home_dir, 'nga_east_data')
+data_dir = os.path.join(home_dir, "nga_east_data")
 
 stddev_types = [StdDev.TOTAL]
 gmpe = NGAEast()
@@ -24,13 +24,7 @@ dx.rrup = np.logspace(-1, np.log10(2000), 100)
 rx = base.RuptureContext()
 sx = base.SitesContext()
 
-IMTS = [
-    imt.PGA(),
-    imt.PGV(),
-    imt.SA(0.3),
-    imt.SA(1.0),
-    imt.SA(3.0)
-]
+IMTS = [imt.PGA(), imt.PGV(), imt.SA(0.3), imt.SA(1.0), imt.SA(3.0)]
 
 MAGS = [3, 5, 6, 7]
 
@@ -51,21 +45,20 @@ def update_results():
                 sx.sids = np.array(list(range(len(sx.vs30))))
                 result[ikey][str(mag)][str(vs30)] = {}
                 ctx = stuff_context(sx, rx, dx)
-                lmean, lsd = gmpe.get_mean_and_stddevs(
-                    ctx, ctx, ctx, i, stddev_types)
-                result[ikey][str(mag)][str(vs30)]['lmean'] = lmean.tolist()
-                result[ikey][str(mag)][str(vs30)]['lsd'] = lsd[0].tolist()
+                lmean, lsd = gmpe.get_mean_and_stddevs(ctx, ctx, ctx, i, stddev_types)
+                result[ikey][str(mag)][str(vs30)]["lmean"] = lmean.tolist()
+                result[ikey][str(mag)][str(vs30)]["lsd"] = lsd[0].tolist()
     # Save results
-    pkl_file = os.path.join(data_dir, 'nga_east_data.pkl')
-    fh = open(pkl_file, 'wb')
+    pkl_file = os.path.join(data_dir, "nga_east_data.pkl")
+    fh = open(pkl_file, "wb")
     pickle.dump(result, fh)
     fh.close()
 
 
 def test_nga_east():
     # Load test data
-    pkl_file = os.path.join(data_dir, 'nga_east_data.pkl')
-    fh = open(pkl_file, 'rb')
+    pkl_file = os.path.join(data_dir, "nga_east_data.pkl")
+    fh = open(pkl_file, "rb")
     target = pickle.load(fh)
     fh.close()
     for i in IMTS:
@@ -76,13 +69,12 @@ def test_nga_east():
                 sx.vs30 = np.full_like(dx.rrup, vs30)
                 sx.sids = np.array(list(range(len(sx.vs30))))
                 ctx = stuff_context(sx, rx, dx)
-                lmean, lsd = gmpe.get_mean_and_stddevs(
-                    ctx, ctx, ctx, i, stddev_types)
-                tmean = np.array(target[ikey][str(mag)][str(vs30)]['lmean'])
+                lmean, lsd = gmpe.get_mean_and_stddevs(ctx, ctx, ctx, i, stddev_types)
+                tmean = np.array(target[ikey][str(mag)][str(vs30)]["lmean"])
                 np.testing.assert_allclose(lmean, tmean, rtol=1e-6, atol=1e-6)
-                tsd = np.array(target[ikey][str(mag)][str(vs30)]['lsd'])
+                tsd = np.array(target[ikey][str(mag)][str(vs30)]["lsd"])
                 np.testing.assert_allclose(lsd[0], tsd, rtol=1e-6, atol=1e-6)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_nga_east()
