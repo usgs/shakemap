@@ -36,52 +36,45 @@ class NGAEast(GMPE):
     Returns NGA East GMPE that combines all of the individual NGAEastUSGSGMPE
     GMPEs.
     """
+
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.STABLE_CONTINENTAL
     DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = const.IMC.RotD50
-    DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
-        IMT.PGA,
-        IMT.PGV,
-        IMT.SA
-    ])
+    DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([IMT.PGA, IMT.PGV, IMT.SA])
 
-    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
-        const.StdDev.TOTAL,
-        const.StdDev.INTER_EVENT,
-        const.StdDev.INTRA_EVENT
-    ])
-    REQUIRES_SITES_PARAMETERS = set(('vs30', ))
-    REQUIRES_RUPTURE_PARAMETERS = set(('mag', ))
-    REQUIRES_DISTANCES = set(('rrup', ))
+    DEFINED_FOR_STANDARD_DEVIATION_TYPES = set(
+        [const.StdDev.TOTAL, const.StdDev.INTER_EVENT, const.StdDev.INTRA_EVENT]
+    )
+    REQUIRES_SITES_PARAMETERS = set(("vs30",))
+    REQUIRES_RUPTURE_PARAMETERS = set(("mag",))
+    REQUIRES_DISTANCES = set(("rrup",))
 
     TABLE_PATHS = os.listdir(NGAEastUSGSGMPE.PATH)
     this_module = os.path.dirname(__file__)
     NGA_BASE_PATH = os.path.join(
-        this_module, '..', '..', 'shakemap', 'data', 'nga_east_tables')
+        this_module, "..", "..", "shakemap", "data", "nga_east_tables"
+    )
 
     NGA_EAST_USGS_WEIGHT = 0.667
     NGA_EAST_SEED_WEIGHT = 0.333
 
-    NGA_EAST_USGS = pd.read_csv(os.path.join(
-        NGA_BASE_PATH, 'nga-east-usgs-weights.dat'))
-    NGA_EAST_SEEDS = pd.read_csv(os.path.join(
-        NGA_BASE_PATH, 'nga-east-seed-weights.dat'))
+    NGA_EAST_USGS = pd.read_csv(
+        os.path.join(NGA_BASE_PATH, "nga-east-usgs-weights.dat")
+    )
+    NGA_EAST_SEEDS = pd.read_csv(
+        os.path.join(NGA_BASE_PATH, "nga-east-seed-weights.dat")
+    )
 
     # Sigma models and their weights
     SIGMA_MODS = ["EPRI", "PANEL"]
     SIGMA_WEIGHTS = [0.8, 0.2]
 
     # For small magnitude extrapolation
-    PATH = os.path.join(os.path.dirname(__file__), 'nga_east_small_mag')
-    SMALL_M_SLOPE = np.loadtxt(
-        os.path.join(PATH, 'nga-east-smallM_slopes.txt'))
-    SMALL_M_SLOPE_PGA = np.loadtxt(
-        os.path.join(PATH, 'nga-east-smallM_slope_pga.txt'))
-    SMALL_M_SLOPE_PGV = np.loadtxt(
-        os.path.join(PATH, 'nga-east-smallM_slope_pgv.txt'))
-    SMALL_M_DIST = np.loadtxt(
-        os.path.join(PATH, 'nga-east-smallM_slope_distances.txt'))
-    SMALL_M_PER = np.loadtxt(
-        os.path.join(PATH, 'nga-east-smallM_slope_periods.txt'))
+    PATH = os.path.join(os.path.dirname(__file__), "nga_east_small_mag")
+    SMALL_M_SLOPE = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slopes.txt"))
+    SMALL_M_SLOPE_PGA = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slope_pga.txt"))
+    SMALL_M_SLOPE_PGV = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slope_pgv.txt"))
+    SMALL_M_DIST = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slope_distances.txt"))
+    SMALL_M_PER = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slope_periods.txt"))
 
     # -------------------------------------------------------------------------
     # To simplify, use the COLLAPSED branch, but cannot get inter and intra
@@ -94,7 +87,7 @@ class NGAEast(GMPE):
     per_idx_end = -2
     per_list_str = NGA_EAST_USGS.keys().tolist()[per_idx_start:per_idx_end]
     per_array = np.array(
-        [float(p.replace('SA', '').replace('P', '.')) for p in per_list_str]
+        [float(p.replace("SA", "").replace("P", ".")) for p in per_list_str]
     )
 
     def __init__(self):
@@ -103,8 +96,7 @@ class NGAEast(GMPE):
         all_table_paths = []
         for i, sigma_mod in enumerate(self.SIGMA_MODS):
             for table_path in self.TABLE_PATHS:
-                gmpe = NGAEastUSGSGMPE(
-                    gmpe_table=table_path, sigma_model=sigma_mod)
+                gmpe = NGAEastUSGSGMPE(gmpe_table=table_path, sigma_model=sigma_mod)
                 gmpes.append(gmpe)
                 sigma_wts.append(self.SIGMA_WEIGHTS[i])
                 all_table_paths.append(table_path)
@@ -151,12 +143,10 @@ class NGAEast(GMPE):
             is_small_mag = False
 
         for i, tp in enumerate(self.ALL_TABLE_PATHS):
-            if 'usgs' in tp:
+            if "usgs" in tp:
                 # Get model number from i-th path using regex
-                mod_num = int(re.search(r'\d+', tp).group())
-                coefs = np.array(
-                    self.NGA_EAST_USGS.iloc[mod_num - 1]
-                )
+                mod_num = int(re.search(r"\d+", tp).group())
+                coefs = np.array(self.NGA_EAST_USGS.iloc[mod_num - 1])
                 # Is the IMT PGA, PGA, or SA?
                 if is_pga:
                     iweight = coefs[-2]
@@ -168,23 +158,23 @@ class NGAEast(GMPE):
                     iweight = np.interp(
                         np.log(imt.period),
                         np.log(self.per_array),
-                        coefs[self.per_idx_start:self.per_idx_end]
+                        coefs[self.per_idx_start : self.per_idx_end],
                     )
                 wts[i] = self.NGA_EAST_USGS_WEIGHT * iweight
             else:
                 # Strip off the cruft to get the string we need to match
-                str_match = tp.replace('nga_east_', '').replace('.hdf5', '')
-                matched = self.NGA_EAST_SEEDS[
-                    self.NGA_EAST_SEEDS['model'] == str_match]
+                str_match = tp.replace("nga_east_", "").replace(".hdf5", "")
+                matched = self.NGA_EAST_SEEDS[self.NGA_EAST_SEEDS["model"] == str_match]
                 if len(matched):
                     iweight = self.NGA_EAST_SEEDS[
-                        self.NGA_EAST_SEEDS['model'] == str_match].iloc[0, 1]
+                        self.NGA_EAST_SEEDS["model"] == str_match
+                    ].iloc[0, 1]
                     wts[i] = self.NGA_EAST_SEED_WEIGHT * iweight
 
         total_gmpe_weights = self.sigma_weights * wts
 
         if not np.allclose(np.sum(total_gmpe_weights), 1.0):
-            raise ValueError('Weights must sum to 1.0.')
+            raise ValueError("Weights must sum to 1.0.")
 
         mean = np.full_like(sites.vs30, 0)
         stddevs = []
@@ -213,9 +203,11 @@ class NGAEast(GMPE):
                     # No table for PGV, compute vimt, then convert to PGV
                     #
                     vmean, vstddevs = gm.get_mean_and_stddevs(
-                        rup, rup, rup, vimt, stddev_types)
+                        rup, rup, rup, vimt, stddev_types
+                    )
                     tmean, tstddevs = ab2020.getPGVandSTDDEVS(
-                        vmean, vstddevs, stddev_types, rup.rrup, rup.vs30)
+                        vmean, vstddevs, stddev_types, rup.rrup, rup.vs30
+                    )
                 except Exception:
                     logging.error("Unexpected error:", sys.exc_info()[0])
                 else:
@@ -223,10 +215,12 @@ class NGAEast(GMPE):
                     # Table exists for PGV, proceed normally
                     #
                     tmean, tstddevs = gm.get_mean_and_stddevs(
-                        rup, rup, rup, imt, stddev_types)
+                        rup, rup, rup, imt, stddev_types
+                    )
             else:
                 tmean, tstddevs = gm.get_mean_and_stddevs(
-                    rup, rup, rup, imt, stddev_types)
+                    rup, rup, rup, imt, stddev_types
+                )
 
             mean += tmean * total_gmpe_weights[i]
             for j, sd in enumerate(tstddevs):
@@ -240,23 +234,21 @@ class NGAEast(GMPE):
         if is_small_mag:
             if is_pga:
                 slopes = np.interp(
-                    np.log(rup.rrup),
-                    np.log(self.SMALL_M_DIST),
-                    self.SMALL_M_SLOPE_PGA)
+                    np.log(rup.rrup), np.log(self.SMALL_M_DIST), self.SMALL_M_SLOPE_PGA
+                )
             elif is_pgv:
                 slopes = np.interp(
-                    np.log(rup.rrup),
-                    np.log(self.SMALL_M_DIST),
-                    self.SMALL_M_SLOPE_PGV)
+                    np.log(rup.rrup), np.log(self.SMALL_M_DIST), self.SMALL_M_SLOPE_PGV
+                )
             else:
                 interp_obj = RectBivariateSpline(
                     np.log(self.SMALL_M_DIST),
                     np.log(self.SMALL_M_PER),
-                    self.SMALL_M_SLOPE, kx=1, ky=1)
-                slopes = interp_obj.ev(
-                    np.log(rup.rrup),
-                    np.log(imt.period)
+                    self.SMALL_M_SLOPE,
+                    kx=1,
+                    ky=1,
                 )
+                slopes = interp_obj.ev(np.log(rup.rrup), np.log(imt.period))
             mean = mean + slopes * delta_mag
 
         return mean, stddevs

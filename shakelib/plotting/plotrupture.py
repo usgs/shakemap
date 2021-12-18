@@ -25,11 +25,10 @@ def plot_rupture_wire3d(rupture, ax=None):
 
     if ax is None:
         fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
+        ax = fig.add_subplot(111, projection="3d")
     else:
-        if 'xlim3d' not in list(ax.properties().keys()):
-            raise TypeError(
-                'Non-3d axes object passed to plot() method.')
+        if "xlim3d" not in list(ax.properties().keys()):
+            raise TypeError("Non-3d axes object passed to plot() method.")
     for quad in rupture.getQuadrilaterals():
         x = [p.longitude for p in quad]
         x.append(x[0])
@@ -37,10 +36,10 @@ def plot_rupture_wire3d(rupture, ax=None):
         y.append(y[0])
         z = [-p.depth for p in quad]
         z.append(z[0])
-        ax.plot(x, y, z, 'k')
-        ax.set_xlabel('Longitude')
-        ax.set_ylabel('Latitude')
-        ax.set_zlabel('Depth')
+        ax.plot(x, y, z, "k")
+        ax.set_xlabel("Longitude")
+        ax.set_ylabel("Latitude")
+        ax.set_zlabel("Depth")
 
     return ax
 
@@ -78,5 +77,5 @@ def map_rupture(rupture):
     ax.set_extent([lon1 - bufx, lon2 + bufx, lat1 - bufy, lat2 + bufy])
     ax.stock_img()
     ax.coastlines()
-    ax.plot(rlons, rlats, 'r', transform=ccrs.PlateCarree())
+    ax.plot(rlons, rlats, "r", transform=ccrs.PlateCarree())
     return ax

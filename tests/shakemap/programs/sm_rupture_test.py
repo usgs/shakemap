@@ -1,4 +1,3 @@
-
 import os
 import subprocess
 import tempfile
@@ -10,32 +9,38 @@ from shakelib.rupture.origin import Origin
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..'))
+shakedir = os.path.abspath(os.path.join(homedir, "..", "..", ".."))
 
 # Dummy origin
 dummy = {
-    'mag': np.nan,
-    'id': 'dummy',
-    'locstring': 'dummy',
-    'mech': 'ALL',
-    'lon': np.nan,
-    'lat': np.nan,
-    'depth': np.nan,
-    'netid': "",
-    'network': "",
-    'time': ""
+    "mag": np.nan,
+    "id": "dummy",
+    "locstring": "dummy",
+    "mech": "ALL",
+    "lon": np.nan,
+    "lat": np.nan,
+    "depth": np.nan,
+    "netid": "",
+    "network": "",
+    "time": "",
 }
 origin = Origin(dummy)
 
-program = os.path.join(shakedir, 'bin', 'sm_rupture')
+program = os.path.join(shakedir, "bin", "sm_rupture")
 
 
 def test_rupture():
     with tempfile.TemporaryDirectory() as tmpdir:
         # Read in a fault file
         rup1_file = os.path.join(
-            shakedir, 'tests', 'data', 'eventdata', 'northridge', 'current',
-            'northridge_fault.txt')
+            shakedir,
+            "tests",
+            "data",
+            "eventdata",
+            "northridge",
+            "current",
+            "northridge_fault.txt",
+        )
         rup1 = get_rupture(origin, rup1_file)
 
         # Known point is p0
@@ -50,29 +55,38 @@ def test_rupture():
         strike = rup1.getStrike()
         dip = rup1.getDip()
 
-        outfile = os.path.join(tmpdir, 'test.json')
+        outfile = os.path.join(tmpdir, "test.json")
 
         op = subprocess.Popen(
             [program, outfile],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            shell=False
+            shell=False,
         )
         responses = (
-            'test\n' +
-            '1\n' +
-            str(px) + '\n' +
-            str(py) + '\n' +
-            str(pz) + '\n' +
-            str(dx) + '\n' +
-            str(dy) + '\n' +
-            str(length) + '\n' +
-            str(width) + '\n' +
-            str(strike) + '\n' +
-            str(dip) + '\n'
+            "test\n"
+            + "1\n"
+            + str(px)
+            + "\n"
+            + str(py)
+            + "\n"
+            + str(pz)
+            + "\n"
+            + str(dx)
+            + "\n"
+            + str(dy)
+            + "\n"
+            + str(length)
+            + "\n"
+            + str(width)
+            + "\n"
+            + str(strike)
+            + "\n"
+            + str(dip)
+            + "\n"
         )
-        op.communicate(responses.encode('ascii'))
+        op.communicate(responses.encode("ascii"))
         rup2 = get_rupture(origin, outfile)
 
         # testing, note that some difference will occur since the original
@@ -86,5 +100,5 @@ def test_rupture():
         np.testing.assert_allclose(rup2.depths, rup1.depths, rtol=rtol)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_rupture()

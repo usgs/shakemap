@@ -10,41 +10,36 @@ from configobj import ConfigObj
 from validate import Validator
 
 # local libraries
-from shakemap.utils.config import (get_config_paths,
-                                   get_configspec,
-                                   config_error)
+from shakemap.utils.config import get_config_paths, get_configspec, config_error
 
 REQ_FIELDS = {
-    'logging.handlers.TimedRotatingFileHandler': [
-        'level',
-        'formatter',
-        'class',
-        'when',
-        'filename'
+    "logging.handlers.TimedRotatingFileHandler": [
+        "level",
+        "formatter",
+        "class",
+        "when",
+        "filename",
     ],
-    'logging.FileHandler': [
-        'level',
-        'formatter',
-        'class',
-        'filename'],
-    'logging.handlers.SMTPHandler': [
-        'level',
-        'formatter',
-        'mailhost',
-        'fromaddr',
-        'toaddrs',
-        'subject',
-        'class']
+    "logging.FileHandler": ["level", "formatter", "class", "filename"],
+    "logging.handlers.SMTPHandler": [
+        "level",
+        "formatter",
+        "mailhost",
+        "fromaddr",
+        "toaddrs",
+        "subject",
+        "class",
+    ],
 }
 
 # mapping of string versions of logging module logging levels
 # to the corresponding constants.
 LOG_LEVELS = {
-    'DEBUG': logging.DEBUG,
-    'INFO': logging.INFO,
-    'WARNING': logging.WARNING,
-    'ERROR': logging.ERROR,
-    'CRITICAL': logging.CRITICAL
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
 }
 
 
@@ -61,87 +56,86 @@ def get_logger(eventid, log_option=None, log_file=None):
     install_path, data_path = get_config_paths()
     config = get_logging_config()
     if log_file is None:
-        fmt = config['formatters']['standard']['format']
-        datefmt = config['formatters']['standard']['datefmt']
+        fmt = config["formatters"]["standard"]["format"]
+        datefmt = config["formatters"]["standard"]["datefmt"]
         # create a console handler, with verbosity setting chosen by user
-        if log_option == 'debug':
+        if log_option == "debug":
             level = logging.DEBUG
-        elif log_option == 'quiet':
+        elif log_option == "quiet":
             level = logging.ERROR
         else:  # default interactive
             level = logging.INFO
 
         logdict = {
-            'version': 1,
-            'formatters': {
-                'standard': {
-                    'format': fmt,
-                    'datefmt': datefmt
+            "version": 1,
+            "formatters": {"standard": {"format": fmt, "datefmt": datefmt}},
+            "handlers": {
+                "stream": {
+                    "level": level,
+                    "formatter": "standard",
+                    "class": "logging.StreamHandler",
                 }
             },
-            'handlers': {
-                'stream': {
-                    'level': level,
-                    'formatter': 'standard',
-                    'class': 'logging.StreamHandler'
-                }
+            "loggers": {
+                "": {"handlers": ["stream"], "level": level, "propagate": True}
             },
-            'loggers': {
-                '': {
-                    'handlers': ['stream'],
-                    'level': level,
-                    'propagate': True
-                }
-            }
         }
 
         logging.config.dictConfig(logdict)
     else:
         event_log_dir = os.path.join(data_path, eventid)
         if not os.path.isdir(event_log_dir):
-            raise NotADirectoryError("Can't open log file: event %s "
-                                     "not found" % eventid)
-        event_log_file = os.path.join(event_log_dir, 'shake.log')
-        config['handlers']['event_file']['filename'] = event_log_file
+            raise NotADirectoryError(
+                "Can't open log file: event %s " "not found" % eventid
+            )
+        event_log_file = os.path.join(event_log_dir, "shake.log")
+        config["handlers"]["event_file"]["filename"] = event_log_file
 
-        if log_option == 'debug':
-            config['handlers']['event_file']['level'] = logging.DEBUG
-        elif log_option == 'quiet':
-            config['handlers']['event_file']['level'] = logging.ERROR
-        elif 'level' in config['handlers']['event_file'] and \
-             config['handlers']['event_file']['level'] in LOG_LEVELS:
-            config['handlers']['event_file']['level'] = \
-                LOG_LEVELS[config['handlers']['event_file']['level']]
+        if log_option == "debug":
+            config["handlers"]["event_file"]["level"] = logging.DEBUG
+        elif log_option == "quiet":
+            config["handlers"]["event_file"]["level"] = logging.ERROR
+        elif (
+            "level" in config["handlers"]["event_file"]
+            and config["handlers"]["event_file"]["level"] in LOG_LEVELS
+        ):
+            config["handlers"]["event_file"]["level"] = LOG_LEVELS[
+                config["handlers"]["event_file"]["level"]
+            ]
         else:
-            config['handlers']['event_file']['level'] = logging.INFO
-        global_log_dir = os.path.join(install_path, 'logs')
+            config["handlers"]["event_file"]["level"] = logging.INFO
+        global_log_dir = os.path.join(install_path, "logs")
 
         if not os.path.isdir(global_log_dir):
             os.makedirs(global_log_dir, exist_ok=True)
-        global_log_file = os.path.join(global_log_dir, 'shake.log')
-        config['handlers']['global_file']['filename'] = global_log_file
+        global_log_file = os.path.join(global_log_dir, "shake.log")
+        config["handlers"]["global_file"]["filename"] = global_log_file
 
-        if log_option == 'debug':
-            config['handlers']['global_file']['level'] = logging.DEBUG
-        elif log_option == 'quiet':
-            config['handlers']['global_file']['level'] = logging.ERROR
-        elif 'level' in config['handlers']['global_file'] and \
-             config['handlers']['global_file']['level'] in LOG_LEVELS:
-            config['handlers']['global_file']['level'] = \
-                LOG_LEVELS[config['handlers']['global_file']['level']]
+        if log_option == "debug":
+            config["handlers"]["global_file"]["level"] = logging.DEBUG
+        elif log_option == "quiet":
+            config["handlers"]["global_file"]["level"] = logging.ERROR
+        elif (
+            "level" in config["handlers"]["global_file"]
+            and config["handlers"]["global_file"]["level"] in LOG_LEVELS
+        ):
+            config["handlers"]["global_file"]["level"] = LOG_LEVELS[
+                config["handlers"]["global_file"]["level"]
+            ]
         else:
-            config['handlers']['global_file']['level'] = logging.INFO
+            config["handlers"]["global_file"]["level"] = logging.INFO
 
-        if log_option == 'debug':
-            config['loggers']['']['level'] = logging.DEBUG
-        elif log_option == 'quiet':
-            config['loggers']['']['level'] = logging.ERROR
-        elif 'level' in config['loggers'][''] and \
-             config['loggers']['']['level'] in LOG_LEVELS:
-            config['loggers']['']['level'] = \
-                LOG_LEVELS[config['loggers']['']['level']]
+        if log_option == "debug":
+            config["loggers"][""]["level"] = logging.DEBUG
+        elif log_option == "quiet":
+            config["loggers"][""]["level"] = logging.ERROR
+        elif (
+            "level" in config["loggers"][""]
+            and config["loggers"][""]["level"] in LOG_LEVELS
+        ):
+            config["loggers"][""]["level"] = LOG_LEVELS[config["loggers"][""]["level"]]
         else:
-            config['loggers']['']['level'] = logging.INFO
+            config["loggers"][""]["level"] = logging.INFO
 
         logging.config.dictConfig(config)
 
@@ -168,11 +162,9 @@ def get_logging_config():
     """
 
     install_path, _ = get_config_paths()
-    conf_file = os.path.join(install_path, 'config', 'logging.conf')
-    spec_file = get_configspec(config='logging')
-    log_config = ConfigObj(conf_file,
-                           configspec=spec_file,
-                           interpolation='template')
+    conf_file = os.path.join(install_path, "config", "logging.conf")
+    spec_file = get_configspec(config="logging")
+    log_config = ConfigObj(conf_file, configspec=spec_file, interpolation="template")
 
     val = Validator()
     results = log_config.validate(val)
@@ -189,9 +181,9 @@ def get_logging_config():
     # information from the logger we specify, copy it into a logger dictionary
     # with an empty key, and then delete the original logger from the config
     # dictionary. Whew.
-    log_name = log_config['loggers'].keys()[0]
-    log_config['loggers'][''] = log_config['loggers'][log_name]
-    del log_config['loggers'][log_name]
+    log_name = log_config["loggers"].keys()[0]
+    log_config["loggers"][""] = log_config["loggers"][log_name]
+    del log_config["loggers"][log_name]
     return log_config
 
 
@@ -208,8 +200,8 @@ def _clean_log_dict(config):
         dict: Dictionary suitable for use with logging.config.dictConfig().
 
     """
-    for handler in config['handlers'].values():
-        myclass = handler['class']
+    for handler in config["handlers"].values():
+        myclass = handler["class"]
         req_fields = REQ_FIELDS[myclass]
         for key in handler.keys():
             if key not in req_fields:
@@ -248,46 +240,42 @@ def get_generic_logger(logfile=None, fmt=None, datefmt=None, level=None):
     if fmt is None or datefmt is None:
         config = get_logging_config()
     if fmt is None:
-        fmt = config['formatters']['standard']['format']
+        fmt = config["formatters"]["standard"]["format"]
     if datefmt is None:
-        datefmt = config['formatters']['standard']['datefmt']
+        datefmt = config["formatters"]["standard"]["datefmt"]
 
     if logfile is None:
-        handler = 'logging.StreamHandler'
+        handler = "logging.StreamHandler"
     else:
-        handler = 'logging.handlers.TimedRotatingFileHandler'
+        handler = "logging.handlers.TimedRotatingFileHandler"
 
     if level is None:
-        level = 'INFO'
+        level = "INFO"
 
     log_cfg = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'standard': {
-                'format': fmt,
-                'datefmt': datefmt,
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "standard": {
+                "format": fmt,
+                "datefmt": datefmt,
             },
         },
-        'handlers': {
-            'default': {
-                'level': 'INFO',
-                'formatter': 'standard',
-                'class': handler,
-                'when': 'midnight'
+        "handlers": {
+            "default": {
+                "level": "INFO",
+                "formatter": "standard",
+                "class": handler,
+                "when": "midnight",
             },
         },
-        'loggers': {
-            '': {
-                'handlers': ['default'],
-                'level': level,
-                'propagate': True
-            },
-        }
+        "loggers": {
+            "": {"handlers": ["default"], "level": level, "propagate": True},
+        },
     }
 
     if logfile:
-        log_cfg['handlers']['default']['filename'] = logfile
+        log_cfg["handlers"]["default"]["filename"] = logfile
     logging.config.dictConfig(log_cfg)
     logger = logging.getLogger()
     return logger

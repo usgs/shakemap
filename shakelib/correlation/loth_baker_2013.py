@@ -9,43 +9,49 @@ from shakemap.c.clib import eval_lb_correlation
 Tlist = np.array([0.01, 0.1, 0.2, 0.5, 1, 2, 5, 7.5, 10.0001])
 
 # Table II. Short range coregionalization matrix, B1
-B1 = np.array([
-    [0.29, 0.25, 0.23, 0.23, 0.18, 0.10, 0.06, 0.06, 0.06],
-    [0.25, 0.30, 0.20, 0.16, 0.10, 0.04, 0.03, 0.04, 0.05],
-    [0.23, 0.20, 0.27, 0.18, 0.10, 0.03, 0.00, 0.01, 0.02],
-    [0.23, 0.16, 0.18, 0.31, 0.22, 0.14, 0.08, 0.07, 0.07],
-    [0.18, 0.10, 0.10, 0.22, 0.33, 0.24, 0.16, 0.13, 0.12],
-    [0.10, 0.04, 0.03, 0.14, 0.24, 0.33, 0.26, 0.21, 0.19],
-    [0.06, 0.03, 0.00, 0.08, 0.16, 0.26, 0.37, 0.30, 0.26],
-    [0.06, 0.04, 0.01, 0.07, 0.13, 0.21, 0.30, 0.28, 0.24],
-    [0.06, 0.05, 0.02, 0.07, 0.12, 0.19, 0.26, 0.24, 0.23]
-])
+B1 = np.array(
+    [
+        [0.29, 0.25, 0.23, 0.23, 0.18, 0.10, 0.06, 0.06, 0.06],
+        [0.25, 0.30, 0.20, 0.16, 0.10, 0.04, 0.03, 0.04, 0.05],
+        [0.23, 0.20, 0.27, 0.18, 0.10, 0.03, 0.00, 0.01, 0.02],
+        [0.23, 0.16, 0.18, 0.31, 0.22, 0.14, 0.08, 0.07, 0.07],
+        [0.18, 0.10, 0.10, 0.22, 0.33, 0.24, 0.16, 0.13, 0.12],
+        [0.10, 0.04, 0.03, 0.14, 0.24, 0.33, 0.26, 0.21, 0.19],
+        [0.06, 0.03, 0.00, 0.08, 0.16, 0.26, 0.37, 0.30, 0.26],
+        [0.06, 0.04, 0.01, 0.07, 0.13, 0.21, 0.30, 0.28, 0.24],
+        [0.06, 0.05, 0.02, 0.07, 0.12, 0.19, 0.26, 0.24, 0.23],
+    ]
+)
 
 # Table III. Long range coregionalization matrix, B2
-B2 = np.array([
-    [0.47, 0.40, 0.43, 0.35, 0.27, 0.15, 0.13, 0.09, 0.12],
-    [0.40, 0.42, 0.37, 0.25, 0.15, 0.03, 0.04, 0.00, 0.03],
-    [0.43, 0.37, 0.45, 0.36, 0.26, 0.15, 0.09, 0.05, 0.08],
-    [0.35, 0.25, 0.36, 0.42, 0.37, 0.29, 0.20, 0.16, 0.16],
-    [0.27, 0.15, 0.26, 0.37, 0.48, 0.41, 0.26, 0.21, 0.21],
-    [0.15, 0.03, 0.15, 0.29, 0.41, 0.55, 0.37, 0.33, 0.32],
-    [0.13, 0.04, 0.09, 0.20, 0.26, 0.37, 0.51, 0.49, 0.49],
-    [0.09, 0.00, 0.05, 0.16, 0.21, 0.33, 0.49, 0.62, 0.60],
-    [0.12, 0.03, 0.08, 0.16, 0.21, 0.32, 0.49, 0.60, 0.68]
-])
+B2 = np.array(
+    [
+        [0.47, 0.40, 0.43, 0.35, 0.27, 0.15, 0.13, 0.09, 0.12],
+        [0.40, 0.42, 0.37, 0.25, 0.15, 0.03, 0.04, 0.00, 0.03],
+        [0.43, 0.37, 0.45, 0.36, 0.26, 0.15, 0.09, 0.05, 0.08],
+        [0.35, 0.25, 0.36, 0.42, 0.37, 0.29, 0.20, 0.16, 0.16],
+        [0.27, 0.15, 0.26, 0.37, 0.48, 0.41, 0.26, 0.21, 0.21],
+        [0.15, 0.03, 0.15, 0.29, 0.41, 0.55, 0.37, 0.33, 0.32],
+        [0.13, 0.04, 0.09, 0.20, 0.26, 0.37, 0.51, 0.49, 0.49],
+        [0.09, 0.00, 0.05, 0.16, 0.21, 0.33, 0.49, 0.62, 0.60],
+        [0.12, 0.03, 0.08, 0.16, 0.21, 0.32, 0.49, 0.60, 0.68],
+    ]
+)
 
 # Table IV. Nugget effect coregionalization matrix, B3
-B3 = np.array([
-    [0.24, 0.22, 0.21, 0.09, -0.02, 0.01, 0.03, 0.02, 0.01],
-    [0.22, 0.28, 0.20, 0.04, -0.05, 0.00, 0.01, 0.01, -0.01],
-    [0.21, 0.20, 0.28, 0.05, -0.06, 0.00, 0.04, 0.03, 0.01],
-    [0.09, 0.04, 0.05, 0.26, 0.14, 0.05, 0.05, 0.05, 0.04],
-    [-0.02, -0.05, -0.06, 0.14, 0.20, 0.07, 0.05, 0.05, 0.05],
-    [0.01, 0.00, 0.00, 0.05, 0.07, 0.12, 0.08, 0.07, 0.06],
-    [0.03, 0.01, 0.04, 0.05, 0.05, 0.08, 0.12, 0.10, 0.08],
-    [0.02, 0.01, 0.03, 0.050, 0.05, 0.07, 0.10, 0.10, 0.09],
-    [0.01, -0.01, 0.01, 0.04, 0.05, 0.06, 0.08, 0.09, 0.09]
-])
+B3 = np.array(
+    [
+        [0.24, 0.22, 0.21, 0.09, -0.02, 0.01, 0.03, 0.02, 0.01],
+        [0.22, 0.28, 0.20, 0.04, -0.05, 0.00, 0.01, 0.01, -0.01],
+        [0.21, 0.20, 0.28, 0.05, -0.06, 0.00, 0.04, 0.03, 0.01],
+        [0.09, 0.04, 0.05, 0.26, 0.14, 0.05, 0.05, 0.05, 0.04],
+        [-0.02, -0.05, -0.06, 0.14, 0.20, 0.07, 0.05, 0.05, 0.05],
+        [0.01, 0.00, 0.00, 0.05, 0.07, 0.12, 0.08, 0.07, 0.06],
+        [0.03, 0.01, 0.04, 0.05, 0.05, 0.08, 0.12, 0.10, 0.08],
+        [0.02, 0.01, 0.03, 0.050, 0.05, 0.07, 0.10, 0.10, 0.09],
+        [0.01, -0.01, 0.01, 0.04, 0.05, 0.06, 0.08, 0.09, 0.09],
+    ]
+)
 
 
 class LothBaker2013(CrossCorrelationBase):
@@ -85,15 +91,15 @@ class LothBaker2013(CrossCorrelationBase):
         """
 
         if np.any(periods < 0.01):
-            raise ValueError('The periods must be greater or equal to 0.01s')
+            raise ValueError("The periods must be greater or equal to 0.01s")
         if np.any(periods > 10):
-            raise ValueError('The periods must be less or equal to 10s')
+            raise ValueError("The periods must be less or equal to 10s")
 
         nper = np.size(periods)
 
-        rgi1 = RegularGridInterpolator((Tlist, Tlist), B1, method='linear')
-        rgi2 = RegularGridInterpolator((Tlist, Tlist), B2, method='linear')
-        rgi3 = RegularGridInterpolator((Tlist, Tlist), B3, method='linear')
+        rgi1 = RegularGridInterpolator((Tlist, Tlist), B1, method="linear")
+        rgi2 = RegularGridInterpolator((Tlist, Tlist), B2, method="linear")
+        rgi3 = RegularGridInterpolator((Tlist, Tlist), B3, method="linear")
 
         #
         # Build new tables with entries at the periods we will use
@@ -107,9 +113,9 @@ class LothBaker2013(CrossCorrelationBase):
         db2 = np.diagonal(B2)
         db3 = np.diagonal(B3)
 
-        rgid1 = RegularGridInterpolator((Tlist,), db1, method='linear')
-        rgid2 = RegularGridInterpolator((Tlist,), db2, method='linear')
-        rgid3 = RegularGridInterpolator((Tlist,), db3, method='linear')
+        rgid1 = RegularGridInterpolator((Tlist,), db1, method="linear")
+        rgid2 = RegularGridInterpolator((Tlist,), db2, method="linear")
+        rgid3 = RegularGridInterpolator((Tlist,), db3, method="linear")
 
         id1 = rgid1(periods)
         id2 = rgid2(periods)
@@ -147,10 +153,9 @@ class LothBaker2013(CrossCorrelationBase):
         """
         # Verify the validity of input arguments
         if np.any(h < 0):
-            raise ValueError('The separation distance must be positive')
+            raise ValueError("The separation distance must be positive")
         if np.shape(ix1) != np.shape(ix2) != np.shape(h):
-            raise ValueError(
-                'The input arguments must all have the same dimensions')
+            raise ValueError("The input arguments must all have the same dimensions")
 
         #
         # Index into the arrays to get the coefficients corresponding to the

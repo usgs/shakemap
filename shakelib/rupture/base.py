@@ -46,7 +46,7 @@ class Rupture(ABC):
         Args:
             file (str): Name of file.
         """
-        with open(file, 'w') as f:
+        with open(file, "w") as f:
             json.dump(self._geojson, f)
 
     @abstractmethod
@@ -162,12 +162,12 @@ class Rupture(ABC):
         rx.ztor = self.getDepthToTop()
         rx.width = self.getWidth()
 
-        if hasattr(origin, 'rake'):
+        if hasattr(origin, "rake"):
             rx.rake = origin.rake
-        elif hasattr(origin, 'mech'):
+        elif hasattr(origin, "mech"):
             rx.rake = constants.RAKEDICT[origin.mech]
         else:
-            rx.rake = constants.RAKEDICT['ALL']
+            rx.rake = constants.RAKEDICT["ALL"]
 
         rx.hypo_lat = origin.lat
         rx.hypo_lon = origin.lon
@@ -190,8 +190,7 @@ class Rupture(ABC):
         origin = self._origin
         oldshape = lon.shape
 
-        rhyp = geodetic.distance(origin.lon, origin.lat, origin.depth,
-                                 lon, lat, depth)
+        rhyp = geodetic.distance(origin.lon, origin.lat, origin.depth, lon, lat, depth)
         rhyp = rhyp.reshape(oldshape)
         return rhyp
 
@@ -210,8 +209,7 @@ class Rupture(ABC):
         origin = self._origin
         oldshape = lon.shape
 
-        repi = geodetic.distance(origin.lon, origin.lat, 0.0,
-                                 lon, lat, depth)
+        repi = geodetic.distance(origin.lon, origin.lat, 0.0, lon, lat, depth)
         repi = repi.reshape(oldshape)
         return repi
 

@@ -69,10 +69,10 @@ def get_rupture(origin, file=None, mesh_dx=0.5, new_format=True):
             rupt = rupture_from_dict_and_origin(d, origin, mesh_dx=mesh_dx)
 
         except Exception as e:
-            if not isinstance(e, json.JSONDecodeError) and \
-               not isinstance(e, UnicodeDecodeError):
-                logging.warning("Unknown exception reading fault file: %s" %
-                                str(e))
+            if not isinstance(e, json.JSONDecodeError) and not isinstance(
+                e, UnicodeDecodeError
+            ):
+                logging.warning("Unknown exception reading fault file: %s" % str(e))
             # -----------------------------------------------------------------
             # Reading as json failed, so hopefully it is a ShakeMap 3 text file
             # -----------------------------------------------------------------
@@ -81,10 +81,12 @@ def get_rupture(origin, file=None, mesh_dx=0.5, new_format=True):
                 rupt = rupture_from_dict_and_origin(d, origin, mesh_dx=mesh_dx)
             except ValueError as e:
                 logging.error(e)
-                raise ValueError("Error reading %s. This could have been "
-                                 "because the latitude and longitdue are "
-                                 "reversed. Try changing the 'new_format' "
-                                 "option." % file)
+                raise ValueError(
+                    "Error reading %s. This could have been "
+                    "because the latitude and longitdue are "
+                    "reversed. Try changing the 'new_format' "
+                    "option." % file
+                )
             except Exception as e:
                 logging.error(e)
                 raise IOError("Unknown rupture file format.")
@@ -130,7 +132,7 @@ def rupture_from_dict_and_origin(rupdict, origin, mesh_dx=0.5):
     if valid_quads is True:
         rupt = QuadRupture(rupdict, origin)
     else:
-        if rupdict['features'][0]['geometry']['type'] == 'Point':
+        if rupdict["features"][0]["geometry"]["type"] == "Point":
             rupt = PointRupture(origin)
         else:
             rupt = EdgeRupture(rupdict, origin, mesh_dx=mesh_dx)
@@ -161,27 +163,29 @@ def rupture_from_dict(d):
     d = copy.deepcopy(d)
 
     try:
-        d['metadata']['time'] = HistoricTime.strptime(d['metadata']['time'],
-                                                      constants.TIMEFMT)
+        d["metadata"]["time"] = HistoricTime.strptime(
+            d["metadata"]["time"], constants.TIMEFMT
+        )
     except ValueError:
-        d['metadata']['time'] = HistoricTime.strptime(d['metadata']['time'],
-                                                      constants.ALT_TIMEFMT)
+        d["metadata"]["time"] = HistoricTime.strptime(
+            d["metadata"]["time"], constants.ALT_TIMEFMT
+        )
 
-    origin = Origin(d['metadata'])
+    origin = Origin(d["metadata"])
 
     # What type of rupture is this?
-    geo_type = d['features'][0]['geometry']['type']
-    if geo_type == 'MultiPolygon':
+    geo_type = d["features"][0]["geometry"]["type"]
+    if geo_type == "MultiPolygon":
         valid_quads = is_quadrupture_class(d)
         if valid_quads is True:
             rupt = QuadRupture(d, origin)
-        elif 'mesh_dx' in d['metadata']:
+        elif "mesh_dx" in d["metadata"]:
             # EdgeRupture will have 'mesh_dx' in metadata
-            mesh_dx = d['metadata']['mesh_dx']
+            mesh_dx = d["metadata"]["mesh_dx"]
             rupt = EdgeRupture(d, origin, mesh_dx=mesh_dx)
         else:
-            raise ValueError('Invalid rupture dictionary.')
-    elif geo_type == 'Point':
+            raise ValueError("Invalid rupture dictionary.")
+    elif geo_type == "Point":
         rupt = PointRupture(origin)
 
     return rupt
@@ -206,20 +210,16 @@ def _rotate_polygon(p):
 
     # Ensure the polygon is closed
     if not np.array_equal(parray[-1, :], parray[0, :]):
-        raise ShakeLibException('Rupture file has unclosed segments.')
+        raise ShakeLibException("Rupture file has unclosed segments.")
 
     # Drop last point
     parray = parray[0:-1, :]
 
     # Rotate by putting first at end
-    parray = np.append(parray[1:, :],
-                       np.reshape(parray[0, :], (1, -1)),
-                       axis=0)
+    parray = np.append(parray[1:, :], np.reshape(parray[0, :], (1, -1)), axis=0)
 
     # Put new first point onto the end so that it is closed.
-    parray = np.append(parray,
-                       np.reshape(parray[0, :], (1, -1)),
-                       axis=0)
+    parray = np.append(parray, np.reshape(parray[0, :], (1, -1)), axis=0)
 
     # Turn numpy array back into a list
     polygon = parray.tolist()
@@ -240,11 +240,10 @@ def _check_polygon(p):
     """
     n_points = len(p)
     if n_points % 2 == 0:
-        raise ValueError('Number of points in polyon must be odd.')
+        raise ValueError("Number of points in polyon must be odd.")
 
     if p[0] != p[-1]:
-        raise ValueError('First and last points in polygon must be '
-                         'identical.')
+        raise ValueError("First and last points in polygon must be " "identical.")
 
     n_pairs = int((n_points - 1) / 2)
     for j in range(n_pairs):
@@ -261,8 +260,7 @@ def _check_polygon(p):
         top_depth = p[j][2]
         bot_depth = p[-(j + 2)][2]
         if top_depth >= bot_depth:
-            raise ValueError(
-                'Top points must be ordered before bottom points.')
+            raise ValueError("Top points must be ordered before bottom points.")
 
 
 def text_to_json(file, new_format=True):
@@ -301,25 +299,25 @@ def text_to_json(file, new_format=True):
 
     """
     isfile = False
-    if hasattr(file, 'read'):
+    if hasattr(file, "read"):
         f = file
     else:
-        f = open(file, 'rt', encoding="latin-1")
+        f = open(file, "rt", encoding="latin-1")
         isfile = True
 
-    reference = ''
+    reference = ""
     polygons = []
     polygon = []
     for line in f.readlines():
         if not len(line.strip()):
             continue
 
-        if line.strip().startswith('#'):
+        if line.strip().startswith("#"):
             # Get reference string
-            reference += line.strip().replace('#', '')
+            reference += line.strip().replace("#", "")
             continue
 
-        if line.strip().startswith('>'):
+        if line.strip().startswith(">"):
             if not len(polygon):
                 continue
             polygons.append(polygon)
@@ -331,16 +329,18 @@ def text_to_json(file, new_format=True):
         if len(parts) == 1:
             if new_format:
                 raise ShakeLibException(
-                    'Rupture file %s has unspecified delimiters.' % file)
-            parts = line.split(',')
+                    "Rupture file %s has unspecified delimiters." % file
+                )
+            parts = line.split(",")
             if len(parts) == 1:
                 raise ShakeLibException(
-                    'Rupture file %s has unspecified delimiters.' % file)
+                    "Rupture file %s has unspecified delimiters." % file
+                )
 
         if len(parts) != 3:
-            msg = 'Rupture file %s is not in lat, lon, depth format.'
+            msg = "Rupture file %s is not in lat, lon, depth format."
             if new_format:
-                'Rupture file %s is not in lon, lat, depth format.'
+                "Rupture file %s is not in lon, lat, depth format."
             raise ShakeLibException(msg % file)
 
         parts = [float(p) for p in parts]
@@ -380,21 +380,14 @@ def text_to_json(file, new_format=True):
 
     json_dict = {
         "type": "FeatureCollection",
-        "metadata": {
-            'reference': reference
-        },
+        "metadata": {"reference": reference},
         "features": [
             {
                 "type": "Feature",
-                "properties": {
-                    "rupture type": "rupture extent"
-                },
-                "geometry": {
-                    "type": "MultiPolygon",
-                    "coordinates": [polygons]
-                }
+                "properties": {"rupture type": "rupture extent"},
+                "geometry": {"type": "MultiPolygon", "coordinates": [polygons]},
             }
-        ]
+        ],
     }
     validate_json(json_dict)
 
@@ -409,35 +402,31 @@ def validate_json(d):
     Args:
         d (dict): Rupture JSON dictionary.
     """
-    if d['type'] != 'FeatureCollection':
-        raise Exception('JSON file is not a \"FeatureColleciton\".')
+    if d["type"] != "FeatureCollection":
+        raise Exception('JSON file is not a "FeatureColleciton".')
 
-    if len(d['features']) != 1:
-        raise Exception('JSON file should contain excactly one feature.')
+    if len(d["features"]) != 1:
+        raise Exception("JSON file should contain excactly one feature.")
 
-    if 'reference' not in d['metadata'].keys():
-        raise Exception('Json metadata field should contain '
-                        '\"reference\" key.')
+    if "reference" not in d["metadata"].keys():
+        raise Exception("Json metadata field should contain " '"reference" key.')
 
-    f = d['features'][0]
+    f = d["features"][0]
 
-    if f['type'] != 'Feature':
-        raise Exception('Feature type should be \"Feature\".')
+    if f["type"] != "Feature":
+        raise Exception('Feature type should be "Feature".')
 
-    geom = f['geometry']
+    geom = f["geometry"]
 
-    if (geom['type'] != 'MultiPolygon' and
-            geom['type'] != 'Point'):
-        raise Exception('Geometry type should be \"MultiPolygon\" '
-                        'or \"Point\".')
+    if geom["type"] != "MultiPolygon" and geom["type"] != "Point":
+        raise Exception('Geometry type should be "MultiPolygon" ' 'or "Point".')
 
-    if 'coordinates' not in geom.keys():
-        raise Exception('Geometry dictionary should contain \"coordinates\" '
-                        'key.')
+    if "coordinates" not in geom.keys():
+        raise Exception('Geometry dictionary should contain "coordinates" ' "key.")
 
-    polygons = geom['coordinates'][0]
+    polygons = geom["coordinates"][0]
 
-    if geom['type'] == 'MultiPolygon':
+    if geom["type"] == "MultiPolygon":
         n_polygons = len(polygons)
         for i in range(n_polygons):
             _check_polygon(polygons[i])
@@ -456,11 +445,11 @@ def is_quadrupture_class(d):
     Returns:
         bool: Can the rupture be represented in the QuadRupture class?
     """
-    f = d['features'][0]
-    geom = f['geometry']
-    if geom['type'] == 'Point':
+    f = d["features"][0]
+    geom = f["geometry"]
+    if geom["type"] == "Point":
         return False
-    polygons = geom['coordinates'][0]
+    polygons = geom["coordinates"][0]
     try:
         len(polygons)
     except Exception:
@@ -474,22 +463,22 @@ def is_quadrupture_class(d):
 
         for k in range(n_quads):
             # Four points of each quad should be co-planar within a tolerance
-            quad = [Point(p[k][0], p[k][1], p[k][2]),
-                    Point(p[k + 1][0], p[k + 1][1], p[k + 1][2]),
-                    Point(p[-(k + 3)][0], p[-(k + 3)][1], p[-(k + 3)][2]),
-                    Point(p[-(k + 2)][0], p[-(k + 2)][1], p[-(k + 2)][2])]
+            quad = [
+                Point(p[k][0], p[k][1], p[k][2]),
+                Point(p[k + 1][0], p[k + 1][1], p[k + 1][2]),
+                Point(p[-(k + 3)][0], p[-(k + 3)][1], p[-(k + 3)][2]),
+                Point(p[-(k + 2)][0], p[-(k + 2)][1], p[-(k + 2)][2]),
+            ]
             test = utils.is_quad(quad)
             if test[0] is False:
                 return False
 
             # Within each quad, top and bottom edges must be horizontal
             tops = np.array([quad[0].depth, quad[1].depth])
-            if not np.isclose(tops[0], tops, rtol=0,
-                              atol=constants.DEPTH_TOL).all():
+            if not np.isclose(tops[0], tops, rtol=0, atol=constants.DEPTH_TOL).all():
                 return False
             bots = np.array([quad[2].depth, quad[3].depth])
-            if not np.isclose(bots[0], bots, rtol=0,
-                              atol=constants.DEPTH_TOL).all():
+            if not np.isclose(bots[0], bots, rtol=0, atol=constants.DEPTH_TOL).all():
                 return False
 
     return True

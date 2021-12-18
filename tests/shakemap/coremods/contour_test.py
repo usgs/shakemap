@@ -16,10 +16,10 @@ def test_intervals():
     np.testing.assert_almost_equal(intervals[-1], 50)
 
     fgrid = np.array([3.5, 5.6, 8.2])
-    intervals = getContourLevels(np.min(fgrid), np.max(fgrid), itype='linear')
+    intervals = getContourLevels(np.min(fgrid), np.max(fgrid), itype="linear")
     np.testing.assert_almost_equal(intervals[0], 3.5)
     np.testing.assert_almost_equal(intervals[-1], 8.0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_intervals()

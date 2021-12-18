@@ -37,21 +37,17 @@ class FM11(GMICE):
     def __init__(self):
         super().__init__()
         self.min_max = (1.0, 10.0)
-        self.name = 'Faenza and Michelini (2010, 2011)'
-        self.scale = 'scale_fm11.ps'
+        self.name = "Faenza and Michelini (2010, 2011)"
+        self.scale = "scale_fm11.ps"
         self._constants = {
-            self._pga: {'C1':  1.68, 'C2':  2.58, 'SMMI': 0.18, 'SPGM': 0.31},
-            self._pgv: {'C1':  5.11, 'C2':  2.35, 'SMMI': 0.14, 'SPGM': 0.22},
-            self._sa03: {'C1':  1.24, 'C2':  2.47, 'SMMI': 0.30, 'SPGM': 0.42},
-            self._sa10: {'C1':  3.12, 'C2':  2.05, 'SMMI': 0.21, 'SPGM': 0.31},
-            self._sa30: {'C1':  4.31, 'C2':  2.00, 'SMMI': 0.14, 'SPGM': 0.26}
+            self._pga: {"C1": 1.68, "C2": 2.58, "SMMI": 0.18, "SPGM": 0.31},
+            self._pgv: {"C1": 5.11, "C2": 2.35, "SMMI": 0.14, "SPGM": 0.22},
+            self._sa03: {"C1": 1.24, "C2": 2.47, "SMMI": 0.30, "SPGM": 0.42},
+            self._sa10: {"C1": 3.12, "C2": 2.05, "SMMI": 0.21, "SPGM": 0.31},
+            self._sa30: {"C1": 4.31, "C2": 2.00, "SMMI": 0.14, "SPGM": 0.26},
         }
 
-        self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
-            PGA,
-            PGV,
-            SA
-        ])
+        self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([PGA, PGV, SA])
 
         self.DEFINED_FOR_SA_PERIODS = set([0.3, 1.0, 3.0])
 
@@ -98,8 +94,8 @@ class FM11(GMICE):
         #
         lamps = np.log10(units) + amps * lfact
 
-        mmi = c['C1'] + c['C2'] * lamps
-        dmmi_damp = np.full_like(lamps, c['C2'] * lfact)
+        mmi = c["C1"] + c["C2"] * lamps
+        dmmi_damp = np.full_like(lamps, c["C2"] * lfact)
 
         mmi = np.clip(mmi, 1.0, 10.0)
         mmi[np.isnan(amps)] = np.nan
@@ -142,8 +138,8 @@ class FM11(GMICE):
         #
         # MMI to PGM
         #
-        pgm = np.power(10, (mmi - c['C1']) / c['C2'])
-        dpgm_dmmi = 1.0 / (c['C2'] * lfact) * dummy_variable
+        pgm = np.power(10, (mmi - c["C1"]) / c["C2"])
+        dpgm_dmmi = 1.0 / (c["C2"] * lfact) * dummy_variable
 
         if imt != self._pgv:
             units = 981.0
@@ -168,11 +164,13 @@ class FM11(GMICE):
         Returns:
             Dictionary of GM to MI sigmas (in MMI units).
         """
-        return {self._pga: self._constants[self._pga]['SMMI'],
-                self._pgv: self._constants[self._pgv]['SMMI'],
-                self._sa03: self._constants[self._sa03]['SMMI'],
-                self._sa10: self._constants[self._sa10]['SMMI'],
-                self._sa30: self._constants[self._sa30]['SMMI']}
+        return {
+            self._pga: self._constants[self._pga]["SMMI"],
+            self._pgv: self._constants[self._pgv]["SMMI"],
+            self._sa03: self._constants[self._sa03]["SMMI"],
+            self._sa10: self._constants[self._sa10]["SMMI"],
+            self._sa30: self._constants[self._sa30]["SMMI"],
+        }
 
     def getMI2GMsd(self):
         """
@@ -187,19 +185,26 @@ class FM11(GMICE):
         # Need to convert log10 to ln units
         #
         lfact = np.log(10.0)
-        return {self._pga: lfact * self._constants[self._pga]['SPGM'],
-                self._pgv: lfact * self._constants[self._pgv]['SPGM'],
-                self._sa03: lfact * self._constants[self._sa03]['SPGM'],
-                self._sa10: lfact * self._constants[self._sa10]['SPGM'],
-                self._sa30: lfact * self._constants[self._sa30]['SPGM']}
+        return {
+            self._pga: lfact * self._constants[self._pga]["SPGM"],
+            self._pgv: lfact * self._constants[self._pgv]["SPGM"],
+            self._sa03: lfact * self._constants[self._sa03]["SPGM"],
+            self._sa10: lfact * self._constants[self._sa10]["SPGM"],
+            self._sa30: lfact * self._constants[self._sa30]["SPGM"],
+        }
 
     def _getConsts(self, imt):
         """
         Helper function to get the constants.
         """
 
-        if (imt != self._pga and imt != self._pgv and imt != self._sa03 and
-                imt != self._sa10 and imt != self._sa30):
+        if (
+            imt != self._pga
+            and imt != self._pgv
+            and imt != self._sa03
+            and imt != self._sa10
+            and imt != self._sa30
+        ):
             raise ValueError("Invalid IMT " + str(imt))
         c = self._constants[imt]
-        return (c)
+        return c

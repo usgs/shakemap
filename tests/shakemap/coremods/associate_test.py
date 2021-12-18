@@ -16,36 +16,35 @@ def test_associate():
 
     installpath, datapath = get_config_paths()
 
-    amp_file = os.path.join(installpath, 'data', 'amps.db')
+    amp_file = os.path.join(installpath, "data", "amps.db")
     if os.path.isfile(amp_file):
         os.remove(amp_file)
 
     # Process a non-existent event (should fail)
-    amod = AssociateModule('not_an_event')
+    amod = AssociateModule("not_an_event")
     with pytest.raises(NotADirectoryError):
         amod.execute()
 
     # Would succeed but we remove event.xml (should fail)
-    event_file = os.path.join(datapath, 'integration_test_0001', 'current',
-                              'event.xml')
-    os.rename(event_file, event_file + '_safe')
+    event_file = os.path.join(datapath, "integration_test_0001", "current", "event.xml")
+    os.rename(event_file, event_file + "_safe")
     try:
-        amod = AssociateModule('integration_test_0001')
+        amod = AssociateModule("integration_test_0001")
         with pytest.raises(FileNotFoundError):
             amod.execute()
     finally:
-        os.rename(event_file + '_safe', event_file)
+        os.rename(event_file + "_safe", event_file)
 
     # Normal event (should succeed)
     try:
-        amod = AssociateModule('integration_test_0001')
+        amod = AssociateModule("integration_test_0001")
         amod.execute()
     finally:
-        amp_file = os.path.join(installpath, 'data', 'amps.db')
+        amp_file = os.path.join(installpath, "data", "amps.db")
         if os.path.isfile(amp_file):
             os.remove(amp_file)
 
 
-if __name__ == '__main__':
-    os.environ['CALLED_FROM_PYTEST'] = 'True'
+if __name__ == "__main__":
+    os.environ["CALLED_FROM_PYTEST"] = "True"
     test_associate()

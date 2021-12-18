@@ -35,14 +35,14 @@ def is_float(s):
 
 
 def prompt_user(args, origin):
-    ref = input('  - Rupture reference? ')
+    ref = input("  - Rupture reference? ")
     origin.reference = ref
 
-    n_quad = input('  - How many quadrilaterals are in this rupture? ')
+    n_quad = input("  - How many quadrilaterals are in this rupture? ")
     if is_int(n_quad):
         n_quad = int(n_quad)
     else:
-        raise ValueError('Number of quadrilaterals must be an interger.')
+        raise ValueError("Number of quadrilaterals must be an interger.")
 
     px = []
     py = []
@@ -54,61 +54,61 @@ def prompt_user(args, origin):
     strike = []
     dip = []
     for i in range(n_quad):
-        print('  Quad %s of %s...' % (i+1, n_quad))
+        print("  Quad %s of %s..." % (i + 1, n_quad))
 
-        out = input('    Longitude of known point: ')
+        out = input("    Longitude of known point: ")
         if is_float(out):
             px.append(float(out))
         else:
-            raise ValueError('Longitude of known point must be a float.')
+            raise ValueError("Longitude of known point must be a float.")
 
-        out = input('    Latitude of known point: ')
+        out = input("    Latitude of known point: ")
         if is_float(out):
             py.append(float(out))
         else:
-            raise ValueError('Latitude of known point must be a float.')
+            raise ValueError("Latitude of known point must be a float.")
 
-        out = input('    Depth (km) of known point: ')
+        out = input("    Depth (km) of known point: ")
         if is_float(out):
             pz.append(float(out))
         else:
-            raise ValueError('Depth of known point must be a float.')
+            raise ValueError("Depth of known point must be a float.")
 
-        out = input('    Along-strike distance (km) of known point: ')
+        out = input("    Along-strike distance (km) of known point: ")
         if is_float(out):
             dx.append(float(out))
         else:
-            raise ValueError('Distance must be a float.')
+            raise ValueError("Distance must be a float.")
 
-        out = input('    Along-dip distance (km) of known point: ')
+        out = input("    Along-dip distance (km) of known point: ")
         if is_float(out):
             dy.append(float(out))
         else:
-            raise ValueError('Distance must be a float.')
+            raise ValueError("Distance must be a float.")
 
-        out = input('    Length (km) of quadrilateral: ')
+        out = input("    Length (km) of quadrilateral: ")
         if is_float(out):
             length.append(float(out))
         else:
-            raise ValueError('Length must be a float.')
+            raise ValueError("Length must be a float.")
 
-        out = input('    Width (km) of quadrilateral: ')
+        out = input("    Width (km) of quadrilateral: ")
         if is_float(out):
             width.append(float(out))
         else:
-            raise ValueError('Width must be a float.')
+            raise ValueError("Width must be a float.")
 
-        out = input('    Strike (deg) of quadrilateral: ')
+        out = input("    Strike (deg) of quadrilateral: ")
         if is_float(out):
             strike.append(float(out))
         else:
-            raise ValueError('Strike must be a float.')
+            raise ValueError("Strike must be a float.")
 
-        out = input('    Dip (deg) of quadrilateral: ')
+        out = input("    Dip (deg) of quadrilateral: ")
         if is_float(out):
             dip.append(float(out))
         else:
-            raise ValueError('Dip must be a float.')
+            raise ValueError("Dip must be a float.")
 
     return QuadRupture.fromOrientation(
         px, py, pz, dx, dy, length, width, strike, dip, origin
@@ -127,16 +127,16 @@ def main(pparser, args):
     else:
         print("* No event.xml file specified, using dummy origin...")
         dummy = {
-            'mag': '',
-            'id': '',
-            'mech': '',
-            'lon': np.nan,
-            'lat': np.nan,
-            'depth': '',
-            'locstring': '',
-            'netid': '',
-            'network': '',
-            'time': ''
+            "mag": "",
+            "id": "",
+            "mech": "",
+            "lon": np.nan,
+            "lat": np.nan,
+            "depth": "",
+            "locstring": "",
+            "netid": "",
+            "network": "",
+            "time": "",
         }
         origin = Origin(dummy)
 
@@ -146,7 +146,7 @@ def main(pparser, args):
         rup = get_rupture(origin, file=args.file, new_format=not args.old)
     else:
         # User did not provide fault.txt file
-        explain_text = '''
+        explain_text = """
 * No fault file specified. You will be prompted to manually enter rupture
 information.
 
@@ -162,7 +162,7 @@ quadrilateral will be defined with the following geometry:
                         V                       |
                         p4----------------------p3
                                 Length
-'''
+"""
         print(explain_text)
         rup = prompt_user(args, origin)
 
@@ -171,17 +171,17 @@ quadrilateral will be defined with the following geometry:
     for k, v in odict.items():
         if isinstance(v, str):
             if not v:
-                rup._geojson['metadata'].pop(k, None)
+                rup._geojson["metadata"].pop(k, None)
         if isinstance(v, float):
             if np.isnan(v):
-                rup._geojson['metadata'].pop(k, None)
+                rup._geojson["metadata"].pop(k, None)
 
     # Write output
     rup.writeGeoJson(args.outfile)
 
 
 def get_parser():
-    desc = '''Create a ShakeMap 4 Rupture File.
+    desc = """Create a ShakeMap 4 Rupture File.
 
 This program creates a ShakeMap 4 rupture file. If a ShakeMap 3 *_fault.txt
 file is provided, it will try to convert it to a rupture.json file. Otherwise,
@@ -190,26 +190,25 @@ the user will be prompted to manually input rupture data (strike, dip, ...).
 Note that the rupture.json requires some origin information that is not in
 the fault.txt file and so these values are filled in with empty values unless
 an event.xml file is also provided.
-'''
-    parser = argparse.ArgumentParser(description=desc, epilog='\n\n')
+"""
+    parser = argparse.ArgumentParser(description=desc, epilog="\n\n")
+    parser.add_argument("outfile", help="Path for output rupture file.")
+    parser.add_argument("-f", "--file", type=str, help="Path to ShakeMap 3 fault file.")
     parser.add_argument(
-        'outfile',
-        help='Path for output rupture file.')
+        "-e", "--eventfile", type=str, help="Path to an event.xml file."
+    )
     parser.add_argument(
-        '-f', '--file', type=str,
-        help='Path to ShakeMap 3 fault file.')
-    parser.add_argument(
-        '-e', '--eventfile', type=str,
-        help='Path to an event.xml file.')
-    parser.add_argument(
-        '-o', '--old', action='store_true',
-        help='Indicates that the ShakeMap 3 fault file'
-             'uses the old format (ordering lon before '
-             'lat).')
+        "-o",
+        "--old",
+        action="store_true",
+        help="Indicates that the ShakeMap 3 fault file"
+        "uses the old format (ordering lon before "
+        "lat).",
+    )
     return parser
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = get_parser()
     args = parser.parse_args()
     main(parser, args)

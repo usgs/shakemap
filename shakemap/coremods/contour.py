@@ -16,14 +16,14 @@ from shakelib.plotting.contour import contour
 from shakemap.utils.utils import get_object_from_config
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
-from shakemap.utils.config import (get_config_paths,
-                                   get_configspec,
-                                   get_custom_validator,
-                                   config_error)
+from shakemap.utils.config import (
+    get_config_paths,
+    get_configspec,
+    get_custom_validator,
+    config_error,
+)
 
-FORMATS = {
-    'geojson': ('GeoJSON', 'json')
-}
+FORMATS = {"geojson": ("GeoJSON", "json")}
 
 DEFAULT_FILTER_SIZE = 10
 
@@ -34,9 +34,9 @@ class ContourModule(CoreModule):
                      shake_result.hdf output file.
     """
 
-    command_name = 'contour'
-    targets = [r'products/cont_.*\.json']
-    dependencies = [('products/shake_result.hdf', True)]
+    command_name = "contour"
+    targets = [r"products/cont_.*\.json"]
+    dependencies = [("products/shake_result.hdf", True)]
 
     def __init__(self, eventid, filter=None):
         super(ContourModule, self).__init__(eventid)
@@ -58,41 +58,42 @@ class ContourModule(CoreModule):
                 exist.
         """
         install_path, data_path = get_config_paths()
-        datadir = os.path.join(data_path, self._eventid, 'current', 'products')
+        datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError('%s is not a valid directory.' % datadir)
-        datafile = os.path.join(datadir, 'shake_result.hdf')
+            raise NotADirectoryError("%s is not a valid directory." % datadir)
+        datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError('%s does not exist.' % datafile)
+            raise FileNotFoundError("%s does not exist." % datafile)
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
         # get the path to the products.conf file, load the config
-        config_file = os.path.join(install_path, 'config', 'products.conf')
-        spec_file = get_configspec('products')
+        config_file = os.path.join(install_path, "config", "products.conf")
+        spec_file = get_configspec("products")
         validator = get_custom_validator()
         config = ConfigObj(config_file, configspec=spec_file)
         results = config.validate(validator)
         if not isinstance(results, bool) or not results:
             config_error(config, results)
 
-        if container.getDataType() != 'grid':
-            raise NotImplementedError('contour module can only contour '
-                                      'gridded data, not sets of points')
+        if container.getDataType() != "grid":
+            raise NotImplementedError(
+                "contour module can only contour " "gridded data, not sets of points"
+            )
 
         # get the filter size from the products.conf
-        filter_size = config['products']['contour']['filter_size']
+        filter_size = config["products"]["contour"]["filter_size"]
 
         # create contour files
-        self.logger.debug('Contouring to files...')
-        contour_to_files(container, datadir, self.logger, self.contents,
-                         filter_size)
+        self.logger.debug("Contouring to files...")
+        contour_to_files(container, datadir, self.logger, self.contents, filter_size)
         container.close()
 
 
-def contour_to_files(container, output_dir, logger, contents,
-                     filter_size=DEFAULT_FILTER_SIZE):
+def contour_to_files(
+    container, output_dir, logger, contents, filter_size=DEFAULT_FILTER_SIZE
+):
     """
     Generate contours of all IMT values.
 
@@ -108,78 +109,98 @@ def contour_to_files(container, output_dir, logger, contents,
 
     # Right now geojson is all we support; if that changes, we'll have
     # to add a configuration or command-line option
-    file_format = 'geojson'
+    file_format = "geojson"
     # open a file for writing
     driver, extension = FORMATS[file_format]
     sa_schema = {
-        'geometry': 'MultiLineString',
-        'properties': {
-            'value': 'float',
-            'units': 'str',
-            'color': 'str',
-            'weight': 'int'
-        }
+        "geometry": "MultiLineString",
+        "properties": {
+            "value": "float",
+            "units": "str",
+            "color": "str",
+            "weight": "int",
+        },
     }
     mmi_schema = {
-        'geometry': 'MultiLineString',
-        'properties': {
-            'value': 'float',
-            'units': 'str',
-            'color': 'str',
-            'weight': 'int'
-        }
+        "geometry": "MultiLineString",
+        "properties": {
+            "value": "float",
+            "units": "str",
+            "color": "str",
+            "weight": "int",
+        },
     }
     crs = from_epsg(4326)
 
     config = container.getConfig()
-    gmice = get_object_from_config('gmice', 'modeling', config)
-    gmice_imts = [imt.__name__ for imt in
-                  gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
+    gmice = get_object_from_config("gmice", "modeling", config)
+    gmice_imts = [imt.__name__ for imt in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
     gmice_pers = gmice.DEFINED_FOR_SA_PERIODS
 
     imtlist = container.getIMTs()
     for imtype in imtlist:
-        component, imtype = imtype.split('/')
+        component, imtype = imtype.split("/")
         fileimt = oq_to_file(imtype)
         oqimt = imt.from_string(imtype)
-        if component == 'GREATER_OF_TWO_HORIZONTAL':
-            fname = 'cont_%s.%s' % (fileimt, extension)
+        if component == "GREATER_OF_TWO_HORIZONTAL":
+            fname = "cont_%s.%s" % (fileimt, extension)
         else:
-            fname = 'cont_%s_%s.%s' % (fileimt, component, extension)
-        if imtype == 'MMI':
-            contents.addFile('mmiContour', 'Intensity Contours',
-                             'Contours of macroseismic intensity.',
-                             fname, 'application/json')
-            contents.addFile('miContour', 'Intensity Contours (Legacy Naming)',
-                             'Contours of macroseismic intensity.',
-                             'cont_mi.json', 'application/json')
-        elif imtype == 'PGA':
-            contents.addFile('pgaContour', 'PGA Contours',
-                             'Contours of ' + component + ' peak '
-                             'ground acceleration (%g).',
-                             fname, 'application/json')
-        elif imtype == 'PGV':
-            contents.addFile('pgvContour', 'PGV Contours',
-                             'Contours of ' + component + ' peak '
-                             'ground velocity (cm/s).',
-                             fname, 'application/json')
+            fname = "cont_%s_%s.%s" % (fileimt, component, extension)
+        if imtype == "MMI":
+            contents.addFile(
+                "mmiContour",
+                "Intensity Contours",
+                "Contours of macroseismic intensity.",
+                fname,
+                "application/json",
+            )
+            contents.addFile(
+                "miContour",
+                "Intensity Contours (Legacy Naming)",
+                "Contours of macroseismic intensity.",
+                "cont_mi.json",
+                "application/json",
+            )
+        elif imtype == "PGA":
+            contents.addFile(
+                "pgaContour",
+                "PGA Contours",
+                "Contours of " + component + " peak " "ground acceleration (%g).",
+                fname,
+                "application/json",
+            )
+        elif imtype == "PGV":
+            contents.addFile(
+                "pgvContour",
+                "PGV Contours",
+                "Contours of " + component + " peak " "ground velocity (cm/s).",
+                fname,
+                "application/json",
+            )
         else:
-            contents.addFile(imtype + 'Contour',
-                             imtype.upper() + ' Contours',
-                             'Contours of ' + component + ' 5% damped ' +
-                             str(oqimt.period) +
-                             ' sec spectral acceleration (%g).',
-                             fname, 'application/json')
+            contents.addFile(
+                imtype + "Contour",
+                imtype.upper() + " Contours",
+                "Contours of "
+                + component
+                + " 5% damped "
+                + str(oqimt.period)
+                + " sec spectral acceleration (%g).",
+                fname,
+                "application/json",
+            )
 
         filename = os.path.join(output_dir, fname)
         if os.path.isfile(filename):
             fpath, fext = os.path.splitext(filename)
-            flist = glob.glob(fpath + '.*')
+            flist = glob.glob(fpath + ".*")
             for fname in flist:
                 os.remove(fname)
 
-        if imtype == 'MMI' or (imtype not in gmice_imts and \
-           ("SA" not in gmice_imts or oqimt.period not in gmice_pers)):
+        if imtype == "MMI" or (
+            imtype not in gmice_imts
+            and ("SA" not in gmice_imts or oqimt.period not in gmice_pers)
+        ):
             my_gmice = None
         else:
             my_gmice = gmice
@@ -194,33 +215,31 @@ def contour_to_files(container, output_dir, logger, contents,
         # not sure where the warning is coming from,
         # but there appears to be no way to stop it...
         with fiona.Env():
-            if imtype == 'MMI':
+            if imtype == "MMI":
                 selected_schema = mmi_schema
             else:
                 selected_schema = sa_schema
             vector_file = fiona.open(
-                filename, 'w',
-                driver=driver,
-                schema=selected_schema,
-                crs=crs
+                filename, "w", driver=driver, schema=selected_schema, crs=crs
             )
 
-            line_strings = contour(container.getIMTGrids(imtype, component),
-                                   imtype, filter_size, my_gmice)
+            line_strings = contour(
+                container.getIMTGrids(imtype, component), imtype, filter_size, my_gmice
+            )
 
             for feature in line_strings:
                 vector_file.write(feature)
 
                 # Grab some metadata
             meta = container.getMetadata()
-            event_info = meta['input']['event_information']
+            event_info = meta["input"]["event_information"]
             mdict = {
-                'eventid': event_info['event_id'],
-                'longitude': float(event_info['longitude']),
-                'latitude': float(event_info['latitude'])
+                "eventid": event_info["event_id"],
+                "longitude": float(event_info["longitude"]),
+                "latitude": float(event_info["latitude"]),
             }
 
-            logger.debug('Writing contour file %s' % filename)
+            logger.debug("Writing contour file %s" % filename)
             vector_file.close()
 
             # Get bounds
@@ -230,9 +249,9 @@ def contour_to_files(container, output_dir, logger, contents,
 
             # Read back in to add metadata/bounds
             data = json.load(open(filename))
-            data['metadata'] = mdict
-            data['bbox'] = bounds
-            with open(filename, 'w') as outfile:
+            data["metadata"] = mdict
+            data["bbox"] = bounds
+            with open(filename, "w") as outfile:
                 json.dump(data, outfile)
 
             #####################################
@@ -241,7 +260,7 @@ def contour_to_files(container, output_dir, logger, contents,
             # Delete this file once everyone has moved to new version
             # of ComCat code.
 
-            if imtype == 'MMI':
-                old_file = os.path.join(output_dir, 'cont_mi.json')
+            if imtype == "MMI":
+                old_file = os.path.join(output_dir, "cont_mi.json")
                 shutil.copy(filename, old_file)
             #####################################

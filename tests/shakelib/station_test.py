@@ -15,7 +15,7 @@ from shakelib.station import StationList
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+shakedir = os.path.abspath(os.path.join(homedir, "..", ".."))
 sys.path.insert(0, shakedir)
 
 #
@@ -32,13 +32,13 @@ def test_station():
     #
     # First test the Calexico data on its own
     #
-    event = 'Calexico'
+    event = "Calexico"
 
-    datadir = os.path.abspath(os.path.join(homedir, 'station_data'))
-    datadir = os.path.abspath(os.path.join(datadir, event, 'input'))
+    datadir = os.path.abspath(os.path.join(homedir, "station_data"))
+    datadir = os.path.abspath(os.path.join(datadir, event, "input"))
 
-    inputfile = os.path.join(datadir, 'stationlist_dat.xml')
-    dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
+    inputfile = os.path.join(datadir, "stationlist_dat.xml")
+    dyfifile = os.path.join(datadir, "ciim3_dat.xml")
     xmlfiles = [inputfile, dyfifile]
 
     stations = StationList.loadFromFiles(xmlfiles, ":memory:")
@@ -46,14 +46,13 @@ def test_station():
     df1, _ = stations.getStationDictionary(instrumented=True)
     df2, _ = stations.getStationDictionary(instrumented=False)
 
-    ppath = os.path.abspath(os.path.join(datadir, '..', 'database',
-                                         'test1.pickle'))
+    ppath = os.path.abspath(os.path.join(datadir, "..", "database", "test1.pickle"))
     if SAVE:
         ldf = [df1, df2]
-        with open(ppath, 'wb') as f:
+        with open(ppath, "wb") as f:
             pickle.dump(ldf, f, protocol=4)
     else:
-        with open(ppath, 'rb') as f:
+        with open(ppath, "rb") as f:
             ldf = pickle.load(f)
 
         saved_df1 = ldf[0]
@@ -66,23 +65,23 @@ def test_station():
     # Should at least hit this code
     #
     imtlist = stations.getIMTtypes()
-    assert 'PGA' in imtlist
-    assert 'PGV' in imtlist
+    assert "PGA" in imtlist
+    assert "PGV" in imtlist
 
     #
     # Add the Northridge data to the Calexico data to test
     # addData()
     #
-    event = 'northridge'
-    datadir = os.path.abspath(os.path.join(homedir, 'station_data'))
-    datadir = os.path.abspath(os.path.join(datadir, event, 'input'))
+    event = "northridge"
+    datadir = os.path.abspath(os.path.join(homedir, "station_data"))
+    datadir = os.path.abspath(os.path.join(datadir, event, "input"))
 
-    inputfile = os.path.join(datadir, 'hist_dat.xml')
-    dyfifile = os.path.join(datadir, 'dyfi_dat.xml')
-    len_stat1 = len(stations.getStationDictionary(instrumented=True)[0]['id'])
+    inputfile = os.path.join(datadir, "hist_dat.xml")
+    dyfifile = os.path.join(datadir, "dyfi_dat.xml")
+    len_stat1 = len(stations.getStationDictionary(instrumented=True)[0]["id"])
     xmlfiles = [inputfile, dyfifile]
     stations = stations.addData(xmlfiles)
-    len_stat2 = len(stations.getStationDictionary(instrumented=True)[0]['id'])
+    len_stat2 = len(stations.getStationDictionary(instrumented=True)[0]["id"])
 
     # Check that more stations were added
     assert len_stat2 > len_stat1
@@ -90,14 +89,13 @@ def test_station():
     df1, _ = stations.getStationDictionary(instrumented=True)
     df2, _ = stations.getStationDictionary(instrumented=False)
 
-    ppath = os.path.abspath(os.path.join(datadir, '..', 'database',
-                                         'test2.pickle'))
+    ppath = os.path.abspath(os.path.join(datadir, "..", "database", "test2.pickle"))
     if SAVE:
         ldf = [df1, df2]
-        with open(ppath, 'wb') as f:
+        with open(ppath, "wb") as f:
             pickle.dump(ldf, f, protocol=4)
     else:
-        with open(ppath, 'rb') as f:
+        with open(ppath, "rb") as f:
             ldf = pickle.load(f)
 
         saved_df1 = ldf[0]
@@ -114,40 +112,39 @@ def test_station2():
     #
     homedir = os.path.dirname(os.path.abspath(__file__))
 
-    event = 'wenchuan'
+    event = "wenchuan"
 
-    datadir = os.path.abspath(os.path.join(homedir, 'station_data'))
-    datadir = os.path.abspath(os.path.join(datadir, event, 'input'))
+    datadir = os.path.abspath(os.path.join(homedir, "station_data"))
+    datadir = os.path.abspath(os.path.join(datadir, event, "input"))
 
-    inputfile = os.path.join(datadir, 'stationlist.xml')
+    inputfile = os.path.join(datadir, "stationlist.xml")
     xmlfiles = [inputfile]
 
     stations = StationList.loadFromFiles(xmlfiles, ":memory:")
 
     df1, _ = stations.getStationDictionary(instrumented=True)
     # Check Keys pressent
-    assert 'PGA' in _
-    assert 'PGV' in _
-    assert 'SA(0.3)' in _
-    assert 'SA(1.0)' in _
-    assert 'SA(3.0)' in _
-    assert 'PGV_sd' in df1
-    assert 'PGV' in df1
-    assert 'SA(0.3)' in df1
-    assert 'SA(1.0)' in df1
-    assert 'SA(3.0)' in df1
-    assert 'id' in df1
+    assert "PGA" in _
+    assert "PGV" in _
+    assert "SA(0.3)" in _
+    assert "SA(1.0)" in _
+    assert "SA(3.0)" in _
+    assert "PGV_sd" in df1
+    assert "PGV" in df1
+    assert "SA(0.3)" in df1
+    assert "SA(1.0)" in df1
+    assert "SA(3.0)" in df1
+    assert "id" in df1
     df2, _ = stations.getStationDictionary(instrumented=False)
     # Check Keys pressent
-    assert 'MMI' in _
-    ppath = os.path.abspath(os.path.join(datadir, '..', 'database',
-                                         'test3.pickle'))
+    assert "MMI" in _
+    ppath = os.path.abspath(os.path.join(datadir, "..", "database", "test3.pickle"))
     if SAVE:
         ldf = [df1, df2]
-        with open(ppath, 'wb') as f:
+        with open(ppath, "wb") as f:
             pickle.dump(ldf, f, protocol=4)
     else:
-        with open(ppath, 'rb') as f:
+        with open(ppath, "rb") as f:
             ldf = pickle.load(f)
 
         saved_df1 = ldf[0]
@@ -178,19 +175,19 @@ def test_station3():
     #
     homedir = os.path.dirname(os.path.abspath(__file__))
 
-    event = 'wenchuan'
+    event = "wenchuan"
 
-    datadir = os.path.abspath(os.path.join(homedir, 'station_data'))
-    datadir = os.path.abspath(os.path.join(datadir, event, 'input'))
+    datadir = os.path.abspath(os.path.join(homedir, "station_data"))
+    datadir = os.path.abspath(os.path.join(datadir, event, "input"))
 
-    inputfile = os.path.join(datadir, 'stationlist.xml')
+    inputfile = os.path.join(datadir, "stationlist.xml")
     xmlfiles = [inputfile]
 
     stations = StationList.loadFromFiles(xmlfiles, ":memory:")
 
     myjson = stations.getGeoJson()
 
-    ofd = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
+    ofd = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
     jsonfile = ofd.name
     ofd.write(json.dumps(myjson).encode())
     ofd.close()
@@ -212,11 +209,11 @@ def test_station4():
 
     homedir = os.path.dirname(os.path.abspath(__file__))
 
-    event = 'northridge'
-    datadir = os.path.abspath(os.path.join(homedir, 'station_data'))
-    datadir = os.path.abspath(os.path.join(datadir, event, 'input'))
+    event = "northridge"
+    datadir = os.path.abspath(os.path.join(homedir, "station_data"))
+    datadir = os.path.abspath(os.path.join(datadir, event, "input"))
 
-    dyfifile = os.path.join(datadir, 'dyfi_dat.xml')
+    dyfifile = os.path.join(datadir, "dyfi_dat.xml")
     xmlfiles = [dyfifile]
 
     stations = StationList.loadFromFiles(xmlfiles, ":memory:")
@@ -230,13 +227,13 @@ def test_station5():
 
     homedir = os.path.dirname(os.path.abspath(__file__))
 
-    event = 'Calexico'
+    event = "Calexico"
 
-    datadir = os.path.abspath(os.path.join(homedir, 'station_data'))
-    datadir = os.path.abspath(os.path.join(datadir, event, 'input'))
+    datadir = os.path.abspath(os.path.join(homedir, "station_data"))
+    datadir = os.path.abspath(os.path.join(datadir, event, "input"))
 
-    inputfile = os.path.join(datadir, 'stationlist_dat.xml')
-    dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
+    inputfile = os.path.join(datadir, "stationlist_dat.xml")
+    dyfifile = os.path.join(datadir, "ciim3_dat.xml")
 
     xmlfiles = [inputfile, dyfifile]
     stations1 = StationList.loadFromFiles(xmlfiles, ":memory:")
@@ -257,8 +254,8 @@ def compare_dataframes(df1, df2):
 
     assert sorted(list(df1.keys())) == sorted(list(df2.keys()))
 
-    idx1 = np.argsort(df1['id'])
-    idx2 = np.argsort(df2['id'])
+    idx1 = np.argsort(df1["id"])
+    idx2 = np.argsort(df2["id"])
 
     for key in df1.keys():
         if df1[key].dtype == np.float:
@@ -267,7 +264,7 @@ def compare_dataframes(df1, df2):
             assert (df1[key][idx1] == df2[key][idx2]).all()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_station()
     test_station2()
     test_station3()

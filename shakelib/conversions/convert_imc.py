@@ -159,8 +159,9 @@ class ComponentConverter(ABC):
             if imc_in == imc_out:
                 return [imc_in, imc_out]
             else:
-                raise ValueError('No possible conversion between %r and %r.' %
-                (imc_in, imc_out))
+                raise ValueError(
+                    "No possible conversion between %r and %r." % (imc_in, imc_out)
+                )
 
     @abstractmethod
     def _verifyConversion(self, imc_in, imc_out=None):

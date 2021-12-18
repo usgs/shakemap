@@ -13,7 +13,7 @@ from shakelib.conversions.imt.newmark_hall_1982 import NewmarkHall1982
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..', '..'))
+shakedir = os.path.abspath(os.path.join(homedir, "..", "..", "..", ".."))
 sys.path.insert(0, shakedir)
 
 
@@ -24,18 +24,18 @@ def test_newmarkhall1982():
     nh82 = NewmarkHall1982()
 
     # Test that the correct inputs are returned for valid outputs
-    input1 = nh82.getInputIMT('pgv  ')
-    input2 = nh82.getInputIMT('PGV')
+    input1 = nh82.getInputIMT("pgv  ")
+    input2 = nh82.getInputIMT("PGV")
     assert len(input1) == len(input2) == 1
-    assert input1[0] == input2[0] == 'PSA10'
+    assert input1[0] == input2[0] == "PSA10"
 
     # Test that invalid outputs return None
-    input3 = nh82.getInputIMT('INVALID')
+    input3 = nh82.getInputIMT("INVALID")
     assert input3 == None
 
     # Test valid conversions
-    PGVout = nh82.convertAmps('psa10', 'PGV', PSA10in)
-    PGVsdout = nh82.convertSigmas('psa10', 'PGV', sd)
+    PGVout = nh82.convertAmps("psa10", "PGV", PSA10in)
+    PGVsdout = nh82.convertSigmas("psa10", "PGV", sd)
     mfact = nh82.getConversionFactor()
     lnsig = nh82.getLnSigma()
     assert abs(PGVout - np.log(9.46658)) < 0.001
@@ -45,12 +45,12 @@ def test_newmarkhall1982():
 
     # Test invalid conversions
     with pytest.raises(Exception) as a:
-        tmp = nh82.convertAmps('INVALID', 'PSA05', PGVin)
+        tmp = nh82.convertAmps("INVALID", "PSA05", PGVin)
     with pytest.raises(Exception) as a:
-        tmp = nh82.convertAmps('PGV', 'INVALID', PGVin)
+        tmp = nh82.convertAmps("PGV", "INVALID", PGVin)
     with pytest.raises(Exception) as a:
-        tmp = nh82.convertAmps('INVALID', 'INVALID', PGVin)
+        tmp = nh82.convertAmps("INVALID", "INVALID", PGVin)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_newmarkhall1982()

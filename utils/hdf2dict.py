@@ -15,6 +15,7 @@ import numpy as np
 # as an argument, and it will return a dictionary with stuff in it.
 #
 
+
 def get_result_dict(filename):
     """
     This function is called with the path to a shake_result.hdf file. It
@@ -43,26 +44,26 @@ def get_result_dict(filename):
     """
     ddict = {}
     hdfobj = h5py.File(filename, "r+")
-    group = hdfobj['arrays']['imts']['GREATER_OF_TWO_HORIZONTAL']['MMI']
-    for name in ('mean', 'std', 'phi', 'tau'):
+    group = hdfobj["arrays"]["imts"]["GREATER_OF_TWO_HORIZONTAL"]["MMI"]
+    for name in ("mean", "std", "phi", "tau"):
         dset = group[name]
         ddict[name] = dset[()].astype(np.float64)
         metadata = {}
         for key, value in dset.attrs.items():
             metadata[key] = value
-        ddict[name + '_metadata'] = metadata
+        ddict[name + "_metadata"] = metadata
 
     hdfobj.close()
     return ddict
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     ddict = get_result_dict("shake_result.hdf")
 
     print("ddict keys: ", ddict.keys())
     print()
     print("Metadata:")
-    print(ddict['mean_metadata'].items())
+    print(ddict["mean_metadata"].items())
     print()
-    print("Array shape: ", ddict['mean'].shape)
+    print("Array shape: ", ddict["mean"].shape)
