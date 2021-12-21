@@ -862,27 +862,39 @@ class StationList(object):
         self.cursor.execute(sql)
         sta_rows = self.cursor.fetchall()
         current_station_id = ""
-        channel_set = set()
+        channel_list = []
         for row in sta_rows:
             station_id, channel = row
-            if station_id != current_station_id:
-                if len(channel_set) == 3:
-                    ochars = [x[-1] for x in channel_set]
-                    if "1" in ochars and "2" in ochars and "Z" in ochars:
-                        hchans = [x for x in channel_set if x[-1] != "Z"]
-                        sql = (
-                            "UPDATE amp "
-                            'SET orientation = "H"'
-                            "WHERE station_id = ? "
-                            "AND original_channel IN (?, ?)"
-                        )
-                        self.cursor.execute(
-                            sql, (current_station_id, hchans[0], hchans[1])
-                        )
-                        self.db.commit()
+            if current_station_id == "":
                 current_station_id = station_id
-                channel_set = set([channel])
-            channel_set.add(channel)
+                channel_list = [channel]
+            elif station_id == current_station_id:
+                channel_list.append(channel)
+            if len(channel_list) == 3:
+                ochars = [x[-1] for x in channel_list]
+                if "1" in ochars and "2" in ochars and "Z" in ochars:
+                    hinds = [i for i, x in enumerate(ochars) if x == "1" or x == "2"]
+                    sql = (
+                        "UPDATE amp "
+                        'SET orientation = "H"'
+                        "WHERE station_id = ? "
+                        "AND original_channel IN (?, ?)"
+                    )
+                    self.cursor.execute(
+                        sql,
+                        (
+                            current_station_id,
+                            channel_list[hinds[0]],
+                            channel_list[hinds[1]],
+                        ),
+                    )
+                    self.db.commit()
+                # 3 channels, but not 1, 2, Z: bummer
+                channel_list = []
+            # Channels weren't 3 so we can't fix; bummer
+            if current_station_id != station_id:
+                current_station_id = station_id
+                channel_list = [channel]
         return
 
     @staticmethod
