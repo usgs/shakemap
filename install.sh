@@ -16,7 +16,7 @@ fi
 
 CC_PKG=c-compiler
 
-# source $prof
+source $prof
 
 # Name of virtual environment
 VENV=shakemap
