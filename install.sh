@@ -23,7 +23,7 @@ VENV=shakemap
 
 developer=0
 openquake_deps=0
-py_ver=3.8
+py_ver=3.9
 while getopts p:d:q FLAG; do
   case $FLAG in
     p)
@@ -39,14 +39,6 @@ while getopts p:d:q FLAG; do
       ;;
   esac
 done
-
-#if [ $py_ver == '3.8' ] && [ "$unamestr" == 'Linux' ]; then
-#    echo "WARNING: ShakeMap on Python v3.8 on some versions of Linux "
-#    echo "may fail in unexpected ways. We are enforcing the use "
-#    echo "of Python v3.7 until this warning disappears."
-#    echo ""
-#    py_ver=3.7
-#fi
 
 echo "Using python version $py_ver"
 echo ""
@@ -172,7 +164,7 @@ package_list=(
       "lockfile>=0.12.2"
       "mapio>0.7.27"
       "matplotlib-base>=3.4.2"
-      "numpy==1.20"
+      "numpy>=1.20"
       "obspy>=1.2.2"
       "openmp>=8.0.1"
       "pandas>=1.2.5"
@@ -184,8 +176,8 @@ package_list=(
       "python-daemon>=2.3.0"
       "pytest-faulthandler>=2.0.1"
       "pytest-azurepipelines>=0.8.0"
-      "pyzmq<20.0"
-      "rasterio==1.2.5"
+      "pyzmq"
+      "rasterio>=1.2.5"
       "scikit-image>=0.16.2"
       "scipy>=1.4.1"
       "shapely>=1.7.1"
