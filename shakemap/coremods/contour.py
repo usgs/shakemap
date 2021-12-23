@@ -244,7 +244,17 @@ def contour_to_files(
 
             # Get bounds
             tmp = fiona.open(filename)
-            bounds = tmp.bounds
+            try:
+                bounds = tmp.bounds
+            except Exception:
+                # If there were no contours, there won't be any bounds, so
+                # we just make the bbox the epicenter...
+                bounds = "[%s, %s, %s, %s]" % (
+                    event_info["longitude"],
+                    event_info["latitude"],
+                    event_info["longitude"],
+                    event_info["latitude"],
+                )
             tmp.close()
 
             # Read back in to add metadata/bounds
