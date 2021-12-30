@@ -155,7 +155,7 @@ def do_raster(evid, datapath, oc):
                 fname = os.path.join(tmpdirname, fname + "_mean.flt")
                 rin = gdal.Open(fname, GA_ReadOnly)
                 if rin is None:
-                    raise RuntimeError("Couldn't open %s" % fname)
+                    raise RuntimeError(f"Couldn't open {fname}")
                 cols = rin.RasterXSize
                 rows = rin.RasterYSize
                 band = rin.GetRasterBand(1)
@@ -168,7 +168,7 @@ def do_raster(evid, datapath, oc):
                 fname = os.path.join(tmpdirname, fname + "_std.flt")
                 rin = gdal.Open(fname, GA_ReadOnly)
                 if rin is None:
-                    raise RuntimeError("Couldn't open %s" % fname)
+                    raise RuntimeError(f"Couldn't open {fname}")
                 cols = rin.RasterXSize
                 rows = rin.RasterYSize
                 band = rin.GetRasterBand(1)

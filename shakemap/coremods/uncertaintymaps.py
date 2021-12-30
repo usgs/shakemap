@@ -106,10 +106,10 @@ class UncertaintymapsModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
         datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
@@ -392,7 +392,7 @@ def get_text_strings(stringfile):
         dict: A dictionary of strings for use in writing text to the maps.
     """
     if not os.path.isfile(stringfile):
-        FileNotFoundError("File %s not found" % stringfile)
+        FileNotFoundError(f"File {stringfile} not found")
     f = open(stringfile, "rt", encoding="utf-8-sig")
     jline = ""
     for line in f:

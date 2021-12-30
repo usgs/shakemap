@@ -511,11 +511,11 @@ class ModelModule(CoreModule):
         _, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
 
         datafile = os.path.join(datadir, "shake_data.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
         self.datadir = datadir
         self.ic = ShakeMapInputContainer.load(datafile)
 
@@ -848,7 +848,7 @@ class ModelModule(CoreModule):
             # Are we doing directivity?
             # -----------------------------------------------------------------
             if self.do_directivity is True:
-                self.logger.info("Directivity for %s..." % dfid)
+                self.logger.info(f"Directivity for {dfid}...")
                 time1 = time.time()
                 dir_df = Rowshandel2013(
                     self.rupture_obj._origin,
@@ -864,7 +864,7 @@ class ModelModule(CoreModule):
                 self.dir_results.append((dir_df, dfn.dx))
                 directivity_time = time.time() - time1
                 self.logger.debug(
-                    "Directivity %s evaluation time: %f sec" % (dfid, directivity_time)
+                    f"Directivity {dfid} evaluation time: {directivity_time:f} sec"
                 )
 
             # -----------------------------------------------------------------
@@ -880,7 +880,7 @@ class ModelModule(CoreModule):
                         gmpe = MultiGMPE.__from_config__(self.config, filter_imt=oqimt)
                     except KeyError:
                         self.logger.warn(
-                            "Input IMT %s not supported by GMPE: ignoring" % imtstr
+                            f"Input IMT {imtstr} not supported by GMPE: ignoring"
                         )
                         not_supported = True
                 if not_supported:
@@ -1044,7 +1044,7 @@ class ModelModule(CoreModule):
                     gmpe = MultiGMPE.__from_config__(self.config, filter_imt=oqimt)
                 except KeyError:
                     self.logger.warn(
-                        "Input IMT %s not supported by GMPE: ignoring" % imtstr
+                        f"Input IMT {imtstr} not supported by GMPE: ignoring"
                     )
                     not_supported = True
                 if not_supported:
@@ -1428,7 +1428,7 @@ class ModelModule(CoreModule):
             self.dir_results.append((dir_out, self.atten_dx))
             directivity_time = time.time() - time1
             self.logger.debug(
-                "Directivity prediction evaluation time: %f sec" % directivity_time
+                f"Directivity prediction evaluation time: {directivity_time:f} sec"
             )
         else:
             self.directivity = None
@@ -1437,7 +1437,7 @@ class ModelModule(CoreModule):
         """
         Do the MVN computations
         """
-        self.logger.debug("computeMVN: doing IMT %s" % imtstr)
+        self.logger.debug(f"computeMVN: doing IMT {imtstr}")
         time1 = time.time()
         #
         # Get the index of the (pesudo-) period of the output IMT
@@ -1652,13 +1652,13 @@ class ModelModule(CoreModule):
         self.outphi[imtstr] = self.psd[imtstr]
         self.outtau[imtstr] = np.sqrt(sdgrid_tau, out=sdgrid_tau)
 
-        self.logger.debug("\ttime for %s distance=%f" % (imtstr, ddtime))
-        self.logger.debug("\ttime for %s correlation=%f" % (imtstr, ctime))
-        self.logger.debug("\ttime for %s sigma=%f" % (imtstr, stime))
-        self.logger.debug("\ttime for %s rcmatrix=%f" % (imtstr, dtime))
-        self.logger.debug("\ttime for %s amp calc=%f" % (imtstr, atime))
-        self.logger.debug("\ttime for %s sd calc=%f" % (imtstr, mtime))
-        self.logger.debug("total time for %s=%f" % (imtstr, time.time() - time1))
+        self.logger.debug(f"\ttime for {imtstr} distance={ddtime:f}")
+        self.logger.debug(f"\ttime for {imtstr} correlation={ctime:f}")
+        self.logger.debug(f"\ttime for {imtstr} sigma={stime:f}")
+        self.logger.debug(f"\ttime for {imtstr} rcmatrix={dtime:f}")
+        self.logger.debug(f"\ttime for {imtstr} amp calc={atime:f}")
+        self.logger.debug(f"\ttime for {imtstr} sd calc={mtime:f}")
+        self.logger.debug(f"total time for {imtstr}={time.time() - time1:f}")
 
     def _applyCustomMask(self):
         """Apply custom masks to IMT grid outputs."""
@@ -2013,9 +2013,7 @@ class ModelModule(CoreModule):
                     sjdict["features"].remove(station)
                     continue
                 else:
-                    raise ValueError(
-                        "Unknown station %s in stationlist" % (station["id"])
-                    )
+                    raise ValueError(f"Unknown station {station['id']} in stationlist")
             dfx = getattr(self, ndf)
             sdf = dfx.df
             six = sta_ix[ndf][station["id"]]
@@ -2027,7 +2025,7 @@ class ModelModule(CoreModule):
                 and not sdf["MMI_outliers"][six]
                 and not np.isnan(sdf["MMI"][six])
             ):
-                station["properties"]["intensity"] = float("%.1f" % sdf["MMI"][six])
+                station["properties"]["intensity"] = float(f"{sdf['MMI'][six]:.1f}")
                 station["properties"]["intensity_stddev"] = sdf["MMI_sd"][six]
                 if "MMI_nresp" in sdf:
                     station["properties"]["nresp"] = int(sdf["MMI_nresp"][six])
@@ -2551,10 +2549,10 @@ class ModelModule(CoreModule):
                 "Extent and resolution of shakemap results in "
                 "too many grid points. Adjusting resolution..."
             )
-            self.logger.info("Longitude span: %f" % lonspan)
-            self.logger.info("Latitude span: %f" % latspan)
-            self.logger.info("Current dx: %f" % self.smdx)
-            self.logger.info("Current dy: %f" % self.smdy)
+            self.logger.info(f"Longitude span: {lonspan:f}")
+            self.logger.info(f"Latitude span: {latspan:f}")
+            self.logger.info(f"Current dx: {self.smdx:f}")
+            self.logger.info(f"Current dy: {self.smdy:f}")
             self.logger.info("Current number of grid points: %i" % ngrid)
             self.logger.info("Max grid points allowed: %i" % nmax)
             target_res = (
@@ -2570,8 +2568,8 @@ class ModelModule(CoreModule):
                 sel_res = np.max(ok_res)
             self.smdx = sel_res
             self.smdy = sel_res
-            self.logger.info("Updated dx: %f" % self.smdx)
-            self.logger.info("Updatd dy: %f" % self.smdy)
+            self.logger.info(f"Updated dx: {self.smdx:f}")
+            self.logger.info(f"Updatd dy: {self.smdy:f}")
             nx = np.floor(lonspan / self.smdx) + 1
             ny = np.floor(latspan / self.smdy) + 1
             self.logger.info("Updated number of grid points: %i" % (nx * ny))
@@ -2680,7 +2678,7 @@ def _get_nearest_imts(imtstr, imtset, saset):
         #
         return _get_sa_bracket(imtstr, saset)
     else:
-        raise ValueError("Unknown IMT %s in get_imt_bracket" % imtstr)
+        raise ValueError(f"Unknown IMT {imtstr} in get_imt_bracket")
 
 
 def _get_sa_bracket(myimt, saset):
@@ -2840,6 +2838,6 @@ def _get_layer_info(layer):
     elif layer.startswith("vs30"):
         layer_units = "m/s"
     else:
-        raise ValueError("Unknown layer type: %s" % layer)
+        raise ValueError(f"Unknown layer type: {layer}")
 
     return (layer_out, layer_units, layer_digits)

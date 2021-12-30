@@ -35,7 +35,7 @@ def oq_to_file(oqimt):
         integer, fraction = period.split(".")
         if not len(integer):
             integer = "0"
-    fileimt = "psa%sp%s" % (integer, fraction)
+    fileimt = f"psa{integer}p{fraction}"
     return fileimt
 
 
@@ -61,5 +61,5 @@ def file_to_oq(fileimt):
     if not len(fraction):
         fmt = "%s is not a valid filename-friendly IMT string."
         raise ValueError(fmt % fileimt)
-    oqimt = "SA(%s.%s)" % (integer, fraction)
+    oqimt = f"SA({integer}.{fraction})"
     return oqimt

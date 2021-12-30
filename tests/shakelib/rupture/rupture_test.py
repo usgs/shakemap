@@ -868,8 +868,8 @@ def test_rupture_depth(interactive=False):
         plt.sca(ax2)
         im = plt.imshow(depths, cmap="viridis_r")  # noqa
         ch = plt.colorbar()  # noqa
-        fname = os.path.join(os.path.expanduser("~"), "quad_%s_test.png" % name)
-        print("Saving image for %s quad test... %s" % (name, fname))
+        fname = os.path.join(os.path.expanduser("~"), f"quad_{name}_test.png")
+        print(f"Saving image for {name} quad test... {fname}")
         plt.savefig(fname)
         plt.close()
 

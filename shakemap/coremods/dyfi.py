@@ -101,7 +101,7 @@ def _get_dyfi_dataframe(detail_or_url, inputfile=None):
         else:
             df = _parse_geocoded_csv(rawdata)
         if df is None:
-            msg = "Could not read file %s" % inputfile
+            msg = f"Could not read file {inputfile}"
 
     else:
         if isinstance(detail_or_url, str):
@@ -124,7 +124,7 @@ def _get_dyfi_dataframe(detail_or_url, inputfile=None):
 def _parse_dyfi_detail(detail):
 
     if not detail.hasProduct("dyfi"):
-        msg = "%s has no DYFI product at this time." % detail.url
+        msg = f"{detail.url} has no DYFI product at this time."
         dataframe = None
         return (dataframe, msg)
 

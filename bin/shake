@@ -112,7 +112,7 @@ def _format_error_info(exception, eventid):
             edict = read_event_file(datafile)
             mag = edict["mag"]
             loc = edict["locstring"]
-            eqinfo = "M%.1f %s" % (mag, loc)
+            eqinfo = f"M{mag:.1f} {loc}"
 
     stringio = io.StringIO()
     ex_type, ex, tb = sys.exc_info()
@@ -140,7 +140,7 @@ def get_parser():
     for key, core_class in _classes_.items():
         if key.startswith("xtest"):
             continue
-        epilog += "    - %s\n" % inspect.getdoc(core_class["class"])
+        epilog += f"    - {inspect.getdoc(core_class['class'])}\n"
 
     epilog += (
         '\nUse "shake help command" to see the options for a ' "specific command.\n"
@@ -191,7 +191,7 @@ def get_parser():
         "-v",
         "--version",
         action="version",
-        version="ShakeMap version %s" % shakemap.__version__,
+        version=f"ShakeMap version {shakemap.__version__}",
         help="Print the version of ShakeMap and quit.",
     )
     return parser
@@ -230,7 +230,7 @@ def main(args):
         if _config_["process_canceled"]:
             os.remove(cancel_file)
         else:
-            logger.error("Event %s has been canceled: aborting run" % args.eventid)
+            logger.error(f"Event {args.eventid} has been canceled: aborting run")
             return
 
     #
@@ -250,7 +250,7 @@ def main(args):
                 args.cmds = shlex.split(_config_["autorun_modules"])
                 if len(args.cmds):
                     if args.dryrun is False:
-                        logger.info("Autorun modules found: %s" % args.cmds)
+                        logger.info(f"Autorun modules found: {args.cmds}")
                 else:
                     logger.warning(
                         "No modules specified, and no autorun_modules "
@@ -265,7 +265,7 @@ def main(args):
 
                 args.cmds = shlex.split(_config_["cancel_modules"])
                 if len(args.cmds):
-                    logger.info("Cancel modules found: %s" % args.cmds)
+                    logger.info(f"Cancel modules found: {args.cmds}")
                 else:
                     logger.warning(
                         "Cancel option specified, but no cancel_modules "
@@ -274,18 +274,18 @@ def main(args):
                     sys.exit(0)
 
         arglist = args.cmds.copy()
-        logger.debug("arglist: %s" % arglist)
+        logger.debug(f"arglist: {arglist}")
 
         if args.dryrun is True:
 
             cmdlist = ""
             for item in arglist:
                 if " " in item:
-                    cmdlist += "'%s' " % item
+                    cmdlist += f"'{item}' "
                 else:
                     cmdlist += item + " "
             print("Dryrun. The following command would be run:")
-            print("shake %s %s" % (args.eventid, cmdlist))
+            print(f"shake {args.eventid} {cmdlist}")
             sys.exit(0)
 
         oldcmd = ""
@@ -293,12 +293,10 @@ def main(args):
             cmd = arglist.pop(0)
 
             if cmd.startswith("-"):
-                raise KeyError(
-                    'Command "%s" cannot process option "%s"' % (oldcmd, cmd)
-                )
+                raise KeyError(f'Command "{oldcmd}" cannot process option "{cmd}"')
 
             if cmd not in _classes_:
-                raise KeyError('Command "%s" not found in ShakeMap.' % cmd)
+                raise KeyError(f'Command "{cmd}" not found in ShakeMap.')
 
             cmd_class = _classes_[cmd]["class"]
             cmd_obj = cmd_class(args.eventid)
@@ -311,7 +309,7 @@ def main(args):
             oldcmd = cmd
 
         for cmd, obj in cmd_list.items():
-            logger.info("Running command %s" % cmd)
+            logger.info(f"Running command {cmd}")
             status = cdb.getDependencyStatus(cmd)
             while len(status) > 0:
                 if len(status) == 1 and status[0] == cmd:
@@ -338,19 +336,17 @@ def main(args):
                     logger.warning("Exiting.")
                     sys.exit(0)
                 else:
-                    logger.warning('Running "%s" because of --force option.' % cmd)
+                    logger.warning(f'Running "{cmd}" because of --force option.')
                 break
             t1 = time.time()
             try:
                 obj.execute()
             except TerminateShakeMap as e:
-                logger.warning("ShakeMap terminated in module %s: %s" % (cmd, str(e)))
+                logger.warning(f"ShakeMap terminated in module {cmd}: {str(e)}")
                 break
             t2 = time.time()
             elapsed = t2 - t1
-            logger.info(
-                "Finished running command %s: Elapsed %.2f secs" % (cmd, elapsed)
-            )
+            logger.info(f"Finished running command {cmd}: Elapsed {elapsed:.2f} secs")
             # create/update the contents.xml file
             obj.writeContents()
             cdb.updateCommand(cmd)
@@ -360,7 +356,7 @@ def main(args):
         logger.critical(error_msg)  # should get sent by email and logged
         sys.exit(1)
 
-    logger.info("shake finished with event %s" % args.eventid)
+    logger.info(f"shake finished with event {args.eventid}")
 
 
 if __name__ == "__main__":

@@ -52,9 +52,7 @@ class BommerAlarcon2006(IMTConverter):
         elif imt_in == "PGV" and imt_out == "PSA05":
             new_imt = self._convertToPSA05(imt, conversion_factor)
         else:
-            raise ValueError(
-                "No conversion available from %r to %r" % (imt_in, imt_out)
-            )
+            raise ValueError(f"No conversion available from {imt_in!r} to {imt_out!r}")
         return new_imt
 
     @staticmethod

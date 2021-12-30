@@ -74,10 +74,10 @@ def write_instrumented(data_file, event_dir):
     srows = cursor.fetchall()
     for srow in srows:
         sid = srow[0]
-        query2 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        query2 = f'DELETE FROM amp WHERE station_id="{sid}"'
         cursor.execute(query2)
         db.commit()
-        query3 = 'DELETE FROM station WHERE id="%s"' % sid
+        query3 = f'DELETE FROM station WHERE id="{sid}"'
         cursor.execute(query3)
         db.commit()
 
@@ -106,10 +106,10 @@ def write_macroseismic(data_file, event_dir):
     srows = cursor.fetchall()
     for srow in srows:
         sid = srow[0]
-        query2 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        query2 = f'DELETE FROM amp WHERE station_id="{sid}"'
         cursor.execute(query2)
         db.commit()
-        query3 = 'DELETE FROM station WHERE id="%s"' % sid
+        query3 = f'DELETE FROM station WHERE id="{sid}"'
         cursor.execute(query3)
         db.commit()
     # next, remove DYFI
@@ -118,10 +118,10 @@ def write_macroseismic(data_file, event_dir):
     srows = cursor.fetchall()
     for srow in srows:
         sid = srow[0]
-        query5 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        query5 = f'DELETE FROM amp WHERE station_id="{sid}"'
         cursor.execute(query5)
         db.commit()
-        query6 = 'DELETE FROM station WHERE id="%s"' % sid
+        query6 = f'DELETE FROM station WHERE id="{sid}"'
         cursor.execute(query6)
         db.commit()
     cursor.execute("SELECT count(*) FROM station")
@@ -222,7 +222,7 @@ def _get_event_dictionary(detail, source, scenario):
                 "locstring": detail.location,
             }
         except ValueError:
-            print("No origin for event %s." % source)
+            print(f"No origin for event {source}.")
     else:  # no source specified, use detail object
         if scenario is True:
             netname = detail["net"]
@@ -248,7 +248,7 @@ def _get_event_dictionary(detail, source, scenario):
 def main(args):
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
-        print("%s is not a valid directory." % data_path)
+        print(f"{data_path} is not a valid directory.")
         sys.exit(1)
 
     # get the global config for modules.conf
@@ -389,13 +389,13 @@ def main(args):
                 else:
                     shakemap = detail.getProducts("shakemap", source=source)[0]
             except AttributeError:
-                msg = "No ShakeMap product from source %s exists." % source
+                msg = f"No ShakeMap product from source {source} exists."
                 print(msg)
                 sys.exit(0)
 
             got_data_file = False
             try:
-                data_file = os.path.join(event_dir, "%s_dat.xml" % eventid)
+                data_file = os.path.join(event_dir, f"{eventid}_dat.xml")
                 shakemap.getContent("stationlist.xml", filename=data_file)
                 got_data_file = True
                 if not validate_xml(data_file):
@@ -403,7 +403,7 @@ def main(args):
                     got_data_file = False
             except Exception:
                 try:
-                    data_file = os.path.join(event_dir, "%s_dat.json" % eventid)
+                    data_file = os.path.join(event_dir, f"{eventid}_dat.json")
                     shakemap.getContent("stationlist.json", filename=data_file)
                     got_data_file = True
                     if not validate_json(data_file):
@@ -576,7 +576,7 @@ def _write_model_conf(
     if gmice not in allowed_gmice:
         # If not implemented, then it will fall back on global conf GMICE
         warnings.warn(
-            "GMICE %s (event %s) not yet supported in ShakeMap 4." % (gmice, eventid)
+            f"GMICE {gmice} (event {eventid}) not yet supported in ShakeMap 4."
         )
     else:
         model["modeling"]["gmice"] = gmice

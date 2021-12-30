@@ -352,7 +352,7 @@ class BeyerBommer2006(ComponentConverter):
                 # but for now let's just use c2
                 return self.__sa_dict[imc]["c2"]
         else:
-            raise ValueError("unknown IMT %s" % imt.string)
+            raise ValueError(f"unknown IMT {imt.string}")
 
     def __GM2otherSigma(self, imt, imc):
         """
@@ -398,7 +398,7 @@ class BeyerBommer2006(ComponentConverter):
                 # but for now let's just use c4
                 return R, self.__sa_dict[imc]["c4"]
         else:
-            raise ValueError("unknown IMT %s" % imt.string)
+            raise ValueError(f"unknown IMT {imt.string}")
 
     def _verifyConversion(self, imc_in, imc_out=None):
         """
@@ -420,4 +420,4 @@ class BeyerBommer2006(ComponentConverter):
             and imc_in != const.IMC.RANDOM_HORIZONTAL
             and imc_in != const.IMC.HORIZONTAL
         ):
-            raise ValueError("unknown IMC %s" % imc_in)
+            raise ValueError(f"unknown IMC {imc_in}")

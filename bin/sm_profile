@@ -120,7 +120,7 @@ def make_dir(pathstr, default, accept):
     ppath = ""
     while not make_ok:
         if not accept:
-            ppath = input("Please enter the %s: [%s] " % (pathstr, default))
+            ppath = input(f"Please enter the {pathstr}: [{default}] ")
         else:
             ppath = default
         if not len(ppath.strip()):
@@ -277,7 +277,7 @@ def create(config, profile, accept, ppath, nogrids):
     config["profile"] = profile
     config.write()
     sprofile = ShakeProfile(profile, config["profiles"][profile])
-    print("\nCreated profile: %s" % (sprofile))
+    print(f"\nCreated profile: {sprofile}")
 
     if nogrids:
         return
@@ -351,12 +351,12 @@ def create(config, profile, accept, ppath, nogrids):
 
     my_config = os.path.join(config_path, "products.conf")
     old_line = r"topography\s*=\s*.*"
-    new_line = "topography = %s" % os.path.join(topo_path, ftp_topo)
+    new_line = f"topography = {os.path.join(topo_path, ftp_topo)}"
     replace(my_config, old_line, new_line)
 
     my_config = os.path.join(config_path, "model.conf")
     old_line = r"vs30file\s*=\s*.*"
-    new_line = "vs30file = %s" % os.path.join(vs30_path, ftp_vs30)
+    new_line = f"vs30file = {os.path.join(vs30_path, ftp_vs30)}"
     replace(my_config, old_line, new_line)
 
     print("Done.")
@@ -414,7 +414,7 @@ def main(pparser, args):
         config.filename = configfile
         config.write()
         sp = ShakeProfile(newprofile, config["profiles"][newprofile], is_current=True)
-        print("\nSwitched to profile: \n%s\n" % (str(sp)))
+        print(f"\nSwitched to profile: \n{str(sp)}\n")
         sys.exit(0)
 
     if args.delete:
@@ -449,9 +449,9 @@ def main(pparser, args):
 
         config.filename = configfile
         config.write()
-        print("Deleted profile %s:" % profile)
-        print("\tDeleted install directory %s:" % install_path)
-        print("\tDeleted data directory %s:" % data_path)
+        print(f"Deleted profile {profile}:")
+        print(f"\tDeleted install directory {install_path}:")
+        print(f"\tDeleted data directory {data_path}:")
 
         print("\nSet to new profile:\n")
         print(newprofile)

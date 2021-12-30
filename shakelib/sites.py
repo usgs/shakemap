@@ -291,7 +291,7 @@ class Sites(object):
                 padValue=padValue,
             )
         except Exception as msg1:
-            msg = 'Load failure of %s - error message: "%s"' % (vs30File, str(msg1))
+            msg = f'Load failure of {vs30File} - error message: "{str(msg1)}"'
             raise ShakeLibException(msg)
 
         if vs30grid.getData().dtype != np.float64:
@@ -305,10 +305,7 @@ class Sites(object):
         try:
             geodict = get_file_geodict(fname)
         except Exception as msg1:
-            msg = "File geodict failure with %s - error messages: " '"%s"' % (
-                fname,
-                str(msg1),
-            )
+            msg = f'File geodict failure with {fname} - error messages: "{str(msg1)}"'
             raise ShakeLibException(msg)
         return geodict
 

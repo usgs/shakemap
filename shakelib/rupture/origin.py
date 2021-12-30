@@ -186,7 +186,7 @@ class Origin(object):
 
         if mech not in list(mechs.keys()):
             raise ShakeLibException(
-                "Mechanism must be one of: %s" % str(list(mechs.keys()))
+                f"Mechanism must be one of: {str(list(mechs.keys()))}"
             )
 
         if dip is not None:
@@ -241,10 +241,10 @@ def write_event_file(event, xmlfile):
         root.attrib["id"] = event["id"]
         root.attrib["netid"] = event["netid"]
         root.attrib["network"] = event["network"]
-        root.attrib["lat"] = "%.4f" % event["lat"]
-        root.attrib["lon"] = "%.4f" % event["lon"]
-        root.attrib["depth"] = "%.1f" % event["depth"]
-        root.attrib["mag"] = "%.1f" % event["mag"]
+        root.attrib["lat"] = f"{event['lat']:.4f}"
+        root.attrib["lon"] = f"{event['lon']:.4f}"
+        root.attrib["depth"] = f"{event['depth']:.1f}"
+        root.attrib["mag"] = f"{event['mag']:.1f}"
         root.attrib["time"] = event["time"].strftime(constants.ALT_TIMEFMT)
         root.attrib["locstring"] = event["locstring"]
         if "mech" in event:
@@ -383,9 +383,7 @@ def read_event_file(eventxml):
                     xmldict["time"], constants.ALT_TIMEFMT
                 )
             except ValueError:
-                raise ValueError(
-                    "Couldn't convert %s to HistoricTime" % xmldict["time"]
-                )
+                raise ValueError(f"Couldn't convert {xmldict['time']} to HistoricTime")
     else:
         if (
             "year" not in xmldict

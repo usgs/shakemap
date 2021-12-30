@@ -421,8 +421,8 @@ class MultiGMPE(GMPE):
         IMC = getattr(const.IMC, conf["interp"]["component"])
         selected_gmpe = conf["modeling"]["gmpe"]
 
-        logging.debug("selected_gmpe: %s" % selected_gmpe)
-        logging.debug("IMC: %s" % IMC)
+        logging.debug(f"selected_gmpe: {selected_gmpe}")
+        logging.debug(f"IMC: {IMC}")
 
         # ---------------------------------------------------------------------
         # Allow for selected_gmpe to be found in either conf['gmpe_sets'] or
@@ -436,8 +436,8 @@ class MultiGMPE(GMPE):
             gmpe_set_weights = [
                 float(w) for w in conf["gmpe_sets"][selected_gmpe]["weights"]
             ]
-            logging.debug("selected_gmpe_sets: %s" % selected_gmpe_sets)
-            logging.debug("gmpe_set_weights: %s" % gmpe_set_weights)
+            logging.debug(f"selected_gmpe_sets: {selected_gmpe_sets}")
+            logging.debug(f"gmpe_set_weights: {gmpe_set_weights}")
 
             # -----------------------------------------------------------------
             # If it is a GMPE set, does it contain GMPEs or GMPE sets?
@@ -615,8 +615,8 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
         # Construct MultiGMPE
         # ---------------------------------------------------------------------
-        logging.debug("    filtered_gmpes: %s" % filtered_gmpes)
-        logging.debug("    filtered_wts: %s" % filtered_wts)
+        logging.debug(f"    filtered_gmpes: {filtered_gmpes}")
+        logging.debug(f"    filtered_wts: {filtered_wts}")
 
         mgmpe = MultiGMPE.__from_list__(
             filtered_gmpes,
@@ -715,7 +715,7 @@ class MultiGMPE(GMPE):
 
         for g in gmpes:
             if not isinstance(g, GMPE):
-                raise Exception('"%s" is a %s not a GMPE instance.' % (g, type(g)))
+                raise Exception(f'"{g}" is a {type(g)} not a GMPE instance.')
 
         self = cls()
         self.GMPES = gmpes
@@ -779,7 +779,7 @@ class MultiGMPE(GMPE):
             # check that default_gmpe_for_site are OQ GMPEs or None
             for g in default_gmpes_for_site:
                 if not isinstance(g, GMPE):
-                    raise Exception('"%s" is not a GMPE instance.' % g)
+                    raise Exception(f'"{g}" is not a GMPE instance.')
 
             # apply default weights if necessary
             if default_gmpes_for_site_weights is None:
@@ -1045,7 +1045,7 @@ def filter_gmpe_list(gmpes, wts, imt):
                 swts.append(wts[i])
 
     if len(sgmpe) == 0:
-        raise KeyError("No applicable GMPEs from GMPE list for %s" % str(imt))
+        raise KeyError(f"No applicable GMPEs from GMPE list for {str(imt)}")
 
     # Scale weights to sum to one
     swts = np.array(swts)
@@ -1100,4 +1100,4 @@ def get_gmpe_coef_table(gmpe):
         cobj = getattr(gmpe, coef_sel)
         if "sa_coeffs" in cobj.__dir__():
             return cobj
-    raise Exception("GMPE %s does not contain sa_coeffs attribute." % gmpe)
+    raise Exception(f"GMPE {gmpe} does not contain sa_coeffs attribute.")

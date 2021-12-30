@@ -242,7 +242,7 @@ class Queue(object):
             #
             running = self.eventQueue.getRunningEvents()
             for eventid, command in running:
-                self.logger.info("Startup: Running event %s" % (eventid))
+                self.logger.info(f"Startup: Running event {eventid}")
                 event = self.ampHandler.getEvent(eventid)
                 # Update the XML because the DB may have newer information
                 self.writeEventXml(event)
@@ -270,14 +270,11 @@ class Queue(object):
                 #
                 hostname, _, _ = socket.gethostbyaddr(address[0])
                 #            hostname = socket.getfqdn(hostname)
-                self.logger.info(
-                    "Got connection from %s at port %s" % (hostname, address[1])
-                )
+                self.logger.info(f"Got connection from {hostname} at port {address[1]}")
 
                 if hostname not in self.config["servers"]:
                     self.logger.warning(
-                        "Connection from %s refused: not in "
-                        "valid servers list" % hostname
+                        f"Connection from {hostname} refused: not in valid servers list"
                     )
                     clientsocket.close()
                     continue
@@ -304,7 +301,7 @@ class Queue(object):
                     cmd = json.loads(data.decode("utf8"))
                 except json.decoder.JSONDecodeError:
                     self.logger.warning(
-                        "Couldn't decode data from %s: " "ignoring" % hostname
+                        f"Couldn't decode data from {hostname}: ignoring"
                     )
                     continue
 
@@ -314,12 +311,12 @@ class Queue(object):
                     or "data" not in cmd
                     or "id" not in cmd["data"]
                 ):
-                    self.logger.warning("Bad data from %s: ignoring" % hostname)
+                    self.logger.warning(f"Bad data from {hostname}: ignoring")
                     continue
 
                 if cmd["type"] == "origin":
                     self.logger.info(
-                        'Received "origin" for event %s' % cmd["data"]["id"]
+                        f"Received \"origin\" for event {cmd['data']['id']}"
                     )
                     if "action" in cmd["data"]:
                         action = cmd["data"]["action"]
@@ -328,7 +325,7 @@ class Queue(object):
                     self.processOrigin(cmd["data"], action)
                 elif cmd["type"] == "cancel":
                     self.logger.info(
-                        'Received "cancel" for event %s' % cmd["data"]["id"]
+                        f"Received \"cancel\" for event {cmd['data']['id']}"
                     )
                     self.processCancel(cmd["data"])
                 else:
@@ -373,14 +370,14 @@ class Queue(object):
                     event_dir = os.path.join(self.data_path, eventid, "current")
                     if not os.path.isdir(event_dir):
                         self.logger.info(
-                            "Queueing event %s after network " "delay" % eventid
+                            f"Queueing event {eventid} after network delay"
                         )
                         self.dispatchEvent(event, "Event added")
                     else:
-                        self.logger.info("Queueing old event %s for update" % eventid)
+                        self.logger.info(f"Queueing old event {eventid} for update")
                         self.dispatchEvent(event, "Event updated")
                 else:
-                    self.logger.info("Queueing repeat of event %s" % eventid)
+                    self.logger.info(f"Queueing repeat of event {eventid}")
                     self.dispatchEvent(event, "Scheduled repeat")
                 break
 
@@ -408,7 +405,7 @@ class Queue(object):
             self.MEMORY_UPDATE_TIME = current_time
             process = psutil.Process(os.getpid())
             mem = getattr(process.memory_full_info(), "uss", 0) / 1048576.0
-            self.logger.info("Currently using %.1f MB" % mem)
+            self.logger.info(f"Currently using {mem:.1f} MB")
 
         #
         # Do the occasional DB cleanup once per day; keep amps for 30
@@ -485,7 +482,7 @@ class Queue(object):
             try:
                 dt = datetime.strptime(ttemp, constants.ALT_TIMEFMT)
             except ValueError:
-                self.logger.error("Can't parse input time %s" % ttemp)
+                self.logger.error(f"Can't parse input time {ttemp}")
                 return
         event["time"] = dt
 
@@ -494,10 +491,10 @@ class Queue(object):
             os.makedirs(event_dir)
         event_xml = os.path.join(event_dir, "event.xml")
 
-        self.logger.info("Writing event %s to event.xml" % (event["id"]))
+        self.logger.info(f"Writing event {event['id']} to event.xml")
         val = write_event_file(event, event_xml)
         if val:
-            self.logger.error("Error writing event.xml: %s" % val)
+            self.logger.error(f"Error writing event.xml: {val}")
 
         event["time"] = ttemp
 
@@ -511,8 +508,7 @@ class Queue(object):
             )
         except shutil.Error as e:
             self.logger(
-                "Error trying to move data directory %s to %s: %s"
-                % (oldid, newid, str(e))
+                f"Error trying to move data directory {oldid} to {newid}: {str(e)}"
             )
         return
 
@@ -573,14 +569,12 @@ class Queue(object):
             # Do we want to run this event?
             if not force_run and self.magnitudeTooSmall(event):
                 self.logger.info(
-                    "Event %s (mag=%f) too small, skipping"
-                    % (event["id"], event["mag"])
+                    f"Event {event['id']} (mag={event['mag']:f}) too small, skipping"
                 )
                 return
             if not force_run and self.eventTooOldOrInFuture(event):
                 self.logger.info(
-                    "Event %s too old or too far in the future, "
-                    "skipping" % event["id"]
+                    f"Event {event['id']} too old or too far in the future, skipping"
                 )
                 return
             #
@@ -594,7 +588,7 @@ class Queue(object):
                 try:
                     dt = datetime.strptime(event["time"], constants.ALT_TIMEFMT)
                 except ValueError:
-                    self.logger.error("Can't parse input time %s" % event["time"])
+                    self.logger.error(f"Can't parse input time {event['time']}")
                     return
             event_timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
             for mag in sorted(self.config["repeats"].keys(), reverse=True):
@@ -706,7 +700,7 @@ class Queue(object):
                     self.ampHandler.insertEvent(existing, update=True)
                     return
 
-        self.logger.info("cancel is for unprocessed event %s: ignoring" % eventid)
+        self.logger.info(f"cancel is for unprocessed event {eventid}: ignoring")
         return
 
     def magnitudeTooSmall(self, event):
@@ -799,9 +793,9 @@ class Queue(object):
             #
             # Cancellations aren't queued, they're run immediately
             #
-            self.logger.info("Canceling event %s" % eventid)
+            self.logger.info(f"Canceling event {eventid}")
             if eventid in self.children:
-                self.logger.info("Event %s is running; killing..." % eventid)
+                self.logger.info(f"Event {eventid} is running; killing...")
                 self.children[eventid]["popen"].kill()
                 self.children[eventid]["popen"].wait()
                 del self.children[eventid]
@@ -816,7 +810,7 @@ class Queue(object):
             self.eventQueue.insertRunningEvent(eventid, cmd)
             return
 
-        self.logger.info('Queueing event %s due to action "%s"' % (eventid, action))
+        self.logger.info(f'Queueing event {eventid} due to action "{action}"')
         #
         # Add the action as the assemble/augment comment, or replace the
         # comment if it is already there.
@@ -826,12 +820,12 @@ class Queue(object):
                 continue
             if len(self.shake_cmds) == ix + 1:  # This shouldn't happen
                 self.shake_cmds.append("-c")
-                self.shake_cmds.append('"%s"' % action)
+                self.shake_cmds.append(f'"{action}"')
             elif self.shake_cmds[ix + 1] == "-c":
-                self.shake_cmds[ix + 2] = '"%s"' % action
+                self.shake_cmds[ix + 2] = f'"{action}"'
             else:
                 self.shake_cmds.insert(ix + 1, "-c")
-                self.shake_cmds.insert(ix + 2, '"%s"' % action)
+                self.shake_cmds.insert(ix + 2, f'"{action}"')
             break
 
         if action == "test":
@@ -868,8 +862,7 @@ class Queue(object):
                     event["repeats"] = [current_time + mtw]
                 self.ampHandler.insertEvent(event, update=True)
                 self.logger.info(
-                    "Event %s is currently running, shelving "
-                    "this update" % event["id"]
+                    f"Event {event['id']} is currently running, shelving this update"
                 )
                 self.eventQueue.dequeueEvent(eventid)
                 continue
@@ -879,7 +872,7 @@ class Queue(object):
                     # We're due for a rerun anyway, so just leave the
                     # event queued
                     self.logger.info(
-                        "Event %s will repeat soon, shelving " "this update" % eventid
+                        f"Event {eventid} will repeat soon, shelving this update"
                     )
                     self.eventQueue.dequeueEvent(eventid)
                     continue
@@ -895,12 +888,12 @@ class Queue(object):
                     event["repeats"] = [current_time + mtw]
                 self.ampHandler.insertEvent(event, update=True)
                 self.logger.info(
-                    "Event %s ran recently, shelving this " "update" % event["id"]
+                    f"Event {event['id']} ran recently, shelving this update"
                 )
                 self.eventQueue.dequeueEvent(eventid)
                 continue
 
-            self.logger.info("Running event %s" % (eventid))
+            self.logger.info(f"Running event {eventid}")
             # Update the XML because the DB may have newer information
             self.writeEventXml(event)
             p = subprocess.Popen(command)
@@ -941,10 +934,10 @@ class Queue(object):
             # Kill children who take too long
             #
             if info["start_time"] + self.config["max_process_time"] < current_time:
-                self.logger.warning("Event %s taking too long, killing" % eventid)
+                self.logger.warning(f"Event {eventid} taking too long, killing")
                 info["popen"].kill()
                 info["popen"].wait()
-                self.logger.warning("Reaped child for killed event %s" % eventid)
+                self.logger.warning(f"Reaped child for killed event {eventid}")
                 to_delete.append(eventid)
                 self.eventQueue.deleteRunningEvent(eventid)
 
@@ -1012,17 +1005,17 @@ class EventQueue(object):
         db_exists = os.path.isfile(self.db_file)
         self._connection = sqlite3.connect(self.db_file, timeout=15)
         if self._connection is None:
-            raise RuntimeError("Could not connect to %s" % self.db_file)
+            raise RuntimeError(f"Could not connect to {self.db_file}")
         self._connection.isolation_level = "EXCLUSIVE"
         self._cursor = self._connection.cursor()
         self._cursor.execute("PRAGMA foreign_keys = ON")
         self._cursor.execute("PRAGMA journal_mode = WAL")
         if not db_exists:
             for table, tdict in tables.items():
-                createcmd = "CREATE TABLE %s (" % table
+                createcmd = f"CREATE TABLE {table} ("
                 nuggets = []
                 for column, ctype in tdict.items():
-                    nuggets.append("%s %s" % (column, ctype))
+                    nuggets.append(f"{column} {ctype}")
                 createcmd += ",".join(nuggets) + ")"
                 self._cursor.execute(createcmd)
             self._cursor.execute("CREATE INDEX queue_index ON " "queued(eventid)")

@@ -110,10 +110,10 @@ class MappingModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
         datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
@@ -433,8 +433,8 @@ def make_map(adict):
         plt.close(fig2)
     else:
         fileimt = oq_to_file(imtype)
-        pdf_file = os.path.join(adict["datadir"], "%s.pdf" % (fileimt))
-        jpg_file = os.path.join(adict["datadir"], "%s.jpg" % (fileimt))
+        pdf_file = os.path.join(adict["datadir"], f"{fileimt}.pdf")
+        jpg_file = os.path.join(adict["datadir"], f"{fileimt}.jpg")
 
     fig1.savefig(pdf_file, bbox_inches="tight", dpi=adict["pdf_dpi"])
     fig1.savefig(jpg_file, bbox_inches="tight", dpi=adict["img_dpi"])
@@ -503,7 +503,7 @@ def get_text_strings(stringfile):
         dict: A dictionary of strings for use in writing text to the maps.
     """
     if not os.path.isfile(stringfile):
-        FileNotFoundError("File %s not found" % stringfile)
+        FileNotFoundError(f"File {stringfile} not found")
     f = open(stringfile, "rt", encoding="utf-8-sig")
     jline = ""
     for line in f:
@@ -537,10 +537,10 @@ def make_overlay(adict):
     # https://en.wikipedia.org/wiki/World_file
     worldfile = os.path.join(adict["datadir"], "intensity_overlay.pngw")
     with open(worldfile, "wt") as f:
-        f.write("%.4f\n" % geodict.dx)
+        f.write(f"{geodict.dx:.4f}\n")
         f.write("0.0\n")
         f.write("0.0\n")
-        f.write("-%.4f\n" % geodict.dy)
-        f.write("%.4f\n" % geodict.xmin)
-        f.write("%.4f\n" % geodict.ymax)
+        f.write(f"-{geodict.dy:.4f}\n")
+        f.write(f"{geodict.xmin:.4f}\n")
+        f.write(f"{geodict.ymax:.4f}\n")
     return

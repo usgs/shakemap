@@ -54,7 +54,7 @@ def validate_config(mydict, install_path, data_path, global_data_path):
         elif key in ("ipe", "gmice", "ccf"):
             pass
         else:
-            raise ValidateError('Invalid entry in config: "%s"' % (key))
+            raise ValidateError(f'Invalid entry in config: "{key}"')
     return
 
 
@@ -112,12 +112,12 @@ def dist_to_layer(elon, elat, geom):
     elif isinstance(geom, MultiPolygon):
         plist = list(geom.geoms)
     else:
-        raise TypeError("Invalid geometry type in layer: %s" % type(geom))
+        raise TypeError(f"Invalid geometry type in layer: {type(geom)}")
 
     project = partial(
         pyproj.transform,
         pyproj.Proj(proj="latlong", datum="WGS84"),
-        pyproj.Proj(proj="aeqd  +lat_0=%f +lon_0=%f +datum=WGS84" % (elat, elon)),
+        pyproj.Proj(proj=f"aeqd  +lat_0={elat:f} +lon_0={elon:f} +datum=WGS84"),
     )
     ep = Point(0.0, 0.0)
     min_dist = 99999.0
@@ -181,7 +181,7 @@ def update_config_regions(lat, lon, config):
             if layer == "layer_dir":
                 continue
             if layer not in geo_layers:
-                logging.warn("Error: cannot find layer %s in %s" % (layer, layer_dir))
+                logging.warn(f"Error: cannot find layer {layer} in {layer_dir}")
                 continue
             ldist = geo_layers[layer]
             if ldist < min_dist_to_layer:

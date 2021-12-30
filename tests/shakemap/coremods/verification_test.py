@@ -261,10 +261,10 @@ def test_verification():
         #
         for vt in ("8a", "8b", "8c", "8d", "8e"):
             assemble = AssembleModule(
-                "verification_test_000%s" % vt, comment="Test comment."
+                f"verification_test_000{vt}", comment="Test comment."
             )
             assemble.execute()
-            model = ModelModule("verification_test_000%s" % vt)
+            model = ModelModule(f"verification_test_000{vt}")
             model.execute()
         plot = XTestPlotMulti("verification_test_0008")
         plot.execute()
@@ -286,7 +286,7 @@ def test_verification():
         if os.path.isfile(data_file):
             os.remove(data_file)
         for vt in ("8a", "8b", "8c", "8d", "8e"):
-            evid = "verification_test_000%s" % vt
+            evid = f"verification_test_000{vt}"
             data_file = os.path.join(datapath, evid, "current", "shake_data.hdf")
             if os.path.isfile(data_file):
                 os.remove(data_file)

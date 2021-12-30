@@ -36,19 +36,19 @@ def main(args):
     """Main method for script."""
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
-        print("%s is not a valid directory." % data_path)
+        print(f"{data_path} is not a valid directory.")
         sys.exit(1)
 
     # set up a daily rotating file handler logger
     logfile = os.path.join(install_path, "logs", LOGFILE)
     logger = get_generic_logger(logfile=logfile)
 
-    logger.info("Parsing input directory %s" % args.directory)
+    logger.info(f"Parsing input directory {args.directory}")
 
     # Create a handler object
     handler = AmplitudeHandler(install_path, data_path)
 
-    logger.info("Searching %s..." % args.directory)
+    logger.info(f"Searching {args.directory}...")
     xmlfiles = glob.glob(os.path.join(args.directory, "*.xml"))
     nloaded = 0
     for xmlfile in xmlfiles:
@@ -58,7 +58,7 @@ def main(args):
             handler.insertAmps(xmlfile)
             nloaded += 1
         except Exception as e:
-            logger.info('Could not insert file %s: "%s"' % (xmlfile, str(e)))
+            logger.info(f'Could not insert file {xmlfile}: "{str(e)}"')
             # TODO - configure a directory where "bad" amps files can go
             continue
     logger.info("Inserted %i amplitude files into the database." % nloaded)

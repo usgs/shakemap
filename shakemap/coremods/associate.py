@@ -35,10 +35,10 @@ class AssociateModule(CoreModule):
             #
             datadir = os.path.join(data_path, self._eventid, "current")
             if not os.path.isdir(datadir):
-                raise NotADirectoryError("%s is not a valid directory." % datadir)
+                raise NotADirectoryError(f"{datadir} is not a valid directory.")
             eventxml = os.path.join(datadir, "event.xml")
             if not os.path.isfile(eventxml):
-                raise FileNotFoundError("%s does not exist." % eventxml)
+                raise FileNotFoundError(f"{eventxml} does not exist.")
             origin = read_event_file(eventxml)
 
             event = {

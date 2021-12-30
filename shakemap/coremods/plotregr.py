@@ -46,10 +46,10 @@ class PlotRegr(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
         datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         oc = ShakeMapOutputContainer.load(datafile)
@@ -95,8 +95,8 @@ class PlotRegr(CoreModule):
                 ctype = ""
                 cfile = ""
             else:
-                ctype = " %s" % component
-                cfile = "_%s" % component
+                ctype = f" {component}"
+                cfile = f"_{component}"
             #
             # Make plots
             #
@@ -119,8 +119,8 @@ class PlotRegr(CoreModule):
                     self.contents.addFile(
                         "miRegr",
                         "Intensity Regression",
-                        "Regression plot of macroseismic " "intensity%s." % ctype,
-                        "mmi_regr%s.png" % cfile,
+                        f"Regression plot of macroseismic intensity{ctype}.",
+                        f"mmi_regr{cfile}.png",
                         "image/png",
                     )
                 elif myimt == "PGA":
@@ -129,15 +129,15 @@ class PlotRegr(CoreModule):
                         "PGA Regression",
                         "Regression plot of peak "
                         "ground acceleration (%%g)%s." % ctype,
-                        "pga_regr%s.png" % cfile,
+                        f"pga_regr{cfile}.png",
                         "image/png",
                     )
                 elif myimt == "PGV":
                     self.contents.addFile(
                         "pgvRegr",
                         "PGV Regression",
-                        "Regression plot of peak ground " "velocity (cm/s)%s." % ctype,
-                        "pgv_regr%s.png" % cfile,
+                        f"Regression plot of peak ground velocity (cm/s){ctype}.",
+                        f"pgv_regr{cfile}.png",
                         "image/png",
                     )
                 else:
@@ -154,7 +154,7 @@ class PlotRegr(CoreModule):
                         filebase + "Regr",
                         "PSA " + period + " sec Regression",
                         psacap,
-                        filebase + "_regr%s.png" % cfile,
+                        filebase + f"_regr{cfile}.png",
                         "image/png",
                     )
 
@@ -199,7 +199,7 @@ class PlotRegr(CoreModule):
                     "bias"
                 ]
             jstring = json.dumps(jdict, allow_nan=False)
-            jfile = os.path.join(datadir, "attenuation_curves%s.json" % cfile)
+            jfile = os.path.join(datadir, f"attenuation_curves{cfile}.json")
             f = open(jfile, "wt")
             f.write(jstring)
             f.close()
@@ -314,6 +314,6 @@ def make_plots(adict):
     plt.legend()
 
     fileimt = oq_to_file(myimt)
-    pfile = os.path.join(datadir, fileimt + "_regr%s.png" % cfile)
+    pfile = os.path.join(datadir, fileimt + f"_regr{cfile}.png")
     plt.savefig(pfile)
     plt.close()

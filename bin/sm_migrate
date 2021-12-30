@@ -124,7 +124,7 @@ def main(args):
     logger.setLevel(logging.CRITICAL)
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
-        print("%s is not a valid directory." % data_path)
+        print(f"{data_path} is not a valid directory.")
         sys.exit(1)
 
     # get the system model.conf
@@ -235,7 +235,7 @@ def main(args):
         elif filename == "source.txt":
             _extract_file(member, tarball, filename, event_dir)
         else:
-            errors.append("Unknown input file %s for event %s" % (filename, event_id))
+            errors.append(f"Unknown input file {filename} for event {event_id}")
 
     tarball.close()
     sys.stdout.write("\n")
@@ -244,7 +244,7 @@ def main(args):
     # format, also make sure we have all required components
     print("Converting *_fault.txt files to geojson files...")
     for event_id in event_ids:
-        print("    %s" % event_id)
+        print(f"    {event_id}")
         event_dir = os.path.join(data_path, event_id, "current")
         rupt_error = make_rupture(event_dir)
         parse_options(event_dir)
@@ -254,12 +254,12 @@ def main(args):
     print("%i event directories written." % len(event_ids))
     print("The following errors or warnings were detected:")
     for error in errors:
-        print('\t"%s"' % error)
+        print(f'\t"{error}"')
 
     print("The following GMPE conversions were applied:")
     for old_gmpe, gmpe_tuple in conversions.items():
         new_gmpe, ref = gmpe_tuple
-        print('\t"%s" (%s) was converted to new GMPE "%s".' % (old_gmpe, ref, new_gmpe))
+        print(f'\t"{old_gmpe}" ({ref}) was converted to new GMPE "{new_gmpe}".')
 
 
 def parse_options(event_dir):
@@ -358,7 +358,7 @@ def make_rupture(event_dir):
         origin = Origin(eqdict)
         rupt = rupture_from_dict_and_origin(jdict, origin)
     except Exception as e:
-        return 'Error parsing fault file from %s. "%s"' % (event_dir, str(e))
+        return f'Error parsing fault file from {event_dir}. "{str(e)}"'
     jsonfile = os.path.join(event_dir, "rupture.json")
     rupt.writeGeoJson(jsonfile)
     for ffile in fault_files:
@@ -381,7 +381,7 @@ def parse_config(event_dir, tarball, member, migrate_conf=None):
     elif "retrieve.conf" in member:
         pass
     else:
-        errors.append("Unknown config file type %s" % member)
+        errors.append(f"Unknown config file type {member}")
 
     return (errors, conversions)
 
@@ -484,8 +484,7 @@ def parse_info(
             gmice = "WGRW12"
         if gmice not in allowed_gmice:
             errors.append(
-                "GMICE %s (event %s) not yet supported in "
-                "ShakeMap 4." % (gmice, edict["id"])
+                f"GMICE {gmice} (event {edict['id']}) not yet supported in ShakeMap 4."
             )
         else:
             model["modeling"]["gmice"] = gmice
@@ -500,7 +499,7 @@ def parse_info(
                 if old_gmpe not in conversions:
                     conversions[old_gmpe] = (new_gmpe, reference)
             except Exception as e:
-                msg = 'Unable to convert %s, error "%s"' % (old_gmpe, str(e))
+                msg = f'Unable to convert {old_gmpe}, error "{str(e)}"'
                 errors.append(msg)
         else:
             org = Origin(eqdict)

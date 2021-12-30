@@ -53,10 +53,10 @@ def replace_dyfi(stationfile, dyfi_xml):
     rows = cursor.fetchall()
     for row in rows:
         sid = row[0]
-        query2 = 'DELETE FROM amp WHERE station_id="%s"' % sid
+        query2 = f'DELETE FROM amp WHERE station_id="{sid}"'
         cursor.execute(query2)
         conn.commit()
-        query3 = 'DELETE FROM station where id="%s"' % sid
+        query3 = f'DELETE FROM station where id="{sid}"'
         cursor.execute(query3)
         conn.commit()
 
@@ -335,7 +335,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     # output grid register with common grid resolutions (60c, 30c,
     # 15c, 7.5c)
     #
-    logging.debug("Extent: %f, %f, %f, %f" % (lonmin, lonmax, latmin, latmax))
+    logging.debug(f"Extent: {lonmin[0]:f}, {lonmax[0]:f}, {latmin[0]:f}, {latmax[0]:f}")
     return (
         _round_coord(lonmin[0]),
         _round_coord(lonmax[0]),

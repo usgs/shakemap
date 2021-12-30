@@ -48,7 +48,7 @@ class SCPTransfer(TransferBaseModule):
             params["remote_directory"] = os.path.join(pdir, self._eventid)
 
             params.update(properties)
-            fmt = "Doing SCP transfer to %s..." % destination
+            fmt = f"Doing SCP transfer to {destination}..."
             logging.debug(fmt)
 
             sender = SecureSender(properties=params, local_directory=product_dir)

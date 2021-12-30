@@ -38,12 +38,12 @@ class TransferBaseModule(CoreModule):
         install_path, data_path = get_config_paths()
         self.datadir = os.path.join(data_path, self._eventid, "current")
         if not os.path.isdir(self.datadir):
-            raise NotADirectoryError("%s is not a valid directory." % self.datadir)
+            raise NotADirectoryError(f"{self.datadir} is not a valid directory.")
 
         # look for the presence of a NO_TRANSFER file in the datadir.
         notransfer = os.path.join(self.datadir, NO_TRANSFER)
         if os.path.isfile(notransfer):
-            self.logger.info("Event has a %s file blocking transfer." % NO_TRANSFER)
+            self.logger.info(f"Event has a {NO_TRANSFER} file blocking transfer.")
             return
 
         # get the path to the transfer.conf spec file
@@ -55,7 +55,7 @@ class TransferBaseModule(CoreModule):
             # if not there, use the system one
             transfer_conf = os.path.join(install_path, "config", "transfer.conf")
             if not os.path.isfile(transfer_conf):
-                raise FileNotFoundError("%s does not exist." % transfer_conf)
+                raise FileNotFoundError(f"{transfer_conf} does not exist.")
 
         # get the config information for transfer
         self.config = ConfigObj(transfer_conf, configspec=configspec)
@@ -67,7 +67,7 @@ class TransferBaseModule(CoreModule):
         products_dir = os.path.join(self.datadir, "products")
         datafile = os.path.join(products_dir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
@@ -83,7 +83,7 @@ class TransferBaseModule(CoreModule):
             self._make_backup(data_path)
             with open(save_file, "wt") as f:
                 tnow = datetime.utcnow().strftime(constants.TIMEFMT)
-                f.write("Saved %s by %s\n" % (tnow, self.command_name))
+                f.write(f"Saved {tnow} by {self.command_name}\n")
 
     def getProperties(self, info, props=None):
         properties = {}
@@ -199,7 +199,7 @@ class TransferBaseModule(CoreModule):
         new_version = latest_version + 1
         backup = os.path.join(data_dir, "backup%04i" % new_version)
         shutil.copytree(current_dir, backup)
-        logging.debug("Created backup directory %s" % backup)
+        logging.debug(f"Created backup directory {backup}")
 
     def parseArgs(self, arglist):
         """

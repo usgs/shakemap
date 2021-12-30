@@ -246,10 +246,10 @@ class StationList(object):
             stas = json.load(jfp)
             jfp.close()
             if "type" not in stas:
-                logging.warn("%s appears to contain no stations, skipping" % jfile)
+                logging.warn(f"{jfile} appears to contain no stations, skipping")
                 continue
             if stas["type"] != "FeatureCollection":
-                logging.warn("%s is not a ShakeMap JSON stationlist, skipping" % jfile)
+                logging.warn(f"{jfile} is not a ShakeMap JSON stationlist, skipping")
                 continue
 
             # if present, insert reference stuff into the database
@@ -377,14 +377,14 @@ class StationList(object):
                             elif units == "ln(cm/s)":
                                 pass
                             else:
-                                raise ValueError("Unknown units %s in input" % units)
+                                raise ValueError(f"Unknown units {units} in input")
                         else:
                             if units == "%g":
                                 amplitude = np.log(amplitude / 100.0)
                             elif units == "ln(g)":
                                 pass
                             else:
-                                raise ValueError("Unknown units %s in input" % units)
+                                raise ValueError(f"Unknown units {units} in input")
                         amp_rows.append(
                             [
                                 sta_id,
@@ -504,19 +504,19 @@ class StationList(object):
                     sigma = "null"
                 else:
                     value = amp[0]
-                    sigma = float("%.4f" % amp[4])
+                    sigma = float(f"{amp[4]:.4f}")
                 if amp[1] == "PGV":
                     if value != "null":
-                        value = float("%.4f" % (np.exp(value)))
+                        value = float(f"{np.exp(value):.4f}")
                     units = "cm/s"
                 elif amp[1] == "MMI":
                     if value != "null":
-                        value = float("%.1f" % (value))
+                        value = float(f"{value:.1f}")
                     units = "intensity"
                     sd_string = "sigma"
                 else:
                     if value != "null":
-                        value = float("%.4f" % (np.exp(value) * 100))
+                        value = float(f"{np.exp(value) * 100:.4f}")
                     units = "%g"
                 aflag = str(amp[3])
                 if "I" in aflag and "IncompleteRecord" not in aflag:
@@ -693,7 +693,7 @@ class StationList(object):
                         elif units == "ln(cm/s)":
                             pass
                         else:
-                            raise ValueError("Unknown units %s in input" % units)
+                            raise ValueError(f"Unknown units {units} in input")
                     else:
                         if units == "%g":
                             if amp <= 0:
@@ -704,7 +704,7 @@ class StationList(object):
                         elif units == "ln(g)":
                             pass
                         else:
-                            raise ValueError("Unknown units %s in input" % units)
+                            raise ValueError(f"Unknown units {units} in input")
 
                     amp_rows.append(
                         (
@@ -922,7 +922,7 @@ class StationList(object):
                     pp = get_imt_period(key)
                     new_key = "SA(" + str(pp) + ")"
                 else:
-                    raise ValueError("Unknown amp type in input: %s" % key)
+                    raise ValueError(f"Unknown amp type in input: {key}")
                 imt_translate[key] = new_key
             else:
                 new_key = imt_translate[key]
@@ -938,7 +938,7 @@ class StationList(object):
                     )
                     continue
             else:
-                logging.warn("No value for amp %s" % pgm.tag)
+                logging.warn(f"No value for amp {pgm.tag}")
                 continue
             if "flag" in pgm.attrib and pgm.attrib["flag"] != "":
                 flag = pgm.attrib["flag"]
@@ -1027,7 +1027,7 @@ class StationList(object):
                 for comp in station:
                     if "name" not in comp.attrib:
                         logging.warn(
-                            "Unnamed component for station %s; skipping" % (sta_id)
+                            f"Unnamed component for station {sta_id}; skipping"
                         )
                         continue
                     compname = comp.attrib["name"]
@@ -1076,10 +1076,10 @@ class StationList(object):
         Build the database tables.
         """
         for table in TABLES.keys():
-            sql = "CREATE TABLE %s (" % table
+            sql = f"CREATE TABLE {table} ("
             nuggets = []
             for column, ctype in TABLES[table].items():
-                nuggets.append("%s %s" % (column, ctype))
+                nuggets.append(f"{column} {ctype}")
             sql += ",".join(nuggets) + ")"
             self.cursor.execute(sql)
 

@@ -37,10 +37,10 @@ def call_shakemap(cmd, events, modules, logfile):
     """
     modstr = " ".join(modules)
     for event in events:
-        cmdstr = "%s %s %s" % (cmd, event, modstr)
+        cmdstr = f"{cmd} {event} {modstr}"
         res, stdout, stderr = get_command_output(cmdstr)
         if not res:
-            logfile.write('Failure for event %s: "%s"\n' % (event, stdout + stderr))
+            logfile.write(f'Failure for event {event}: "{stdout + stderr}"\n')
     return (res, stdout, stderr)
 
 
@@ -55,7 +55,7 @@ def main(args):
     comment = args.comment
     for module in args.modules:
         if module == "assemble":
-            modstr = 'assemble -c "%s"' % comment
+            modstr = f'assemble -c "{comment}"'
         else:
             modstr = module
         new_modules.append(modstr)
@@ -69,14 +69,14 @@ def main(args):
     # peel off the first event, call shake and see if it works
     # if not, exit with some kind of useful error
     test_event = events.pop(0)
-    print("Testing input with the event %s..." % test_event)
+    print(f"Testing input with the event {test_event}...")
     logfile = "test_log.log"
     f = open(logfile, "wt")
     res, stdout, stderr = call_shakemap(shake, [test_event], new_modules, f)
     f.close()
     os.remove(logfile)
     if not res:
-        print('The test event failed with output: "%s" "%s"' % (stdout, stderr))
+        print(f'The test event failed with output: "{stdout}" "{stderr}"')
         sys.exit(1)
     else:
         print("Test event succeeded. Parallelization commencing...")

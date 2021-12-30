@@ -53,7 +53,7 @@ def test_plot_rupture(interactive=False):
     if interactive:
         fname = os.path.join(os.path.expanduser("~"), "rupture_wire_plot.png")
         plt.savefig(fname)
-        print("Wire 3D plot saved to %s.  Delete this file if you wish." % fname)
+        print(f"Wire 3D plot saved to {fname}.  Delete this file if you wish.")
 
     # Need to get tests to check exception for if an axis is handed off
     fig = plt.figure()
@@ -97,7 +97,7 @@ def test_map_rupture(interactive=False):
     if interactive:
         fname = os.path.join(os.path.expanduser("~"), "rupture_map.png")
         plt.savefig(fname)
-        print("Rupture map plot saved to %s.  Delete this file if you wish." % fname)
+        print(f"Rupture map plot saved to {fname}.  Delete this file if you wish.")
 
 
 if __name__ == "__main__":

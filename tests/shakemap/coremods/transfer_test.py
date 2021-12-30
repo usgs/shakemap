@@ -88,7 +88,7 @@ def dummy_test_transfer():
         nsrcfiles = len(os.listdir(products_dir))
         assert nfiles == nsrcfiles
     except Exception as e:
-        print("Exception: %s" % str(e))
+        print(f"Exception: {str(e)}")
     finally:
         if os.path.isdir(tdir):
             shutil.rmtree(tdir)

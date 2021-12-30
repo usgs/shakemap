@@ -94,7 +94,7 @@ def get_generic_amp_factors(sx, myimt):
             mygrid, _ = gc.getGrid(thisimt)
         elif not thisimt.startswith("SA("):
             logging.warning(
-                "Generic Amp Factors: IMT %s not found in file %s" % (myimt, gfile)
+                f"Generic Amp Factors: IMT {myimt} not found in file {gfile}"
             )
             mygrid = None
         else:

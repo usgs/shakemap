@@ -68,9 +68,7 @@ class NewmarkHall1982(IMTConverter):
         if imt_in == "PSA10" and imt_out == "PGV":
             new_imt = self._convertToPGV(imt, conversion_factor)
         else:
-            raise ValueError(
-                "No conversion available from %r to %r" % (imt_in, imt_out)
-            )
+            raise ValueError(f"No conversion available from {imt_in!r} to {imt_out!r}")
         return new_imt
 
     def convertSigmas(self, imt_in, imt_out, sigma):

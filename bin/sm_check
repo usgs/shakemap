@@ -16,19 +16,19 @@ def _print_issue(issue, ntabs):
     for key, value in issue.items():
         if isinstance(value, dict):
             tabs = TAB * ntabs
-            print("%s%s (section):" % (tabs, key))
+            print(f"{tabs}{key} (section):")
             ntabs += 1
             print_issue(value, ntabs=ntabs)
         elif isinstance(value, bool):
             if value == False:
                 tabs = TAB * ntabs
-                print("%s%s parameter is missing." % (tabs, key))
+                print(f"{tabs}{key} parameter is missing.")
             continue
         else:
             tabs = TAB * ntabs
-            print("%s%s (parameter):" % (tabs, key))
+            print(f"{tabs}{key} (parameter):")
             tabs = TAB * (ntabs + 1)
-            print("%s%s" % (tabs, value))
+            print(f"{tabs}{value}")
 
 
 if __name__ == "__main__":
@@ -53,9 +53,9 @@ is not required for the user's installation of ShakeMap.
         )
         print(msg)
         for mfile in missing:
-            print("  %s" % mfile)
+            print(f"  {mfile}")
         print()
     for specfile, issue in issues.items():
-        print("%s (file):" % specfile)
+        print(f"{specfile} (file):")
         _print_issue(issue, 1)
         print()
