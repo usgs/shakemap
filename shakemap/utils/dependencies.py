@@ -342,7 +342,7 @@ class CommandDatabase(object):
                 found = glob.glob(pattern)
                 if len(found) == 0 and required:
                     # Didn't find a required file -- this prevents a run
-                    logging.warning("Did not find required dependency: %s" % pattern)
+                    logging.warning(f"Did not find required dependency: {pattern}")
                     clean = False
                     break
                 if len(found) > 0:

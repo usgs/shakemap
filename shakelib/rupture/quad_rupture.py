@@ -430,15 +430,15 @@ class QuadRupture(Rupture):
             f = open(rupturefile, "wt")
         else:
             f = rupturefile  # just a reference to the input file-like object
-        f.write("#%s\n" % self._reference)
+        f.write(f"#{self._reference}\n")
         for quad in self.getQuadrilaterals():
             P0, P1, P2, P3 = quad
-            f.write("%.4f %.4f %.4f\n" % (P0.latitude, P0.longitude, P0.depth))
-            f.write("%.4f %.4f %.4f\n" % (P1.latitude, P1.longitude, P1.depth))
-            f.write("%.4f %.4f %.4f\n" % (P2.latitude, P2.longitude, P2.depth))
-            f.write("%.4f %.4f %.4f\n" % (P3.latitude, P3.longitude, P3.depth))
-            f.write("%.4f %.4f %.4f\n" % (P0.latitude, P0.longitude, P0.depth))
-            f.write(u">\n")
+            f.write(f"{P0.latitude:.4f} {P0.longitude:.4f} {P0.depth:.4f}\n")
+            f.write(f"{P1.latitude:.4f} {P1.longitude:.4f} {P1.depth:.4f}\n")
+            f.write(f"{P2.latitude:.4f} {P2.longitude:.4f} {P2.depth:.4f}\n")
+            f.write(f"{P3.latitude:.4f} {P3.longitude:.4f} {P3.depth:.4f}\n")
+            f.write(f"{P0.latitude:.4f} {P0.longitude:.4f} {P0.depth:.4f}\n")
+            f.write(">\n")
         if not hasattr(rupturefile, "read"):
             f.close()
 

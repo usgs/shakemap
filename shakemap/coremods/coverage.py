@@ -46,10 +46,10 @@ class CoverageModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
         datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
@@ -186,13 +186,9 @@ class CoverageModule(CoreModule):
                     }
 
                 if component == "GREATER_OF_TWO_HORIZONTAL":
-                    fname = "coverage_%s_%s_res.covjson" % (fileimt, resolution)
+                    fname = f"coverage_{fileimt}_{resolution}_res.covjson"
                 else:
-                    fname = "coverage_%s_%s_%s_res.covjson" % (
-                        fileimt,
-                        resolution,
-                        component,
-                    )
+                    fname = f"coverage_{fileimt}_{resolution}_{component}_res.covjson"
                 filepath = os.path.join(datadir, fname)
                 with open(filepath, "w") as outfile:
                     json.dump(coverage, outfile, separators=(",", ":"))

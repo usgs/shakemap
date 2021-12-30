@@ -73,8 +73,8 @@ def get_weights(origin, config):
                     gmpelist.append(rdict["gmpe"][idx])
 
     weightlist = np.array(weightlist)
-    logging.debug("gmpelist: %s" % gmpelist)
-    logging.debug("weightlist: %s" % weightlist)
+    logging.debug(f"gmpelist: {gmpelist}")
+    logging.debug(f"weightlist: {weightlist}")
     gmmdict = {"gmpelist": gmpelist, "weightlist": weightlist}
     #
     # Here we get the region-specific ipe, gmice, and ccf. If they are

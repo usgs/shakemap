@@ -48,7 +48,7 @@ mech="" />"""
         "depth": 19.0,
     }
     for key in testdict.keys():
-        value = eval("origin.%s" % key)
+        value = eval(f"origin.{key}")
         if type(value) is str:
             assert testdict[key] == value
         if type(value) is float:

@@ -258,7 +258,7 @@ class BooreKishida2017(ComponentConverter):
             m1 = np.interp(imt_per, pa, self.pars["m1smooth"][2:])
             m2 = np.interp(imt_per, pa, self.pars["m2smooth"][2:])
         else:
-            raise ValueError("Unknown IMT: %s" % str(imt))
+            raise ValueError(f"Unknown IMT: {str(imt)}")
         return (sigma, c0, r1, m1, m2)
 
     @staticmethod
@@ -328,7 +328,7 @@ class BooreKishida2017(ComponentConverter):
             # For less common IMCs, Beyer & Bommer (2006) found most
             # of them to be more or less equivalent to geometric mean
             #
-            logging.warning("Can't handle IMC %s, using GMAR" % oq_imc)
+            logging.warning(f"Can't handle IMC {oq_imc}, using GMAR")
             return "GMAR"
 
     def _verifyConversion(self, imc_in, imc_out=None):
@@ -345,9 +345,7 @@ class BooreKishida2017(ComponentConverter):
         """
         filename, forward = self._imcPairToFile(imc_in, imc_out)
         if filename is None:
-            raise ValueError(
-                "Can't find a conversion file for %s and %s" % (imc_in, imc_out)
-            )
+            raise ValueError(f"Can't find a conversion file for {imc_in} and {imc_out}")
         self.forward = forward
         if filename == "Null":
             # Null conversion -- imc_in and imc_out are either identical

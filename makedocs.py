@@ -58,8 +58,7 @@ def main(args):
     res, stdout, stderr = get_command_output(sphinx_cmd)
     if not res:
         raise Exception(
-            "Could not build ShakeMap API documentation"
-            ' - error "%s".' % stderr.decode()
+            f'Could not build ShakeMap API documentation - error "{stderr.decode()}".'
         )
     if args.verbose:
         print(stdout.decode("utf-8"))
@@ -74,8 +73,7 @@ def main(args):
     res, stdout, stderr = get_command_output(sphinx_cmd)
     if not res:
         raise Exception(
-            "Could not build ShakeLib API documentation"
-            ' - error "%s".' % stderr.decode()
+            f'Could not build ShakeLib API documentation - error "{stderr.decode()}".'
         )
     if args.verbose:
         print(stdout.decode("utf-8"))
@@ -131,10 +129,10 @@ def main(args):
     # -------------------------------------------------------------
     sys.stderr.write("Building shakemap manual (HTML)...\n")
     res, stdout, stderr = get_command_output(
-        "sphinx-build -a -E %s %s" % (DOC_SRC_DIR, DOCS_DIR)
+        f"sphinx-build -a -E {DOC_SRC_DIR} {DOCS_DIR}"
     )
     if not res:
-        raise Exception("Could not build HTML. - " 'error "%s"' % stderr.decode())
+        raise Exception(f'Could not build HTML. - error "{stderr.decode()}"')
     if args.verbose:
         print(stdout.decode("utf-8"))
         print(stderr.decode("utf-8"))

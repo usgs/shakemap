@@ -31,7 +31,7 @@ class HistoryModule(CoreModule):
         backups = glob.glob(os.path.join(data_path, self._eventid, "backup*"))
         backups.sort(reverse=True)
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
 
         # First try the current results file...
         datafile = os.path.join(datadir, "products", "shake_result.hdf")

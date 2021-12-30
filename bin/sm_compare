@@ -94,7 +94,7 @@ def main(pparser, args):
     ax_cbar1 = plt.axes([x1, y1 - 0.1, wid, 0.05])
     cbar1 = fig.colorbar(cs1, cax=ax_cbar1, orientation="horizontal", ticks=levels)
     cbar1.ax.tick_params(labelsize=6)
-    cbar1.ax.set_xlabel("%s Ratio" % args.imt)
+    cbar1.ax.set_xlabel(f"{args.imt} Ratio")
     cbar1.ax.get_yaxis().labelpad = 15
 
     # Difference plot
@@ -116,15 +116,15 @@ def main(pparser, args):
     cbar2 = fig.colorbar(cs2, cax=ax_cbar2, orientation="horizontal", ticks=levels)
     cbar2.ax.tick_params(labelsize=6)
     if args.imt == "pgv":
-        cbar2.ax.set_xlabel("%s Difference (cm/s)" % args.imt)
+        cbar2.ax.set_xlabel(f"{args.imt} Difference (cm/s)")
     elif args.imt == "stdpgv":
-        cbar2.ax.set_xlabel("%s Difference (ln(cm/s))" % args.imt)
+        cbar2.ax.set_xlabel(f"{args.imt} Difference (ln(cm/s))")
     elif args.imt == "mmi" or args.imt == "stdmmi":
-        cbar2.ax.set_xlabel("%s Difference" % args.imt)
+        cbar2.ax.set_xlabel(f"{args.imt} Difference")
     elif "std" in args.imt:
-        cbar2.ax.set_xlabel("%s Difference (ln(g))" % args.imt)
+        cbar2.ax.set_xlabel(f"{args.imt} Difference (ln(g))")
     else:
-        cbar2.ax.set_xlabel("%s Difference (percent g)" % args.imt)
+        cbar2.ax.set_xlabel(f"{args.imt} Difference (percent g)")
     cbar2.ax.get_yaxis().labelpad = 15
     plt.savefig(args.output, dpi=300, bbox_inches="tight")
 

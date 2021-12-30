@@ -72,7 +72,7 @@ def main(args):
     """Main method for script."""
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
-        print("%s is not a valid directory." % data_path)
+        print(f"{data_path} is not a valid directory.")
         sys.exit(1)
 
     config = queue.get_config(install_path)
@@ -82,22 +82,22 @@ def main(args):
     logger = get_generic_logger(logfile=logfile)
 
     if args.type != "origin" and args.type != "trump-origin":
-        logger.info("No action on product type %s" % args.type)
+        logger.info(f"No action on product type {args.type}")
         sys.exit(0)
 
     if args.status not in ["UPDATE", "DELETE"]:
-        logger.info("No action on status %s" % args.status)
+        logger.info(f"No action on status {args.status}")
         sys.exit(0)
 
     if args.action not in ["EVENT_ADDED", "EVENT_UPDATED"]:
-        logger.info("No action on action %s" % args.action)
+        logger.info(f"No action on action {args.action}")
         sys.exit(0)
 
     if not args.property_event_type:
         args.property_event_type = ""
     args.property_event_type = " ".join(args.property_event_type)
     if args.property_event_type != "earthquake":
-        logger.info("No action on event types of %s" % args.property_event_type)
+        logger.info(f"No action on event types of {args.property_event_type}")
         sys.exit(0)
 
     if not args.preferred_eventid:
@@ -105,7 +105,7 @@ def main(args):
         sys.exit(0)
 
     if args.preferred_eventsource in ("pt", "at", "dr", "ew"):
-        logger.info("Undesirable eventsource: %s" % args.preferred_eventsource)
+        logger.info(f"Undesirable eventsource: {args.preferred_eventsource}")
         sys.exit(0)
 
     if args.status == "DELETE":
@@ -115,7 +115,7 @@ def main(args):
             "alt_eventids": args.eventids,
         }
         queue.send_queue("cancel", event, config["port"])
-        logger.info("Sending cancel event %s to queue." % args.preferred_eventid)
+        logger.info(f"Sending cancel event {args.preferred_eventid} to queue.")
         sys.exit(0)
 
     if (
@@ -136,7 +136,7 @@ def main(args):
             detail = get_event_by_id(args.preferred_eventid)
         except Exception as e:
             fails += 1
-            logger.warn("Libcomcat error: %s" % (str(e)))
+            logger.warn(f"Libcomcat error: {str(e)}")
             logger.warn(
                 "Error retrieving event data from comcat for event "
                 "%s, will try %d more times" % (args.preferred_eventid, 3 - fails)
@@ -157,7 +157,7 @@ def main(args):
             # authoritative event id -- we just assume that we've run it
             # before (or not) based on better information
             logger.warn(
-                "Event %s is older than cutoff, skipping" % (args.preferred_eventid)
+                f"Event {args.preferred_eventid} is older than cutoff, skipping"
             )
             sys.exit(0)
         else:
@@ -186,7 +186,7 @@ def main(args):
             except Exception as e:
                 fails += 1
                 places = []
-                logger.warn("Error in GeoServe getPlaces: %s" % str(e))
+                logger.warn(f"Error in GeoServe getPlaces: {str(e)}")
                 logger.warn(
                     "Failure communicating with comcat; will try "
                     "%d more times" % (3 - fails)
@@ -252,7 +252,7 @@ def main(args):
         "alt_eventids": args.eventids,
         "action": action,
     }
-    logger.info("Sending event %s to queue." % args.preferred_eventid)
+    logger.info(f"Sending event {args.preferred_eventid} to queue.")
 
     # Poke the queue to run shake on this event.
     queue.send_queue("origin", event, config["port"])

@@ -60,10 +60,10 @@ class ContourModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
         datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
@@ -143,9 +143,9 @@ def contour_to_files(
         fileimt = oq_to_file(imtype)
         oqimt = imt.from_string(imtype)
         if component == "GREATER_OF_TWO_HORIZONTAL":
-            fname = "cont_%s.%s" % (fileimt, extension)
+            fname = f"cont_{fileimt}.{extension}"
         else:
-            fname = "cont_%s_%s.%s" % (fileimt, component, extension)
+            fname = f"cont_{fileimt}_{component}.{extension}"
         if imtype == "MMI":
             contents.addFile(
                 "mmiContour",
@@ -239,7 +239,7 @@ def contour_to_files(
                 "latitude": float(event_info["latitude"]),
             }
 
-            logger.debug("Writing contour file %s" % filename)
+            logger.debug(f"Writing contour file {filename}")
             vector_file.close()
 
             # Get bounds

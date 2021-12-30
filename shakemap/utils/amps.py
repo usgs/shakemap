@@ -102,10 +102,10 @@ class AmplitudeHandler(object):
         self._connect()
         if not db_exists:
             for table, tdict in TABLES.items():
-                createcmd = "CREATE TABLE %s (" % table
+                createcmd = f"CREATE TABLE {table} ("
                 nuggets = []
                 for column, ctype in tdict.items():
-                    nuggets.append("%s %s" % (column, ctype))
+                    nuggets.append(f"{column} {ctype}")
                 createcmd += ",".join(nuggets) + ")"
                 self._cursor.execute(createcmd)
             self._cursor.execute("CREATE INDEX station_index ON " "channel(station_id)")
@@ -118,7 +118,7 @@ class AmplitudeHandler(object):
     def _connect(self):
         self._connection = sqlite3.connect(self._dbfile, timeout=15)
         if self._connection is None:
-            raise RuntimeError("Could not connect to %s" % self._dbfile)
+            raise RuntimeError(f"Could not connect to {self._dbfile}")
         self._connection.isolation_level = "EXCLUSIVE"
         self._cursor = self._connection.cursor()
         self._cursor.execute("PRAGMA foreign_keys = ON")
@@ -455,7 +455,7 @@ class AmplitudeHandler(object):
             end = start + MAX_VARS
             if end > nstas:
                 end = nstas
-            varstr = "({0})".format(", ".join("?" for _ in sta_sids[start:end]))
+            varstr = f"({', '.join('?' for _ in sta_sids[start:end])})"
             query = amp_query % varstr
             self._cursor.execute(query, sta_sids[start:end])
             amprows = self._cursor.fetchall()
@@ -487,7 +487,7 @@ class AmplitudeHandler(object):
             end = start + MAX_VARS
             if end > njunk:
                 end = njunk
-            varstr = "({0})".format(", ".join("?" for _ in junk_sids[start:end]))
+            varstr = f"({', '.join('?' for _ in junk_sids[start:end])})"
             self._cursor.execute(delete_query % varstr, junk_sids[start:end])
             start = end
 
@@ -543,9 +543,9 @@ class AmplitudeHandler(object):
                     code=stacode,
                     name=name,
                     insttype="",
-                    lat="%.4f" % lat,
-                    lon="%.4f" % lon,
-                    dist="%.4f" % dist,
+                    lat=f"{lat:.4f}",
+                    lon=f"{lon:.4f}",
+                    dist=f"{dist:.4f}",
                     netid=net,
                     commtype="DIG",
                     loc="",
@@ -562,13 +562,13 @@ class AmplitudeHandler(object):
                 component = ET.SubElement(station, "comp", name=comp)
                 oldchan = chan
                 oldloc = loc
-            ET.SubElement(component, imt, value="%.6f" % value, flag="%s" % str(flag))
+            ET.SubElement(component, imt, value=f"{value:.6f}", flag=f"{str(flag)}")
 
         data_folder = os.path.join(self._data_path, eventid, "current")
         if not os.path.isdir(data_folder):
             os.makedirs(data_folder)
         amptime = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-        xmlfile = os.path.join(data_folder, "unassoc_%s_dat.xml" % amptime)
+        xmlfile = os.path.join(data_folder, f"unassoc_{amptime}_dat.xml")
 
         if pretty_print:
             pstring = prettify(root)
@@ -600,12 +600,10 @@ class AmplitudeHandler(object):
             newxmlstr = newxmlstr.encode("utf-8", errors="xmlcharrefreplace")
             amps = dET.fromstring(newxmlstr)
         except Exception as e:
-            raise Exception('Could not parse %s, due to error "%s"' % (xmlfile, str(e)))
+            raise Exception(f'Could not parse {xmlfile}, due to error "{str(e)}"')
 
         if amps.tag != "amplitudes":
-            raise Exception(
-                "%s does not appear to be an amplitude XML " "file." % xmlfile
-            )
+            raise Exception(f"{xmlfile} does not appear to be an amplitude XML file.")
         agency = amps.get("agency")
         record = amps.find("record")
         timing = record.find("timing")
@@ -645,7 +643,7 @@ class AmplitudeHandler(object):
             pgmtime = int(dt_to_timestamp(pgmdate))
         else:
             if not len(time_dict):
-                print("No time data for file %s" % fname)
+                print(f"No time data for file {fname}")
                 return
             pgmdate = datetime(
                 time_dict["year"],

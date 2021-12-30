@@ -31,10 +31,10 @@ class XTestPlot(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
         datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
@@ -64,8 +64,8 @@ class XTestPlot(CoreModule):
             axa[0].plot(data["lons"], data["mean"] - data["std"], "--b")
             axa[1].plot(data["lons"], data["std"], "-.r", label="stddev")
             plt.xlabel("Longitude")
-            axa[0].set_ylabel("Mean ln(%s) (g)" % myimt)
-            axa[1].set_ylabel("Stddev ln(%s) (g)" % myimt)
+            axa[0].set_ylabel(f"Mean ln({myimt}) (g)")
+            axa[1].set_ylabel(f"Stddev ln({myimt}) (g)")
             axa[0].legend(loc="best")
             axa[1].legend(loc="best")
             axa[0].set_title(self._eventid)

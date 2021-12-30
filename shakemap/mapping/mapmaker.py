@@ -49,7 +49,7 @@ FIGWIDTH = 9.5
 FIGHEIGHT = 10.0
 XOFFSET = 4  # how many pixels between the city dot and the city text
 VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
-DEGREE_SYMBOL = u"\u00B0"
+DEGREE_SYMBOL = "\u00B0"
 
 # define the zorder values for various map components
 # all of the zorder values for different plotted parameters
@@ -350,7 +350,7 @@ def _draw_imt_legend(
             plt.plot([right, right], [bottom, top], "k")
             plt.fill(px, py, mmic, ec=mmic)
             xloc = left + width / 2.0
-            imtstr = "{0:.3g}".format(np.exp(imtv) * divisor)
+            imtstr = f"{np.exp(imtv) * divisor:.3g}"
             th = plt.text(xloc, 0.5, imtstr, fontproperties=font0, **alignment)
             th.set_path_effects(
                 [
@@ -487,7 +487,7 @@ def _draw_imt_legend(
         plt.text(
             refx,
             yloc_sixth_row,
-            "%s %s" % (tdict["legend"]["scale"], ref),
+            f"{tdict['legend']['scale']} {ref}",
             va="center",
             zorder=9999,
         )
@@ -527,10 +527,10 @@ def _draw_mmi_legend(
     pga_values = np.exp(pga_values) * 100
     pgv_values = np.exp(pgv_values)
     pga_labels = [
-        "{0:.3g}".format(set_num_precision(pga, 3, mode="float")) for pga in pga_values
+        f"{set_num_precision(pga, 3, mode='float'):.3g}" for pga in pga_values
     ]
     pgv_labels = [
-        "{0:.3g}".format(set_num_precision(pgv, 3, mode="float")) for pgv in pgv_values
+        f"{set_num_precision(pgv, 3, mode='float'):.3g}" for pgv in pgv_values
     ]
 
     pga_labels[0] = "<" + pga_labels[0]
@@ -670,9 +670,7 @@ def _draw_mmi_legend(
 
     ref = gmice.name
     refx = 0
-    plt.text(
-        refx, yloc_sixth_row, "%s %s" % (tdict["legend"]["scale"], ref), va="center"
-    )
+    plt.text(refx, yloc_sixth_row, f"{tdict['legend']['scale']} {ref}", va="center")
 
     nsteps = 10
     for i, width in enumerate(tdict["mmi_scale"]["box_widths"]):
@@ -684,14 +682,14 @@ def _draw_mmi_legend(
             yloc_first_row,
             tdict["mmi_scale"]["shaking_labels"][i],
             fontproperties=font1,
-            **alignment
+            **alignment,
         )
         plt.text(
             textleft,
             yloc_second_row,
             tdict["mmi_scale"]["damage_labels"][i],
             fontproperties=font1,
-            **alignment
+            **alignment,
         )
         plt.text(
             textleft, yloc_third_row, acceleration[i], fontproperties=font1, **alignment
@@ -709,7 +707,7 @@ def _draw_mmi_legend(
             yloc_fifth_row,
             tdict["mmi_scale"]["intensity_labels"][i],
             fontproperties=font,
-            **alignment
+            **alignment,
         )
         th.set_path_effects(
             [
@@ -817,7 +815,7 @@ def _east_west_formatted(tdict, longitude, num_format="g"):
     Returns:
         string: formatter tick
     """
-    fmt_string = u"{longitude:{num_format}}{degree}{hemisphere}"
+    fmt_string = "{longitude:{num_format}}{degree}{hemisphere}"
     return fmt_string.format(
         longitude=abs(longitude),
         num_format=num_format,
@@ -836,7 +834,7 @@ def _north_south_formatted(tdict, latitude, num_format="g"):
     Returns:
         string: formatter tick
     """
-    fmt_string = u"{latitude:{num_format}}{degree}{hemisphere}"
+    fmt_string = "{latitude:{num_format}}{degree}{hemisphere}"
     return fmt_string.format(
         latitude=abs(latitude),
         num_format=num_format,
@@ -978,13 +976,13 @@ def _draw_title(imt, adict, uncertainty=False, uncertainty_string="Total Uncerta
     if mag is None:
         mag = float(edict["magnitude"])
     if hlon < 0:
-        lonstr = "%s%.2f" % (tdict["title_parts"]["west"], np.abs(hlon))
+        lonstr = f"{tdict['title_parts']['west']}{np.abs(hlon):.2f}"
     else:
-        lonstr = "%s%.2f" % (tdict["title_parts"]["east"], hlon)
+        lonstr = f"{tdict['title_parts']['east']}{hlon:.2f}"
     if hlat < 0:
-        latstr = "%s%.2f" % (tdict["title_parts"]["south"], np.abs(hlat))
+        latstr = f"{tdict['title_parts']['south']}{np.abs(hlat):.2f}"
     else:
-        latstr = "%s%.2f" % (tdict["title_parts"]["north"], hlat)
+        latstr = f"{tdict['title_parts']['north']}{hlat:.2f}"
     dep = float(edict["depth"])
     eid = edict["event_id"]
     if imt.startswith("SA("):

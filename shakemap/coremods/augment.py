@@ -65,11 +65,11 @@ class AugmentModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
 
         hdf_file = os.path.join(datadir, "shake_data.hdf")
         if not os.path.isfile(hdf_file):
-            raise FileNotFoundError("%s does not exist. Use assemble." % hdf_file)
+            raise FileNotFoundError(f"{hdf_file} does not exist. Use assemble.")
         shake_data = ShakeMapInputContainer.load(hdf_file)
 
         # Prompt for a comment string if none is provided on the command line
@@ -174,7 +174,7 @@ class AugmentModule(CoreModule):
                 )
                 if not os.path.isfile(loc_file):
                     raise FileNotFoundError(
-                        'prediction file "%s" is not a ' "valid file" % loc_file
+                        f'prediction file "{loc_file}" is not a valid file'
                     )
                 shake_config["interp"]["prediction_location"]["file"] = loc_file
         #

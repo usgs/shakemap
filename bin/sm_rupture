@@ -54,7 +54,7 @@ def prompt_user(args, origin):
     strike = []
     dip = []
     for i in range(n_quad):
-        print("  Quad %s of %s..." % (i + 1, n_quad))
+        print(f"  Quad {i + 1} of {n_quad}...")
 
         out = input("    Longitude of known point: ")
         if is_float(out):

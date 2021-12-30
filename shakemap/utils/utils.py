@@ -36,14 +36,14 @@ def migrate_gmpe(old_gmpe, config=None):
     if config is None:
         install_path, _ = get_config_paths()
         if not os.path.isdir(install_path):
-            raise OSError("%s is not a valid directory." % install_path)
+            raise OSError(f"{install_path} is not a valid directory.")
         config_file = os.path.join(install_path, "config", "migrate.conf")
         if os.path.isfile(config_file):
             config = ConfigObj(config_file)
         else:
-            raise OSError("%s not found." % config_file)
+            raise OSError(f"{config_file} not found.")
     if old_gmpe not in config["modules"]:
-        raise KeyError("ShakeMap 3.5 GMPE %s not found in migrate.conf." % old_gmpe)
+        raise KeyError(f"ShakeMap 3.5 GMPE {old_gmpe} not found in migrate.conf.")
     new_gmpe = config["modules"][old_gmpe]["openquake"]
     reference = config["modules"][old_gmpe]["reference"]
     return (new_gmpe, reference)
@@ -104,7 +104,7 @@ def get_network_name(netid):
             logging.warning(error_str)
             fails += 1
         except Exception as e:
-            logging.warning("Error in get_network_name: %s" % str(e))
+            logging.warning(f"Error in get_network_name: {str(e)}")
             logging.warning("Will try %d more times" % (3 - fails))
             fails += 1
             time.sleep(20)
@@ -169,7 +169,7 @@ def query_yes_no(question, default="yes"):
     elif default == "no":
         prompt = " [y/N] "
     else:
-        raise ValueError("invalid default answer: '%s'" % default)
+        raise ValueError(f"invalid default answer: '{default}'")
 
     while True:
         sys.stdout.write(question + prompt)

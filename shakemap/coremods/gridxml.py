@@ -58,7 +58,7 @@ def _oq_to_gridxml(oqimt):
             integer = "0"
     if int(integer) >= 10:
         raise ValueError("Periods >= than 10 seconds not supported.")
-    fileimt = "PSA%s%s" % (integer, fraction)
+    fileimt = f"PSA{integer}{fraction}"
     return fileimt
 
 
@@ -87,10 +87,10 @@ class GridXMLModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
         datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
@@ -210,10 +210,10 @@ class GridXMLModule(CoreModule):
                     layers, geodict, event_dict, shake_dict, {}, field_keys=field_keys
                 )
                 if component == "GREATER_OF_TWO_HORIZONTAL":
-                    fname = os.path.join(datadir, "%s.xml" % xml_type)
+                    fname = os.path.join(datadir, f"{xml_type}.xml")
                 else:
-                    fname = os.path.join(datadir, "%s_%s.xml" % (xml_type, component))
-                logger.debug("Saving IMT grids to %s" % fname)
+                    fname = os.path.join(datadir, f"{xml_type}_{component}.xml")
+                logger.debug(f"Saving IMT grids to {fname}")
                 shake_grid.save(fname)  # TODO - set grid version number
                 cname = os.path.split(fname)[1]
 
@@ -221,7 +221,7 @@ class GridXMLModule(CoreModule):
                     self.contents.addFile(
                         "xmlGrids",
                         "XML Grid",
-                        "XML grid of %s ground motions" % component,
+                        f"XML grid of {component} ground motions",
                         cname,
                         "text/xml",
                     )
@@ -229,7 +229,7 @@ class GridXMLModule(CoreModule):
                     self.contents.addFile(
                         "uncertaintyGrids",
                         "Uncertainty Grid",
-                        "XML grid of %s uncertainties" % component,
+                        f"XML grid of {component} uncertainties",
                         cname,
                         "text/xml",
                     )

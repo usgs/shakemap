@@ -90,12 +90,12 @@ class AssembleModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
 
         eventxml = os.path.join(datadir, "event.xml")
         self.logger.debug("Looking for event.xml file...")
         if not os.path.isfile(eventxml):
-            raise FileNotFoundError("%s does not exist." % eventxml)
+            raise FileNotFoundError(f"{eventxml} does not exist.")
 
         # Prompt for a comment string if none is provided on the command line
         if self.comment is None:
@@ -152,7 +152,7 @@ class AssembleModule(CoreModule):
                 )
                 if not os.path.isfile(loc_file):
                     raise FileNotFoundError(
-                        "prediction file '%s' is not " "a valid file" % loc_file
+                        f"prediction file '{loc_file}' is not a valid file"
                     )
                 global_config["interp"]["prediction_location"]["file"] = loc_file
 
@@ -254,9 +254,7 @@ class AssembleModule(CoreModule):
             momentfile=momentfile,
             datafiles=datafiles,
         )
-        self.logger.debug(
-            "Created HDF5 input container in %s" % shake_data.getFileName()
-        )
+        self.logger.debug(f"Created HDF5 input container in {shake_data.getFileName()}")
         ah = AmplitudeHandler(install_path, data_path)
         event = ah.getEvent(self._eventid)
         if event is None:
@@ -283,7 +281,7 @@ class AssembleModule(CoreModule):
             config_file = os.path.join(datadir, "simulation.conf")
             if not os.path.isfile(config_file):
                 raise FileNotFoundError(
-                    "Could not find simulation config file %s" % config_file
+                    f"Could not find simulation config file {config_file}"
                 )
 
             # find the spec file for simulation.conf
@@ -397,7 +395,7 @@ def _get_grids(config, simfile):
     for imt, imtcols in imtdict.items():
         icount = len(imtcols)
         if icount != 2:
-            raise IndexError("Incorrect number of channels for IMT %s." % imt)
+            raise IndexError(f"Incorrect number of channels for IMT {imt}.")
         channel1, channel2 = imtcols
         maximt = dataframe[[channel1, channel2]].max(axis=1).values
         data = np.log(np.reshape(maximt, (nrows, ncols), order=row_order))

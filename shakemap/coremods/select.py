@@ -51,13 +51,13 @@ class SelectModule(CoreModule):
         install_path, data_path = cfg.get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory" % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory")
         # ---------------------------------------------------------------------
         # Open event.xml and make an Origin object
         # ---------------------------------------------------------------------
         eventxml = os.path.join(datadir, "event.xml")
         if not os.path.isfile(eventxml):
-            raise FileNotFoundError("%s does not exist." % eventxml)
+            raise FileNotFoundError(f"{eventxml} does not exist.")
         momentfile = os.path.join(datadir, "moment.xml")
         if not os.path.isfile(momentfile):
             momentfile = None

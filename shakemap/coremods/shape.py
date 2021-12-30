@@ -57,10 +57,10 @@ class ShapeModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, "current", "products")
         if not os.path.isdir(datadir):
-            raise NotADirectoryError("%s is not a valid directory." % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
         datafile = os.path.join(datadir, "shake_result.hdf")
         if not os.path.isfile(datafile):
-            raise FileNotFoundError("%s does not exist." % datafile)
+            raise FileNotFoundError(f"{datafile} does not exist.")
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
@@ -150,7 +150,7 @@ def create_polygons(container, datadir, logger, max_workers, method="pcontour"):
             "geometry": "MultiLineString",
         }
     else:
-        raise ValueError("Unknown contouring method {}".format(method))
+        raise ValueError(f"Unknown contouring method {method}")
 
     smdata = os.path.join(get_data_path(), "gis")
     # Make a directory for the files to live in prior to being zipped

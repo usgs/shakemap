@@ -38,9 +38,9 @@ def get_configspec(config=None):
     """
     if config is None:
         return os.path.join(get_data_path(), "modelspec.conf")
-    fname = os.path.join(get_data_path(), "%sspec.conf" % config)
+    fname = os.path.join(get_data_path(), f"{config}spec.conf")
     if not os.path.isfile(fname):
-        raise FileNotFoundError('No file "%s" exists.' % fname)
+        raise FileNotFoundError(f'No file "{fname}" exists.')
     return fname
 
 
@@ -224,7 +224,7 @@ def config_error(config, results):
             errs += 1
         else:
             logging.error(
-                "The following section was missing:%s " % ", ".join(section_list)
+                f"The following section was missing:{', '.join(section_list)} "
             )
             errs += 1
     if errs:
@@ -294,8 +294,7 @@ def check_config(config, logger):
     """
     if config["modeling"]["gmpe"] not in config["gmpe_sets"]:
         logger.error(
-            "Configuration error: gmpe %s not in gmpe_sets"
-            % (config["modeling"]["gmpe"])
+            f"Configuration error: gmpe {config['modeling']['gmpe']} not in gmpe_sets"
         )
         raise ValidateError()
     if config["modeling"]["gmice"] not in config["gmice_modules"]:
@@ -306,14 +305,12 @@ def check_config(config, logger):
         raise ValidateError()
     if config["modeling"]["ipe"] not in config["ipe_modules"]:
         logger.error(
-            "Configuration error: ipe %s not in ipe_modules"
-            % (config["modeling"]["ipe"])
+            f"Configuration error: ipe {config['modeling']['ipe']} not in ipe_modules"
         )
         raise ValidateError()
     if config["modeling"]["ccf"] not in config["ccf_modules"]:
         logger.error(
-            "Configuration error: ccf %s not in ccf_modules"
-            % (config["modeling"]["ccf"])
+            f"Configuration error: ccf {config['modeling']['ccf']} not in ccf_modules"
         )
         raise ValidateError()
 
@@ -442,14 +439,14 @@ def weight_list(value, min):
     try:
         out = [float(a) for a in value]
     except ValueError:
-        logging.error("%s is not a list of floats" % value)
+        logging.error(f"{value} is not a list of floats")
         raise ValidateError()
     np_out = np.array(out)
     if np.any(np_out < 0):
-        logging.error("all list values must be >= 0: %s" % value)
+        logging.error(f"all list values must be >= 0: {value}")
         raise ValidateError()
     if len(out) > 0 and np.abs(np.sum(np_out) - 1.0) > 0.01:
-        logging.error("weights must sum to 1.0: %s" % value)
+        logging.error(f"weights must sum to 1.0: {value}")
         raise ValidateError()
 
     return out
@@ -475,7 +472,7 @@ def nanfloat_list(value, min):
     if isinstance(value, list) and not value:
         value = []
     if not isinstance(value, list):
-        logging.error("'%s' is not a list" % value)
+        logging.error(f"'{value}' is not a list")
         raise ValidateError()
     if len(value) < min:
         logging.error("extent list must contain %i entries" % min)
@@ -507,11 +504,11 @@ def gmpe_list(value, min):
     if isinstance(value, str):
         value = [value]
     if not isinstance(value, list) or len(value) < int(min):
-        logging.error("'%s' is not a list of at least %s gmpes" % (value, min))
+        logging.error(f"'{value}' is not a list of at least {min} gmpes")
         raise ValidateError()
     for gmpe in value:
         if not isinstance(gmpe, str):
-            logging.error("'%s' is not a list of strings" % (value))
+            logging.error(f"'{value}' is not a list of strings")
             raise ValidateError()
 
     return value
@@ -538,7 +535,7 @@ def extent_list(value):
     if isinstance(value, list) and not value:
         return []
     if not isinstance(value, list):
-        logging.error("'%s' is not a list of 4 coordinates" % value)
+        logging.error(f"'{value}' is not a list of 4 coordinates")
         raise ValidateError()
     if len(value) != 4:
         logging.error("extent list must contain 4 entries")
@@ -546,7 +543,7 @@ def extent_list(value):
     try:
         out = [float(a) for a in value]
     except ValueError:
-        logging.error("%s is not a list of 4 floats" % value)
+        logging.error(f"{value} is not a list of 4 floats")
         raise ValidateError()
     if (
         out[0] < -360.0
@@ -559,8 +556,7 @@ def extent_list(value):
         or out[3] > 90.0
     ):
         logging.error(
-            "Invalid extent: %s "
-            "(-360 <= longitude <= 360, -90 <= latitude <= 90)" % value
+            f"Invalid extent: {value} (-360 <= longitude <= 360, -90 <= latitude <= 90)"
         )
         raise ValidateError()
 
@@ -586,7 +582,7 @@ def file_type(value):
     gp = os.path.join(os.path.expanduser("~"), "shakemap_data")
     value = path_macro_sub(value, ip=ip, dp=dp, gp=gp)
     if not os.path.isfile(value):
-        logging.error("file '%s' is not a valid file" % value)
+        logging.error(f"file '{value}' is not a valid file")
         raise ValidateError(value)
     return value
 
@@ -651,19 +647,19 @@ def cfg_float_list(value):
         ValidateError
     """
     if not value or value == "None":
-        logging.error("'%s' is not a list of at least 1 float" % (value))
+        logging.error(f"'{value}' is not a list of at least 1 float")
         raise ValidateError()
     if isinstance(value, str):
         value = [value]
     if not isinstance(value, list) or len(value) < 1:
-        logging.error("'%s' is not a list of at least 1 float" % (value))
+        logging.error(f"'{value}' is not a list of at least 1 float")
         raise ValidateError()
     fvalue = []
     for val in value:
         try:
             fval = float(val)
         except ValueError:
-            logging.error("'%s' is not a list of floats" % (value))
+            logging.error(f"'{value}' is not a list of floats")
             raise ValidateError()
         fvalue.append(fval)
     return fvalue
@@ -684,12 +680,12 @@ def cfg_float(value):
         ValidateError
     """
     if not isinstance(value, (str, float)) or not value or value == "None":
-        logging.error("'%s' is not a float" % (value))
+        logging.error(f"'{value}' is not a float")
         raise ValidateError()
     try:
         fval = float(value)
     except ValueError:
-        logging.error("'%s' is not a float" % (value))
+        logging.error(f"'{value}' is not a float")
         raise ValidateError()
     return fval
 
@@ -709,7 +705,7 @@ def cfg_bool(value):
         ValidateError
     """
     if not isinstance(value, (str, bool)) or not value or value == "None":
-        logging.error("'%s' is not a bool" % (value))
+        logging.error(f"'{value}' is not a bool")
         raise ValidateError()
     try:
         if value.lower() in ["true", "t", "yes", "y", "1"]:
@@ -717,7 +713,7 @@ def cfg_bool(value):
         else:
             bval = False
     except ValueError:
-        logging.error("'%s' is not a bool" % (value))
+        logging.error(f"'{value}' is not a bool")
         raise ValidateError()
     return bval
 
@@ -743,14 +739,14 @@ def check_profile_config(config):
         data_exists = os.path.isdir(config["profiles"][profile]["data_path"])
         delete_profile = False
         if not data_exists:
-            logging.warn("Data path for profile %s does not exist." % profile)
+            logging.warn(f"Data path for profile {profile} does not exist.")
             delete_profile = True
         install_exists = os.path.isdir(config["profiles"][profile]["install_path"])
         if not install_exists:
-            logging.warn("Install path for profile %s does not exist." % profile)
+            logging.warn(f"Install path for profile {profile} does not exist.")
             delete_profile = True
         if delete_profile:
-            logging.warn("    Deleting profile %s." % profile)
+            logging.warn(f"    Deleting profile {profile}.")
             del config["profiles"][profile]
             config.write()
     return config

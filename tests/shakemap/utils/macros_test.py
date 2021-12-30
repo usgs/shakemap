@@ -32,7 +32,7 @@ def test_macros():
     assert list(sorted(macros.keys())) == list(sorted(test_dict.keys()))
     for key, mvalue in macros.items():
         tvalue = test_dict[key]
-        print("Testing key %s: %s vs %s." % (key, mvalue, tvalue))
+        print(f"Testing key {key}: {mvalue} vs {tvalue}.")
         assert mvalue == tvalue
 
 

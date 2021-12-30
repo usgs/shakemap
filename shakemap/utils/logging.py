@@ -85,9 +85,7 @@ def get_logger(eventid, log_option=None, log_file=None):
     else:
         event_log_dir = os.path.join(data_path, eventid)
         if not os.path.isdir(event_log_dir):
-            raise NotADirectoryError(
-                "Can't open log file: event %s " "not found" % eventid
-            )
+            raise NotADirectoryError(f"Can't open log file: event {eventid} not found")
         event_log_file = os.path.join(event_log_dir, "shake.log")
         config["handlers"]["event_file"]["filename"] = event_log_file
 

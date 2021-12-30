@@ -61,7 +61,7 @@ class EmailTransfer(TransferBaseModule):
             if not isinstance(params, configobj.Section):
                 continue
             params.update(properties)
-            fmt = "Doing email transfer to %s..." % destination
+            fmt = f"Doing email transfer to {destination}..."
             logging.debug(fmt)
 
             # replace macro strings with actual strings
@@ -69,7 +69,7 @@ class EmailTransfer(TransferBaseModule):
                 for macro, replacement in macros.items():
                     if isinstance(param, str):
                         try:
-                            param = param.replace("[%s]" % macro, replacement)
+                            param = param.replace(f"[{macro}]", replacement)
                             params[pkey] = param
                         except Exception as e:
                             x = 1
@@ -79,7 +79,7 @@ class EmailTransfer(TransferBaseModule):
             for lfile in params["attachments"]:
                 fullfile = os.path.join(product_dir, lfile)
                 if not os.path.isfile(fullfile):
-                    logging.warn("%s does not exist." % fullfile)
+                    logging.warn(f"{fullfile} does not exist.")
                 attachments.append(fullfile)
 
             sender = EmailSender(properties=params, local_files=attachments)
@@ -89,7 +89,7 @@ class EmailTransfer(TransferBaseModule):
                 try:
                     nfiles, msg = sender.send()
                     with open(mailfile, "wt") as f:
-                        f.write("Mailed at %s UTC" % (str(datetime.utcnow())))
+                        f.write(f"Mailed at {str(datetime.utcnow())} UTC")
                 except Exception as e:
                     logging.warning(str(e))
                     raise (e)

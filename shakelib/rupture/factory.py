@@ -72,7 +72,7 @@ def get_rupture(origin, file=None, mesh_dx=0.5, new_format=True):
             if not isinstance(e, json.JSONDecodeError) and not isinstance(
                 e, UnicodeDecodeError
             ):
-                logging.warning("Unknown exception reading fault file: %s" % str(e))
+                logging.warning(f"Unknown exception reading fault file: {str(e)}")
             # -----------------------------------------------------------------
             # Reading as json failed, so hopefully it is a ShakeMap 3 text file
             # -----------------------------------------------------------------
@@ -329,12 +329,12 @@ def text_to_json(file, new_format=True):
         if len(parts) == 1:
             if new_format:
                 raise ShakeLibException(
-                    "Rupture file %s has unspecified delimiters." % file
+                    f"Rupture file {file} has unspecified delimiters."
                 )
             parts = line.split(",")
             if len(parts) == 1:
                 raise ShakeLibException(
-                    "Rupture file %s has unspecified delimiters." % file
+                    f"Rupture file {file} has unspecified delimiters."
                 )
 
         if len(parts) != 3:
