@@ -261,7 +261,7 @@ fi
 
 # This package
 echo "Installing ${VENV}..."
-pip install --no-deps -e .
+pip install -v -v -v --no-deps -e .
 
 # if pip install fails, bow out gracefully
 if [ $? -ne 0 ];then
