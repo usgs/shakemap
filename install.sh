@@ -172,7 +172,7 @@ package_list=(
       "lockfile>=0.12.2"
       "mapio>0.7.27"
       "matplotlib-base>=3.4.2"
-      "numpy>=1.20"
+      "numpy=1.21"
       "obspy>=1.2.2"
       "openmp>=8.0.1"
       "pandas>=1.2.5"
@@ -261,6 +261,8 @@ fi
 
 # This package
 echo "Installing ${VENV}..."
+touch shakemap/c/*.pyx
+touch shakemap/c/contour.c
 pip install --no-deps -e .
 
 # if pip install fails, bow out gracefully

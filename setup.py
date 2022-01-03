@@ -91,6 +91,7 @@ setup(
         "bin/sm_rupture",
         "bin/sm_batch",
         "bin/sm_sync",
+        "bin/fix_netcdf",
     ],
     cmdclass=cmdclass,
     ext_modules=cythonize(ext_modules),
