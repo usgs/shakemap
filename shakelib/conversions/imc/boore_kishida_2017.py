@@ -54,6 +54,7 @@ class BooreKishida2017(ComponentConverter):
         horizontal component of motion. Bulletin of the Seismological Society
         of America, 96(4A), 1512-1522.
     """
+
     def __init__(self, imc_in, imc_out):
         super().__init__()
         if type(imc_in) == IMC:
@@ -61,73 +62,76 @@ class BooreKishida2017(ComponentConverter):
         elif type(imc_in) == str:
             imc_from_str = self.imc_from_str(imc_in)
             if imc_from_str is None:
-                logging.warning("Unknown IMC string '%s' in input, using "
-                                "Average horizontal", imc_in)
+                logging.warning(
+                    "Unknown IMC string '%s' in input, using " "Average horizontal",
+                    imc_in,
+                )
                 self.imc_in = IMC.AVERAGE_HORIZONTAL
             else:
                 self.imc_in = imc_from_str
         else:
-            logging.warning("Unknown object passed as input %s, using Average "
-                            "horizontal", type(imc_in))
+            logging.warning(
+                "Unknown object passed as input %s, using Average " "horizontal",
+                type(imc_in),
+            )
             self.imc_in = IMC.AVERAGE_HORIZONTAL
         if type(imc_out) == IMC:
             self.imc_out = imc_out
         elif type(imc_out) == str:
             imc_from_str = self.imc_from_str(imc_out)
             if imc_from_str is None:
-                logging.warning("Unknown IMC string '%s' in output, using "
-                                "Average horizontal", imc_out)
+                logging.warning(
+                    "Unknown IMC string '%s' in output, using " "Average horizontal",
+                    imc_out,
+                )
                 self.imc_out = IMC.AVERAGE_HORIZONTAL
             else:
                 self.imc_out = imc_from_str
         else:
-            logging.warning("Unknown object passed as opuput %s, using Average "
-                            "horizontal", type(imc_out))
+            logging.warning(
+                "Unknown object passed as opuput %s, using Average " "horizontal",
+                type(imc_out),
+            )
             self.imc_out = IMC.AVERAGE_HORIZONTAL
 
         # Possible conversions
         self.conversion_graph = {
-            IMC.RotD50: set([
-                IMC.GMRotI50,
-                IMC.AVERAGE_HORIZONTAL,
-                IMC.RotD100,
-                IMC.GREATER_OF_TWO_HORIZONTAL,
-                IMC.RANDOM_HORIZONTAL,
-                IMC.HORIZONTAL,
-                IMC.MEDIAN_HORIZONTAL]),
-            IMC.GMRotI50: set([
-                IMC.RotD50,
-                IMC.GREATER_OF_TWO_HORIZONTAL]),
-            IMC.AVERAGE_HORIZONTAL: set([
-                IMC.RotD50,
-                IMC.GREATER_OF_TWO_HORIZONTAL]),
-            IMC.RotD100: set([
-                IMC.RotD50,
-                IMC.GREATER_OF_TWO_HORIZONTAL]),
-            IMC.GREATER_OF_TWO_HORIZONTAL: set([
-                IMC.RotD50,
-                IMC.GMRotI50,
-                IMC.AVERAGE_HORIZONTAL,
-                IMC.RotD100,
-                IMC.RANDOM_HORIZONTAL,
-                IMC.HORIZONTAL,
-                IMC.MEDIAN_HORIZONTAL]),
-            IMC.HORIZONTAL: set([
-                IMC.GREATER_OF_TWO_HORIZONTAL,
-                IMC.RotD50]),
-            IMC.MEDIAN_HORIZONTAL: set([
-                IMC.GREATER_OF_TWO_HORIZONTAL,
-                IMC.RotD50]),
-            IMC.RANDOM_HORIZONTAL: set([
-                IMC.GREATER_OF_TWO_HORIZONTAL,
-                IMC.RotD50])
+            IMC.RotD50: set(
+                [
+                    IMC.GMRotI50,
+                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.RotD100,
+                    IMC.GREATER_OF_TWO_HORIZONTAL,
+                    IMC.RANDOM_HORIZONTAL,
+                    IMC.HORIZONTAL,
+                    IMC.MEDIAN_HORIZONTAL,
+                ]
+            ),
+            IMC.GMRotI50: set([IMC.RotD50, IMC.GREATER_OF_TWO_HORIZONTAL]),
+            IMC.AVERAGE_HORIZONTAL: set([IMC.RotD50, IMC.GREATER_OF_TWO_HORIZONTAL]),
+            IMC.RotD100: set([IMC.RotD50, IMC.GREATER_OF_TWO_HORIZONTAL]),
+            IMC.GREATER_OF_TWO_HORIZONTAL: set(
+                [
+                    IMC.RotD50,
+                    IMC.GMRotI50,
+                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.RotD100,
+                    IMC.RANDOM_HORIZONTAL,
+                    IMC.HORIZONTAL,
+                    IMC.MEDIAN_HORIZONTAL,
+                ]
+            ),
+            IMC.HORIZONTAL: set([IMC.GREATER_OF_TWO_HORIZONTAL, IMC.RotD50]),
+            IMC.MEDIAN_HORIZONTAL: set([IMC.GREATER_OF_TWO_HORIZONTAL, IMC.RotD50]),
+            IMC.RANDOM_HORIZONTAL: set([IMC.GREATER_OF_TWO_HORIZONTAL, IMC.RotD50]),
         }
         # Check if any imc values are unknown. If they are, convert
         # to AVERAGE_HORIZONTAL
         self.checkUnknown()
         # Get shortest conversion "path" between imc_in and imc_out
-        self.path = self.getShortestPath(self.conversion_graph,
-                                         self.imc_in, self.imc_out)
+        self.path = self.getShortestPath(
+            self.conversion_graph, self.imc_in, self.imc_out
+        )
 
     def convertAmpsOnce(self, imt, amps, rrups=None, mag=None):
         """
@@ -151,7 +155,7 @@ class BooreKishida2017(ComponentConverter):
         """
         # Check if mag and rrups are real values
         if mag is None or rrups is None:
-            raise ValueError('No magnitude or rupture distances specified.')
+            raise ValueError("No magnitude or rupture distances specified.")
         # Verify that the conversion is possible
         self._verifyConversion(self.imc_in, self.imc_out)
         # Return original amps if imc_in and imc_out are the same
@@ -166,8 +170,12 @@ class BooreKishida2017(ComponentConverter):
         elif mag > 9:
             mag = 9.0
         # Calculate conversion variable
-        ln_ratio = c0 + r1 * np.log(rrups_clipped / 50) + \
-            m1 * (mag - 5.5) + m2 * (mag - 5.5)**2
+        ln_ratio = (
+            c0
+            + r1 * np.log(rrups_clipped / 50)
+            + m1 * (mag - 5.5)
+            + m2 * (mag - 5.5) ** 2
+        )
         #
         # The B&K file naming convention has things like D100D50, which
         # means the parameters give the (log) ratio of RotD100/RotD50,
@@ -213,7 +221,7 @@ class BooreKishida2017(ComponentConverter):
         # Get coeffecients
         (sigma, c0, r1, m1, m2) = self._getParamsFromIMT(imt)
         # Calculate conversion
-        sigmas = np.sqrt(sigmas**2 + sigma**2)
+        sigmas = np.sqrt(sigmas ** 2 + sigma ** 2)
 
         return sigmas
 
@@ -230,27 +238,27 @@ class BooreKishida2017(ComponentConverter):
             (float, float, float, float, float): Coeffients for conversion.
         """
         if imt == PGA():
-            sigma = self.pars['sigma'][0]
-            c0 = self.pars['c0smooth'][0]
-            r1 = self.pars['r1smooth'][0]
-            m1 = self.pars['m1smooth'][0]
-            m2 = self.pars['m2smooth'][0]
+            sigma = self.pars["sigma"][0]
+            c0 = self.pars["c0smooth"][0]
+            r1 = self.pars["r1smooth"][0]
+            m1 = self.pars["m1smooth"][0]
+            m2 = self.pars["m2smooth"][0]
         elif imt == PGV():
-            sigma = self.pars['sigma'][1]
-            c0 = self.pars['c0smooth'][1]
-            r1 = self.pars['r1smooth'][1]
-            m1 = self.pars['m1smooth'][1]
-            m2 = self.pars['m2smooth'][1]
-        elif 'SA' in imt.string:
+            sigma = self.pars["sigma"][1]
+            c0 = self.pars["c0smooth"][1]
+            r1 = self.pars["r1smooth"][1]
+            m1 = self.pars["m1smooth"][1]
+            m2 = self.pars["m2smooth"][1]
+        elif "SA" in imt.string:
             imt_per = imt.period
-            pa = self.pars['per'][2:]
-            sigma = np.interp(imt_per, pa, self.pars['sigma'][2:])
-            c0 = np.interp(imt_per, pa, self.pars['c0smooth'][2:])
-            r1 = np.interp(imt_per, pa, self.pars['r1smooth'][2:])
-            m1 = np.interp(imt_per, pa, self.pars['m1smooth'][2:])
-            m2 = np.interp(imt_per, pa, self.pars['m2smooth'][2:])
+            pa = self.pars["per"][2:]
+            sigma = np.interp(imt_per, pa, self.pars["sigma"][2:])
+            c0 = np.interp(imt_per, pa, self.pars["c0smooth"][2:])
+            r1 = np.interp(imt_per, pa, self.pars["r1smooth"][2:])
+            m1 = np.interp(imt_per, pa, self.pars["m1smooth"][2:])
+            m2 = np.interp(imt_per, pa, self.pars["m2smooth"][2:])
         else:
-            raise ValueError("Unknown IMT: %s" % str(imt))
+            raise ValueError(f"Unknown IMT: {str(imt)}")
         return (sigma, c0, r1, m1, m2)
 
     @staticmethod
@@ -267,14 +275,13 @@ class BooreKishida2017(ComponentConverter):
             string 'Null', then imc_in and imc_out evaluated to be the
             same.
         """
-        datadir = pkg_resources.resource_filename('shakelib.conversions.imc',
-                                                  'data')
-        conv_files = glob.glob(os.path.join(datadir, '*.csv'))
+        datadir = pkg_resources.resource_filename("shakelib.conversions.imc", "data")
+        conv_files = glob.glob(os.path.join(datadir, "*.csv"))
         stub1 = BooreKishida2017._imcToFilestr(imc_in)
         stub2 = BooreKishida2017._imcToFilestr(imc_out)
         if stub1 == stub2:
             # No conversion necessary
-            return ('Null', True)
+            return ("Null", True)
         #
         # Look for the conversion from imc_in -> imc_out
         #
@@ -302,25 +309,27 @@ class BooreKishida2017(ComponentConverter):
         """
 
         if oq_imc == IMC.RotD50:
-            return 'D50'
+            return "D50"
         elif oq_imc == IMC.RotD100:
-            return 'D100'
+            return "D100"
         elif oq_imc == IMC.GMRotI50:
-            return 'GM50'
-        elif oq_imc == IMC.AVERAGE_HORIZONTAL or \
-                oq_imc == IMC.HORIZONTAL or \
-                oq_imc == IMC.RANDOM_HORIZONTAL or \
-                oq_imc == IMC.MEDIAN_HORIZONTAL:
-            return 'GMAR'
+            return "GM50"
+        elif (
+            oq_imc == IMC.AVERAGE_HORIZONTAL
+            or oq_imc == IMC.HORIZONTAL
+            or oq_imc == IMC.RANDOM_HORIZONTAL
+            or oq_imc == IMC.MEDIAN_HORIZONTAL
+        ):
+            return "GMAR"
         elif oq_imc == IMC.GREATER_OF_TWO_HORIZONTAL:
-            return 'Larger'
+            return "Larger"
         else:
             #
             # For less common IMCs, Beyer & Bommer (2006) found most
             # of them to be more or less equivalent to geometric mean
             #
-            logging.warning("Can't handle IMC %s, using GMAR" % oq_imc)
-            return 'GMAR'
+            logging.warning(f"Can't handle IMC {oq_imc}, using GMAR")
+            return "GMAR"
 
     def _verifyConversion(self, imc_in, imc_out=None):
         """
@@ -336,10 +345,9 @@ class BooreKishida2017(ComponentConverter):
         """
         filename, forward = self._imcPairToFile(imc_in, imc_out)
         if filename is None:
-            raise ValueError("Can't find a conversion file for %s and %s" %
-                             (imc_in, imc_out))
+            raise ValueError(f"Can't find a conversion file for {imc_in} and {imc_out}")
         self.forward = forward
-        if filename == 'Null':
+        if filename == "Null":
             # Null conversion -- imc_in and imc_out are either identical
             # or at least functionally equivalent
             self.pars = None

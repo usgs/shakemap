@@ -44,7 +44,7 @@ class QuadRupture(Rupture):
 
         """
 
-        polys = d['features'][0]['geometry']['coordinates'][0]
+        polys = d["features"][0]["geometry"]["coordinates"][0]
         n_polygons = len(polys)
         lon = []
         lat = []
@@ -62,24 +62,23 @@ class QuadRupture(Rupture):
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, datetime):
-                d['metadata'][k] = v.strftime(constants.TIMEFMT)
+                d["metadata"][k] = v.strftime(constants.TIMEFMT)
             else:
-                d['metadata'][k] = v
+                d["metadata"][k] = v
 
         self._geojson = d
         self._lon = lon
         self._lat = lat
         self._depth = dep
         self._origin = origin
-        self._reference = d['metadata']['reference']
+        self._reference = d["metadata"]["reference"]
         self._setQuadrilaterals()
 
     def getDepthAtPoint(self, lat, lon):
         SMALL_DISTANCE = 2e-03  # 2 meters
         depth = np.nan
 
-        tmp, _ = self.computeRjb(np.array([lon]), np.array([lat]),
-                                 np.array([0]))
+        tmp, _ = self.computeRjb(np.array([lon]), np.array([lat]), np.array([0]))
         if tmp > SMALL_DISTANCE:
             return depth
 
@@ -134,13 +133,13 @@ class QuadRupture(Rupture):
         sxdd = ddn.dot(s0sx)
 
         # get width of quad (convert from km to m)
-        w = utils.get_quad_width(quad)*1000
+        w = utils.get_quad_width(quad) * 1000
 
         # Get weights for top and bottom edge depths
         N = utils.get_quad_normal(quad)
         V = utils.get_vertical_vector(quad)
         dip = np.degrees(np.arccos(Vector.dot(N, V)))
-        ws = (w * np.cos(np.radians(dip)))
+        ws = w * np.cos(np.radians(dip))
         wtt = (ws - sxdd) / ws
         wtb = sxdd / ws
 
@@ -173,7 +172,7 @@ class QuadRupture(Rupture):
         wsum = 0.0
         for quad in self._quadrilaterals:
             wsum = wsum + utils.get_quad_width(quad)
-        mwidth = (wsum / len(self._quadrilaterals))
+        mwidth = wsum / len(self._quadrilaterals)
         return mwidth
 
     def getArea(self):
@@ -192,8 +191,20 @@ class QuadRupture(Rupture):
         return asum
 
     @classmethod
-    def fromTrace(cls, xp0, yp0, xp1, yp1, zp, widths, dips, origin,
-                  strike=None, group_index=None, reference=""):
+    def fromTrace(
+        cls,
+        xp0,
+        yp0,
+        xp1,
+        yp1,
+        zp,
+        widths,
+        dips,
+        origin,
+        strike=None,
+        group_index=None,
+        reference="",
+    ):
         """
         Create a QuadRupture instance from a set of vertices that define the
         top of the rupture, and an array of widths/dips.
@@ -235,15 +246,23 @@ class QuadRupture(Rupture):
                 length as the input arrays.
 
         """
-        if not (len(xp0) == len(yp0) == len(xp1) == len(yp1) ==
-                len(zp) == len(dips) == len(widths)):
+        if not (
+            len(xp0)
+            == len(yp0)
+            == len(xp1)
+            == len(yp1)
+            == len(zp)
+            == len(dips)
+            == len(widths)
+        ):
             raise ShakeLibException(
-                'Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be '
-                'equal.')
+                "Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be " "equal."
+            )
         if strike is not None and len(xp0) != len(strike) and len(strike) != 1:
             raise ShakeLibException(
-                'Strike must be None or an array of one value or the '
-                'same length as trace coordinates.')
+                "Strike must be None or an array of one value or the "
+                "same length as trace coordinates."
+            )
 
         if group_index is None:
             group_index = np.array(range(len(xp0)))
@@ -252,13 +271,13 @@ class QuadRupture(Rupture):
         dips = np.radians(dips)
 
         # Ensure that all input sequences are numpy arrays
-        xp0 = np.array(xp0, dtype='d')
-        xp1 = np.array(xp1, dtype='d')
-        yp0 = np.array(yp0, dtype='d')
-        yp1 = np.array(yp1, dtype='d')
-        zp = np.array(zp, dtype='d')
-        widths = np.array(widths, dtype='d')
-        dips = np.array(dips, dtype='d')
+        xp0 = np.array(xp0, dtype="d")
+        xp1 = np.array(xp1, dtype="d")
+        yp0 = np.array(yp0, dtype="d")
+        yp1 = np.array(yp1, dtype="d")
+        zp = np.array(zp, dtype="d")
+        widths = np.array(widths, dtype="d")
+        dips = np.array(dips, dtype="d")
 
         # Get a projection object
         west = np.min((xp0.min(), xp1.min()))
@@ -288,8 +307,9 @@ class QuadRupture(Rupture):
             else:
                 theta = np.radians(strike[i])
 
-            R = np.array([[np.cos(theta), -np.sin(theta)],
-                          [np.sin(theta), np.cos(theta)]])
+            R = np.array(
+                [[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]]
+            )
 
             # Rotate the top edge points into a new coordinate system (vertical
             # line)
@@ -309,8 +329,9 @@ class QuadRupture(Rupture):
             # Get right side coordinates in un-rotated projected system
             p3p = np.array([p3xp, p3yp])
             p2p = np.array([p2xp, p2yp])
-            Rback = np.array([[np.cos(-theta), -np.sin(-theta)],
-                              [np.sin(-theta), np.cos(-theta)]])
+            Rback = np.array(
+                [[np.cos(-theta), -np.sin(-theta)], [np.sin(-theta), np.cos(-theta)]]
+            )
             p3 = np.dot(Rback, p3p)
             p2 = np.dot(Rback, p2p)
             p3x = np.array([p3[0]])
@@ -338,52 +359,57 @@ class QuadRupture(Rupture):
         for i in range(n_groups):
             ind = np.where(u_groups[i] == group_index)[0]
             lons = np.concatenate(
-                [xp0[ind[0]].reshape((1,)),
-                 xp1[ind], xp2[ind][::-1],
-                 xp3[ind][::-1][-1].reshape((1,)),
-                 xp0[ind[0]].reshape((1,))
-                 ])
+                [
+                    xp0[ind[0]].reshape((1,)),
+                    xp1[ind],
+                    xp2[ind][::-1],
+                    xp3[ind][::-1][-1].reshape((1,)),
+                    xp0[ind[0]].reshape((1,)),
+                ]
+            )
             lats = np.concatenate(
-                [yp0[ind[0]].reshape((1,)),
-                 yp1[ind],
-                 yp2[ind][::-1],
-                 yp3[ind][::-1][-1].reshape((1,)),
-                 yp0[ind[0]].reshape((1,))
-                 ])
+                [
+                    yp0[ind[0]].reshape((1,)),
+                    yp1[ind],
+                    yp2[ind][::-1],
+                    yp3[ind][::-1][-1].reshape((1,)),
+                    yp0[ind[0]].reshape((1,)),
+                ]
+            )
             deps = np.concatenate(
-                [zp[ind[0]].reshape((1,)),
-                 zp[ind],
-                 zpdown[ind][::-1],
-                 zpdown[ind][::-1][-1].reshape((1,)),
-                 zp[ind[0]].reshape((1,))])
+                [
+                    zp[ind[0]].reshape((1,)),
+                    zp[ind],
+                    zpdown[ind][::-1],
+                    zpdown[ind][::-1][-1].reshape((1,)),
+                    zp[ind[0]].reshape((1,)),
+                ]
+            )
 
             poly = []
             for lon, lat, dep in zip(lons, lats, deps):
                 poly.append([lon, lat, dep])
             coords.append(poly)
 
-        d = {"type": "FeatureCollection",
-             "metadata": {
-                 "reference": reference
-             },
-             "features": [{
-                 "type": "Feature",
-                 "properties": {
-                     "rupture type": "rupture extent"
-                 },
-                 "geometry": {
-                     "type": "MultiPolygon",
-                     "coordinates": [coords]
-                 }
-             }]}
+        d = {
+            "type": "FeatureCollection",
+            "metadata": {"reference": reference},
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"rupture type": "rupture extent"},
+                    "geometry": {"type": "MultiPolygon", "coordinates": [coords]},
+                }
+            ],
+        }
 
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime(constants.TIMEFMT)
+                d["metadata"][k] = v.strftime(constants.TIMEFMT)
             else:
-                d['metadata'][k] = v
+                d["metadata"][k] = v
 
         return cls(d, origin)
 
@@ -400,25 +426,24 @@ class QuadRupture(Rupture):
                 object.
 
         """
-        if not hasattr(rupturefile, 'read'):
-            f = open(rupturefile, 'wt')
+        if not hasattr(rupturefile, "read"):
+            f = open(rupturefile, "wt")
         else:
             f = rupturefile  # just a reference to the input file-like object
-        f.write('#%s\n' % self._reference)
+        f.write(f"#{self._reference}\n")
         for quad in self.getQuadrilaterals():
             P0, P1, P2, P3 = quad
-            f.write('%.4f %.4f %.4f\n' % (P0.latitude, P0.longitude, P0.depth))
-            f.write('%.4f %.4f %.4f\n' % (P1.latitude, P1.longitude, P1.depth))
-            f.write('%.4f %.4f %.4f\n' % (P2.latitude, P2.longitude, P2.depth))
-            f.write('%.4f %.4f %.4f\n' % (P3.latitude, P3.longitude, P3.depth))
-            f.write('%.4f %.4f %.4f\n' % (P0.latitude, P0.longitude, P0.depth))
-            f.write(u'>\n')
-        if not hasattr(rupturefile, 'read'):
+            f.write(f"{P0.latitude:.4f} {P0.longitude:.4f} {P0.depth:.4f}\n")
+            f.write(f"{P1.latitude:.4f} {P1.longitude:.4f} {P1.depth:.4f}\n")
+            f.write(f"{P2.latitude:.4f} {P2.longitude:.4f} {P2.depth:.4f}\n")
+            f.write(f"{P3.latitude:.4f} {P3.longitude:.4f} {P3.depth:.4f}\n")
+            f.write(f"{P0.latitude:.4f} {P0.longitude:.4f} {P0.depth:.4f}\n")
+            f.write(">\n")
+        if not hasattr(rupturefile, "read"):
             f.close()
 
     @classmethod
-    def fromOrientation(cls, px, py, pz, dx, dy, length, width,
-                        strike, dip, origin):
+    def fromOrientation(cls, px, py, pz, dx, dy, length, width, strike, dip, origin):
         """
         Create a QuadRupture instance from a known point, shape, and
         orientation.
@@ -474,31 +499,40 @@ class QuadRupture(Rupture):
                 all equal.
         """
         # Verify that arrays are of equal length
-        if len(px) == len(py) == len(pz) == len(
-                dx) == len(dy) == len(length) == len(width) == len(
-                strike) == len(dip):
+        if (
+            len(px)
+            == len(py)
+            == len(pz)
+            == len(dx)
+            == len(dy)
+            == len(length)
+            == len(width)
+            == len(strike)
+            == len(dip)
+        ):
             pass
         else:
             raise ShakeLibException(
-                'Number of px, py, pz, dx, dy, length, width, '
-                'strike, dip points must be '
-                'equal.')
+                "Number of px, py, pz, dx, dy, length, width, "
+                "strike, dip points must be "
+                "equal."
+            )
 
         # Verify that all are numpy arrays
-        px = np.array(px, dtype='d')
-        py = np.array(py, dtype='d')
-        pz = np.array(pz, dtype='d')
-        dx = np.array(dx, dtype='d')
-        dy = np.array(dy, dtype='d')
-        length = np.array(length, dtype='d')
-        width = np.array(width, dtype='d')
-        strike = np.array(strike, dtype='d')
-        dip = np.array(dip, dtype='d')
+        px = np.array(px, dtype="d")
+        py = np.array(py, dtype="d")
+        pz = np.array(pz, dtype="d")
+        dx = np.array(dx, dtype="d")
+        dy = np.array(dy, dtype="d")
+        length = np.array(length, dtype="d")
+        width = np.array(width, dtype="d")
+        strike = np.array(strike, dtype="d")
+        dip = np.array(dip, dtype="d")
 
         # Get P1 and P2 (top horizontal points)
         theta = np.rad2deg(np.arctan2(dy * np.cos(np.deg2rad(dip)), dx))
         P1_direction = strike + 180 + theta
-        P1_distance = np.sqrt(dx**2 + (dy * np.cos(np.deg2rad(dip)))**2)
+        P1_distance = np.sqrt(dx ** 2 + (dy * np.cos(np.deg2rad(dip))) ** 2)
         P2_direction = strike
         P2_distance = length
         P1_lon = []
@@ -506,12 +540,12 @@ class QuadRupture(Rupture):
         P2_lon = []
         P2_lat = []
         for idx, value in enumerate(px):
-            P1_points = point_at(px[idx], py[idx],
-                                 P1_direction[idx], P1_distance[idx])
+            P1_points = point_at(px[idx], py[idx], P1_direction[idx], P1_distance[idx])
             P1_lon += [P1_points[0]]
             P1_lat += [P1_points[1]]
-            P2_points = point_at(P1_points[0], P1_points[1],
-                                 P2_direction[idx], P2_distance[idx])
+            P2_points = point_at(
+                P1_points[0], P1_points[1], P2_direction[idx], P2_distance[idx]
+            )
             P2_lon += [P2_points[0]]
             P2_lat += [P2_points[1]]
 
@@ -519,18 +553,38 @@ class QuadRupture(Rupture):
         top_horizontal_depth = pz - np.abs(dy * np.sin(np.deg2rad(dip)))
 
         # Get QuadRupture object
-        quad = QuadRupture.fromTrace(P1_lon, P1_lat, P2_lon, P2_lat,
-                                     top_horizontal_depth, width, dip,
-                                     origin, strike=strike)
+        quad = QuadRupture.fromTrace(
+            P1_lon,
+            P1_lat,
+            P2_lon,
+            P2_lat,
+            top_horizontal_depth,
+            width,
+            dip,
+            origin,
+            strike=strike,
+        )
         return quad
 
     @classmethod
-    def fromVertices(cls,
-                     xp0, yp0, zp0, xp1, yp1, zp1,
-                     xp2, yp2, zp2, xp3, yp3, zp3,
-                     origin,
-                     group_index=None,
-                     reference=None):
+    def fromVertices(
+        cls,
+        xp0,
+        yp0,
+        zp0,
+        xp1,
+        yp1,
+        zp1,
+        xp2,
+        yp2,
+        zp2,
+        xp3,
+        yp3,
+        zp3,
+        origin,
+        group_index=None,
+        reference=None,
+    ):
         """
         Create a QuadDrupture instance from the vector of vertices that fully
         define the quadrilaterals. The points p0, ..., p3 are labeled below for
@@ -575,34 +629,48 @@ class QuadRupture(Rupture):
                 all equal, or if the length of the group_index is not the
                 same as the arrays (if group_index is supplied)..
         """
-        if len(xp0) == len(yp0) == len(zp0) == len(xp1) == len(yp1) == \
-           len(zp1) == len(xp2) == len(yp2) == len(zp2) == len(xp3) == \
-           len(yp3) == len(zp3):
+        if (
+            len(xp0)
+            == len(yp0)
+            == len(zp0)
+            == len(xp1)
+            == len(yp1)
+            == len(zp1)
+            == len(xp2)
+            == len(yp2)
+            == len(zp2)
+            == len(xp3)
+            == len(yp3)
+            == len(zp3)
+        ):
             pass
         else:
-            raise ShakeLibException('All vectors specifying quadrilateral '
-                                    'vertices must have the same length.')
+            raise ShakeLibException(
+                "All vectors specifying quadrilateral "
+                "vertices must have the same length."
+            )
 
         nq = len(xp0)
         if group_index is not None:
             if len(group_index) != nq:
                 raise ShakeLibException(
-                    "group_index must have same length as vertices.")
+                    "group_index must have same length as vertices."
+                )
         else:
             group_index = np.array(range(nq))
 
-        xp0 = np.array(xp0, dtype='d')
-        yp0 = np.array(yp0, dtype='d')
-        zp0 = np.array(zp0, dtype='d')
-        xp1 = np.array(xp1, dtype='d')
-        yp1 = np.array(yp1, dtype='d')
-        zp1 = np.array(zp1, dtype='d')
-        xp2 = np.array(xp2, dtype='d')
-        yp2 = np.array(yp2, dtype='d')
-        zp2 = np.array(zp2, dtype='d')
-        xp3 = np.array(xp3, dtype='d')
-        yp3 = np.array(yp3, dtype='d')
-        zp3 = np.array(zp3, dtype='d')
+        xp0 = np.array(xp0, dtype="d")
+        yp0 = np.array(yp0, dtype="d")
+        zp0 = np.array(zp0, dtype="d")
+        xp1 = np.array(xp1, dtype="d")
+        yp1 = np.array(yp1, dtype="d")
+        zp1 = np.array(zp1, dtype="d")
+        xp2 = np.array(xp2, dtype="d")
+        yp2 = np.array(yp2, dtype="d")
+        zp2 = np.array(zp2, dtype="d")
+        xp3 = np.array(xp3, dtype="d")
+        yp3 = np.array(yp3, dtype="d")
+        zp3 = np.array(zp3, dtype="d")
 
         # ---------------------------------------------------------------------
         # Create GeoJSON object
@@ -614,56 +682,59 @@ class QuadRupture(Rupture):
         for i in range(n_groups):
             ind = np.where(u_groups[i] == group_index)[0]
             lons = np.concatenate(
-                [xp0[ind[0]].reshape((1,)),
-                 xp1[ind],
-                 xp2[ind][::-1],
-                 xp3[ind][::-1][-1].reshape((1,)),
-                 xp0[ind[0]].reshape((1,))
-                 ])
+                [
+                    xp0[ind[0]].reshape((1,)),
+                    xp1[ind],
+                    xp2[ind][::-1],
+                    xp3[ind][::-1][-1].reshape((1,)),
+                    xp0[ind[0]].reshape((1,)),
+                ]
+            )
             lats = np.concatenate(
-                [yp0[ind[0]].reshape((1,)),
-                 yp1[ind],
-                 yp2[ind][::-1],
-                 yp3[ind][::-1][-1].reshape((1,)),
-                 yp0[ind[0]].reshape((1,))
-                 ])
+                [
+                    yp0[ind[0]].reshape((1,)),
+                    yp1[ind],
+                    yp2[ind][::-1],
+                    yp3[ind][::-1][-1].reshape((1,)),
+                    yp0[ind[0]].reshape((1,)),
+                ]
+            )
             deps = np.concatenate(
-                [zp0[ind[0]].reshape((1,)),
-                 zp1[ind],
-                 zp2[ind][::-1],
-                 zp3[ind][::-1][-1].reshape((1,)),
-                 zp0[ind[0]].reshape((1,))
-                 ])
+                [
+                    zp0[ind[0]].reshape((1,)),
+                    zp1[ind],
+                    zp2[ind][::-1],
+                    zp3[ind][::-1][-1].reshape((1,)),
+                    zp0[ind[0]].reshape((1,)),
+                ]
+            )
 
             poly = []
             for lon, lat, dep in zip(lons, lats, deps):
                 poly.append([lon, lat, dep])
             coords.append(poly)
 
-        d = {"type": "FeatureCollection",
-             "metadata": {
-                 "reference": reference
-             },
-             "features": [{
-                 "type": "Feature",
-                 "properties": {
-                     "rupture type": "rupture extent"
-                 },
-                 "geometry": {
-                     "type": "MultiPolygon",
-                     "coordinates": [coords]
-                 }
-             }]}
+        d = {
+            "type": "FeatureCollection",
+            "metadata": {"reference": reference},
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"rupture type": "rupture extent"},
+                    "geometry": {"type": "MultiPolygon", "coordinates": [coords]},
+                }
+            ],
+        }
 
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime(constants.TIMEFMT)
+                d["metadata"][k] = v.strftime(constants.TIMEFMT)
             else:
-                d['metadata'][k] = v
-        if hasattr(origin, 'id'):
-            d['metadata']['eventid'] = origin.id
+                d["metadata"][k] = v
+        if hasattr(origin, "id"):
+            d["metadata"]["eventid"] = origin.id
 
         return cls(d, origin)
 
@@ -806,8 +877,7 @@ class QuadRupture(Rupture):
 
         # Check that arrays are the same length
         if len(self._lon) != len(self._lat) != len(self._depth):
-            raise IndexError(
-                'Length of input lon, lat, depth arrays must be equal')
+            raise IndexError("Length of input lon, lat, depth arrays must be equal")
 
         # Construct quads
         group_start = 0
@@ -816,9 +886,9 @@ class QuadRupture(Rupture):
         self._group_index = []
         groupind = 0
         for i in range(n_groups):
-            lonseg = self._lon[group_start:group_ends[i]]
-            latseg = self._lat[group_start:group_ends[i]]
-            depthseg = self._depth[group_start:group_ends[i]]
+            lonseg = self._lon[group_start : group_ends[i]]
+            latseg = self._lat[group_start : group_ends[i]]
+            depthseg = self._depth[group_start : group_ends[i]]
 
             # Each group can have many contiguous quadrilaterals defined in it
             # separations (nans) between segments mean that segments are not
@@ -829,18 +899,16 @@ class QuadRupture(Rupture):
             quad_start = 0
             quad_end = -1
             for j in range(nquads):
-                P0 = Point(lonseg[quad_start],
-                           latseg[quad_start],
-                           depthseg[quad_start])
-                P1 = Point(lonseg[quad_start + 1],
-                           latseg[quad_start + 1],
-                           depthseg[quad_start + 1])
-                P2 = Point(lonseg[quad_end - 1],
-                           latseg[quad_end - 1],
-                           depthseg[quad_end - 1])
-                P3 = Point(lonseg[quad_end],
-                           latseg[quad_end],
-                           depthseg[quad_end])
+                P0 = Point(lonseg[quad_start], latseg[quad_start], depthseg[quad_start])
+                P1 = Point(
+                    lonseg[quad_start + 1],
+                    latseg[quad_start + 1],
+                    depthseg[quad_start + 1],
+                )
+                P2 = Point(
+                    lonseg[quad_end - 1], latseg[quad_end - 1], depthseg[quad_end - 1]
+                )
+                P3 = Point(lonseg[quad_end], latseg[quad_end], depthseg[quad_end])
                 quad = [P0, P1, P2, P3]
 
                 # Enforce plane by moving P2 -- already close because of check
@@ -1005,9 +1073,7 @@ class QuadRupture(Rupture):
             tuple: 3-tuple of numpy arrays indicating X,Y,Z (lon,lat,depth)
                 coordinates.
         """
-        return (np.array(self._lon),
-                np.array(self._lat),
-                np.array(self._depth))
+        return (np.array(self._lon), np.array(self._lat), np.array(self._depth))
 
     def getRuptureAsMesh(self):
         """

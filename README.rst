@@ -81,7 +81,7 @@ Introduction
 ------------
 
 This repository holds the latest version of the ShakeMap code (v4.0).
-ShakeMap is a system for rapidly characterizing the extent nad distribution of
+ShakeMap is a system for rapidly characterizing the extent and distribution of
 strong ground shaking following significant earthquakes. The code is 
 primarily written in the Python programming language. See the documentation 
 at http://usgs.github.io/shakemap/sm4_index.html for a more detailed discussion

@@ -23,9 +23,9 @@ class DummyCorrelation(CrossCorrelationBase):
         """
 
         if np.any(periods < 0.01):
-            raise ValueError('The periods must be greater or equal to 0.01s')
+            raise ValueError("The periods must be greater or equal to 0.01s")
         if np.any(periods > 10):
-            raise ValueError('The periods must be less or equal to 10s')
+            raise ValueError("The periods must be less or equal to 10s")
 
         self.periods = periods.copy()
 
@@ -61,10 +61,9 @@ class DummyCorrelation(CrossCorrelationBase):
         """
         # Verify the validity of input arguments
         if np.any(h < 0):
-            raise ValueError('The separation distance must be positive')
+            raise ValueError("The separation distance must be positive")
         if np.shape(ix1) != np.shape(ix2) or np.shape(ix1) != np.shape(h):
-            raise ValueError(
-                'The input arguments must all have the same dimensions')
+            raise ValueError("The input arguments must all have the same dimensions")
 
         p1 = self.periods[ix1]
         p2 = self.periods[ix2]

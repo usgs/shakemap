@@ -11,7 +11,7 @@ from shakemap.utils.config import get_config_paths
 from shakemap.utils.amps import AmplitudeHandler
 from shakemap.utils.logging import get_generic_logger
 
-LOGFILE = 'amps.log'
+LOGFILE = "amps.log"
 
 
 def get_parser():
@@ -20,54 +20,54 @@ def get_parser():
     Returns:
         ArgumentParser: argparse instance for this script.
     """
-    description = '''Insert strong motion unassociated peak amplitude
+    description = """Insert strong motion unassociated peak amplitude
     files into a database.
-    '''
+    """
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--directory',
-                        help='Directory containing unassociated strong '
-                             'motion peak amplitudes')
+    parser.add_argument(
+        "--directory",
+        help="Directory containing unassociated strong " "motion peak amplitudes",
+    )
 
     return parser
 
 
 def main(args):
-    """Main method for script.
-
-    """
+    """Main method for script."""
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
-        print('%s is not a valid directory.' % data_path)
+        print(f"{data_path} is not a valid directory.")
         sys.exit(1)
 
     # set up a daily rotating file handler logger
-    logfile = os.path.join(install_path, 'logs', LOGFILE)
+    logfile = os.path.join(install_path, "logs", LOGFILE)
     logger = get_generic_logger(logfile=logfile)
 
-    logger.info('Parsing input directory %s' % args.directory)
+    logger.info(f"Parsing input directory {args.directory}")
 
     # Create a handler object
     handler = AmplitudeHandler(install_path, data_path)
 
-    logger.info('Searching %s...' % args.directory)
-    xmlfiles = glob.glob(os.path.join(args.directory, '*.xml'))
+    logger.info(f"Searching {args.directory}...")
+    xmlfiles = glob.glob(os.path.join(args.directory, "*.xml"))
     nloaded = 0
     for xmlfile in xmlfiles:
-        if xmlfile.endswith('product.xml'):
+        if xmlfile.endswith("product.xml"):
             continue
         try:
             handler.insertAmps(xmlfile)
             nloaded += 1
         except Exception as e:
-            logger.info('Could not insert file %s: "%s"' % (xmlfile, str(e)))
+            logger.info(f'Could not insert file {xmlfile}: "{str(e)}"')
             # TODO - configure a directory where "bad" amps files can go
             continue
-    logger.info('Inserted %i amplitude files into the database.' % nloaded)
+    logger.info("Inserted %i amplitude files into the database." % nloaded)
 
 
-if __name__ == '__main__':
-    clean_argv = ' '.join([x.replace('"', '').replace('=', ' ', 1)
-                           for x in sys.argv]).split()
+if __name__ == "__main__":
+    clean_argv = " ".join(
+        [x.replace('"', "").replace("=", " ", 1) for x in sys.argv]
+    ).split()
     parser = get_parser()
     pargs, unknown = parser.parse_known_args(clean_argv)
     main(pargs)

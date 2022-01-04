@@ -15,8 +15,9 @@ class SCPTransfer(TransferBaseModule):
     """
     transfer_pdl - Transfer content via SCP to a remote server.
     """
-    command_name = 'transfer_scp'
-    dependencies = [('products/*', False)]
+
+    command_name = "transfer_scp"
+    dependencies = [("products/*", False)]
 
     def __init__(self, eventid):
         # call the parent constructor
@@ -29,29 +30,28 @@ class SCPTransfer(TransferBaseModule):
         super(SCPTransfer, self).execute()
 
         # check to see if SCP is a configured method
-        if 'scp' not in self.config:
-            logging.info('No SCP transfer has been configured. Returning.')
+        if "scp" not in self.config:
+            logging.info("No SCP transfer has been configured. Returning.")
             return
 
         # get the properties needed for the sender
         properties, product_properties = self.getProperties(self.info)
 
         # get the products directory
-        product_dir = os.path.join(self.datadir, 'products')
+        product_dir = os.path.join(self.datadir, "products")
 
         # loop over all possible scp destinations, send products to
         # each one
-        for destination, params in self.config['scp'].items():
+        for destination, params in self.config["scp"].items():
             # append the event ID to the remote_directory
-            pdir = params['remote_directory']
-            params['remote_directory'] = os.path.join(pdir, self._eventid)
+            pdir = params["remote_directory"]
+            params["remote_directory"] = os.path.join(pdir, self._eventid)
 
             params.update(properties)
-            fmt = 'Doing SCP transfer to %s...' % destination
+            fmt = f"Doing SCP transfer to {destination}..."
             logging.debug(fmt)
 
-            sender = SecureSender(properties=params,
-                                  local_directory=product_dir)
+            sender = SecureSender(properties=params, local_directory=product_dir)
             if self.cancel:
                 msg = sender.cancel()
             else:
@@ -59,7 +59,7 @@ class SCPTransfer(TransferBaseModule):
                     nfiles, msg = sender.send()
                 except Exception as e:
                     logging.warning(str(e))
-                    raise(e)
+                    raise (e)
                 fmt = '%i files sent.  Message from sender: \n"%s"'
                 tpl = (nfiles, msg)
                 logging.info(fmt % tpl)

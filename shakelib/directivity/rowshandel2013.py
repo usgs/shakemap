@@ -65,8 +65,20 @@ class Rowshandel2013(object):
     __c2 = [-0.035, -0.10, -0.15, -0.26, -0.30]
     __periods = [1.0, 3.0, 5.0, 7.5, 10.0]
 
-    def __init__(self, origin, rup, lat, lon, dep, dx, T, a_weight=0.5,
-                 mtype=1, simpleDT=False, centered=True):
+    def __init__(
+        self,
+        origin,
+        rup,
+        lat,
+        lon,
+        dep,
+        dx,
+        T,
+        a_weight=0.5,
+        mtype=1,
+        simpleDT=False,
+        centered=True,
+    ):
         """
         Constructor for rowshandel2013.
 
@@ -105,10 +117,10 @@ class Rowshandel2013(object):
         else:
             self._T = T
         if (a_weight > 1.0) or (a_weight < 0):
-            raise ValueError('a_weight must be between 0 and 1.')
+            raise ValueError("a_weight must be between 0 and 1.")
         self._a_weight = a_weight
         if (mtype != 1) and (mtype != 2):
-            raise ValueError('mtype can onlty be 1 or 2.')
+            raise ValueError("mtype can onlty be 1 or 2.")
         self._mtype = mtype
         self._simpleDT = simpleDT
         self._centered = centered
@@ -122,8 +134,18 @@ class Rowshandel2013(object):
         self.__computeFd()
 
     @classmethod
-    def fromSites(cls, origin, rup, sites, dx, T, a_weight=0.5,
-                  mtype=1, simpleDT=False, centered=True):
+    def fromSites(
+        cls,
+        origin,
+        rup,
+        sites,
+        dx,
+        T,
+        a_weight=0.5,
+        mtype=1,
+        simpleDT=False,
+        centered=True,
+    ):
         """Construct a rowshandel2013 instance from a sites instance.
 
         Class method for constructing a rowshandel2013 instance from
@@ -164,8 +186,9 @@ class Rowshandel2013(object):
         lons = np.linspace(west, east, nx)
         lon, lat = np.meshgrid(lons, lats)
         dep = np.zeros_like(lon)
-        return cls(origin, rup, lat, lon, dep, dx, T,
-                   a_weight, mtype, simpleDT, centered)
+        return cls(
+            origin, rup, lat, lon, dep, dx, T, a_weight, mtype, simpleDT, centered
+        )
 
     def getFd(self):
         """
@@ -234,8 +257,9 @@ class Rowshandel2013(object):
             if self._centered:
                 self._fd[i] = c1sel * self._WP * self._DT * xcipc
             else:
-                self._fd[i] = (c1sel * self._xi_prime + c2sel) * \
-                    self._LD * self._DT * self._WP
+                self._fd[i] = (
+                    (c1sel * self._xi_prime + c2sel) * self._LD * self._DT * self._WP
+                )
 
     def __computeWrup(self):
         """
@@ -257,13 +281,11 @@ class Rowshandel2013(object):
         # First find which quad the hypocenter is on
         # ---------------------------------------------------------------------
 
-        x, y, z = latlon2ecef(
-            self._hyp.latitude, self._hyp.longitude, self._hyp.depth)
+        x, y, z = latlon2ecef(self._hyp.latitude, self._hyp.longitude, self._hyp.depth)
         hyp_ecef = np.array([[x, y, z]])
         qdist = np.zeros(nquad)
         for i in range(0, nquad):
-            qdist[i] = utils._quad_distance(
-                self._rup.getQuadrilaterals()[i], hyp_ecef)
+            qdist[i] = utils._quad_distance(self._rup.getQuadrilaterals()[i], hyp_ecef)
         ind = int(np.where(qdist == np.min(qdist))[0][0])
         # *** check that this doesn't break with more than one quad
         q = self._rup.getQuadrilaterals()[ind]
@@ -272,10 +294,12 @@ class Rowshandel2013(object):
         # Compute Wrup on that quad
         # ---------------------------------------------------------------------
 
-        pp0 = Vector.fromPoint(geo.point.Point(
-            q[0].longitude, q[0].latitude, q[0].depth))
-        hyp_ecef = Vector.fromPoint(geo.point.Point(
-            self._hyp.longitude, self._hyp.latitude, self._hyp.depth))
+        pp0 = Vector.fromPoint(
+            geo.point.Point(q[0].longitude, q[0].latitude, q[0].depth)
+        )
+        hyp_ecef = Vector.fromPoint(
+            geo.point.Point(self._hyp.longitude, self._hyp.latitude, self._hyp.depth)
+        )
         hp0 = hyp_ecef - pp0
         ddv = utils.get_quad_down_dip_vector(q)
         self._Wrup = Vector.dot(ddv, hp0) / 1000
@@ -284,8 +308,9 @@ class Rowshandel2013(object):
         """
         Computes the xi' value.
         """
-        hypo_ecef = Vector.fromPoint(geo.point.Point(
-            self._hyp.longitude, self._hyp.latitude, self._hyp.depth))
+        hypo_ecef = Vector.fromPoint(
+            geo.point.Point(self._hyp.longitude, self._hyp.latitude, self._hyp.depth)
+        )
 
         slat = self._lat
         slon = self._lon
@@ -298,10 +323,15 @@ class Rowshandel2013(object):
         # Make a 3x(#number of sites) matrix of site locations
         # (rows are x, y, z) in ECEF
         site_ecef_x, site_ecef_y, site_ecef_z = latlon2ecef(
-            slat, slon, np.zeros(slon.shape))
-        site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
-                             np.reshape(site_ecef_y, (-1,)),
-                             np.reshape(site_ecef_z, (-1,))])
+            slat, slon, np.zeros(slon.shape)
+        )
+        site_mat = np.array(
+            [
+                np.reshape(site_ecef_x, (-1,)),
+                np.reshape(site_ecef_y, (-1,)),
+                np.reshape(site_ecef_z, (-1,)),
+            ]
+        )
 
         xi_prime_unscaled = np.zeros_like(slat)
 
@@ -323,18 +353,18 @@ class Rowshandel2013(object):
 
             # Rupture plane normal vector (ECEF coords)
             rpnv = utils.get_quad_normal(q)
-            rpnvcol = np.array([[rpnv.x],
-                                [rpnv.y],
-                                [rpnv.z]])
+            rpnvcol = np.array([[rpnv.x], [rpnv.y], [rpnv.z]])
 
-            cp_mat = np.array([np.reshape(mesh['cpx'], (-1,)),
-                               np.reshape(mesh['cpy'], (-1,)),
-                               np.reshape(mesh['cpz'], (-1,))])
+            cp_mat = np.array(
+                [
+                    np.reshape(mesh["cpx"], (-1,)),
+                    np.reshape(mesh["cpy"], (-1,)),
+                    np.reshape(mesh["cpz"], (-1,)),
+                ]
+            )
 
             # Compute matrix of p vectors
-            hypcol = np.array([[hypo_ecef.x],
-                               [hypo_ecef.y],
-                               [hypo_ecef.z]])
+            hypcol = np.array([[hypo_ecef.x], [hypo_ecef.y], [hypo_ecef.z]])
             pmat = cp_mat - hypcol
 
             # Project pmat onto quad
@@ -357,18 +387,17 @@ class Rowshandel2013(object):
 
             # Strike slip and dip slip components of unit slip vector
             # (ECEF coords)
-            ds_mat, ss_mat = _get_quad_slip_ds_ss(
-                q, self._rake, cp_mat, pmatnorm)
+            ds_mat, ss_mat = _get_quad_slip_ds_ss(q, self._rake, cp_mat, pmatnorm)
 
-            slpmat = (ds_mat + ss_mat)
+            slpmat = ds_mat + ss_mat
             mag = np.sqrt(np.sum(slpmat * slpmat, axis=0))
             slpmatnorm = slpmat / mag
 
             # Loop over sites
             for i in range(site_mat.shape[1]):
-                sitecol = np.array([[site_mat[0, i]],
-                                    [site_mat[1, i]],
-                                    [site_mat[2, i]]])
+                sitecol = np.array(
+                    [[site_mat[0, i]], [site_mat[1, i]], [site_mat[2, i]]]
+                )
 
                 qmat = sitecol - cp_mat  # 3x(ni*nj), like r2
                 mag = np.sqrt(np.sum(qmat * qmat, axis=0))
@@ -416,10 +445,10 @@ class Rowshandel2013(object):
         # o Normalize xi_prime_s and xi_prime_p
         # o Reshape them
         # o Add them together with the 'a' weights
-        xi_prime_tmp = (self._a_weight) * (xi_prime_s / nsubs) + \
-                       (1 - self._a_weight) * (xi_prime_p / nsubp)
-        xi_prime_unscaled = xi_prime_unscaled + \
-            np.reshape(xi_prime_tmp, slat.shape)
+        xi_prime_tmp = (self._a_weight) * (xi_prime_s / nsubs) + (
+            1 - self._a_weight
+        ) * (xi_prime_p / nsubp)
+        xi_prime_unscaled = xi_prime_unscaled + np.reshape(xi_prime_tmp, slat.shape)
 
         # Scale so that xi_prime has range (0, 1)
         if self._mtype == 1:
@@ -508,18 +537,18 @@ class Rowshandel2013(object):
         slat = self._lat
         slon = self._lon
         site_z = np.zeros_like(slat)
-        ddict = get_distance('rrup', slat, slon, site_z, self._rup)
-        Rrup = np.reshape(ddict['rrup'], (-1, ))
+        ddict = get_distance("rrup", slat, slon, site_z, self._rup)
+        Rrup = np.reshape(ddict["rrup"], (-1,))
         nsite = len(Rrup)
 
-        if self._simpleDT:   # eqn 3.10
+        if self._simpleDT:  # eqn 3.10
             R1 = 35
             R2 = 70
             DT = np.ones(nsite)
             ix = tuple([(Rrup > R1) & (Rrup < R2)])
             DT[ix] = 2 - Rrup[ix] / R1
             DT[Rrup >= R2] = 0
-        else:                  # eqn 3.9
+        else:  # eqn 3.9
             if period >= 1:
                 R1 = 20 + 10 * np.log(period)
                 R2 = 2 * (20 + 10 * np.log(period))
@@ -531,8 +560,7 @@ class Rowshandel2013(object):
             # DT[(Rrup > R1) & (Rrup < R2)] = \
             #    2 - Rrup[(Rrup > R1) & (Rrup < R2)]/(20 + 10 * np.log(period))
             # Modification:
-            DT[(Rrup > R1) & (Rrup < R2)] = 2 - \
-                Rrup[(Rrup > R1) & (Rrup < R2)] / R1
+            DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)] / R1
             # Note: it is not clear if the above modification is 'correct'
             #       but it gives results that make more sense
             DT[Rrup >= R2] = 0
@@ -563,8 +591,9 @@ class Rowshandel2013(object):
         # Update (Rowshandel, personal communication)
         sig = 0.55
         Tp = np.exp(1.04 * self._M - 6.0)
-        self._WP = np.exp(-(np.log10(period / Tp) *
-                            np.log10(period / Tp)) / (2 * sig * sig))
+        self._WP = np.exp(
+            -(np.log10(period / Tp) * np.log10(period / Tp)) / (2 * sig * sig)
+        )
 
     @classmethod
     def getPeriods(cls):
@@ -603,24 +632,48 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     s1_local = utils.get_local_unit_slip_vector_SS(strike, dip, rake)
 
     # Convert to a column array
-    d1_col = np.array([[d1_local.x],
-                       [d1_local.y],
-                       [d1_local.z]])
-    s1_col = np.array([[s1_local.x],
-                       [s1_local.y],
-                       [s1_local.z]])
+    d1_col = np.array([[d1_local.x], [d1_local.y], [d1_local.z]])
+    s1_col = np.array([[s1_local.x], [s1_local.y], [s1_local.z]])
 
     # Define 'local' coordinate system
     qlats = [a.latitude for a in q]
     qlons = [a.longitude for a in q]
     proj = OrthographicProjection(
-        np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
+        np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats)
+    )
 
     # Convert p and cp to geographic coords
-    p0lat, p0lon, p0z = ecef2latlon(cp[0, ], cp[1, ], cp[2, ])
-    p1lat, p1lon, p1z = ecef2latlon(cp[0, ] + p[0, ],
-                                    cp[1, ] + p[1, ],
-                                    cp[2, ] + p[2, ])
+    p0lat, p0lon, p0z = ecef2latlon(
+        cp[
+            0,
+        ],
+        cp[
+            1,
+        ],
+        cp[
+            2,
+        ],
+    )
+    p1lat, p1lon, p1z = ecef2latlon(
+        cp[
+            0,
+        ]
+        + p[
+            0,
+        ],
+        cp[
+            1,
+        ]
+        + p[
+            1,
+        ],
+        cp[
+            2,
+        ]
+        + p[
+            2,
+        ],
+    )
 
     # Convert p to 'local' coords
     p0x, p0y = proj(p0lon, p0lat)
@@ -630,37 +683,81 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     pz = p1z - p0z
 
     # Apply sign changes in 'local' coords
-    s1mat = np.array([[np.abs(s1_col[0]) * np.sign(px)],
-                      [np.abs(s1_col[1]) * np.sign(py)],
-                      [np.abs(s1_col[2]) * np.sign(pz)]])
-#                      [np.abs(s1_col[2])*np.ones_like(pz)]])
+    s1mat = np.array(
+        [
+            [np.abs(s1_col[0]) * np.sign(px)],
+            [np.abs(s1_col[1]) * np.sign(py)],
+            [np.abs(s1_col[2]) * np.sign(pz)],
+        ]
+    )
+    #                      [np.abs(s1_col[2])*np.ones_like(pz)]])
 
     dipsign = -np.sign(np.sin(np.radians(rake)))
-    d1mat = np.array([[d1_col[0] * np.ones_like(px) * dipsign],
-                      [d1_col[1] * np.ones_like(py) * dipsign],
-                      [d1_col[2] * np.ones_like(pz) * dipsign]])
+    d1mat = np.array(
+        [
+            [d1_col[0] * np.ones_like(px) * dipsign],
+            [d1_col[1] * np.ones_like(py) * dipsign],
+            [d1_col[2] * np.ones_like(pz) * dipsign],
+        ]
+    )
 
     # Need to track 'origin'
     s0 = np.array([[0], [0], [0]])
 
     # Convert from 'local' to geographic coords
-    s1_ll = proj(s1mat[0, ], s1mat[1, ], reverse=True)
-    d1_ll = proj(d1mat[0, ], d1mat[1, ], reverse=True)
+    s1_ll = proj(
+        s1mat[
+            0,
+        ],
+        s1mat[
+            1,
+        ],
+        reverse=True,
+    )
+    d1_ll = proj(
+        d1mat[
+            0,
+        ],
+        d1mat[
+            1,
+        ],
+        reverse=True,
+    )
     s0_ll = proj(s0[0], s0[1], reverse=True)
 
     # And then back to ECEF:
-    s1_ecef = latlon2ecef(s1_ll[1], s1_ll[0], s1mat[2, ])
-    d1_ecef = latlon2ecef(d1_ll[1], d1_ll[0], d1mat[2, ])
+    s1_ecef = latlon2ecef(
+        s1_ll[1],
+        s1_ll[0],
+        s1mat[
+            2,
+        ],
+    )
+    d1_ecef = latlon2ecef(
+        d1_ll[1],
+        d1_ll[0],
+        d1mat[
+            2,
+        ],
+    )
     s0_ecef = latlon2ecef(s0_ll[1], s0_ll[0], s0[2])
     s00 = s0_ecef[0].reshape(-1)
     s01 = s0_ecef[1].reshape(-1)
     s02 = s0_ecef[2].reshape(-1)
-    d_mat = np.array([d1_ecef[0].reshape(-1) - s00,
-                      d1_ecef[1].reshape(-1) - s01,
-                      d1_ecef[2].reshape(-1) - s02])
-    s_mat = np.array([s1_ecef[0].reshape(-1) - s00,
-                      s1_ecef[1].reshape(-1) - s01,
-                      s1_ecef[2].reshape(-1) - s02])
+    d_mat = np.array(
+        [
+            d1_ecef[0].reshape(-1) - s00,
+            d1_ecef[1].reshape(-1) - s01,
+            d1_ecef[2].reshape(-1) - s02,
+        ]
+    )
+    s_mat = np.array(
+        [
+            s1_ecef[0].reshape(-1) - s00,
+            s1_ecef[1].reshape(-1) - s01,
+            s1_ecef[2].reshape(-1) - s02,
+        ]
+    )
     return d_mat, s_mat
 
 
@@ -678,6 +775,10 @@ def _rotation_matrix(axis, theta):
     b, c, d = -axis * np.sin(theta / 2)
     aa, bb, cc, dd = a * a, b * b, c * c, d * d
     bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
-    return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
-                     [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
-                     [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
+    return np.array(
+        [
+            [aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
+            [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
+            [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc],
+        ]
+    )

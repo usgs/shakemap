@@ -17,7 +17,7 @@ class ExceptionModule(CoreModule):
     Module to raise an exception for testing purposes.
     """
 
-    command_name = 'exception'
+    command_name = "exception"
 
     def __init__(self, eventid, seconds=None):
         """
@@ -25,7 +25,7 @@ class ExceptionModule(CoreModule):
         """
         self._eventid = eventid
         log_config = get_logging_config()
-        log_name = log_config['loggers'].keys()[0]
+        log_name = log_config["loggers"].keys()[0]
         self.logger = logging.getLogger(log_name)
         if seconds is not None:
             self.seconds = seconds
@@ -38,4 +38,4 @@ class ExceptionModule(CoreModule):
         handling logic.
         """
 
-        raise Exception('This is a test of exception handling.')
+        raise Exception("This is a test of exception handling.")

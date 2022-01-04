@@ -33,37 +33,50 @@ class Wald99(GMICE):
     def __init__(self):
         super().__init__()
         self.min_max = (1.0, 10.0)
-        self.name = 'Wald et al. (1999)'
-        self.scale = 'scale_wald99.ps'
+        self.name = "Wald et al. (1999)"
+        self.scale = "scale_wald99.ps"
         self.__constants = {
-            self._pga: {'C1':  3.66, 'C2': -1.66, 'C3':  2.20, 'C4': 1.00,
-                        'T1':  1.82, 'T2': 5.00, 'SMMI': 1.08, 'SPGM': 0.295},
-            self._pgv: {'C1':  3.47, 'C2':  2.35, 'C3':  2.10, 'C4': 3.40,
-                        'T1':  0.76, 'T2': 5.00, 'SMMI': 0.98, 'SPGM': 0.282},
+            self._pga: {
+                "C1": 3.66,
+                "C2": -1.66,
+                "C3": 2.20,
+                "C4": 1.00,
+                "T1": 1.82,
+                "T2": 5.00,
+                "SMMI": 1.08,
+                "SPGM": 0.295,
+            },
+            self._pgv: {
+                "C1": 3.47,
+                "C2": 2.35,
+                "C3": 2.10,
+                "C4": 3.40,
+                "T1": 0.76,
+                "T2": 5.00,
+                "SMMI": 0.98,
+                "SPGM": 0.282,
+            },
         }
 
-        self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
-            PGA,
-            PGV
-        ])
+        self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([PGA, PGV])
 
         self.DEFINED_FOR_SA_PERIODS = set([])
 
     def getPreferredMI(self, df, dists=None, mag=None):
-        if 'PGA' not in df or 'PGV' not in df:
-            if 'PGV' in df:
-                oqimt = imt.from_string('PGV')
-                return self.getMIfromGM(df['PGV'], oqimt, dists, mag)[0]
-            elif 'PGA' in df:
-                oqimt = imt.from_string('PGA')
-                return self.getMIfromGM(df['PGA'], oqimt, dists, mag)[0]
+        if "PGA" not in df or "PGV" not in df:
+            if "PGV" in df:
+                oqimt = imt.from_string("PGV")
+                return self.getMIfromGM(df["PGV"], oqimt, dists, mag)[0]
+            elif "PGA" in df:
+                oqimt = imt.from_string("PGA")
+                return self.getMIfromGM(df["PGA"], oqimt, dists, mag)[0]
             else:
                 return None
-        oqimt = imt.from_string('PGA')
-        mmi_pga = self.getMIfromGM(df['PGA'], oqimt, dists, mag)[0]
+        oqimt = imt.from_string("PGA")
+        mmi_pga = self.getMIfromGM(df["PGA"], oqimt, dists, mag)[0]
         ix_nan_pga = np.isnan(mmi_pga)
-        oqimt = imt.from_string('PGV')
-        mmi_pgv = self.getMIfromGM(df['PGV'], oqimt, dists, mag)[0]
+        oqimt = imt.from_string("PGV")
+        mmi_pgv = self.getMIfromGM(df["PGV"], oqimt, dists, mag)[0]
         ix_nan_pgv = np.isnan(mmi_pgv)
         ix_nan = ix_nan_pga | ix_nan_pgv
         vscale = np.zeros_like(mmi_pga)
@@ -72,8 +85,11 @@ class Wald99(GMICE):
         vscale[vscale > 1] = 1
         ascale = 1 - vscale
         mmi = np.full_like(mmi_pga, np.nan)
-        mmi[~ix_nan] = np.clip(mmi_pga[~ix_nan] * ascale[~ix_nan] +
-                               mmi_pgv[~ix_nan] * vscale[~ix_nan], 1, 10)
+        mmi[~ix_nan] = np.clip(
+            mmi_pga[~ix_nan] * ascale[~ix_nan] + mmi_pgv[~ix_nan] * vscale[~ix_nan],
+            1,
+            10,
+        )
         mmi[ix_nan_pgv] = mmi_pga[ix_nan_pgv]
         mmi[ix_nan_pga] = mmi_pgv[ix_nan_pga]
         ix_nan = np.isnan(mmi)
@@ -131,15 +147,15 @@ class Wald99(GMICE):
         #
         # This is the upper segment of the bi-linear fit
         #
-        idx = lamps >= c['T1']
-        mmi[idx] = c['C2'] + c['C1'] * lamps[idx]
-        dmmi_damp[idx] = c['C1'] * lfact
+        idx = lamps >= c["T1"]
+        mmi[idx] = c["C2"] + c["C1"] * lamps[idx]
+        dmmi_damp[idx] = c["C1"] * lfact
         #
         # This is the lower segment of the bi-linear fit
         #
-        idx = lamps < c['T1']
-        mmi[idx] = c['C4'] + c['C3'] * lamps[idx]
-        dmmi_damp[idx] = c['C3'] * lfact
+        idx = lamps < c["T1"]
+        mmi[idx] = c["C4"] + c["C3"] * lamps[idx]
+        dmmi_damp[idx] = c["C3"] * lfact
 
         mmi = np.clip(mmi, 1.0, 10.0)
         mmi[ix_nan] = np.nan
@@ -181,15 +197,15 @@ class Wald99(GMICE):
         #
         # Upper segment of bi-linear relationship
         #
-        idx = mmi >= c['T2']
-        pgm[idx] = np.power(10, (mmi[idx] - c['C2']) / c['C1'])
-        dpgm_dmmi[idx] = 1.0 / (c['C1'] * lfact)
+        idx = mmi >= c["T2"]
+        pgm[idx] = np.power(10, (mmi[idx] - c["C2"]) / c["C1"])
+        dpgm_dmmi[idx] = 1.0 / (c["C1"] * lfact)
         #
         # Lower segment of bi-linear relationship
         #
-        idx = mmi < c['T2']
-        pgm[idx] = np.power(10, (mmi[idx] - c['C4']) / c['C3'])
-        dpgm_dmmi[idx] = 1.0 / (c['C3'] * lfact)
+        idx = mmi < c["T2"]
+        pgm[idx] = np.power(10, (mmi[idx] - c["C4"]) / c["C3"])
+        dpgm_dmmi[idx] = 1.0 / (c["C3"] * lfact)
 
         if imt != self._pgv:
             units = 981.0
@@ -210,8 +226,10 @@ class Wald99(GMICE):
         Returns:
             Dictionary of GM to MI sigmas (in MMI units).
         """
-        return {self._pga: self.__constants[self._pga]['SMMI'],
-                self._pgv: self.__constants[self._pgv]['SMMI']}
+        return {
+            self._pga: self.__constants[self._pga]["SMMI"],
+            self._pgv: self.__constants[self._pgv]["SMMI"],
+        }
 
     def getMI2GMsd(self):
         """
@@ -226,8 +244,10 @@ class Wald99(GMICE):
         # Need to convert log10 to ln units
         #
         lfact = np.log(10.0)
-        return {self._pga: lfact * self.__constants[self._pga]['SPGM'],
-                self._pgv: lfact * self.__constants[self._pgv]['SPGM']}
+        return {
+            self._pga: lfact * self.__constants[self._pga]["SPGM"],
+            self._pgv: lfact * self.__constants[self._pgv]["SPGM"],
+        }
 
     def _getConsts(self, imt):
         """

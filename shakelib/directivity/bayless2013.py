@@ -69,19 +69,20 @@ class Bayless2013(object):
         `[link] <http://srl.geoscienceworld.org/content/68/1/199.abstract>`__
 
     """  # noqa
+
     # ------------------------------------------------------------------------
     # C0 adn C1 are for RotD50. One set for each mechanism (SS vs DS).
     # FN and FP are also available
     # ------------------------------------------------------------------------
     __periods = np.array([0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10])
-    __c0ss = np.array([0.0, 0.0, -0.12, -0.175, -0.21, -0.235, -0.255,
-                       -0.275, -0.29, -0.3])
-    __c1ss = np.array([0.0, 0.0, 0.075, 0.090, 0.095, 0.099, 0.103, 0.108,
-                       0.112, 0.115])
-    __c0ds = np.array([0.0, 0.0, 0.0, 0.0, 0.0, -0.033, -0.089, -0.133,
-                       -0.16, -0.176])
-    __c1ds = np.array([0.0, 0.0, 0.0, 0.0, 0.034, 0.093, 0.128, 0.15,
-                       0.165, 0.179])
+    __c0ss = np.array(
+        [0.0, 0.0, -0.12, -0.175, -0.21, -0.235, -0.255, -0.275, -0.29, -0.3]
+    )
+    __c1ss = np.array(
+        [0.0, 0.0, 0.075, 0.090, 0.095, 0.099, 0.103, 0.108, 0.112, 0.115]
+    )
+    __c0ds = np.array([0.0, 0.0, 0.0, 0.0, 0.0, -0.033, -0.089, -0.133, -0.16, -0.176])
+    __c1ds = np.array([0.0, 0.0, 0.0, 0.0, 0.034, 0.093, 0.128, 0.15, 0.165, 0.179])
 
     def __init__(self, origin, rup, lat, lon, depth, T):
         """
@@ -130,12 +131,11 @@ class Bayless2013(object):
             self.i = i
 
             # Compute some genral stuff that is required for all mechanisms
-            dtypes = ['rrup', 'rx', 'ry0']
-            dists = get_distance(dtypes, self._lat, self._lon, self._dep,
-                                 self._rup)
-            self.__Rrup = np.reshape(dists['rrup'], self._lat.shape)
-            self.__Rx = np.reshape(dists['rx'], self._lat.shape)
-            self.__Ry = np.reshape(dists['ry0'], self._lat.shape)
+            dtypes = ["rrup", "rx", "ry0"]
+            dists = get_distance(dtypes, self._lat, self._lon, self._dep, self._rup)
+            self.__Rrup = np.reshape(dists["rrup"], self._lat.shape)
+            self.__Rx = np.reshape(dists["rx"], self._lat.shape)
+            self.__Ry = np.reshape(dists["ry0"], self._lat.shape)
             # NOTE: use Rx and Ry to compute Az in 'computeAz'. It is probably
             #       possible to make this a lot faster by avoiding the
             #       calculation of these distances each time.
@@ -153,11 +153,11 @@ class Bayless2013(object):
             else:
                 self._T_Mw = 1.0
 
-            if self.SlipCategory == 'SS':
+            if self.SlipCategory == "SS":
                 self.__computeSS()
                 self._fd = self._fd + self.weights[i] * self._fd_SS
 
-            elif self.SlipCategory == 'DS':
+            elif self.SlipCategory == "DS":
                 self.__computeDS()
                 self._fd = self._fd + self.weights[i] * self._fd_DS
 
@@ -174,12 +174,11 @@ class Bayless2013(object):
                 # Compute weights:
                 DipWeight = refrake / (np.pi / 2.0)
                 StrikeWeight = 1.0 - DipWeight
-                fdcombined = StrikeWeight * self._fd_SS + DipWeight * \
-                    self._fd_DS
+                fdcombined = StrikeWeight * self._fd_SS + DipWeight * self._fd_DS
                 self._fd = self._fd + self.weights[i] * fdcombined
 
     def __setPseudoHypocenters(self):
-        """ Set a pseudo-hypocenter.
+        """Set a pseudo-hypocenter.
 
         Adapted from ShakeMap 3.5 src/contour/directivity.c
 
@@ -192,8 +191,9 @@ class Bayless2013(object):
         is segmented along strike, not updip. All geometric parameters are
         computed relative to the pseudo-hypocenter."
         """
-        hyp_ecef = Vector.fromPoint(geo.point.Point(
-            self._hyp.longitude, self._hyp.latitude, self._hyp.depth))
+        hyp_ecef = Vector.fromPoint(
+            geo.point.Point(self._hyp.longitude, self._hyp.latitude, self._hyp.depth)
+        )
         # Loop over each quad
         self.phyp = [None] * self._nq
         for i in range(self._nq):
@@ -260,20 +260,24 @@ class Bayless2013(object):
         self.__computeD(self.i)
 
         # Geometric directivity predictor:
-        RxoverW = (self.__Rx /
-                   self._W[self.i]).clip(
-            min=-np.pi / 2.0, max=2.0 * np.pi / 3.0)
+        RxoverW = (self.__Rx / self._W[self.i]).clip(
+            min=-np.pi / 2.0, max=2.0 * np.pi / 3.0
+        )
         f_geom = np.log(self.d) * np.cos(RxoverW)
 
         # Distance taper
         T_CD = np.ones_like(self._lat)
-        ix = tuple([(self.__Rrup / self._W[self.i] > 1.5) &
-                    (self.__Rrup / self._W[self.i] < 2.0)])
+        ix = tuple(
+            [
+                (self.__Rrup / self._W[self.i] > 1.5)
+                & (self.__Rrup / self._W[self.i] < 2.0)
+            ]
+        )
         T_CD[ix] = 1.0 - (self.__Rrup[ix] / self._W[self.i] - 1.5) / 0.5
         T_CD[self.__Rrup / self._W[self.i] >= 2.0] = 0.0
 
         # Azimuth taper
-        T_Az = np.sin(np.abs(self.Az))**2
+        T_Az = np.sin(np.abs(self.Az)) ** 2
 
         # Select Coefficients
         ix = tuple([self._T == self.__periods])
@@ -293,13 +297,12 @@ class Bayless2013(object):
 
         # Distance taper
         T_CD = np.ones_like(self._lat)
-        ix = tuple([
-            (self.__Rrup /
-             self._L[
-                 self.i] > 0.5) & (
-                self.__Rrup /
-                self._L[
-                    self.i] < 1.0)])
+        ix = tuple(
+            [
+                (self.__Rrup / self._L[self.i] > 0.5)
+                & (self.__Rrup / self._L[self.i] < 1.0)
+            ]
+        )
         T_CD[ix] = 1 - (self.__Rrup[ix] / self._L[self.i] - 0.5) / 0.5
         T_CD[self.__Rrup / self._L[self.i] >= 1.0] = 0.0
 
@@ -340,8 +343,7 @@ class Bayless2013(object):
         hp1 = p1 - hyp_ecef
         # convert to km (used as max later)
         udip_len = Vector.dot(hp1, e21norm) / 1000.0
-        udip_col = np.array(
-            [[e21norm.x], [e21norm.y], [e21norm.z]])  # ECEF coords
+        udip_col = np.array([[e21norm.x], [e21norm.y], [e21norm.z]])  # ECEF coords
 
         # Sites
         slat = self._lat
@@ -355,17 +357,21 @@ class Bayless2013(object):
         # Make a 3x(#number of sites) matrix of site locations
         # (rows are x, y, z) in ECEF
         site_ecef_x, site_ecef_y, site_ecef_z = ecef.latlon2ecef(
-            slat, slon, np.zeros(slon.shape))
-        site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
-                             np.reshape(site_ecef_y, (-1,)),
-                             np.reshape(site_ecef_z, (-1,))])
+            slat, slon, np.zeros(slon.shape)
+        )
+        site_mat = np.array(
+            [
+                np.reshape(site_ecef_x, (-1,)),
+                np.reshape(site_ecef_y, (-1,)),
+                np.reshape(site_ecef_z, (-1,)),
+            ]
+        )
 
         # Hypocenter-to-site matrix
         h2s_mat = site_mat - hyp_col  # in ECEF
 
         # Dot hypocenter-to-site with updip vector
-        d_raw = np.abs(np.sum(h2s_mat * udip_col, axis=0)) / \
-            1000.0  # convert to km
+        d_raw = np.abs(np.sum(h2s_mat * udip_col, axis=0)) / 1000.0  # convert to km
         d_raw = np.reshape(d_raw, self._lat.shape)
         self.d = d_raw.clip(min=1.0, max=udip_len)
 
@@ -389,8 +395,7 @@ class Bayless2013(object):
         hp1 = p1 - epi_ecef
         strike_min = Vector.dot(hp0, e01norm) / 1000.0  # convert to km
         strike_max = Vector.dot(hp1, e01norm) / 1000.0  # convert to km
-        strike_col = np.array(
-            [[e01norm.x], [e01norm.y], [e01norm.z]])  # ECEF coords
+        strike_col = np.array([[e01norm.x], [e01norm.y], [e01norm.z]])  # ECEF coords
 
         # Sites
         slat = self._lat
@@ -404,10 +409,15 @@ class Bayless2013(object):
         # Make a 3x(#number of sites) matrix of site locations
         # (rows are x, y, z) in ECEF
         site_ecef_x, site_ecef_y, site_ecef_z = ecef.latlon2ecef(
-            slat, slon, np.zeros(slon.shape))
-        site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
-                             np.reshape(site_ecef_y, (-1,)),
-                             np.reshape(site_ecef_z, (-1,))])
+            slat, slon, np.zeros(slon.shape)
+        )
+        site_mat = np.array(
+            [
+                np.reshape(site_ecef_x, (-1,)),
+                np.reshape(site_ecef_y, (-1,)),
+                np.reshape(site_ecef_z, (-1,)),
+            ]
+        )
 
         # Epicenter-to-site matrix
         e2s_mat = site_mat - epi_col  # in ECEF
@@ -422,8 +432,7 @@ class Bayless2013(object):
 
         # Put back into a 2d array
         s_raw = np.reshape(s_raw, self._lat.shape)
-        self.s = np.abs(s_raw.clip(min=strike_min,
-                                   max=strike_max)).clip(min=np.exp(1))
+        self.s = np.abs(s_raw.clip(min=strike_min, max=strike_max)).clip(min=np.exp(1))
 
         # Compute theta
         sdots = np.sum(e2s_norm * strike_col, axis=0)
@@ -449,9 +458,8 @@ class Bayless2013(object):
         strike slip, DS for dip slip, or Unspecified.
         """
         arake = np.abs(self._rake)
-        self.SlipCategory = 'Unspecified'
-        if ((arake >= 0) and (arake <= 30)) or (
-                (arake >= 150) and (arake <= 180)):
-            self.SlipCategory = 'SS'
+        self.SlipCategory = "Unspecified"
+        if ((arake >= 0) and (arake <= 30)) or ((arake >= 150) and (arake <= 180)):
+            self.SlipCategory = "SS"
         if (arake >= 60) and (arake <= 120):
-            self.SlipCategory = 'DS'
+            self.SlipCategory = "DS"

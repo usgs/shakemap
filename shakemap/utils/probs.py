@@ -35,81 +35,68 @@ def get_weights(origin, config):
     all_keylist = list(probs.keys())
 
     # let's have the code default to use the slab data
-    if config['tectonic_regions']['subduction']:
-        use_slab = config['tectonic_regions']['subduction']['use_slab']
+    if config["tectonic_regions"]["subduction"]:
+        use_slab = config["tectonic_regions"]["subduction"]["use_slab"]
     else:
         use_slab = True
 
-    for region, rdict in config['tectonic_regions'].items():
-        if (region == 'subduction') and use_slab:
-            if 'crustal' in probs or 'subduction_0' in probs:
-                if 'crustal' in probs:
-                    topkey = 'crustal'
+    for region, rdict in config["tectonic_regions"].items():
+        if (region == "subduction") and use_slab:
+            if "crustal" in probs or "subduction_0" in probs:
+                if "crustal" in probs:
+                    topkey = "crustal"
                 else:
-                    topkey = 'subduction_0'
-                gmpelist += rdict['crustal']['gmpe']
+                    topkey = "subduction_0"
+                gmpelist += rdict["crustal"]["gmpe"]
                 weightlist.append(probs[topkey])
-            if 'interface' in probs or 'subduction_1' in probs:
-                if 'interface' in probs:
-                    midkey = 'interface'
+            if "interface" in probs or "subduction_1" in probs:
+                if "interface" in probs:
+                    midkey = "interface"
                 else:
-                    midkey = 'subduction_1'
-                gmpelist += rdict['interface']['gmpe']
+                    midkey = "subduction_1"
+                gmpelist += rdict["interface"]["gmpe"]
                 weightlist.append(probs[midkey])
-            if 'intraslab' in probs or 'subduction_2' in probs:
-                if 'intraslab' in probs:
-                    botkey = 'intraslab'
+            if "intraslab" in probs or "subduction_2" in probs:
+                if "intraslab" in probs:
+                    botkey = "intraslab"
                 else:
-                    botkey = 'subduction_2'
-                gmpelist += rdict['intraslab']['gmpe']
+                    botkey = "subduction_2"
+                gmpelist += rdict["intraslab"]["gmpe"]
                 weightlist.append(probs[botkey])
         else:
-            pat = re.compile(region + '_')
+            pat = re.compile(region + "_")
             keylist = sorted(list(filter(pat.search, all_keylist)))
             if len(keylist):
                 for key in keylist:
                     weightlist.append(probs[key])
-                    idx = int(key.split('_')[1])
-                    gmpelist.append(rdict['gmpe'][idx])
+                    idx = int(key.split("_")[1])
+                    gmpelist.append(rdict["gmpe"][idx])
 
     weightlist = np.array(weightlist)
-    logging.debug('gmpelist: %s' % gmpelist)
-    logging.debug('weightlist: %s' % weightlist)
-    gmmdict = {'gmpelist': gmpelist,
-               'weightlist': weightlist}
+    logging.debug(f"gmpelist: {gmpelist}")
+    logging.debug(f"weightlist: {weightlist}")
+    gmmdict = {"gmpelist": gmpelist, "weightlist": weightlist}
     #
     # Here we get the region-specific ipe, gmice, and ccf. If they are
     # not specified in the config, we use None, and let the value
     # fall back to whatever is specified in the system config.
     #
-    if strec_results['TectonicRegion'] == 'Active':
-        gmmdict['ipe'] = config['tectonic_regions']['acr'].get(
-            'ipe', None)
-        gmmdict['gmice'] = config['tectonic_regions']['acr'].get(
-            'gmice', None)
-        gmmdict['ccf'] = config['tectonic_regions']['acr'].get(
-            'ccf', None)
-    elif strec_results['TectonicRegion'] == 'Stable':
-        gmmdict['ipe'] = config['tectonic_regions']['scr'].get(
-            'ipe', None)
-        gmmdict['gmice'] = config['tectonic_regions']['scr'].get(
-            'gmice', None)
-        gmmdict['ccf'] = config['tectonic_regions']['scr'].get(
-            'ccf', None)
-    elif strec_results['TectonicRegion'] == 'Subduction':
-        gmmdict['ipe'] = config['tectonic_regions']['subduction'].get(
-            'ipe', None)
-        gmmdict['gmice'] = config['tectonic_regions']['subduction'].get(
-            'gmice', None)
-        gmmdict['ccf'] = config['tectonic_regions']['subduction'].get(
-            'ccf', None)
-    elif strec_results['TectonicRegion'] == 'Volcanic':
-        gmmdict['ipe'] = config['tectonic_regions']['volcanic'].get(
-            'ipe', None)
-        gmmdict['gmice'] = config['tectonic_regions']['volcanic'].get(
-            'gmice', None)
-        gmmdict['ccf'] = config['tectonic_regions']['volcanic'].get(
-            'ccf', None)
+    if strec_results["TectonicRegion"] == "Active":
+        gmmdict["ipe"] = config["tectonic_regions"]["acr"].get("ipe", None)
+        gmmdict["gmice"] = config["tectonic_regions"]["acr"].get("gmice", None)
+        gmmdict["ccf"] = config["tectonic_regions"]["acr"].get("ccf", None)
+    elif strec_results["TectonicRegion"] == "Stable":
+        gmmdict["ipe"] = config["tectonic_regions"]["scr"].get("ipe", None)
+        gmmdict["gmice"] = config["tectonic_regions"]["scr"].get("gmice", None)
+        gmmdict["ccf"] = config["tectonic_regions"]["scr"].get("ccf", None)
+    elif strec_results["TectonicRegion"] == "Subduction":
+        gmmdict["ipe"] = config["tectonic_regions"]["subduction"].get("ipe", None)
+        gmmdict["gmice"] = config["tectonic_regions"]["subduction"].get("gmice", None)
+        gmmdict["ccf"] = config["tectonic_regions"]["subduction"].get("ccf", None)
+    elif strec_results["TectonicRegion"] == "Volcanic":
+        gmmdict["ipe"] = config["tectonic_regions"]["volcanic"].get("ipe", None)
+        gmmdict["gmice"] = config["tectonic_regions"]["volcanic"].get("gmice", None)
+        gmmdict["ccf"] = config["tectonic_regions"]["volcanic"].get("ccf", None)
     return gmmdict, strec_results
 
 
@@ -162,17 +149,18 @@ def get_probs(origin, config):
         eid = origin.id
 
     tensor_params = None
-    if hasattr(origin, 'moment'):
+    if hasattr(origin, "moment"):
         tensor_params = origin.moment
 
     strec_results = selector.getSubductionType(
-        lat, lon, depth, eid, tensor_params=tensor_params)
+        lat, lon, depth, eid, tensor_params=tensor_params
+    )
 
     region_probs = get_region_probs(eid, depth, strec_results, config)
-    in_subduction = strec_results['TectonicRegion'] == 'Subduction'
-    above_slab = not np.isnan(strec_results['SlabModelDepth'])
+    in_subduction = strec_results["TectonicRegion"] == "Subduction"
+    above_slab = not np.isnan(strec_results["SlabModelDepth"])
 
-    use_slab = config['tectonic_regions']['subduction']['use_slab']
+    use_slab = config["tectonic_regions"]["subduction"]["use_slab"]
 
     if use_slab:
         if in_subduction:
@@ -180,18 +168,18 @@ def get_probs(origin, config):
                 strec_results, depth, mag, config, above_slab
             )
             for key, value in subduction_probs.items():
-                subduction_probs[key] = value * region_probs['subduction']
+                subduction_probs[key] = value * region_probs["subduction"]
 
             # If we are in a subduction zone then we don't want the
             # keys for subduction_0, 1, 2 (which are the generic vertical
             # subduction subtypes that are not informed by the slab model because
             # it isn't available)
-            if 'subduction_0' in region_probs:
-                del region_probs['subduction_0']
-            if 'subduction_1' in region_probs:
-                del region_probs['subduction_1']
-            if 'subduction_2' in region_probs:
-                del region_probs['subduction_2']
+            if "subduction_0" in region_probs:
+                del region_probs["subduction_0"]
+            if "subduction_1" in region_probs:
+                del region_probs["subduction_1"]
+            if "subduction_2" in region_probs:
+                del region_probs["subduction_2"]
 
         else:
             # If we are NOT in a subduction zone we may or may not need subduction
@@ -199,14 +187,13 @@ def get_probs(origin, config):
             # either way, we will not have access to the slab model and so we have
             # to use the generic vertical subtypes
             subduction_probs = {
-                'crustal': region_probs['subduction_0'],
-                'interface': region_probs['subduction_1'],
-                'intraslab': region_probs['subduction_2']
+                "crustal": region_probs["subduction_0"],
+                "interface": region_probs["subduction_1"],
+                "intraslab": region_probs["subduction_2"],
             }
         region_probs.update(subduction_probs)
     else:
-        logging.info('"use_slab" is False so no slab used in finding GMPE '
-                     'weights.')
+        logging.info('"use_slab" is False so no slab used in finding GMPE ' "weights.")
 
     return (region_probs, strec_results)
 
@@ -241,41 +228,41 @@ def get_region_probs(eid, depth, strec_results, config):
     """
     region_probs = {}
     region_mapping = {
-        'scr': 'DistanceToStable',
-        'acr': 'DistanceToActive',
-        'volcanic': 'DistanceToVolcanic',
-        'subduction': 'DistanceToSubduction'
+        "scr": "DistanceToStable",
+        "acr": "DistanceToActive",
+        "volcanic": "DistanceToVolcanic",
+        "subduction": "DistanceToSubduction",
     }
     layer_probs = {}
-    for region, rdict in config['tectonic_regions'].items():
+    for region, rdict in config["tectonic_regions"].items():
         distance = strec_results[region_mapping[region]]
         # If we're considering subduction zones but not IN a subduction zone
         x1 = 0.0
         p2 = 0.0
 
         p1 = 1.0
-        x2 = rdict['horizontal_buffer']
+        x2 = rdict["horizontal_buffer"]
 
         region_prob = get_probability(distance, x1, p1, x2, p2)
         region_probs[region] = region_prob
 
         region_layer_probs = {}
         # now do the weights for each depth zone
-        for i in range(0, len(rdict['min_depth'])):
+        for i in range(0, len(rdict["min_depth"])):
             # First, taper from -1 to 0 for the lower end
-            x1 = rdict['min_depth'][i] - rdict['vertical_buffer'] / 2
+            x1 = rdict["min_depth"][i] - rdict["vertical_buffer"] / 2
             p1 = -1.0
-            x2 = rdict['min_depth'][i]
+            x2 = rdict["min_depth"][i]
             p2 = 0.0
             p_layer1 = get_probability(depth, x1, p1, x2, p2)
             # Then, taper from 0 to -1 for the higher end
-            x1 = rdict['max_depth'][i]
+            x1 = rdict["max_depth"][i]
             p1 = 0.0
-            x2 = rdict['max_depth'][i] + rdict['vertical_buffer'] / 2
+            x2 = rdict["max_depth"][i] + rdict["vertical_buffer"] / 2
             p2 = -1.0
             p_layer2 = get_probability(depth, x1, p1, x2, p2)
             # Lastly, combine to get probability curve for layer i
-            region_layer_probs['%s_%i' % (region, i)] = 1 + p_layer1 + p_layer2
+            region_layer_probs["%s_%i" % (region, i)] = 1 + p_layer1 + p_layer2
         probsum = sum([lp for lp in list(region_layer_probs.values())])
         if probsum > 0:
             for key, value in region_layer_probs.items():
@@ -292,16 +279,14 @@ def get_region_probs(eid, depth, strec_results, config):
         layerkeys = list(layer_probs.keys())
         reg_layers = list(filter(pat.search, layerkeys))
         for reg_layer in reg_layers:
-            layer_probs[reg_layer] = layer_probs[reg_layer] * \
-                region_probs[region]
+            layer_probs[reg_layer] = layer_probs[reg_layer] * region_probs[region]
 
     region_probs.update(layer_probs)
 
     return region_probs
 
 
-def get_subduction_probs(strec_results, depth, mag, config,
-                         above_slab):
+def get_subduction_probs(strec_results, depth, mag, config, above_slab):
     """Get probabilities of earthquake being crustal, interface or intraslab.
 
     Args:
@@ -321,46 +306,46 @@ def get_subduction_probs(strec_results, depth, mag, config,
                 interface.
 
     """
-    subcfg = config['subduction']
+    subcfg = config["subduction"]
     if above_slab:
         # the angle between moment tensor and slab
-        kagan = strec_results['KaganAngle']  # can be nan
+        kagan = strec_results["KaganAngle"]  # can be nan
 
         # Depth to slab
-        slab_depth = strec_results['SlabModelDepth']
+        slab_depth = strec_results["SlabModelDepth"]
 
         # Error in depth to slab
-        slab_depth_error = strec_results['SlabModelDepthUncertainty']
+        slab_depth_error = strec_results["SlabModelDepthUncertainty"]
 
         # what is the effective bottom of the interface zone?
-        max_interface_depth = strec_results['SlabModelMaximumDepth']
+        max_interface_depth = strec_results["SlabModelMaximumDepth"]
 
         # Calculate the probability of interface given the
         # (absolute value of) difference between hypocenter and depth to slab.
         dz = np.abs(depth - slab_depth)
 
-        x1 = subcfg['p_int_hypo']['x1'] + slab_depth_error
-        x2 = subcfg['p_int_hypo']['x2'] + slab_depth_error
-        p1 = subcfg['p_int_hypo']['p1']
-        p2 = subcfg['p_int_hypo']['p2']
+        x1 = subcfg["p_int_hypo"]["x1"] + slab_depth_error
+        x2 = subcfg["p_int_hypo"]["x2"] + slab_depth_error
+        p1 = subcfg["p_int_hypo"]["p1"]
+        p2 = subcfg["p_int_hypo"]["p2"]
         p_int_hypo = get_probability(dz, x1, p1, x2, p2)
 
         # Calculate probability of interface given Kagan's angle
         if np.isfinite(kagan):
-            x1 = subcfg['p_int_kagan']['x1']
-            x2 = subcfg['p_int_kagan']['x2']
-            p1 = subcfg['p_int_kagan']['p1']
-            p2 = subcfg['p_int_kagan']['p2']
+            x1 = subcfg["p_int_kagan"]["x1"]
+            x2 = subcfg["p_int_kagan"]["x2"]
+            p1 = subcfg["p_int_kagan"]["p1"]
+            p2 = subcfg["p_int_kagan"]["p2"]
             p_int_kagan = get_probability(kagan, x1, p1, x2, p2)
         else:
-            p_int_kagan = subcfg['p_kagan_default']
+            p_int_kagan = subcfg["p_kagan_default"]
 
         # Calculate probability that event occurred above bottom of seismogenic
         # zone, given to us by the Slab model.
-        x1 = max_interface_depth + subcfg['p_int_sz']['x1']
-        x2 = max_interface_depth + subcfg['p_int_sz']['x2']
-        p1 = subcfg['p_int_sz']['p1']
-        p2 = subcfg['p_int_sz']['p2']
+        x1 = max_interface_depth + subcfg["p_int_sz"]["x1"]
+        x2 = max_interface_depth + subcfg["p_int_sz"]["x2"]
+        p1 = subcfg["p_int_sz"]["p1"]
+        p2 = subcfg["p_int_sz"]["p2"]
         p_int_sz = get_probability(depth, x1, p1, x2, p2)
 
         # Calculate combined probability of interface
@@ -368,18 +353,18 @@ def get_subduction_probs(strec_results, depth, mag, config,
 
         # Calculate probability that the earthquake lies above the slab
         # and is thus crustal.
-        x1 = subcfg['p_crust_slab']['x1']
-        x2 = subcfg['p_crust_slab']['x2']
-        p1 = subcfg['p_crust_slab']['p1']
-        p2 = subcfg['p_crust_slab']['p2']
+        x1 = subcfg["p_crust_slab"]["x1"]
+        x2 = subcfg["p_crust_slab"]["x2"]
+        p1 = subcfg["p_crust_slab"]["p1"]
+        p2 = subcfg["p_crust_slab"]["p2"]
 
         p_crust_slab = get_probability((depth - slab_depth), x1, p1, x2, p2)
 
         # Calculate probability that the earthquake lies within the crust
-        x1 = subcfg['p_crust_hypo']['x1']
-        x2 = subcfg['p_crust_hypo']['x2']
-        p1 = subcfg['p_crust_hypo']['p1']
-        p2 = subcfg['p_crust_hypo']['p2']
+        x1 = subcfg["p_crust_hypo"]["x1"]
+        x2 = subcfg["p_crust_hypo"]["x2"]
+        p1 = subcfg["p_crust_hypo"]["p1"]
+        p2 = subcfg["p_crust_hypo"]["p2"]
         p_crust_hypo = get_probability(depth, x1, p1, x2, p2)
 
         # Calculate probability of crustal
@@ -389,29 +374,29 @@ def get_subduction_probs(strec_results, depth, mag, config,
         p_slab = 1 - (p_int + p_crustal)
 
     else:
-        slab_depth = subcfg['default_slab_depth']
+        slab_depth = subcfg["default_slab_depth"]
         # Calculate the probability that an earthquake is interface
         # given magnitude
-        x1 = subcfg['p_int_mag']['x1']
-        p1 = subcfg['p_int_mag']['p1']
-        x2 = subcfg['p_int_mag']['x2']
-        p2 = subcfg['p_int_mag']['p2']
+        x1 = subcfg["p_int_mag"]["x1"]
+        p1 = subcfg["p_int_mag"]["p1"]
+        x2 = subcfg["p_int_mag"]["x2"]
+        p2 = subcfg["p_int_mag"]["p2"]
         p_int_mag = get_probability(mag, x1, p1, x2, p2)
 
         # Calculate the probability that the earthquake is
         # interface given depth (two part function).
         # upper portion of function
-        x1 = subcfg['p_int_dep_no_slab_upper']['x1']
-        p1 = subcfg['p_int_dep_no_slab_upper']['p1']
-        x2 = subcfg['p_int_dep_no_slab_upper']['x2']
-        p2 = subcfg['p_int_dep_no_slab_upper']['p2']
+        x1 = subcfg["p_int_dep_no_slab_upper"]["x1"]
+        p1 = subcfg["p_int_dep_no_slab_upper"]["p1"]
+        x2 = subcfg["p_int_dep_no_slab_upper"]["x2"]
+        p2 = subcfg["p_int_dep_no_slab_upper"]["p2"]
         p_int_depth_upper = get_probability(depth, x1, p1, x2, p2)
 
         # lower portion of function
-        x1 = subcfg['p_int_dep_no_slab_lower']['x1']
-        p1 = subcfg['p_int_dep_no_slab_lower']['p1']
-        x2 = subcfg['p_int_dep_no_slab_lower']['x2']
-        p2 = subcfg['p_int_dep_no_slab_lower']['p2']
+        x1 = subcfg["p_int_dep_no_slab_lower"]["x1"]
+        p1 = subcfg["p_int_dep_no_slab_lower"]["p1"]
+        x2 = subcfg["p_int_dep_no_slab_lower"]["x2"]
+        p2 = subcfg["p_int_dep_no_slab_lower"]["p2"]
         p_int_depth_lower = get_probability(depth, x1, p1, x2, p2)
 
         p_int_depth = p_int_depth_upper + p_int_depth_lower
@@ -420,7 +405,7 @@ def get_subduction_probs(strec_results, depth, mag, config,
         # inflates and appraoches 1 as magnitude gets large, assuming
         # that the ramp function for p_int_mag is zero at small magnitudes
         # and 1 at large magnitudes.
-        p_int = p_int_depth + (1 - p_int_depth)*p_int_mag
+        p_int = p_int_depth + (1 - p_int_depth) * p_int_mag
 
         if depth > slab_depth:
             p_crustal = 0.0
@@ -429,11 +414,7 @@ def get_subduction_probs(strec_results, depth, mag, config,
             p_crustal = 1 - p_int
             p_slab = 0.0
 
-    probs = {
-        'crustal': p_crustal,
-        'interface': p_int,
-        'intraslab': p_slab
-    }
+    probs = {"crustal": p_crustal, "interface": p_int, "intraslab": p_slab}
     return probs
 
 

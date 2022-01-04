@@ -1,6 +1,7 @@
 # Local imports
 from shakelib.conversions.convert_imt import IMTConverter
 
+
 class BommerAlarcon2006(IMTConverter):
     """
     Class for conversion between PGV (units of cm/s) and PSA05 (units of g)
@@ -14,14 +15,12 @@ class BommerAlarcon2006(IMTConverter):
         ground velocity. Journal of Earthquake Engineering, 10(01), 1-31.
         `[link] <http://www.worldscientific.com/doi/abs/10.1142/S1363246906002463>`__
     """
+
     def __init__(self):
         super().__init__()
         # output_input dictionary where the key is the output
         # and the value is a list of the possible inputs
-        self.output_input = {
-            'PGV': ['PSA05'],
-            'PSA05': ['PGV']
-        }
+        self.output_input = {"PGV": ["PSA05"], "PSA05": ["PGV"]}
         self.conversion_factor = 1.0 / (20.0) * 100.0 * 9.81
 
     def convertAmps(self, imt_in, imt_out, imt):
@@ -48,13 +47,12 @@ class BommerAlarcon2006(IMTConverter):
         imt_out = imt_out.upper().strip()
         conversion_factor = self.conversion_factor
         # Check which method to use
-        if imt_in == 'PSA05' and imt_out == 'PGV':
+        if imt_in == "PSA05" and imt_out == "PGV":
             new_imt = self._convertToPGV(imt, conversion_factor)
-        elif imt_in == 'PGV' and imt_out == 'PSA05':
+        elif imt_in == "PGV" and imt_out == "PSA05":
             new_imt = self._convertToPSA05(imt, conversion_factor)
         else:
-            raise ValueError('No conversion available from %r to %r' % (imt_in,
-                    imt_out))
+            raise ValueError(f"No conversion available from {imt_in!r} to {imt_out!r}")
         return new_imt
 
     @staticmethod

@@ -17,7 +17,7 @@ class HistoryModule(CoreModule):
     history -- Output the version history of an event.
     """
 
-    command_name = 'history'
+    command_name = "history"
 
     def execute(self):
         """
@@ -27,14 +27,14 @@ class HistoryModule(CoreModule):
             NotADirectoryError: When the event data directory does not exist.
         """
         _, data_path = get_config_paths()
-        datadir = os.path.join(data_path, self._eventid, 'current')
-        backups = glob.glob(os.path.join(data_path, self._eventid, 'backup*'))
+        datadir = os.path.join(data_path, self._eventid, "current")
+        backups = glob.glob(os.path.join(data_path, self._eventid, "backup*"))
         backups.sort(reverse=True)
         if not os.path.isdir(datadir):
-            raise NotADirectoryError('%s is not a valid directory.' % datadir)
+            raise NotADirectoryError(f"{datadir} is not a valid directory.")
 
         # First try the current results file...
-        datafile = os.path.join(datadir, 'products', 'shake_result.hdf')
+        datafile = os.path.join(datadir, "products", "shake_result.hdf")
         if os.path.isfile(datafile):
             # Open the ShakeMapOutputContainer and extract the data
             container = ShakeMapOutputContainer.load(datafile)
@@ -43,8 +43,7 @@ class HistoryModule(CoreModule):
             except LookupError:
                 print("\nNo version history available for this event.\n")
                 return
-            history = (metadata['processing']['shakemap_versions']
-                               ['map_data_history'])
+            history = metadata["processing"]["shakemap_versions"]["map_data_history"]
             final = False
             if len(backups) > 0:
                 last_ver = int(backups[0][-4:])
@@ -60,8 +59,9 @@ class HistoryModule(CoreModule):
             return
 
         # There should be a results file in the backup directory...
-        datafile = os.path.join(data_path, self._eventid, backups[0],
-                                'products', 'shake_result.hdf')
+        datafile = os.path.join(
+            data_path, self._eventid, backups[0], "products", "shake_result.hdf"
+        )
         if os.path.isfile(datafile):
             # Open the ShakeMapOutputContainer and extract the data
             container = ShakeMapOutputContainer.load(datafile)
@@ -70,8 +70,7 @@ class HistoryModule(CoreModule):
             except LookupError:
                 print("\nNo version history available for this event.\n")
                 return
-            history = (metadata['processing']['shakemap_versions']
-                               ['map_data_history'])
+            history = metadata["processing"]["shakemap_versions"]["map_data_history"]
             print_history(history, final=True)
             return
 
@@ -90,11 +89,10 @@ def print_history(history, final=False):
     print("------------------------------------------")
     for ix, line in enumerate(history):
         if final is False and ix == len(history) - 1:
-            asterisk = '*'
+            asterisk = "*"
         else:
-            asterisk = ''
-        print("%s | %s | %d | %s%s" % (line[0], line[1], line[2], line[3],
-                                       asterisk))
+            asterisk = ""
+        print("%s | %s | %d | %s%s" % (line[0], line[1], line[2], line[3], asterisk))
     print("")
     if final is False:
         print("*Not finalized.\n")

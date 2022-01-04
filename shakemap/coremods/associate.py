@@ -17,7 +17,7 @@ class AssociateModule(CoreModule):
                  XML data file to the event's current directory.
     """
 
-    command_name = 'associate'
+    command_name = "associate"
 
     def execute(self):
         """
@@ -33,24 +33,25 @@ class AssociateModule(CoreModule):
             # This shouldn't ever happen, but the code is here just
             # in case it does
             #
-            datadir = os.path.join(data_path, self._eventid, 'current')
+            datadir = os.path.join(data_path, self._eventid, "current")
             if not os.path.isdir(datadir):
-                raise NotADirectoryError('%s is not a valid directory.' %
-                                         datadir)
-            eventxml = os.path.join(datadir, 'event.xml')
+                raise NotADirectoryError(f"{datadir} is not a valid directory.")
+            eventxml = os.path.join(datadir, "event.xml")
             if not os.path.isfile(eventxml):
-                raise FileNotFoundError('%s does not exist.' % eventxml)
+                raise FileNotFoundError(f"{eventxml} does not exist.")
             origin = read_event_file(eventxml)
 
-            event = {'id': self._eventid,
-                     'netid': origin['netid'],
-                     'network': origin['network'],
-                     'time': origin['time'].strftime(constants.TIMEFMT),
-                     'lat': origin['lat'],
-                     'lon': origin['lon'],
-                     'depth': origin['depth'],
-                     'mag': origin['mag'],
-                     'locstring': origin['locstring']}
+            event = {
+                "id": self._eventid,
+                "netid": origin["netid"],
+                "network": origin["network"],
+                "time": origin["time"].strftime(constants.TIMEFMT),
+                "lat": origin["lat"],
+                "lon": origin["lon"],
+                "depth": origin["depth"],
+                "mag": origin["mag"],
+                "locstring": origin["locstring"],
+            }
             amp_handler.insertEvent(event)
 
         amp_handler.associateOne(self._eventid, pretty_print=True)

@@ -42,7 +42,7 @@ class EdgeRupture(Rupture):
             EdgeRupture instance.
 
         """
-        polys = d['features'][0]['geometry']['coordinates'][0]
+        polys = d["features"][0]["geometry"]["coordinates"][0]
         n_polygons = len(polys)
         toplons = np.empty(shape=(0, 0))
         toplats = np.empty(shape=(0, 0))
@@ -78,16 +78,16 @@ class EdgeRupture(Rupture):
             group_index.extend([g_ind] * n_pairs)
             g_ind = g_ind + 1
 
-        reference = d['metadata']['reference']
+        reference = d["metadata"]["reference"]
 
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime(constants.TIMEFMT)
+                d["metadata"][k] = v.strftime(constants.TIMEFMT)
             else:
-                d['metadata'][k] = v
-        d['metadata']['mesh_dx'] = mesh_dx
+                d["metadata"][k] = v
+        d["metadata"]["mesh_dx"] = mesh_dx
 
         self._geojson = d
 
@@ -104,8 +104,19 @@ class EdgeRupture(Rupture):
         self._computeStrikeDip()
 
     @classmethod
-    def fromArrays(cls, toplons, toplats, topdeps, botlons, botlats, botdeps,
-                   origin, group_index=None, mesh_dx=0.5, reference=''):
+    def fromArrays(
+        cls,
+        toplons,
+        toplats,
+        topdeps,
+        botlons,
+        botlats,
+        botdeps,
+        origin,
+        group_index=None,
+        mesh_dx=0.5,
+        reference="",
+    ):
         """
         Class method to initialize an EdgeRupture class from arrays of
         longitude, latitude, and depth along the top and bottom edges.
@@ -143,40 +154,40 @@ class EdgeRupture(Rupture):
         n_groups = len(u_groups)
         for i in range(n_groups):
             ind = np.where(u_groups[i] == group_index)[0]
-            lons = np.concatenate([toplons[ind], botlons[ind][::-1],
-                                   toplons[ind][0].reshape((1,))])
-            lats = np.concatenate([toplats[ind], botlats[ind][::-1],
-                                   toplats[ind][0].reshape((1,))])
-            deps = np.concatenate([topdeps[ind], botdeps[ind][::-1],
-                                   topdeps[ind][0].reshape((1,))])
+            lons = np.concatenate(
+                [toplons[ind], botlons[ind][::-1], toplons[ind][0].reshape((1,))]
+            )
+            lats = np.concatenate(
+                [toplats[ind], botlats[ind][::-1], toplats[ind][0].reshape((1,))]
+            )
+            deps = np.concatenate(
+                [topdeps[ind], botdeps[ind][::-1], topdeps[ind][0].reshape((1,))]
+            )
             poly = []
             for lon, lat, dep in zip(lons, lats, deps):
                 poly.append([lon, lat, dep])
             coords.append(poly)
 
-        d = {"type": "FeatureCollection",
-             "metadata": {
-                 "reference": reference
-             },
-             "features": [{
-                 "type": "Feature",
-                 "properties": {
-                     "rupture type": "rupture extent"
-                 },
-                 "geometry": {
-                     "type": "MultiPolygon",
-                     "coordinates": [coords]
-                 }
-             }]}
+        d = {
+            "type": "FeatureCollection",
+            "metadata": {"reference": reference},
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"rupture type": "rupture extent"},
+                    "geometry": {"type": "MultiPolygon", "coordinates": [coords]},
+                }
+            ],
+        }
 
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime(constants.TIMEFMT)
+                d["metadata"][k] = v.strftime(constants.TIMEFMT)
             else:
-                d['metadata'][k] = v
-        d['metadata']['mesh_dx'] = mesh_dx
+                d["metadata"][k] = v
+        d["metadata"]["mesh_dx"] = mesh_dx
 
         return cls(d, origin, mesh_dx)
 
@@ -236,38 +247,42 @@ class EdgeRupture(Rupture):
             nseg = len(group_segments) - 1
             for j in range(nseg):
                 ind = group_segments[j]
-                p0 = latlon2ecef(self._toplats[ind],
-                                 self._toplons[ind],
-                                 self._topdeps[ind])
-                p1 = latlon2ecef(self._toplats[ind + 1],
-                                 self._toplons[ind + 1],
-                                 self._topdeps[ind + 1])
-                p2 = latlon2ecef(self._botlats[ind + 1],
-                                 self._botlons[ind + 1],
-                                 self._botdeps[ind + 1])
-                p3 = latlon2ecef(self._botlats[ind],
-                                 self._botlons[ind],
-                                 self._botdeps[ind])
-                a = np.sqrt((p1[0] - p0[0])**2 +
-                            (p1[1] - p0[1])**2 +
-                            (p1[2] - p0[2])**2)
-                b = np.sqrt((p2[0] - p0[0])**2 +
-                            (p2[1] - p0[1])**2 +
-                            (p2[2] - p0[2])**2)
-                c = np.sqrt((p2[0] - p1[0])**2 +
-                            (p2[1] - p1[1])**2 +
-                            (p2[2] - p1[2])**2)
+                p0 = latlon2ecef(
+                    self._toplats[ind], self._toplons[ind], self._topdeps[ind]
+                )
+                p1 = latlon2ecef(
+                    self._toplats[ind + 1],
+                    self._toplons[ind + 1],
+                    self._topdeps[ind + 1],
+                )
+                p2 = latlon2ecef(
+                    self._botlats[ind + 1],
+                    self._botlons[ind + 1],
+                    self._botdeps[ind + 1],
+                )
+                p3 = latlon2ecef(
+                    self._botlats[ind], self._botlons[ind], self._botdeps[ind]
+                )
+                a = np.sqrt(
+                    (p1[0] - p0[0]) ** 2 + (p1[1] - p0[1]) ** 2 + (p1[2] - p0[2]) ** 2
+                )
+                b = np.sqrt(
+                    (p2[0] - p0[0]) ** 2 + (p2[1] - p0[1]) ** 2 + (p2[2] - p0[2]) ** 2
+                )
+                c = np.sqrt(
+                    (p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2 + (p2[2] - p1[2]) ** 2
+                )
                 s = (a + b + c) / 2
                 A1 = np.sqrt(s * (s - a) * (s - b) * (s - c))
-                a = np.sqrt((p0[0] - p3[0])**2 +
-                            (p0[1] - p3[1])**2 +
-                            (p0[2] - p3[2])**2)
-                b = np.sqrt((p2[0] - p3[0])**2 +
-                            (p2[1] - p3[1])**2 +
-                            (p2[2] - p3[2])**2)
-                c = np.sqrt((p0[0] - p2[0])**2 +
-                            (p0[1] - p2[1])**2 +
-                            (p0[2] - p2[2])**2)
+                a = np.sqrt(
+                    (p0[0] - p3[0]) ** 2 + (p0[1] - p3[1]) ** 2 + (p0[2] - p3[2]) ** 2
+                )
+                b = np.sqrt(
+                    (p2[0] - p3[0]) ** 2 + (p2[1] - p3[1]) ** 2 + (p2[2] - p3[2]) ** 2
+                )
+                c = np.sqrt(
+                    (p0[0] - p2[0]) ** 2 + (p0[1] - p2[1]) ** 2 + (p0[2] - p2[2]) ** 2
+                )
                 s = (a + b + c) / 2
                 A2 = np.sqrt(s * (s - a) * (s - b) * (s - c))
                 area = area + (A1 + A2) / 1000 / 1000
@@ -308,7 +323,9 @@ class EdgeRupture(Rupture):
         groups = self._group_index
         u_groups = np.unique(groups)
         ng = len(u_groups)
-        nan = np.array(np.nan).reshape(1,)
+        nan = np.array(np.nan).reshape(
+            1,
+        )
         for i in range(ng):
             top_lats = self._toplats[groups == u_groups[i]]
             top0 = top_lats[0].reshape((1,))
@@ -331,7 +348,9 @@ class EdgeRupture(Rupture):
         groups = self._group_index
         u_groups = np.unique(groups)
         ng = len(u_groups)
-        nan = np.array(np.nan).reshape(1,)
+        nan = np.array(np.nan).reshape(
+            1,
+        )
         for i in range(ng):
             top_lons = self._toplons[groups == u_groups[i]]
             top0 = top_lons[0].reshape((1,))
@@ -354,7 +373,9 @@ class EdgeRupture(Rupture):
         groups = self._group_index
         u_groups = np.unique(groups)
         ng = len(u_groups)
-        nan = np.array(np.nan).reshape(1,)
+        nan = np.array(np.nan).reshape(
+            1,
+        )
         for i in range(ng):
             top_deps = self._topdeps[groups == u_groups[i]]
             top0 = top_deps[0].reshape((1,))
@@ -398,30 +419,34 @@ class EdgeRupture(Rupture):
             nseg = len(group_segments) - 1
             for j in range(nseg):
                 ind = group_segments[j]
-                P0 = Point(self._toplons[ind],
-                           self._toplats[ind],
-                           self._topdeps[ind])
-                P1 = Point(self._toplons[ind + 1],
-                           self._toplats[ind + 1],
-                           self._topdeps[ind + 1])
-                P2 = Point(self._botlons[ind + 1],
-                           self._botlats[ind + 1],
-                           self._botdeps[ind + 1])
-                P3 = Point(self._botlons[ind],
-                           self._botlats[ind],
-                           self._botdeps[ind])
-                P1up = Point(self._toplons[ind + 1],
-                             self._toplats[ind + 1],
-                             self._topdeps[ind + 1] - 1.0)
-                P1N = Point(self._toplons[ind + 1],
-                            self._toplats[ind + 1] + 0.001,
-                            self._topdeps[ind + 1])
-                P3up = Point(self._botlons[ind],
-                             self._botlats[ind],
-                             self._botdeps[ind] - 1.0)
-                P3N = Point(self._botlons[ind],
-                            self._botlats[ind] + 0.001,
-                            self._botdeps[ind])
+                P0 = Point(self._toplons[ind], self._toplats[ind], self._topdeps[ind])
+                P1 = Point(
+                    self._toplons[ind + 1],
+                    self._toplats[ind + 1],
+                    self._topdeps[ind + 1],
+                )
+                P2 = Point(
+                    self._botlons[ind + 1],
+                    self._botlats[ind + 1],
+                    self._botdeps[ind + 1],
+                )
+                P3 = Point(self._botlons[ind], self._botlats[ind], self._botdeps[ind])
+                P1up = Point(
+                    self._toplons[ind + 1],
+                    self._toplats[ind + 1],
+                    self._topdeps[ind + 1] - 1.0,
+                )
+                P1N = Point(
+                    self._toplons[ind + 1],
+                    self._toplats[ind + 1] + 0.001,
+                    self._topdeps[ind + 1],
+                )
+                P3up = Point(
+                    self._botlons[ind], self._botlats[ind], self._botdeps[ind] - 1.0
+                )
+                P3N = Point(
+                    self._botlons[ind], self._botlats[ind] + 0.001, self._botdeps[ind]
+                )
                 p0 = Vector.fromPoint(P0)
                 p1 = Vector.fromPoint(P1)
                 p2 = Vector.fromPoint(P2)
@@ -513,18 +538,14 @@ class EdgeRupture(Rupture):
             ind = np.where(self._group_index == ugroup[i])[0]
             nq = len(ind) - 1
             for j in range(nq):
-                P0 = Point(self._toplons[j],
-                           self._toplats[j],
-                           self._topdeps[j])
-                P1 = Point(self._toplons[j + 1],
-                           self._toplats[j + 1],
-                           self._topdeps[j + 1])
-                P2 = Point(self._botlons[j + 1],
-                           self._botlats[j + 1],
-                           self._botdeps[j + 1])
-                P3 = Point(self._botlons[j],
-                           self._botlats[j],
-                           self._botdeps[j])
+                P0 = Point(self._toplons[j], self._toplats[j], self._topdeps[j])
+                P1 = Point(
+                    self._toplons[j + 1], self._toplats[j + 1], self._topdeps[j + 1]
+                )
+                P2 = Point(
+                    self._botlons[j + 1], self._botlats[j + 1], self._botdeps[j + 1]
+                )
+                P3 = Point(self._botlons[j], self._botlats[j], self._botdeps[j])
                 qlist.append([P0, P1, P2, P3])
 
         return qlist
@@ -573,23 +594,32 @@ class EdgeRupture(Rupture):
             g_ind = np.where(u_groups[j] == self._group_index)[0]
             nq = len(self._toplats[g_ind]) - 1
             for i in range(nq):
-                q = [Point(self._toplons[g_ind[i]],
-                           self._toplats[g_ind[i]],
-                           self._topdeps[g_ind[i]]),
-                     Point(self._toplons[g_ind[i + 1]],
-                           self._toplats[g_ind[i + 1]],
-                           self._topdeps[g_ind[i + 1]]),
-                     Point(self._botlons[g_ind[i + 1]],
-                           self._botlats[g_ind[i + 1]],
-                           self._botdeps[g_ind[i + 1]]),
-                     Point(self._botlons[g_ind[i]],
-                           self._botlats[g_ind[i]],
-                           self._botdeps[g_ind[i]])
-                     ]
+                q = [
+                    Point(
+                        self._toplons[g_ind[i]],
+                        self._toplats[g_ind[i]],
+                        self._topdeps[g_ind[i]],
+                    ),
+                    Point(
+                        self._toplons[g_ind[i + 1]],
+                        self._toplats[g_ind[i + 1]],
+                        self._topdeps[g_ind[i + 1]],
+                    ),
+                    Point(
+                        self._botlons[g_ind[i + 1]],
+                        self._botlats[g_ind[i + 1]],
+                        self._botdeps[g_ind[i + 1]],
+                    ),
+                    Point(
+                        self._botlons[g_ind[i]],
+                        self._botlats[g_ind[i]],
+                        self._botdeps[g_ind[i]],
+                    ),
+                ]
                 mesh = utils.get_quad_mesh(q, dx=mesh_dx)
-                mx.extend(list(np.reshape(mesh['x'], (-1,))))
-                my.extend(list(np.reshape(mesh['y'], (-1,))))
-                mz.extend(list(np.reshape(mesh['z'], (-1,))))
+                mx.extend(list(np.reshape(mesh["x"], (-1,))))
+                my.extend(list(np.reshape(mesh["y"], (-1,))))
+                mz.extend(list(np.reshape(mesh["z"], (-1,))))
         mesh_mat = np.array([np.array(mx), np.array(my), np.array(mz)])
 
         # ---------------------------------------------------------------------
@@ -650,23 +680,16 @@ class EdgeRupture(Rupture):
             g_ind = np.where(u_groups[j] == self._group_index)[0]
             nq = len(self._toplats[g_ind]) - 1
             for i in range(nq):
-                q = [Point(self._toplons[g_ind[i]],
-                           self._toplats[g_ind[i]],
-                           0),
-                     Point(self._toplons[g_ind[i + 1]],
-                           self._toplats[g_ind[i + 1]],
-                           0),
-                     Point(self._botlons[g_ind[i + 1]],
-                           self._botlats[g_ind[i + 1]],
-                           0),
-                     Point(self._botlons[g_ind[i]],
-                           self._botlats[g_ind[i]],
-                           0)
-                     ]
+                q = [
+                    Point(self._toplons[g_ind[i]], self._toplats[g_ind[i]], 0),
+                    Point(self._toplons[g_ind[i + 1]], self._toplats[g_ind[i + 1]], 0),
+                    Point(self._botlons[g_ind[i + 1]], self._botlats[g_ind[i + 1]], 0),
+                    Point(self._botlons[g_ind[i]], self._botlats[g_ind[i]], 0),
+                ]
                 mesh = utils.get_quad_mesh(q, dx=mesh_dx)
-                mx.extend(list(np.reshape(mesh['x'], (-1,))))
-                my.extend(list(np.reshape(mesh['y'], (-1,))))
-                mz.extend(list(np.reshape(mesh['z'], (-1,))))
+                mx.extend(list(np.reshape(mesh["x"], (-1,))))
+                my.extend(list(np.reshape(mesh["y"], (-1,))))
+                mz.extend(list(np.reshape(mesh["z"], (-1,))))
         mesh_mat = np.array([np.array(mx), np.array(my), np.array(mz)])
 
         # ---------------------------------------------------------------------

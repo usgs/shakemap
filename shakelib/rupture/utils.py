@@ -55,10 +55,7 @@ def is_quad(q):
         on_plane = True
 
     # Fixed quad
-    fquad = [p0.toPoint(),
-             p1.toPoint(),
-             new_p2.toPoint(),
-             p3.toPoint()]
+    fquad = [p0.toPoint(), p1.toPoint(), new_p2.toPoint(), p3.toPoint()]
 
     return (on_plane, fquad)
 
@@ -81,7 +78,7 @@ def get_quad_width(q):
     AB = p0 - p1
     AC = p0 - p3
     t1 = (AB.cross(AC).cross(AB)).norm()
-    width = t1.dot(AC)/1000.0
+    width = t1.dot(AC) / 1000.0
 
     return width
 
@@ -129,51 +126,46 @@ def get_quad_mesh(q, dx):
     yfac = np.linspace(0, 1, ny)
 
     # Build mesh: dict of ny by nx arrays (x, y, z):
-    mesh = {'x': np.zeros([ny, nx]), 'y': np.zeros(
-        [ny, nx]), 'z': np.zeros([ny, nx])}
+    mesh = {"x": np.zeros([ny, nx]), "y": np.zeros([ny, nx]), "z": np.zeros([ny, nx])}
     for i in range(nx):
         mpts = [topp[i] + (botp[i] - topp[i]) * a for a in yfac]
-        mesh['x'][:, i] = [a.x for a in mpts]
-        mesh['y'][:, i] = [a.y for a in mpts]
-        mesh['z'][:, i] = [a.z for a in mpts]
+        mesh["x"][:, i] = [a.x for a in mpts]
+        mesh["y"][:, i] = [a.y for a in mpts]
+        mesh["z"][:, i] = [a.z for a in mpts]
 
     # Make arrays of pixel corners
-    mesh['llx'] = mesh['x'][1:, 0:-1]
-    mesh['lrx'] = mesh['x'][1:, 1:]
-    mesh['ulx'] = mesh['x'][0:-1, 0:-1]
-    mesh['urx'] = mesh['x'][0:-1, 1:]
-    mesh['lly'] = mesh['y'][1:, 0:-1]
-    mesh['lry'] = mesh['y'][1:, 1:]
-    mesh['uly'] = mesh['y'][0:-1, 0:-1]
-    mesh['ury'] = mesh['y'][0:-1, 1:]
-    mesh['llz'] = mesh['z'][1:, 0:-1]
-    mesh['lrz'] = mesh['z'][1:, 1:]
-    mesh['ulz'] = mesh['z'][0:-1, 0:-1]
-    mesh['urz'] = mesh['z'][0:-1, 1:]
-    mesh['cpx'] = np.zeros_like(mesh['llx'])
-    mesh['cpy'] = np.zeros_like(mesh['llx'])
-    mesh['cpz'] = np.zeros_like(mesh['llx'])
+    mesh["llx"] = mesh["x"][1:, 0:-1]
+    mesh["lrx"] = mesh["x"][1:, 1:]
+    mesh["ulx"] = mesh["x"][0:-1, 0:-1]
+    mesh["urx"] = mesh["x"][0:-1, 1:]
+    mesh["lly"] = mesh["y"][1:, 0:-1]
+    mesh["lry"] = mesh["y"][1:, 1:]
+    mesh["uly"] = mesh["y"][0:-1, 0:-1]
+    mesh["ury"] = mesh["y"][0:-1, 1:]
+    mesh["llz"] = mesh["z"][1:, 0:-1]
+    mesh["lrz"] = mesh["z"][1:, 1:]
+    mesh["ulz"] = mesh["z"][0:-1, 0:-1]
+    mesh["urz"] = mesh["z"][0:-1, 1:]
+    mesh["cpx"] = np.zeros_like(mesh["llx"])
+    mesh["cpy"] = np.zeros_like(mesh["llx"])
+    mesh["cpz"] = np.zeros_like(mesh["llx"])
 
     # i and j are indices over subruptures
-    ni, nj = mesh['llx'].shape
+    ni, nj = mesh["llx"].shape
     for i in range(0, ni):
         for j in range(0, nj):
             # Rupture corner points
-            pp0 = Vector(
-                mesh['ulx'][i, j], mesh['uly'][i, j], mesh['ulz'][i, j])
-            pp1 = Vector(
-                mesh['urx'][i, j], mesh['ury'][i, j], mesh['urz'][i, j])
-            pp2 = Vector(
-                mesh['lrx'][i, j], mesh['lry'][i, j], mesh['lrz'][i, j])
-            pp3 = Vector(
-                mesh['llx'][i, j], mesh['lly'][i, j], mesh['llz'][i, j])
+            pp0 = Vector(mesh["ulx"][i, j], mesh["uly"][i, j], mesh["ulz"][i, j])
+            pp1 = Vector(mesh["urx"][i, j], mesh["ury"][i, j], mesh["urz"][i, j])
+            pp2 = Vector(mesh["lrx"][i, j], mesh["lry"][i, j], mesh["lrz"][i, j])
+            pp3 = Vector(mesh["llx"][i, j], mesh["lly"][i, j], mesh["llz"][i, j])
             # Find center of quad
             mp0 = pp0 + (pp1 - pp0) * 0.5
             mp1 = pp3 + (pp2 - pp3) * 0.5
             cp = mp0 + (mp1 - mp0) * 0.5
-            mesh['cpx'][i, j] = cp.x
-            mesh['cpy'][i, j] = cp.y
-            mesh['cpz'][i, j] = cp.z
+            mesh["cpx"][i, j] = cp.x
+            mesh["cpy"][i, j] = cp.y
+            mesh["cpz"][i, j] = cp.z
     return mesh
 
 
@@ -196,10 +188,8 @@ def get_local_unit_slip_vector(strike, dip, rake):
     strike = np.radians(strike)
     dip = np.radians(dip)
     rake = np.radians(rake)
-    sx = np.sin(rake) * np.cos(dip) * np.cos(strike) + \
-        np.cos(rake) * np.sin(strike)
-    sy = np.sin(rake) * np.cos(dip) * np.sin(strike) + \
-        np.cos(rake) * np.cos(strike)
+    sx = np.sin(rake) * np.cos(dip) * np.cos(strike) + np.cos(rake) * np.sin(strike)
+    sy = np.sin(rake) * np.cos(dip) * np.sin(strike) + np.cos(rake) * np.cos(strike)
     sz = np.sin(rake) * np.sin(dip)
     return Vector(sx, sy, sz)
 
@@ -290,7 +280,8 @@ def get_quad_slip(q, rake):
     qlats = [a.latitude for a in q]
     qlons = [a.longitude for a in q]
     proj = OrthographicProjection(
-        np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
+        np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats)
+    )
     s1_ll = proj(np.array([s1_local.x]), np.array([s1_local.y]), reverse=True)
     s0_ll = proj(np.array([s0_local.x]), np.array([s0_local.y]), reverse=True)
     s1_ecef = Vector.fromTuple(latlon2ecef(s1_ll[1], s1_ll[0], s1_local.z))
@@ -409,7 +400,7 @@ def get_vertical_vector(q):
     P0, P1, P2, P3 = q
     P0_up = copy.deepcopy(P0)
     P0_up.depth = P0_up.depth - 1.0
-    p0 = Vector.fromPoint(P0)   # fromPoint converts to ECEF
+    p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
     p1 = Vector.fromPoint(P0_up)
     v1 = (p1 - p0).norm()
     return v1
@@ -470,8 +461,9 @@ def _quad_distance(q, points, horizontal=False):
     if horizontal:
         dist[inside_idx] = 0.0
     else:
-        dist[inside_idx] = np.power(np.abs(
-            np.sum(p0d[inside_idx, :] * normalVector.getArray(), axis=1)), 2)
+        dist[inside_idx] = np.power(
+            np.abs(np.sum(p0d[inside_idx, :] * normalVector.getArray(), axis=1)), 2
+        )
 
     outside_idx = np.logical_not(inside_idx)
     s0 = _distance_sq_to_segment(p0d, p1d)
@@ -522,10 +514,8 @@ def get_distance_to_plane(planepoints, otherpoint):
         b = (-d / D) * bt
         c = (-d / D) * ct
 
-        numer = np.abs(a * otherpoint.x +
-                       b * otherpoint.y +
-                       c * otherpoint.z + d)
-        denom = np.sqrt(a**2 + b**2 + c**2)
+        numer = np.abs(a * otherpoint.x + b * otherpoint.y + c * otherpoint.z + d)
+        denom = np.sqrt(a ** 2 + b ** 2 + c ** 2)
         dist = numer / denom
     else:
         dist = 0
@@ -552,10 +542,10 @@ def _distance_sq_to_segment(p0, p1):
 
     dist = np.zeros_like(p1[:, 0])
     # /* Are the two points equal? */
-    idx_equal = (p0[:, 0] == p1[:, 0]) & (
-        p0[:, 1] == p1[:, 1]) & (p0[:, 2] == p1[:, 2])
-    dist[idx_equal] = np.sqrt(p0[idx_equal, 0]**2 +
-                              p0[idx_equal, 1]**2 + p0[idx_equal, 2]**2)
+    idx_equal = (p0[:, 0] == p1[:, 0]) & (p0[:, 1] == p1[:, 1]) & (p0[:, 2] == p1[:, 2])
+    dist[idx_equal] = np.sqrt(
+        p0[idx_equal, 0] ** 2 + p0[idx_equal, 1] ** 2 + p0[idx_equal, 2] ** 2
+    )
 
     v = p1 - p0
 
@@ -569,12 +559,13 @@ def _distance_sq_to_segment(p0, p1):
 
     c1 = -1 * np.sum(p0 * v, axis=1)
     idx_neg = c1 <= 0
-    dist[idx_neg] = p0[idx_neg, 0]**2 + p0[idx_neg, 1]**2 + p0[idx_neg, 2]**2
+    dist[idx_neg] = p0[idx_neg, 0] ** 2 + p0[idx_neg, 1] ** 2 + p0[idx_neg, 2] ** 2
 
     c2 = np.sum(v * v, axis=1)
     idx_less_c1 = c2 <= c1
-    dist[idx_less_c1] = p1[idx_less_c1, 0]**2 + \
-        p1[idx_less_c1, 1]**2 + p1[idx_less_c1, 2]**2
+    dist[idx_less_c1] = (
+        p1[idx_less_c1, 0] ** 2 + p1[idx_less_c1, 1] ** 2 + p1[idx_less_c1, 2] ** 2
+    )
 
     idx_other = np.logical_not(idx_neg | idx_equal | idx_less_c1)
 
@@ -582,8 +573,9 @@ def _distance_sq_to_segment(p0, p1):
     t1 = c1 / c2
     t1.shape = (nr, 1)
     tmp = p0 + (v * t1)
-    dist[idx_other] = tmp[idx_other, 0]**2 + \
-        tmp[idx_other, 1]**2 + tmp[idx_other, 2]**2
+    dist[idx_other] = (
+        tmp[idx_other, 0] ** 2 + tmp[idx_other, 1] ** 2 + tmp[idx_other, 2] ** 2
+    )
 
     return dist
 
@@ -598,14 +590,16 @@ def rake_to_mech(rake):
     Returns:
         str: Mechanism.
     """
-    mech = 'ALL'
+    mech = "ALL"
     if rake is not None:
-        if (rake >= -180 and rake <= -150) or \
-           (rake >= -30 and rake <= 30) or \
-           (rake >= 150 and rake <= 180):
-            mech = 'SS'
+        if (
+            (rake >= -180 and rake <= -150)
+            or (rake >= -30 and rake <= 30)
+            or (rake >= 150 and rake <= 180)
+        ):
+            mech = "SS"
         if rake >= -120 and rake <= -60:
-            mech = 'NM'
+            mech = "NM"
         if rake >= 60 and rake <= 120:
-            mech = 'RS'
+            mech = "RS"
     return mech

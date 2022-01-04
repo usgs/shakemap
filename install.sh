@@ -22,8 +22,9 @@ source $prof
 VENV=shakemap
 
 developer=0
-py_ver=3.8
-while getopts p:d FLAG; do
+openquake_deps=0
+py_ver=3.10
+while getopts p:d:q FLAG; do
   case $FLAG in
     p)
         py_ver=$OPTARG
@@ -32,16 +33,20 @@ while getopts p:d FLAG; do
         echo "Installing developer packages."
         developer=1
       ;;
+    q)
+        echo "Installing full OpenQuake dependencies."
+        openquake_deps=1
+      ;;
   esac
 done
 
-#if [ $py_ver == '3.8' ] && [ "$unamestr" == 'Linux' ]; then
-#    echo "WARNING: ShakeMap on Python v3.8 on some versions of Linux "
-#    echo "may fail in unexpected ways. We are enforcing the use "
-#    echo "of Python v3.7 until this warning disappears."
-#    echo ""
-#    py_ver=3.7
-#fi
+if [ $py_ver == '3.9' ] && [ "$unamestr" == 'Linux' ]; then
+    echo "WARNING: ShakeMap on Python v3.9 on some versions of Linux"
+    echo "has known problems. We are enforcing the use of Python v3.8"
+    echo "or Python v3.10 until this warning disappears. Defaulting to"
+    echo "Python v3.10"
+    py_ver=3.10
+fi
 
 echo "Using python version $py_ver"
 echo ""
@@ -140,6 +145,14 @@ dev_list=(
     "sphinx-argparse>=0.2.5"
 )
 
+openquake_list=(
+      "decorator>=4.3"
+      "django>=3.2"
+      "requests>=2.20"
+      "setuptools"
+      "toml"
+)
+
 # Required package list:
 package_list=(
       "python=$py_ver"
@@ -157,9 +170,9 @@ package_list=(
       "ipython>=7.22.0"
       "libcomcat>=2.0.12"
       "lockfile>=0.12.2"
-      "mapio>=0.7.27"
+      "mapio>0.7.27"
       "matplotlib-base>=3.4.2"
-      "numpy==1.20"
+      "numpy=1.21"
       "obspy>=1.2.2"
       "openmp>=8.0.1"
       "pandas>=1.2.5"
@@ -171,7 +184,8 @@ package_list=(
       "python-daemon>=2.3.0"
       "pytest-faulthandler>=2.0.1"
       "pytest-azurepipelines>=0.8.0"
-      "rasterio==1.2.5"
+      "pyzmq"
+      "rasterio>=1.2.5"
       "scikit-image>=0.16.2"
       "scipy>=1.4.1"
       "shapely>=1.7.1"
@@ -183,6 +197,11 @@ package_list=(
 
 if [ $developer == 1 ]; then
     package_list=( "${package_list[@]}" "${dev_list[@]}" )
+    echo ${package_list[*]}
+fi
+
+if [ $openquake_deps == 1 ]; then
+    package_list=( "${package_list[@]}" "${openquake_list[@]}" )
     echo ${package_list[*]}
 fi
 
@@ -233,7 +252,7 @@ fi
 
 # Install OQ from github to get NGA East since it isn't in a release yet.
 echo "Installing OpenQuake from github..."
-pip install --upgrade https://github.com/gem/oq-engine/archive/refs/tags/v3.12.0.tar.gz
+pip install --upgrade --no-dependencies https://github.com/gem/oq-engine/archive/engine-3.12.zip
 if [ $? -ne 0 ];then
     echo "Failed to pip install OpenQuake. Exiting."
     exit 1
@@ -242,6 +261,8 @@ fi
 
 # This package
 echo "Installing ${VENV}..."
+touch shakemap/c/*.pyx
+touch shakemap/c/contour.c
 pip install --no-deps -e .
 
 # if pip install fails, bow out gracefully

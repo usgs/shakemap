@@ -40,7 +40,7 @@ class PDLTransfer(TransferBaseModule):
         pdl_dir = os.path.join(self.datadir, "pdl")
         products_dir = os.path.join(self.datadir, "products")
         if not os.path.isdir(pdl_dir):
-            raise NotADirectoryError("%s does not exist." % pdl_dir)
+            raise NotADirectoryError(f"{pdl_dir} does not exist.")
 
         # get the properties needed for the sender
         properties, product_properties = self.getProperties(self.info)
@@ -57,20 +57,21 @@ class PDLTransfer(TransferBaseModule):
             if "cmdline_args" in params:
                 cmdline_args = params["cmdline_args"].copy()
             del params["cmdline_args"]
+
             params.update(properties)
             if self.usedevconfig is True:
                 if params["devconfig"] is None or not os.path.isfile(
                     params["devconfig"]
                 ):
                     raise FileNotFoundError(
-                        'Dev config file "%s" does not ' "exist" % params["devconfig"]
+                        f"Dev config file \"{params['devconfig']}\" does not exist"
                     )
                 # Swap the config file for the devconfig file
                 params["configfile"] = params["devconfig"]
-                fmt = "Doing PDL transfer to %s DEV..." % destination
+                fmt = f"Doing PDL transfer to {destination} DEV..."
                 logging.debug(fmt)
             else:
-                fmt = "Doing PDL transfer to %s..." % destination
+                fmt = f"Doing PDL transfer to {destination}..."
                 logging.debug(fmt)
 
             sender = PDLSender(

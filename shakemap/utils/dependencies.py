@@ -19,7 +19,7 @@ def sha_sum(fname):
         str: The sha256 checksum as a hex string.
     """
     hasher = hashlib.sha256()
-    with open(fname, 'rb') as fd:
+    with open(fname, "rb") as fd:
         for block in iter(lambda: fd.read(65536), b""):
             hasher.update(block)
     return hasher.hexdigest()
@@ -131,8 +131,8 @@ class DepNode(object):
 
 
 class CommandDatabase(object):
-    """A class to keep track of dependencies.
-    """
+    """A class to keep track of dependencies."""
+
     def __init__(self, classes, eventid, install_path=None, data_path=None):
         """
         Create a new (or open an exsiting) dependency database for checking
@@ -149,7 +149,7 @@ class CommandDatabase(object):
         """
         if install_path is None or data_path is None:
             install_path, data_path = get_config_paths()
-        event_path = os.path.join(data_path, eventid, 'current')
+        event_path = os.path.join(data_path, eventid, "current")
 
         self.eventid = eventid
         self.event_path = event_path
@@ -160,68 +160,69 @@ class CommandDatabase(object):
         self.cconnect = con = sqlite3.connect(":memory:")
         self.ccursor = cur = con.cursor()
 
-        cur.execute('''CREATE TABLE dependencies
-                       (command text, dependency text, required integer)''')
+        cur.execute(
+            """CREATE TABLE dependencies
+                       (command text, dependency text, required integer)"""
+        )
         con.commit()
 
-        config_path = os.path.join(install_path, 'config')
+        config_path = os.path.join(install_path, "config")
         self.targets = {}
         self.cmdsums = {}
         dependencies = []
         for cmd, cd in classes.items():
-            if cd['class'].targets is not None:
-                for target in cd['class'].targets:
-                    self.targets[cmd] = self.targets.get(cmd, []) + \
-                        [re.compile(os.path.join(event_path, target))]
+            if cd["class"].targets is not None:
+                for target in cd["class"].targets:
+                    self.targets[cmd] = self.targets.get(cmd, []) + [
+                        re.compile(os.path.join(event_path, target))
+                    ]
             else:
                 self.targets[cmd] = None
-            if cd['class'].dependencies is not None:
-                for depend in cd['class'].dependencies:
-                    dependencies.append((cmd,
-                                         os.path.join(event_path, depend[0]),
-                                         int(depend[1])))
+            if cd["class"].dependencies is not None:
+                for depend in cd["class"].dependencies:
+                    dependencies.append(
+                        (cmd, os.path.join(event_path, depend[0]), int(depend[1]))
+                    )
             # Configs are dependencies, too, they just live in a different
             # directory
-            if cd['class'].configs is not None:
-                for config in cd['class'].configs:
-                    dependencies.append((cmd,
-                                         os.path.join(config_path, config),
-                                         1))
+            if cd["class"].configs is not None:
+                for config in cd["class"].configs:
+                    dependencies.append((cmd, os.path.join(config_path, config), 1))
 
-            self.cmdsums[cmd] = sha_sum(cd['mfile'])
+            self.cmdsums[cmd] = sha_sum(cd["mfile"])
 
         if len(dependencies) > 0:
-            cur.executemany('INSERT into dependencies values (?, ?, ?)',
-                            dependencies)
+            cur.executemany("INSERT into dependencies values (?, ?, ?)", dependencies)
             con.commit()
 
         #
         # The dependencies.db database keeps track of the state of the
         # dependencies from previous runs
         #
-        dbfile = os.path.join(install_path, 'data', 'dependencies.db')
+        dbfile = os.path.join(install_path, "data", "dependencies.db")
         if not os.path.isfile(dbfile):
             # It doesn't exist, so create it
             # TODO: Better checking would probably be good here
             self.fconnect = sqlite3.connect(dbfile, timeout=15)
             self.fcursor = self.fconnect.cursor()
             self.fcursor.execute(
-                '''CREATE TABLE file_checksums (command text NOT NULL,
+                """CREATE TABLE file_checksums (command text NOT NULL,
                    file text NOT NULL,
-                   checksum text, PRIMARY KEY (command, file))''')
+                   checksum text, PRIMARY KEY (command, file))"""
+            )
             self.fcursor.execute(
-                '''CREATE TABLE cmd_checksums (command text NOT NULL,
+                """CREATE TABLE cmd_checksums (command text NOT NULL,
                    eventid text NOT NULL,
-                   checksum text, PRIMARY KEY (command, eventid))''')
+                   checksum text, PRIMARY KEY (command, eventid))"""
+            )
             self.fconnect.commit()
         else:
             self.fconnect = sqlite3.connect(dbfile, timeout=15)
             self.fcursor = self.fconnect.cursor()
-        self.fcursor.execute('PRAGMA journal_mode = WAL')
+        self.fcursor.execute("PRAGMA journal_mode = WAL")
 
     def close(self):
-        """Closes the object and associated databases
-        """
+        """Closes the object and associated databases"""
         self.fcursor.close()
         self.fconnect.close()
         self.ccursor.close()
@@ -251,8 +252,7 @@ class CommandDatabase(object):
         return status
 
     def __buildDependencyTree(self, cmd, root=None):
-        """Internal function to build the dependency tree for a command.
-        """
+        """Internal function to build the dependency tree for a command."""
         deps = self.__getDependencies(cmd)
         child = root = DepNode(deps, cmd, root)
         for fp in deps:
@@ -269,8 +269,7 @@ class CommandDatabase(object):
         return root
 
     def __getDependencyStatus(self, tree):
-        """Internal function to create a list of out-of-date commands.
-        """
+        """Internal function to create a list of out-of-date commands."""
         status = []
         for leaf in tree.getLeaves():
             status += self.__traceLeaf(leaf)
@@ -279,8 +278,7 @@ class CommandDatabase(object):
         # descendents: set() gets the unique elements, sorted() puts
         # them in proper order based on tree "level", and the list
         # comprehension extracts the command name into a list.
-        status = [x[0] for x in sorted(set(status), key=lambda x: x[1],
-                                       reverse=True)]
+        status = [x[0] for x in sorted(set(status), key=lambda x: x[1], reverse=True)]
         return status
 
     def __traceLeaf(self, leaf):
@@ -302,8 +300,7 @@ class CommandDatabase(object):
             # If command is out of date, all descendent commands need to be
             # rerun; otherwise ok
             #
-            sql = ('SELECT checksum FROM cmd_checksums WHERE command=? AND '
-                   'eventid=?')
+            sql = "SELECT checksum FROM cmd_checksums WHERE command=? AND " "eventid=?"
             self.fcursor.execute(sql, (leaf.cmd(), self.eventid))
             result = self.fcursor.fetchall()
 
@@ -322,9 +319,8 @@ class CommandDatabase(object):
             if explist is not None:
                 for exp in explist:
                     found_target = False
-                    files = glob.glob(os.path.join(self.event_path, '*'))
-                    files += glob.glob(os.path.join(self.event_path,
-                                                    'products', '*'))
+                    files = glob.glob(os.path.join(self.event_path, "*"))
+                    files += glob.glob(os.path.join(self.event_path, "products", "*"))
                     for filename in files:
                         if exp.fullmatch(filename):
                             found_target = True
@@ -341,14 +337,12 @@ class CommandDatabase(object):
             # If dep file is out of date, child command and all descendent
             # commands need to be rerun
             #
-            sql = ('SELECT checksum FROM file_checksums WHERE command=? '
-                   'AND file=?')
+            sql = "SELECT checksum FROM file_checksums WHERE command=? " "AND file=?"
             for pattern, required in leaf.deps():
                 found = glob.glob(pattern)
                 if len(found) == 0 and required:
                     # Didn't find a required file -- this prevents a run
-                    logging.warning('Did not find required dependency: %s' %
-                                    pattern)
+                    logging.warning(f"Did not find required dependency: {pattern}")
                     clean = False
                     break
                 if len(found) > 0:
@@ -380,8 +374,10 @@ class CommandDatabase(object):
         Returns:
             nothing: Nothing.
         """
-        sql = ('INSERT OR REPLACE INTO file_checksums (command, file, '
-               'checksum) values (?, ?, ?)')
+        sql = (
+            "INSERT OR REPLACE INTO file_checksums (command, file, "
+            "checksum) values (?, ?, ?)"
+        )
         args = []
         files = self.__getDependencies(cmd)
         for fp in files:
@@ -393,18 +389,19 @@ class CommandDatabase(object):
         if len(args) > 0:
             self.fcursor.executemany(sql, args)
 
-        sql = ('INSERT OR REPLACE INTO cmd_checksums (command, eventid, '
-               'checksum) values (?, ?, ?)')
+        sql = (
+            "INSERT OR REPLACE INTO cmd_checksums (command, eventid, "
+            "checksum) values (?, ?, ?)"
+        )
         self.fcursor.execute(sql, (cmd, self.eventid, self.cmdsums[cmd]))
         self.fconnect.commit()
         return
 
     def __getDependencies(self, cmd):
-        """Internal function to get the file dependencies of a command.
-        """
+        """Internal function to get the file dependencies of a command."""
         self.ccursor.execute(
-            'SELECT dependency, required FROM dependencies WHERE command=?',
-            (cmd,))
+            "SELECT dependency, required FROM dependencies WHERE command=?", (cmd,)
+        )
         return self.ccursor.fetchall()
 
     def __findCmd(self, filepath):

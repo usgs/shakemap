@@ -20,13 +20,13 @@ from shakelib.rupture.point_rupture import PointRupture
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..'))
+shakedir = os.path.abspath(os.path.join(homedir, "..", "..", ".."))
 sys.path.insert(0, shakedir)
 
 
 def randomword(length):
     letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for i in range(length))
+    return "".join(random.choice(letters) for i in range(length))
 
 
 def dict_equal(d1, d2):
@@ -45,22 +45,22 @@ depth="19.0" locstring="EASTERN SICHUAN, CHINA" productcode="us2008ryan"
 mech="" netid="us" network="" />"""
     try:
         config = {
-            'alliance': 'chaotic neutral',
-            'race': 'Elf',
-            'armor': 5,
-            'class': 'Warrior',
-            'intelligence': 10
+            "alliance": "chaotic neutral",
+            "race": "Elf",
+            "armor": 5,
+            "class": "Warrior",
+            "intelligence": 10,
         }
-        rupturefile = os.path.join(homedir, 'container_data',
-                                   'Barkaetal02_fault.txt')
+        rupturefile = os.path.join(homedir, "container_data", "Barkaetal02_fault.txt")
         eventfile = io.StringIO(event_text)
-        datafiles = [os.path.join(
-            homedir, 'container_data/northridge_stations_dat.xml')]
+        datafiles = [
+            os.path.join(homedir, "container_data/northridge_stations_dat.xml")
+        ]
 
-        timestamp = datetime.datetime.utcnow().strftime('%FT%TZ')
-        originator = 'us'
+        timestamp = datetime.datetime.utcnow().strftime("%FT%TZ")
+        originator = "us"
         version = 1
-        history = {'history': [[timestamp, originator, version]]}
+        history = {"history": [[timestamp, originator, version]]}
 
         container = ShakeMapInputContainer.createFromInput(
             datafile,
@@ -68,7 +68,8 @@ mech="" netid="us" network="" />"""
             eventfile,
             history,
             datafiles=datafiles,
-            rupturefile=rupturefile)
+            rupturefile=rupturefile,
+        )
         cfile = container.getFileName()
         assert datafile == cfile
         config = container.getConfig()
@@ -90,18 +91,16 @@ mech="" netid="us" network="" />"""
         df1, _ = station.getStationDictionary(instrumented=True)
         df2, _ = station2.getStationDictionary(instrumented=True)
         assert dict_equal(df1, df2)
-        assert history['history'][-1][0] == history['history'][-1][0]
-        assert history['history'][-1][1] == history['history'][-1][1]
-        assert history['history'][-1][2] == history['history'][-1][2]
+        assert history["history"][-1][0] == history["history"][-1][0]
+        assert history["history"][-1][1] == history["history"][-1][1]
+        assert history["history"][-1][2] == history["history"][-1][2]
 
         container2.close()
 
         eventfile.seek(0)
         container3 = ShakeMapInputContainer.createFromInput(
-            datafile,
-            config,
-            eventfile,
-            {})
+            datafile, config, eventfile, {}
+        )
         try:
             # this should fail, because we haven't set any station data yet
             station = container3.getStationList()
@@ -119,11 +118,11 @@ mech="" netid="us" network="" />"""
         # some dummy data
         #
         config = {
-            'alliance': 'chaotic neutral',
-            'race': 'Elf',
-            'armor': 5,
-            'class': 'Warrior',
-            'intelligence': 10
+            "alliance": "chaotic neutral",
+            "race": "Elf",
+            "armor": 5,
+            "class": "Warrior",
+            "intelligence": 10,
         }
         with pytest.raises(AttributeError):
             container3.getStationDict()
@@ -146,97 +145,97 @@ def test_output_container():
     # create MMI mean data for maximum component
     mean_mmi_maximum_data = np.random.rand(nrows, ncols)
     mean_mmi_maximum_metadata = {
-        'xmin': -118.5,
-        'xmax': -114.5,
-        'ymin': 32.1,
-        'ymax': 36.7,
-        'dx': 0.01,
-        'dy': 0.02,
-        'nx': 400,
-        'ny': 230,
-        'name': 'Gandalf',
-        'color': 'white',
-        'powers': 'magic'
+        "xmin": -118.5,
+        "xmax": -114.5,
+        "ymin": 32.1,
+        "ymax": 36.7,
+        "dx": 0.01,
+        "dy": 0.02,
+        "nx": 400,
+        "ny": 230,
+        "name": "Gandalf",
+        "color": "white",
+        "powers": "magic",
     }
 
     # create MMI std data for maximum component
     std_mmi_maximum_data = mean_mmi_maximum_data / 10
     std_mmi_maximum_metadata = {
-        'xmin': -118.5,
-        'xmax': -114.5,
-        'ymin': 32.1,
-        'ymax': 36.7,
-        'dx': 0.01,
-        'dy': 0.02,
-        'nx': 400,
-        'ny': 230,
-        'name': 'Legolas',
-        'color': 'green',
-        'powers': 'good hair'
+        "xmin": -118.5,
+        "xmax": -114.5,
+        "ymin": 32.1,
+        "ymax": 36.7,
+        "dx": 0.01,
+        "dy": 0.02,
+        "nx": 400,
+        "ny": 230,
+        "name": "Legolas",
+        "color": "green",
+        "powers": "good hair",
     }
 
     # create MMI mean data for rotd50 component
     mean_mmi_rotd50_data = np.random.rand(nrows, ncols)
     mean_mmi_rotd50_metadata = {
-        'xmin': -118.5,
-        'xmax': -114.5,
-        'ymin': 32.1,
-        'ymax': 36.7,
-        'dx': 0.01,
-        'dy': 0.02,
-        'nx': 400,
-        'ny': 230,
-        'name': 'Gimli',
-        'color': 'brown',
-        'powers': 'axing'
+        "xmin": -118.5,
+        "xmax": -114.5,
+        "ymin": 32.1,
+        "ymax": 36.7,
+        "dx": 0.01,
+        "dy": 0.02,
+        "nx": 400,
+        "ny": 230,
+        "name": "Gimli",
+        "color": "brown",
+        "powers": "axing",
     }
 
     # create MMI std data for rotd50 component
     std_mmi_rotd50_data = mean_mmi_rotd50_data / 10
     std_mmi_rotd50_metadata = {
-        'xmin': -118.5,
-        'xmax': -114.5,
-        'ymin': 32.1,
-        'ymax': 36.7,
-        'dx': 0.01,
-        'dy': 0.02,
-        'nx': 400,
-        'ny': 230,
-        'name': 'Aragorn',
-        'color': 'white',
-        'powers': 'scruffiness'
+        "xmin": -118.5,
+        "xmax": -114.5,
+        "ymin": 32.1,
+        "ymax": 36.7,
+        "dx": 0.01,
+        "dy": 0.02,
+        "nx": 400,
+        "ny": 230,
+        "name": "Aragorn",
+        "color": "white",
+        "powers": "scruffiness",
     }
 
     # create PGA mean data for maximum component
     mean_pga_maximum_data = np.random.rand(nrows, ncols)
     mean_pga_maximum_metadata = {
-        'xmin': -118.5,
-        'xmax': -114.5,
-        'ymin': 32.1,
-        'ymax': 36.7,
-        'dx': 0.01,
-        'dy': 0.02,
-        'nx': 400,
-        'ny': 230,
-        'name': 'Pippin',
-        'color': 'purple',
-        'powers': 'rashness'
+        "xmin": -118.5,
+        "xmax": -114.5,
+        "ymin": 32.1,
+        "ymax": 36.7,
+        "dx": 0.01,
+        "dy": 0.02,
+        "nx": 400,
+        "ny": 230,
+        "name": "Pippin",
+        "color": "purple",
+        "powers": "rashness",
     }
 
     # create PGA std data for maximum component
     std_pga_maximum_data = mean_pga_maximum_data / 10
     std_pga_maximum_metadata = {
-        'xmin': -118.5,
-        'xmax': -114.5,
-        'ymin': 32.1,
-        'ymax': 36.7,
-        'dx': 0.01,
-        'dy': 0.02,
-        'nx': 400,
-        'ny': 230,
-        'name': 'Merry',
-        'color': 'grey',
-        'powers': 'hunger'
+        "xmin": -118.5,
+        "xmax": -114.5,
+        "ymin": 32.1,
+        "ymax": 36.7,
+        "dx": 0.01,
+        "dy": 0.02,
+        "nx": 400,
+        "ny": 230,
+        "name": "Merry",
+        "color": "grey",
+        "powers": "hunger",
     }
 
     f, datafile = tempfile.mkstemp()
@@ -246,58 +245,69 @@ def test_output_container():
         container = ShakeMapOutputContainer.create(datafile)
         # LookupError raised if trying to dropIMTs if there are none
         with pytest.raises(LookupError):
-            container.dropIMT('mmi')
+            container.dropIMT("mmi")
 
         # Add imts
-        container.setIMTGrids('mmi', 'maximum',
-                              mean_mmi_maximum_data, mean_mmi_maximum_metadata,
-                              std_mmi_maximum_data, std_mmi_maximum_metadata)
-        container.setIMTGrids('mmi', 'rotd50',
-                              mean_mmi_rotd50_data, mean_mmi_rotd50_metadata,
-                              std_mmi_rotd50_data, std_mmi_rotd50_metadata)
-        container.setIMTGrids('pga', 'maximum',
-                              mean_pga_maximum_data, mean_pga_maximum_metadata,
-                              std_pga_maximum_data, std_pga_maximum_metadata)
+        container.setIMTGrids(
+            "mmi",
+            "maximum",
+            mean_mmi_maximum_data,
+            mean_mmi_maximum_metadata,
+            std_mmi_maximum_data,
+            std_mmi_maximum_metadata,
+        )
+        container.setIMTGrids(
+            "mmi",
+            "rotd50",
+            mean_mmi_rotd50_data,
+            mean_mmi_rotd50_metadata,
+            std_mmi_rotd50_data,
+            std_mmi_rotd50_metadata,
+        )
+        container.setIMTGrids(
+            "pga",
+            "maximum",
+            mean_pga_maximum_data,
+            mean_pga_maximum_metadata,
+            std_pga_maximum_data,
+            std_pga_maximum_metadata,
+        )
 
         # get the maximum MMI imt data
-        mmi_max_dict = container.getIMTGrids('mmi', component='maximum')
-        np.testing.assert_allclose(mmi_max_dict['mean'],
-                                   mean_mmi_maximum_data)
-        np.testing.assert_allclose(mmi_max_dict['std'],
-                                   std_mmi_maximum_data)
-        assert mmi_max_dict['mean_metadata'] == mean_mmi_maximum_metadata
-        assert mmi_max_dict['std_metadata'] == std_mmi_maximum_metadata
+        mmi_max_dict = container.getIMTGrids("mmi", component="maximum")
+        np.testing.assert_allclose(mmi_max_dict["mean"], mean_mmi_maximum_data)
+        np.testing.assert_allclose(mmi_max_dict["std"], std_mmi_maximum_data)
+        assert mmi_max_dict["mean_metadata"] == mean_mmi_maximum_metadata
+        assert mmi_max_dict["std_metadata"] == std_mmi_maximum_metadata
 
         # get the rotd50 MMI imt data
-        mmi_rot_dict = container.getIMTGrids('mmi', component='rotd50')
-        np.testing.assert_allclose(mmi_rot_dict['mean'],
-                                   mean_mmi_rotd50_data)
-        np.testing.assert_allclose(mmi_rot_dict['std'],
-                                   std_mmi_rotd50_data)
-        assert mmi_rot_dict['mean_metadata'] == mean_mmi_rotd50_metadata
-        assert mmi_rot_dict['std_metadata'] == std_mmi_rotd50_metadata
+        mmi_rot_dict = container.getIMTGrids("mmi", component="rotd50")
+        np.testing.assert_allclose(mmi_rot_dict["mean"], mean_mmi_rotd50_data)
+        np.testing.assert_allclose(mmi_rot_dict["std"], std_mmi_rotd50_data)
+        assert mmi_rot_dict["mean_metadata"] == mean_mmi_rotd50_metadata
+        assert mmi_rot_dict["std_metadata"] == std_mmi_rotd50_metadata
 
         # get list of all imts
         imts = container.getIMTs()
 
         # get list of maximum imts
-        max_imts = container.getIMTs(component='maximum')
-        assert sorted(max_imts) == ['mmi', 'pga']
+        max_imts = container.getIMTs(component="maximum")
+        assert sorted(max_imts) == ["mmi", "pga"]
 
         # get list of components for mmi
-        mmi_comps = container.getComponents('mmi')
-        assert sorted(mmi_comps) == ['maximum', 'rotd50']
+        mmi_comps = container.getComponents("mmi")
+        assert sorted(mmi_comps) == ["maximum", "rotd50"]
 
         # Test dropIMT
-        imts = container.getIMTs('maximum')
-        assert imts == ['mmi', 'pga']
-        container.dropIMT('mmi')
-        imts = container.getIMTs('maximum')
-        assert imts == ['pga']
+        imts = container.getIMTs("maximum")
+        assert imts == ["mmi", "pga"]
+        container.dropIMT("mmi")
+        imts = container.getIMTs("maximum")
+        assert imts == ["pga"]
         container.close()
 
     except Exception as e:
-        raise(e)
+        raise (e)
     finally:
         os.remove(datafile)
 
@@ -321,67 +331,63 @@ def test_output_arrays():
         std = np.random.rand(100)
         lats = np.random.rand(100)
         lons = np.random.rand(100)
-        ids = np.array([randomword(4).encode('ascii') for x in range(100)])
-        metadata = {
-            'units': '%g',
-            'digits': 4
-        }
+        ids = np.array([randomword(4).encode("ascii") for x in range(100)])
+        metadata = {"units": "%g", "digits": 4}
         #
         # Put the data in the container
         #
-        container.setIMTArrays('PGA', 'Larger', lons, lats, ids,
-                               mean, metadata,
-                               std, metadata)
+        container.setIMTArrays(
+            "PGA", "Larger", lons, lats, ids, mean, metadata, std, metadata
+        )
         #
         # Now extract it and compare it to what we put in there
         #
-        dout = container.getIMTArrays('PGA', 'Larger')
-        np.testing.assert_allclose(dout['lons'], lons)
-        np.testing.assert_allclose(dout['lats'], lats)
-        assert all(dout['ids'] == ids)
-        np.testing.assert_allclose(dout['mean'], mean)
-        np.testing.assert_allclose(dout['std'], std)
+        dout = container.getIMTArrays("PGA", "Larger")
+        np.testing.assert_allclose(dout["lons"], lons)
+        np.testing.assert_allclose(dout["lats"], lats)
+        assert all(dout["ids"] == ids)
+        np.testing.assert_allclose(dout["mean"], mean)
+        np.testing.assert_allclose(dout["std"], std)
         #
         # Check the data type
         #
-        assert container.getDataType() == 'points'
+        assert container.getDataType() == "points"
         #
         # Try raising some exceptions
         #
         # Shouldn't be able to find this IMT
         with pytest.raises(LookupError):
-            container.getIMTArrays('JUNK', 'Larger')
+            container.getIMTArrays("JUNK", "Larger")
         # Shapes of inputs not the same
         with pytest.raises(ValueError):
             empty = np.array([])
-            container.setIMTArrays('PGV','Larger', empty, lats, ids,
-                                   mean, metadata,
-                                   std, metadata)
+            container.setIMTArrays(
+                "PGV", "Larger", empty, lats, ids, mean, metadata, std, metadata
+            )
         # IMT already exists
         with pytest.raises(LookupError):
-            container.setIMTArrays('PGA', 'Larger', lons, lats, ids,
-                                   mean, metadata,
-                                   std, metadata)
+            container.setIMTArrays(
+                "PGA", "Larger", lons, lats, ids, mean, metadata, std, metadata
+            )
         # Trying to set a grid in a file with points
         with pytest.raises(TypeError):
-            container.setIMTGrids('PGV', 'Larger', mean, metadata,
-                                  std, metadata)
+            container.setIMTGrids("PGV", "Larger", mean, metadata, std, metadata)
         # Trying to get a grid in a file with points
         with pytest.raises(TypeError):
-            container.getIMTGrids('PGA', 'Larger')
+            container.getIMTGrids("PGA", "Larger")
 
         container.close()
 
     except Exception as e:
         if os.path.isfile(datafile):
             os.remove(datafile)
-        raise(e)
+        raise (e)
     finally:
         if os.path.isfile(datafile):
             os.remove(datafile)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_input_container()
     test_output_container()
     test_output_arrays()

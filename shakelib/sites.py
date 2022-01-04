@@ -19,8 +19,9 @@ class Sites(object):
     `SitesContext <https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py>`__.
     """  # noqa
 
-    def __init__(self, vs30grid, vs30measured_grid=None, backarc=None,
-                 defaultVs30=686.0):
+    def __init__(
+        self, vs30grid, vs30measured_grid=None, backarc=None, defaultVs30=686.0
+    ):
         """
         Construct a Sites object.
 
@@ -50,12 +51,10 @@ class Sites(object):
         else:
             xmin = self._GeoDict.xmin
             xmax = self._GeoDict.xmax
-        self._lons = np.linspace(xmin,
-                                 xmax,
-                                 self._GeoDict.nx)
-        self._lats = np.linspace(self._GeoDict.ymax,
-                                 self._GeoDict.ymin,
-                                 self._GeoDict.ny)
+        self._lons = np.linspace(xmin, xmax, self._GeoDict.nx)
+        self._lats = np.linspace(
+            self._GeoDict.ymax, self._GeoDict.ymin, self._GeoDict.ny
+        )
 
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
@@ -69,15 +68,32 @@ class Sites(object):
                     # we want something that is just aligned, since we're
                     # padding edges
                     geodict = fgeodict.getAligned(geodict)
-            vs30grid = read(vs30File, samplegeodict=geodict,
-                            resample=resample, method='linear',
-                            doPadding=padding, padValue=defaultVs30)
+            vs30grid = read(
+                vs30File,
+                samplegeodict=geodict,
+                resample=resample,
+                method="linear",
+                doPadding=padding,
+                padValue=defaultVs30,
+            )
         return vs30grid
 
     @classmethod
-    def fromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0,
-                   vs30File=None, vs30measured_grid=None,
-                   backarc=None, padding=False, resample=False):
+    def fromBounds(
+        cls,
+        xmin,
+        xmax,
+        ymin,
+        ymax,
+        dx,
+        dy,
+        defaultVs30=686.0,
+        vs30File=None,
+        vs30measured_grid=None,
+        backarc=None,
+        padding=False,
+        resample=False,
+    ):
         """
         Create a Sites object by defining a center point, resolution, extent,
         and Vs30 values.
@@ -104,19 +120,33 @@ class Sites(object):
         """  # noqa
         geodict = GeoDict.createDictFromBox(xmin, xmax, ymin, ymax, dx, dy)
         if vs30File is not None:
-            vs30grid = cls._create(geodict, defaultVs30,
-                                   vs30File, padding, resample)
+            vs30grid = cls._create(geodict, defaultVs30, vs30File, padding, resample)
         else:
-            griddata = np.ones((geodict.ny, geodict.nx),
-                               dtype=np.float64) * defaultVs30
+            griddata = np.ones((geodict.ny, geodict.nx), dtype=np.float64) * defaultVs30
             vs30grid = Grid2D(griddata, geodict)
-        return cls(vs30grid, vs30measured_grid=vs30measured_grid,
-                   backarc=backarc, defaultVs30=defaultVs30)
+        return cls(
+            vs30grid,
+            vs30measured_grid=vs30measured_grid,
+            backarc=backarc,
+            defaultVs30=defaultVs30,
+        )
 
     @classmethod
-    def fromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0,
-                   vs30File=None, vs30measured_grid=None,
-                   backarc=None, padding=False, resample=False):
+    def fromCenter(
+        cls,
+        cx,
+        cy,
+        xspan,
+        yspan,
+        dx,
+        dy,
+        defaultVs30=686.0,
+        vs30File=None,
+        vs30measured_grid=None,
+        backarc=None,
+        padding=False,
+        resample=False,
+    ):
         """
         Create a Sites object by defining a center point, resolution, extent,
         and Vs30 values.
@@ -143,14 +173,16 @@ class Sites(object):
         """  # noqa
         geodict = GeoDict.createDictFromCenter(cx, cy, dx, dy, xspan, yspan)
         if vs30File is not None:
-            vs30grid = cls._create(geodict, defaultVs30,
-                                   vs30File, padding, resample)
+            vs30grid = cls._create(geodict, defaultVs30, vs30File, padding, resample)
         else:
-            griddata = np.ones((geodict.ny, geodict.nx),
-                               dtype=np.float64) * defaultVs30
+            griddata = np.ones((geodict.ny, geodict.nx), dtype=np.float64) * defaultVs30
             vs30grid = Grid2D(griddata, geodict)
-        return cls(vs30grid, vs30measured_grid=vs30measured_grid,
-                   backarc=backarc, defaultVs30=defaultVs30)
+        return cls(
+            vs30grid,
+            vs30measured_grid=vs30measured_grid,
+            backarc=backarc,
+            defaultVs30=defaultVs30,
+        )
 
     def getSitesContext(self, lldict=None, rock_vs30=None):
         """
@@ -185,21 +217,19 @@ class Sites(object):
         sctx = SitesContext()
 
         if lldict is not None:
-            lats = lldict['lats']
-            lons = lldict['lons']
+            lats = lldict["lats"]
+            lons = lldict["lons"]
             latshape = lats.shape
             lonshape = lons.shape
             if latshape != lonshape:
-                msg = 'Input lat/lon arrays must have the same dimensions'
+                msg = "Input lat/lon arrays must have the same dimensions"
                 raise ShakeLibException(msg)
 
             if rock_vs30 is not None:
-                tmp = self._Vs30.getValue(
-                    lats, lons, default=self._defaultVs30)
+                tmp = self._Vs30.getValue(lats, lons, default=self._defaultVs30)
                 sctx.vs30 = np.ones_like(tmp) * rock_vs30
             else:
-                sctx.vs30 = self._Vs30.getValue(
-                    lats, lons, default=self._defaultVs30)
+                sctx.vs30 = self._Vs30.getValue(lats, lons, default=self._defaultVs30)
             sctx.lats = lats
             sctx.lons = lons
             sctx.sids = np.array(range(np.size(lons))).reshape(lons.shape)
@@ -210,11 +240,9 @@ class Sites(object):
                 sctx.vs30 = np.full_like(self._Vs30.getData(), rock_vs30)
             else:
                 sctx.vs30 = self._Vs30.getData().copy()
-            sctx.sids = \
-                np.array(
-                    range(
-                        np.size(sctx.lons)*
-                        np.size(sctx.lats))).reshape(sctx.vs30.shape)
+            sctx.sids = np.array(
+                range(np.size(sctx.lons) * np.size(sctx.lats))
+            ).reshape(sctx.vs30.shape)
 
         Sites._addDepthParameters(sctx)
 
@@ -245,18 +273,25 @@ class Sites(object):
         return self._GeoDict.nx, self._GeoDict.ny
 
     @staticmethod
-    def _load(vs30File, samplegeodict=None, resample=False, method='linear',
-              doPadding=False, padValue=np.nan):
+    def _load(
+        vs30File,
+        samplegeodict=None,
+        resample=False,
+        method="linear",
+        doPadding=False,
+        padValue=np.nan,
+    ):
         try:
-            vs30grid = read(vs30File,
-                            samplegeodict=samplegeodict,
-                            resample=resample,
-                            method=method,
-                            doPadding=doPadding,
-                            padValue=padValue)
+            vs30grid = read(
+                vs30File,
+                samplegeodict=samplegeodict,
+                resample=resample,
+                method=method,
+                doPadding=doPadding,
+                padValue=padValue,
+            )
         except Exception as msg1:
-            msg = 'Load failure of %s - error message: "%s"' % (
-                vs30File, str(msg1))
+            msg = f'Load failure of {vs30File} - error message: "{str(msg1)}"'
             raise ShakeLibException(msg)
 
         if vs30grid.getData().dtype != np.float64:
@@ -270,8 +305,7 @@ class Sites(object):
         try:
             geodict = get_file_geodict(fname)
         except Exception as msg1:
-            msg = 'File geodict failure with %s - error messages: '\
-                '"%s"' % (fname, str(msg1))
+            msg = f'File geodict failure with {fname} - error messages: "{str(msg1)}"'
             raise ShakeLibException(msg)
         return geodict
 
@@ -305,8 +339,10 @@ class Sites(object):
 
         Returns: Numpy array of z1.0 in m.
         """
-        z1 = np.exp(-(7.15 / 4.0) *
-                    np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
+        z1 = np.exp(
+            -(7.15 / 4.0)
+            * np.log((vs30 ** 4.0 + 571.0 ** 4) / (1360 ** 4.0 + 571.0 ** 4))
+        )
         return z1
 
     @staticmethod
@@ -319,8 +355,10 @@ class Sites(object):
 
         Returns: Numpy array of z1.0 in m.
         """
-        z1 = np.exp(-(5.23 / 2.0) *
-                    np.log((vs30**2.0 + 412.**2.0) / (1360**2.0 + 412.**2.0)))
+        z1 = np.exp(
+            -(5.23 / 2.0)
+            * np.log((vs30 ** 2.0 + 412.0 ** 2.0) / (1360 ** 2.0 + 412.0 ** 2.0))
+        )
         return z1
 
     @staticmethod
@@ -335,8 +373,10 @@ class Sites(object):
 
         """
         # ASK14 define units as km, but implemented as m in OQ
-        z1 = np.exp(-(7.67 / 4.0) *
-                    np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
+        z1 = np.exp(
+            -(7.67 / 4.0)
+            * np.log((vs30 ** 4.0 + 610.0 ** 4) / (1360 ** 4.0 + 610.0 ** 4))
+        )
         return z1
 
     @staticmethod
@@ -351,8 +391,10 @@ class Sites(object):
 
         """
         # ASK14 define units as km, but implemented as m in OQ
-        z1 = np.exp(-(5.32 / 2.0) *
-                    np.log((vs30**2.0 + 412.**2) / (1360**2.0 + 412.**2)))
+        z1 = np.exp(
+            -(5.32 / 2.0)
+            * np.log((vs30 ** 2.0 + 412.0 ** 2) / (1360 ** 2.0 + 412.0 ** 2))
+        )
         return z1
 
     @staticmethod
@@ -393,7 +435,7 @@ class Sites(object):
 
         Returns: Numpy array of z1.0 in m.
         """
-        z1pt0 = np.exp(28.5 - (3.82 / 8.0) * np.log(vs30**8 + 378.7**8))
+        z1pt0 = np.exp(28.5 - (3.82 / 8.0) * np.log(vs30 ** 8 + 378.7 ** 8))
         return z1pt0
 
     @staticmethod

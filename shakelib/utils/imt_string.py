@@ -20,7 +20,7 @@ def oq_to_file(oqimt):
         ValueError: when there is no corresponding filename-friendly
             IMT representation.
     """
-    if oqimt in ['PGA', 'PGV', 'MMI']:
+    if oqimt in ["PGA", "PGV", "MMI"]:
         return oqimt.lower()
     float_pattern = r"[-+]?\d*\.\d+|\d+"
     periods = re.findall(float_pattern, oqimt)
@@ -28,14 +28,14 @@ def oq_to_file(oqimt):
         fmt = 'IMT string "%s" has no file-name friendly representation.'
         raise ValueError(fmt % oqimt)
     period = periods[0]
-    if period.find('.') < 0:
+    if period.find(".") < 0:
         integer = period
-        fraction = '0'
+        fraction = "0"
     else:
-        integer, fraction = period.split('.')
+        integer, fraction = period.split(".")
         if not len(integer):
-            integer = '0'
-    fileimt = 'psa%sp%s' % (integer, fraction)
+            integer = "0"
+    fileimt = f"psa{integer}p{fraction}"
     return fileimt
 
 
@@ -52,14 +52,14 @@ def file_to_oq(fileimt):
     Returns:
         str: Openquake IMT nomenclature string.
     """
-    if fileimt in ['pga', 'pgv', 'mmi']:
+    if fileimt in ["pga", "pgv", "mmi"]:
         return fileimt.upper()
-    if 'p' not in fileimt:
-        fmt = '%s is not a valid filename-friendly IMT string.'
+    if "p" not in fileimt:
+        fmt = "%s is not a valid filename-friendly IMT string."
         raise ValueError(fmt % fileimt)
-    integer, fraction = fileimt.replace('psa', '').split('p')
+    integer, fraction = fileimt.replace("psa", "").split("p")
     if not len(fraction):
-        fmt = '%s is not a valid filename-friendly IMT string.'
+        fmt = "%s is not a valid filename-friendly IMT string."
         raise ValueError(fmt % fileimt)
-    oqimt = 'SA(%s.%s)' % (integer, fraction)
+    oqimt = f"SA({integer}.{fraction})"
     return oqimt

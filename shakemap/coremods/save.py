@@ -15,8 +15,9 @@ class SaveTransfer(TransferBaseModule):
     """
     save - Create backup directory and prep for next ShakeMap map version.
     """
-    command_name = 'save'
-    dependencies = [('products/*', False)]
+
+    command_name = "save"
+    dependencies = [("products/*", False)]
 
     def __init__(self, eventid):
         # call the parent constructor

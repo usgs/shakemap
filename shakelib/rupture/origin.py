@@ -47,7 +47,7 @@ class Origin(object):
     """
 
     def __init__(self, event):
-        """ Construct an Origin object.
+        """Construct an Origin object.
 
         Args:
             event (dict): Dictionary of values. See list above for required
@@ -75,43 +75,45 @@ class Origin(object):
                 missing.append(req)
 
         if len(missing):
-            raise KeyError('Input event dictionary is missing the following '
-                           'required keys: "%s"' % (', '.join(missing)))
+            raise KeyError(
+                "Input event dictionary is missing the following "
+                'required keys: "%s"' % (", ".join(missing))
+            )
 
         # ---------------------------------------------------------------------
         # Check some types, ranges, and defaults
         # ---------------------------------------------------------------------
-        if not type(event['id']) is str and event['id'] is not None:
-            raise TypeError('event id  must be a string.')
+        if not type(event["id"]) is str and event["id"] is not None:
+            raise TypeError("event id  must be a string.")
 
-        if float(event['lat']) > 90 or float(event['lat']) < -90:
-            raise ValueError('lat must be between -90 and 90 degrees.')
+        if float(event["lat"]) > 90 or float(event["lat"]) < -90:
+            raise ValueError("lat must be between -90 and 90 degrees.")
 
-        if float(event['lon']) > 180 or float(event['lon']) < -180:
-            raise ValueError('lon must be between -180 and 180 degrees.')
+        if float(event["lon"]) > 180 or float(event["lon"]) < -180:
+            raise ValueError("lon must be between -180 and 180 degrees.")
 
-        if 'type' in ekeys and 'mech' not in ekeys:
-            event['mech'] = event['type']
-            del event['type']
-        if 'mech' in event.keys():
-            if event['mech'] == '':
-                event['mech'] = constants.DEFAULT_MECH
-            if not event['mech'] in constants.RAKEDICT.keys():
-                raise ValueError('mech must be SS, NM, RS, or ALL.')
+        if "type" in ekeys and "mech" not in ekeys:
+            event["mech"] = event["type"]
+            del event["type"]
+        if "mech" in event.keys():
+            if event["mech"] == "":
+                event["mech"] = constants.DEFAULT_MECH
+            if not event["mech"] in constants.RAKEDICT.keys():
+                raise ValueError("mech must be SS, NM, RS, or ALL.")
         else:
-            event['mech'] = constants.DEFAULT_MECH
+            event["mech"] = constants.DEFAULT_MECH
 
         # ---------------------------------------------------------------------
         # Add keys as class attributes
         # ---------------------------------------------------------------------
         for k, v in event.items():
-            if k == 'rake':
+            if k == "rake":
                 setattr(self, k, float(v))
             else:
                 setattr(self, k, v)
 
         # What about rake?
-        if not hasattr(self, 'rake'):
+        if not hasattr(self, "rake"):
             self.rake = constants.RAKEDICT[self.mech]
 
         if self.rake is None:
@@ -175,21 +177,23 @@ class Origin(object):
                 default value for mechanism (see table above). Value will be
                 converted to range between -180 and 180 degrees.
         """
-        mechs = {'RS': {'rake': 90.0, 'dip': 40.0},
-                 'NM': {'rake': -90.0, 'dip': 50.0},
-                 'SS': {'rake': 0.0, 'dip': 90.0},
-                 'ALL': {'rake': 45.0, 'dip': 90.0}}
+        mechs = {
+            "RS": {"rake": 90.0, "dip": 40.0},
+            "NM": {"rake": -90.0, "dip": 50.0},
+            "SS": {"rake": 0.0, "dip": 90.0},
+            "ALL": {"rake": 45.0, "dip": 90.0},
+        }
 
         if mech not in list(mechs.keys()):
             raise ShakeLibException(
-                'Mechanism must be one of: %s' % str(
-                    list(mechs.keys())))
+                f"Mechanism must be one of: {str(list(mechs.keys()))}"
+            )
 
         if dip is not None:
             if dip < 0 or dip > 90:
-                raise Exception('Dip must be in range 0-90 degrees.')
+                raise Exception("Dip must be in range 0-90 degrees.")
         else:
-            dip = mechs[mech]['dip']
+            dip = mechs[mech]["dip"]
 
         if rake is not None:
             if rake < -180:
@@ -198,10 +202,10 @@ class Origin(object):
                 rake -= 360
             if rake < -180 or rake > 180:
                 raise Exception(
-                    'Rake must be transformable to be in range -180 to 180 '
-                    'degrees.')
+                    "Rake must be transformable to be in range -180 to 180 " "degrees."
+                )
         else:
-            rake = mechs[mech]['rake']
+            rake = mechs[mech]["rake"]
 
         self.dip = dip
         self.rake = rake
@@ -233,29 +237,28 @@ def write_event_file(event, xmlfile):
         nothing: Nothing.
     """
     try:
-        root = etree.Element('earthquake')
-        root.attrib['id'] = event['id']
-        root.attrib['netid'] = event['netid']
-        root.attrib['network'] = event['network']
-        root.attrib['lat'] = '%.4f' % event['lat']
-        root.attrib['lon'] = '%.4f' % event['lon']
-        root.attrib['depth'] = '%.1f' % event['depth']
-        root.attrib['mag'] = '%.1f' % event['mag']
-        root.attrib['time'] = event['time'].strftime(constants.ALT_TIMEFMT)
-        root.attrib['locstring'] = event['locstring']
-        if 'mech' in event:
-            root.attrib['mech'] = event['mech']
-        if 'reference' in event:
-            root.attrib['reference'] = event['reference']
-        if 'productcode' in event:
-            root.attrib['productcode'] = event['productcode']
-        if 'event_type' in event:
-            if event['event_type'] not in ['ACTUAL', 'SCENARIO']:
-                raise AttributeError(
-                    'event_type must be "ACTUAL" or "SCENARIO"')
-            root.attrib['event_type'] = event['event_type']
+        root = etree.Element("earthquake")
+        root.attrib["id"] = event["id"]
+        root.attrib["netid"] = event["netid"]
+        root.attrib["network"] = event["network"]
+        root.attrib["lat"] = f"{event['lat']:.4f}"
+        root.attrib["lon"] = f"{event['lon']:.4f}"
+        root.attrib["depth"] = f"{event['depth']:.1f}"
+        root.attrib["mag"] = f"{event['mag']:.1f}"
+        root.attrib["time"] = event["time"].strftime(constants.ALT_TIMEFMT)
+        root.attrib["locstring"] = event["locstring"]
+        if "mech" in event:
+            root.attrib["mech"] = event["mech"]
+        if "reference" in event:
+            root.attrib["reference"] = event["reference"]
+        if "productcode" in event:
+            root.attrib["productcode"] = event["productcode"]
+        if "event_type" in event:
+            if event["event_type"] not in ["ACTUAL", "SCENARIO"]:
+                raise AttributeError('event_type must be "ACTUAL" or "SCENARIO"')
+            root.attrib["event_type"] = event["event_type"]
         else:
-            root.attrib['event_type'] = 'ACTUAL'
+            root.attrib["event_type"] = "ACTUAL"
 
         tree = etree.ElementTree(root)
         tree.write(xmlfile, pretty_print=True)
@@ -323,10 +326,10 @@ def read_event_file(eventxml):
         root = dET.fromstring(data)
 
     # Turn XML content into dictionary
-    if root.tag == 'earthquake':
+    if root.tag == "earthquake":
         xmldict = dict(root.items())
     else:
-        eq = root.find('earthquake')
+        eq = root.find("earthquake")
         xmldict = dict(eq.items())
 
     eqdict = {}
@@ -350,66 +353,69 @@ def read_event_file(eventxml):
     #########################################################
 
     # read in the id fields
-    eqdict['id'] = xmldict['id']
+    eqdict["id"] = xmldict["id"]
     # This isn't optional, but maybe it isn't in some old files
-    if 'network' in xmldict:
-        eqdict['network'] = xmldict['network']
+    if "network" in xmldict:
+        eqdict["network"] = xmldict["network"]
     else:
-        eqdict['network'] = ""
+        eqdict["network"] = ""
 
-    eqdict['netid'] = xmldict['netid']
+    eqdict["netid"] = xmldict["netid"]
 
     # look for the productcode attribute in the xml,
     # otherwise use the event id
-    if 'productcode' in xmldict:
-        eqdict['productcode'] = xmldict['productcode']
+    if "productcode" in xmldict:
+        eqdict["productcode"] = xmldict["productcode"]
     elif isinstance(eventxml, str):
-        eqdict['productcode'] = eqdict['id']
+        eqdict["productcode"] = eqdict["id"]
     else:
         # It's up to the user of this data how to construct the
         # product code
         pass
 
     # Support old event file date/times
-    if 'time' in xmldict:
+    if "time" in xmldict:
         try:
-            eqdict['time'] = HistoricTime.strptime(
-                xmldict['time'],
-                constants.TIMEFMT)
+            eqdict["time"] = HistoricTime.strptime(xmldict["time"], constants.TIMEFMT)
         except ValueError:
             try:
-                eqdict['time'] = HistoricTime.strptime(
-                    xmldict['time'],
-                    constants.ALT_TIMEFMT)
+                eqdict["time"] = HistoricTime.strptime(
+                    xmldict["time"], constants.ALT_TIMEFMT
+                )
             except ValueError:
-                raise ValueError("Couldn't convert %s to HistoricTime" %
-                                 xmldict['time'])
+                raise ValueError(f"Couldn't convert {xmldict['time']} to HistoricTime")
     else:
-        if 'year' not in xmldict or 'month' not in xmldict or \
-           'day' not in xmldict or 'hour' not in xmldict or \
-           'minute' not in xmldict or 'second' not in xmldict:
+        if (
+            "year" not in xmldict
+            or "month" not in xmldict
+            or "day" not in xmldict
+            or "hour" not in xmldict
+            or "minute" not in xmldict
+            or "second" not in xmldict
+        ):
             raise ValueError("Missing date/time elements in event file.")
-        eqdict['time'] = HistoricTime.datetime(
-            xmldict['year'],
-            xmldict['month'],
-            xmldict['day'],
-            xmldict['hour'],
-            xmldict['minute'],
-            xmldict['second'])
+        eqdict["time"] = HistoricTime.datetime(
+            xmldict["year"],
+            xmldict["month"],
+            xmldict["day"],
+            xmldict["hour"],
+            xmldict["minute"],
+            xmldict["second"],
+        )
 
-    eqdict['lat'] = float(xmldict['lat'])
-    eqdict['lon'] = float(xmldict['lon'])
-    eqdict['depth'] = float(xmldict['depth'])
-    eqdict['mag'] = float(xmldict['mag'])
-    eqdict['locstring'] = xmldict['locstring']
+    eqdict["lat"] = float(xmldict["lat"])
+    eqdict["lon"] = float(xmldict["lon"])
+    eqdict["depth"] = float(xmldict["depth"])
+    eqdict["mag"] = float(xmldict["mag"])
+    eqdict["locstring"] = xmldict["locstring"]
 
-    if 'mech' in xmldict:
-        eqdict['mech'] = xmldict['mech']
+    if "mech" in xmldict:
+        eqdict["mech"] = xmldict["mech"]
     # Older files may have "type" instead of "mech"
-    if 'type' in xmldict:
-        eqdict['type'] = xmldict['type']
-    if 'reference' in xmldict:
-        eqdict['reference'] = xmldict['reference']
+    if "type" in xmldict:
+        eqdict["type"] = xmldict["type"]
+    if "reference" in xmldict:
+        eqdict["reference"] = xmldict["reference"]
 
     return eqdict
 
@@ -449,7 +455,7 @@ def read_moment_quakeml(momentfile):
 
     # obspy spits out a bunch of warnings we don't care about
     with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
+        warnings.simplefilter("ignore")
         catalog = read_events(momentfile)
 
     if not len(catalog.events):
@@ -460,11 +466,11 @@ def read_moment_quakeml(momentfile):
     focal = catalog.events[0].focal_mechanisms[0]
 
     # get the source and type information, if possible
-    mtype = 'unknown'
+    mtype = "unknown"
     if focal.method_id is not None:
         mtype = focal.method_id
 
-    msource = 'unknown'
+    msource = "unknown"
     if focal.creation_info is not None:
         if focal.creation_info.agency_id is not None:
             msource = focal.creation_info.agency_id
@@ -480,38 +486,35 @@ def read_moment_quakeml(momentfile):
             mrp = focal.moment_tensor.tensor.m_rp
             mtp = focal.moment_tensor.tensor.m_tp
             params = fill_tensor_from_components(
-                mrr, mtt,
-                mpp, mrt,
-                mrp, mtp,
-                source=msource,
-                mtype=mtype)
+                mrr, mtt, mpp, mrt, mrp, mtp, source=msource, mtype=mtype
+            )
     else:
         plane1 = focal.nodal_planes.nodal_plane_1
         plane2 = focal.nodal_planes.nodal_plane_2
-        params['NP1'] = {
-            'strike': plane1.strike,
-            'dip': plane1.dip,
-            'rake': plane1.rake
+        params["NP1"] = {
+            "strike": plane1.strike,
+            "dip": plane1.dip,
+            "rake": plane1.rake,
         }
-        params['NP2'] = {
-            'strike': plane2.strike,
-            'dip': plane2.dip,
-            'rake': plane2.rake
+        params["NP2"] = {
+            "strike": plane2.strike,
+            "dip": plane2.dip,
+            "rake": plane2.rake,
         }
-        params['T'] = {
-            'azimuth': focal.principal_axes.t_axis.azimuth,
-            'plunge': focal.principal_axes.t_axis.plunge
+        params["T"] = {
+            "azimuth": focal.principal_axes.t_axis.azimuth,
+            "plunge": focal.principal_axes.t_axis.plunge,
         }
-        params['N'] = {
-            'azimuth': focal.principal_axes.n_axis.azimuth,
-            'plunge': focal.principal_axes.n_axis.plunge
+        params["N"] = {
+            "azimuth": focal.principal_axes.n_axis.azimuth,
+            "plunge": focal.principal_axes.n_axis.plunge,
         }
-        params['P'] = {
-            'azimuth': focal.principal_axes.p_axis.azimuth,
-            'plunge': focal.principal_axes.p_axis.plunge
+        params["P"] = {
+            "azimuth": focal.principal_axes.p_axis.azimuth,
+            "plunge": focal.principal_axes.p_axis.plunge,
         }
 
-    moment = {'moment': params}
+    moment = {"moment": params}
     return moment
 
 
@@ -526,15 +529,15 @@ def read_source(sourcefile):
     """
     isFile = False
     if isinstance(sourcefile, str):
-        f = open(sourcefile, 'rt')
+        f = open(sourcefile, "rt")
     else:
         isFile = True
         f = sourcefile
     params = {}
     for line in f.readlines():
-        if line.startswith('#'):
+        if line.startswith("#"):
             continue
-        parts = line.split('=')
+        parts = line.split("=")
         key = parts[0].strip()
         value = parts[1].strip()
         # see if this is some sort of number

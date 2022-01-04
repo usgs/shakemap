@@ -36,48 +36,48 @@ def contour(imtdict, imtype, filter_size, gmice):
     """  # noqa
     oqimt = imt.from_string(imtype)
 
-    intensity_colormap = ColorPalette.fromPreset('mmi')
-    grid = imtdict['mean']
-    metadata = imtdict['mean_metadata']
-    if imtype == 'MMI':
+    intensity_colormap = ColorPalette.fromPreset("mmi")
+    grid = imtdict["mean"]
+    metadata = imtdict["mean_metadata"]
+    if imtype == "MMI":
         sgrid = grid
-        units = 'mmi'
-    elif imtype == 'PGV':
+        units = "mmi"
+    elif imtype == "PGV":
         sgrid = np.exp(grid)
-        units = 'cms'
+        units = "cms"
     else:
         sgrid = np.exp(grid) * 100.0
-        units = 'pctg'
+        units = "pctg"
     if filter_size > 0:
         fgrid = median_filter(sgrid, size=int(filter_size))
     else:
         fgrid = sgrid
 
-    interval_type = 'log'
-    if imtype == 'MMI':
-        interval_type = 'linear'
+    interval_type = "log"
+    if imtype == "MMI":
+        interval_type = "linear"
 
-    if np.all(np.isnan(fgrid)): # data is totally empty; no contours
+    if np.all(np.isnan(fgrid)):  # data is totally empty; no contours
         intervals = np.array([])
     else:
         grid_min = np.nanmin(fgrid)
         grid_max = np.nanmax(fgrid)
         if grid_max - grid_min:
             intervals = getContourLevels(grid_min, grid_max, itype=interval_type)
-        else: # data is totally flat; don't draw any contours
+        else:  # data is totally flat; don't draw any contours
             intervals = np.array([])
 
-    lonstart = metadata['xmin']
-    latstart = metadata['ymin']
+    lonstart = metadata["xmin"]
+    latstart = metadata["ymin"]
 
-    lonend = metadata['xmax']
+    lonend = metadata["xmax"]
     if lonend < lonstart:
         lonstart -= 360
 
     lonspan = np.abs(lonend - lonstart)
-    latspan = np.abs(metadata['ymax'] - latstart)
-    nlon = metadata['nx']
-    nlat = metadata['ny']
+    latspan = np.abs(metadata["ymax"] - latstart)
+    nlon = metadata["nx"]
+    nlat = metadata["ny"]
 
     line_strings = []  # dictionary of MultiLineStrings and props
 
@@ -96,54 +96,47 @@ def contour(imtdict, imtype, filter_size, gmice):
             #
             coords = measure.approximate_polygon(coords, filter_size / 20)
 
-            mylons = np.around(coords[:, 1] * lonspan / nlon + lonstart,
-                               decimals=6)
-            mylats = np.around((nlat - coords[:, 0]) * latspan / nlat +
-                               latstart, decimals=6)
+            mylons = np.around(coords[:, 1] * lonspan / nlon + lonstart, decimals=6)
+            mylats = np.around(
+                (nlat - coords[:, 0]) * latspan / nlat + latstart, decimals=6
+            )
 
-            contours[ic] = np.hstack((mylons[:].reshape((-1, 1)),
-                                      mylats[:].reshape((-1, 1))))
+            contours[ic] = np.hstack(
+                (mylons[:].reshape((-1, 1)), mylats[:].reshape((-1, 1)))
+            )
             plot_contours.append(contours[ic])
             new_contours.append(contours[ic].tolist())
 
         if len(new_contours):
             mls = MultiLineString(new_contours)
-            props = {
-                'value': cval,
-                'units': units
-            }
-            if imtype == 'MMI':
+            props = {"value": cval, "units": units}
+            if imtype == "MMI":
                 pass
-            elif imtype == 'PGV':
+            elif imtype == "PGV":
                 lcval = np.log(cval)
             else:
                 lcval = np.log(cval / 100)
             if gmice:
                 mmival = gmice.getMIfromGM(np.array([lcval]), oqimt)[0][0]
-            elif imtype == 'MMI':
+            elif imtype == "MMI":
                 mmival = cval
             else:
                 mmival = 1
             color_array = np.array(intensity_colormap.getDataColor(mmival))
             color_rgb = np.array(color_array[0:3] * 255, dtype=int).tolist()
-            props['color'] = '#%02x%02x%02x' % tuple(color_rgb)
-            if imtype == 'MMI':
+            props["color"] = "#%02x%02x%02x" % tuple(color_rgb)
+            if imtype == "MMI":
                 if (cval * 2) % 2 == 1:
-                    props['weight'] = 4
+                    props["weight"] = 4
                 else:
-                    props['weight'] = 2
+                    props["weight"] = 2
             else:
-                props['weight'] = 4
-            line_strings.append(
-                {
-                    'geometry': mapping(mls),
-                    'properties': props
-                }
-            )
+                props["weight"] = 4
+            line_strings.append({"geometry": mapping(mls), "properties": props})
     return line_strings
 
 
-def getContourLevels(dmin, dmax, itype='log'):
+def getContourLevels(dmin, dmax, itype="log"):
     """
     Get contour levels given min/max values and desired IMT.
 
@@ -160,7 +153,7 @@ def getContourLevels(dmin, dmax, itype='log'):
         ndarray: Numpy array of contour levels.
 
     """
-    if itype == 'log':
+    if itype == "log":
         # Within-decade label values
         dec_inc = np.array([1, 2, 5], dtype=float)
 
@@ -182,9 +175,5 @@ def getContourLevels(dmin, dmax, itype='log'):
             levels = np.array([(dmin + dmax) / 2])
     else:
         # MMI contours are every 0.5 units
-        levels = np.arange(
-            np.ceil(dmin * 2) / 2,
-            np.floor(dmax * 2) / 2 + 0.5,
-            0.5
-        )
+        levels = np.arange(np.ceil(dmin * 2) / 2, np.floor(dmax * 2) / 2 + 0.5, 0.5)
     return levels

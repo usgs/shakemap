@@ -16,26 +16,37 @@ SIZE = (8, 4)
 
 
 def get_parser():
-    desc = '''Compare two shakemaps.
+    desc = """Compare two shakemaps.
 
 This program is to quickly make maps comparing two different shakemaps. Since
 the main goal is to compare across maps using ShakeMap 3.5 and ShakeMap 4.0
 the arguments are paths to grid.xml files.
 
 Note that ratios are grid1/grid2 and differences are grid1 - grid2.
-'''
-    parser = argparse.ArgumentParser(description=desc, epilog='\n\n')
-    parser.add_argument('grid1', type=str,
-                        help='Path to a ShakeMap grid.xml file.')
-    parser.add_argument('grid2', type=str,
-                        help='Path to a ShakeMap grid.xml file.')
-    parser.add_argument('-i', '--imt', type=str, default='pga',
-                        help='Which IMT to use? A String such as pga, pgv, '
-                             'psa03, psa10.')
-    parser.add_argument('-o', '--output', type=str, default='compare.png',
-                        help='Output filename. Default: compare.png')
-    parser.add_argument('-n', '--nocoasts', action='store_true',
-                        help='Suppresses printing of coastlines on the maps.')
+"""
+    parser = argparse.ArgumentParser(description=desc, epilog="\n\n")
+    parser.add_argument("grid1", type=str, help="Path to a ShakeMap grid.xml file.")
+    parser.add_argument("grid2", type=str, help="Path to a ShakeMap grid.xml file.")
+    parser.add_argument(
+        "-i",
+        "--imt",
+        type=str,
+        default="pga",
+        help="Which IMT to use? A String such as pga, pgv, " "psa03, psa10.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default="compare.png",
+        help="Output filename. Default: compare.png",
+    )
+    parser.add_argument(
+        "-n",
+        "--nocoasts",
+        action="store_true",
+        help="Suppresses printing of coastlines on the maps.",
+    )
     return parser
 
 
@@ -58,7 +69,7 @@ def main(pparser, args):
 
     a1 = c1.getData()
     a2 = c2.getData()
-    ratio = a1/a2
+    ratio = a1 / a2
     dif = a1 - a2
     lats = np.linspace(cutdict.ymin, cutdict.ymax, ratio.shape[0])
     lons = np.linspace(cutdict.xmin, cutdict.xmax, ratio.shape[1])
@@ -76,17 +87,14 @@ def main(pparser, args):
     fig = plt.figure(figsize=SIZE)
     ax1 = plt.axes([x1, y1, wid, height], projection=ccrs.PlateCarree())
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
-    cs1 = ax1.contourf(lons, lats, np.flipud(ratio), levels,
-                       cmap=cmap, extend='both')
+    cs1 = ax1.contourf(lons, lats, np.flipud(ratio), levels, cmap=cmap, extend="both")
     if not args.nocoasts:
         ax1.add_feature(cfeature.COASTLINE)
 
-    ax_cbar1 = plt.axes([x1, y1-0.1, wid, 0.05])
-    cbar1 = fig.colorbar(cs1, cax=ax_cbar1,
-                         orientation='horizontal',
-                         ticks=levels)
+    ax_cbar1 = plt.axes([x1, y1 - 0.1, wid, 0.05])
+    cbar1 = fig.colorbar(cs1, cax=ax_cbar1, orientation="horizontal", ticks=levels)
     cbar1.ax.tick_params(labelsize=6)
-    cbar1.ax.set_xlabel('%s Ratio' % args.imt)
+    cbar1.ax.set_xlabel(f"{args.imt} Ratio")
     cbar1.ax.get_yaxis().labelpad = 15
 
     # Difference plot
@@ -100,31 +108,28 @@ def main(pparser, args):
 
     ax2 = plt.axes([x1, y1, wid, height], projection=ccrs.PlateCarree())
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
-    cs2 = ax2.contourf(lons, lats, np.flipud(dif), levels,
-                       cmap=cmap, extend='both')
+    cs2 = ax2.contourf(lons, lats, np.flipud(dif), levels, cmap=cmap, extend="both")
     if not args.nocoasts:
         ax2.add_feature(cfeature.COASTLINE)
 
-    ax_cbar2 = plt.axes([x1, y1-0.1, wid, 0.05])
-    cbar2 = fig.colorbar(cs2, cax=ax_cbar2,
-                         orientation='horizontal',
-                         ticks=levels)
+    ax_cbar2 = plt.axes([x1, y1 - 0.1, wid, 0.05])
+    cbar2 = fig.colorbar(cs2, cax=ax_cbar2, orientation="horizontal", ticks=levels)
     cbar2.ax.tick_params(labelsize=6)
-    if args.imt == 'pgv':
-        cbar2.ax.set_xlabel('%s Difference (cm/s)' % args.imt)
-    elif args.imt == 'stdpgv':
-        cbar2.ax.set_xlabel('%s Difference (ln(cm/s))' % args.imt)
-    elif args.imt == 'mmi' or args.imt == 'stdmmi':
-        cbar2.ax.set_xlabel('%s Difference' % args.imt)
-    elif 'std' in args.imt:
-        cbar2.ax.set_xlabel('%s Difference (ln(g))' % args.imt)
+    if args.imt == "pgv":
+        cbar2.ax.set_xlabel(f"{args.imt} Difference (cm/s)")
+    elif args.imt == "stdpgv":
+        cbar2.ax.set_xlabel(f"{args.imt} Difference (ln(cm/s))")
+    elif args.imt == "mmi" or args.imt == "stdmmi":
+        cbar2.ax.set_xlabel(f"{args.imt} Difference")
+    elif "std" in args.imt:
+        cbar2.ax.set_xlabel(f"{args.imt} Difference (ln(g))")
     else:
-        cbar2.ax.set_xlabel('%s Difference (percent g)' % args.imt)
+        cbar2.ax.set_xlabel(f"{args.imt} Difference (percent g)")
     cbar2.ax.get_yaxis().labelpad = 15
-    plt.savefig(args.output, dpi=300, bbox_inches='tight')
+    plt.savefig(args.output, dpi=300, bbox_inches="tight")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = get_parser()
     pargs = parser.parse_args()
     main(parser, pargs)
