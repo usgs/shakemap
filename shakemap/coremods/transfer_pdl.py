@@ -53,6 +53,11 @@ class PDLTransfer(TransferBaseModule):
         # loop over all possible pdl destinations, send products to
         # each one
         for destination, params in self.config["pdl"].items():
+            cmdline_args = {}
+            if "cmdline_args" in params:
+                cmdline_args = params["cmdline_args"].copy()
+            del params["cmdline_args"]
+
             params.update(properties)
             if self.usedevconfig is True:
                 if params["devconfig"] is None or not os.path.isfile(
@@ -73,6 +78,7 @@ class PDLTransfer(TransferBaseModule):
                 properties=params,
                 local_directory=pdl_dir,
                 product_properties=product_properties,
+                cmdline_args=cmdline_args,
             )
             if self.cancel:
                 msg = sender.cancel()
