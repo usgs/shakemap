@@ -2,7 +2,7 @@
 import os
 import os.path
 import sys
-import pkg_resources
+import importlib.resources as importlib_resources
 import logging
 import glob
 
@@ -22,7 +22,7 @@ def get_data_path():
         str: The full path to the data directory.
 
     """
-    return pkg_resources.resource_filename("shakemap", "data")
+    return importlib_resources.files("shakemap") / "data"
 
 
 def get_configspec(config=None):
