@@ -16,15 +16,15 @@ jobs:
   timeoutInMinutes: 120
   strategy:
     matrix:
-      Linux_Python310:
-        imageName: 'ubuntu-latest'
-        python.version: '3.10'
-      Linux_Python39:
-        imageName: 'ubuntu-latest'
-        python.version: '3.9'
       Linux_Python38:
         imageName: 'ubuntu-latest'
         python.version: '3.8'
+      Linux_Python39:
+        imageName: 'ubuntu-latest'
+        python.version: '3.9'
+      Linux_Python310:
+        imageName: 'ubuntu-latest'
+        python.version: '3.10'
       MacOS_11_Python38:
         imageName: 'macos-11'
         python.version: '3.8'

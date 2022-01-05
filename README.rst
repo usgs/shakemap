@@ -1,36 +1,51 @@
-+---------+------------------+-----------------+------------+
-| Azure   | |AzureM1015P37|  | OSX 10.15       | Python 3.7 |
-+         +------------------+-----------------+------------+
-|         | |AzureM1015P38|  | OSX 10.15       | Python 3.8 |
-+         +------------------+-----------------+------------+
-|         | |AzureM1014P37|  | OSX 10.14       | Python 3.7 |
-+         +------------------+-----------------+------------+
-|         | |AzureM1014P38|  | OSX 10.14       | Python 3.8 |
-+         +------------------+-----------------+------------+
-|         | |AzureLP37|      | ubuntu          | Python 3.7 |
-+         +------------------+-----------------+------------+
-|         | |AzureLP38|      | ubuntu          | Python 3.8 |
-+---------+------------------+-----------------+------------+
-| Travis  | |Travis|         | ubuntu          | Python 3.7 |
-+---------+------------------+-----------------+------------+
-| Codacy  | |Codacy|                                        |
-+---------+-------------------------------------------------+
-| CodeCov | |CodeCov|                                       |
-+---------+-------------------------------------------------+
++---------+------------------+-----------------+-------------+
+| Azure   | |AzureLP38|      | ubuntu          | Python 3.8  |
++         +------------------+-----------------+-------------+
+|         | |AzureLP39|      | ubuntu          | Python 3.9  |
++         +------------------+-----------------+-------------+
+|         | |AzureLP310|     | ubuntu          | Python 3.10 |
++         +------------------+-----------------+-------------+
+|         | |AzureM11P38|    | OSX 11          | Python 3.8  |
++         +------------------+-----------------+-------------+
+|         | |AzureM11P39|    | OSX 11          | Python 3.9  |
++         +------------------+-----------------+-------------+
+|         | |AzureM11P310|   | OSX 11          | Python 3.10 |
++         +------------------+-----------------+-------------+
+|         | |AzureM1015P38|  | OSX 10.15       | Python 3.8  |
++         +------------------+-----------------+-------------+
+|         | |AzureM1015P39|  | OSX 10.15       | Python 3.9  |
++         +------------------+-----------------+-------------+
+|         | |AzureM1015P310| | OSX 10.15       | Python 3.10 |
++---------+------------------+-----------------+-------------+
+| CodeCov | |CodeCov|                                        |
++---------+--------------------------------------------------+
 
-
-.. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
-    :target: https://travis-ci.org/usgs/shakemap
-    :alt: Travis Build Status
 
 .. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
 
-.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/1f771008e85041b89b97b6d12d85298a
-    :target: https://www.codacy.com/app/emthompson_2/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
+.. |AzureLP38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python38
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
 
-.. |AzureM1015P37| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_15_Python37
+.. |AzureLP39| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python39
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+.. |AzureLP310| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python310
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+.. |AzureM11P38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_11_Python38
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+.. |AzureM11P39| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_11_Python39
+   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
+   :alt: Azure DevOps Build Status                                             
+
+.. |AzureM11P310| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_11_Python310
    :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
 
@@ -38,22 +53,18 @@
    :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
 
-.. |AzureM1014P37| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_14_Python37
+.. |AzureM1015P39| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_15_Python39
    :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
 
-.. |AzureM1014P38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_14_Python38
+.. |AzureM1015P310| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_15_Python310
    :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
 
-.. |AzureLP37| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python37
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
 
-.. |AzureLP38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python38
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
 
 
 shakemap
@@ -96,9 +107,9 @@ Installation and Dependencies
 -----------------------------
 
 - Mac OSX or Linux operating systems
-- bash shell, gcc, git, curl
+- bash shell, git, curl
 - On OSX, Xcode and command line tools
 - The ``install.sh`` script installs this package and all other dependencies,
-  including python 3.5 and the required python libraries. It is regularly tested
+  including python 3.X and the required python libraries. It is regularly tested
   on OSX, CentOS, and Ubuntu.
 - See the wiki for this repository for installation instructions.
