@@ -1,17 +1,11 @@
 +---------+------------------+-----------------+-------------+
-| Azure   | |AzureLP38|      | ubuntu          | Python 3.8  |
-+         +------------------+-----------------+-------------+
-|         | |AzureLP39|      | ubuntu          | Python 3.9  |
+| Azure   | |AzureLP39|      | ubuntu          | Python 3.9  |
 +         +------------------+-----------------+-------------+
 |         | |AzureLP310|     | ubuntu          | Python 3.10 |
-+         +------------------+-----------------+-------------+
-|         | |AzureM11P38|    | OSX 11          | Python 3.8  |
 +         +------------------+-----------------+-------------+
 |         | |AzureM11P39|    | OSX 11          | Python 3.9  |
 +         +------------------+-----------------+-------------+
 |         | |AzureM11P310|   | OSX 11          | Python 3.10 |
-+         +------------------+-----------------+-------------+
-|         | |AzureM1015P38|  | OSX 10.15       | Python 3.8  |
 +         +------------------+-----------------+-------------+
 |         | |AzureM1015P39|  | OSX 10.15       | Python 3.9  |
 +         +------------------+-----------------+-------------+
@@ -25,10 +19,6 @@
     :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
 
-.. |AzureLP38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python38
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
 .. |AzureLP39| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python39
    :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
@@ -37,19 +27,11 @@
    :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
 
-.. |AzureM11P38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_11_Python38
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
 .. |AzureM11P39| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_11_Python39
    :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
 
 .. |AzureM11P310| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_11_Python310
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
-.. |AzureM1015P38| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_15_Python38
    :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
    :alt: Azure DevOps Build Status                                             
 
