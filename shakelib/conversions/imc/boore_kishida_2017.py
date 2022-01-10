@@ -6,7 +6,7 @@ horizontal intensity measure components.
 import glob
 import logging
 import os.path
-import pkg_resources
+import importlib.resources as importlib_resources
 
 # Third party imports
 import numpy as np
@@ -275,7 +275,7 @@ class BooreKishida2017(ComponentConverter):
             string 'Null', then imc_in and imc_out evaluated to be the
             same.
         """
-        datadir = pkg_resources.resource_filename("shakelib.conversions.imc", "data")
+        datadir = importlib_resources.files("shakelib.conversions.imc") / "data"
         conv_files = glob.glob(os.path.join(datadir, "*.csv"))
         stub1 = BooreKishida2017._imcToFilestr(imc_in)
         stub2 = BooreKishida2017._imcToFilestr(imc_out)

@@ -167,6 +167,14 @@ def get_parser():
     )
     parser.add_argument(
         "-c",
+        "--comment",
+        help="Provide a comment for 'assemble' in "
+        "this version of the ShakeMap. If the comment "
+        "has spaces, the string should be quoted (e.g., "
+        '--comment "This is a comment.")',
+    )
+    parser.add_argument(
+        "-x",
         "--cancel",
         action="store_true",
         help="Cancel shakemap; execute cancel_modules list in " "shake.conf.",
@@ -178,14 +186,6 @@ def get_parser():
         help="Print a command line that would be executed if "
         "the process was called without this flag, and "
         "then exit without other action.",
-    )
-    parser.add_argument(
-        "-a",
-        "--autorun",
-        action="store_true",
-        help="No-op; we are keeping this argument for backward compatibility "
-        "but it no longer does anything. It is now the default behavior to "
-        "use the autorun_modules in shake.conf when no modules are specified.",
     )
     parser.add_argument(
         "-v",
@@ -217,13 +217,6 @@ def main(args):
 
     logger = get_logger(args.eventid, log_option=log_option, log_file=log_file)
 
-    if args.autorun:
-        logger.warning(
-            "The -a (--autorun) option is deprecated. It is now the default "
-            "behavior to use the autorun_modules in shake.conf when no "
-            "modules are specified."
-        )
-
     event_path = os.path.join(data_path, args.eventid, "current")
     cancel_file = os.path.join(event_path, CANCEL_FILE)
     if os.path.isfile(cancel_file):
@@ -251,6 +244,10 @@ def main(args):
                 if len(args.cmds):
                     if args.dryrun is False:
                         logger.info(f"Autorun modules found: {args.cmds}")
+                        if args.comment:
+                            logger.info(
+                                f"Replacing assemble comment with: '{args.comment}'"
+                            )
                 else:
                     logger.warning(
                         "No modules specified, and no autorun_modules "
@@ -277,7 +274,6 @@ def main(args):
         logger.debug(f"arglist: {arglist}")
 
         if args.dryrun is True:
-
             cmdlist = ""
             for item in arglist:
                 if " " in item:
@@ -304,6 +300,14 @@ def main(args):
 
             if args.eventid.lower() == "help":
                 arglist = ["-h"]
+
+            # If this command is assemble, and the user has specified a comment, apply it
+            if "assemble" in cmd and args.comment:
+                # Pop the old comment and insert the new one
+                if "-c" in arglist[0]:
+                    _ = arglist.pop(0)
+                    _ = arglist.pop(0)
+                arglist.insert(0, f"-c '{args.comment}'")
 
             arglist = cmd_obj.parseArgs(arglist)
             oldcmd = cmd
