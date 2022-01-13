@@ -9,14 +9,23 @@ References & Bibliography
 Abrahamson, N.A. and W.J. Silva (2008). Summary of the Abrahamson & Silva NGA ground motion 
 relations, *Earthquake Spectra* 24, 67-97.
 
-Abrahamson, N., G. Atkinson, D. Boore, Y. Bozorgnia, K. Campbell, B. Chiou, B., I.M. Idriss, W. Silva, 
-and R. Youngs (2008).  Comparisons of the NGA ground-motion relations, *Earthquake Spectra* 24(1), 45-66.
+Abrahamson, N., G. Atkinson, D. Boore, Y. Bozorgnia, K. Campbell, B. Chiou,
+B., I.M. Idriss, W. Silva, and R. Youngs (2008).  Comparisons of the NGA
+ground-motion relations, *Earthquake Spectra* 24(1), 45-66.
 \
 
 .. _abrahamson2014:
 
 Abrahamson, N.A., W.J. Silva, and R. Kamai (2014). Summary of the ASK14 Ground Motion Relation 
 for Active Crustal Regions, *Earthquake Spectra* 30(3), 1025-1055.
+\
+
+.. _abrahamson2020:
+
+Abrahamson, N.A., S. Bhasin (2020). Conditional ground-motion model for peak
+ground velocity for active crustal regions, *PEER Report No. 2020/05*,
+Pacific Earthquake Engineering Research Center, University of California,
+Berkeley.
 
 Akkar, S. and J.J. Bommer (2010). Empirical equations for the prediction of PGA, PGV and spectral 
 accelerations in Europe, the Mediterranean region and the Middle East, *Seis. Res. Lett.* 81(2), 195-
@@ -301,6 +310,13 @@ Spectral Acceleration from Modified Mercalli Intensity Data, *Earthquake Spectra
 Eguchi, R.T., J.D. Goltz, H.A. Seligson, P.J. Flores, N.C. Blais, T.H. Heaton, and 
 E. Bortugno (1997).  The Early Post-Earthquake Damage Assessment Tool (EPEDAT), *Earthquake 
 Spectra* 13(4), 815-832.
+\
+
+.. _engler2022:
+
+Engler, Davis T., C. Bruce Worden, Eric M. Thompson, Kishor S. Jaiswal (2022).
+Partitioning Ground Motion Uncertainty When Conditioned on Station Data.
+*Bull. Seism. Soc. Am.* 2022; doi: https://doi.org/10.1785/0120210177
 \
 
 .. _epri1991:
@@ -842,12 +858,6 @@ at http://usgs.github.io/shakemap/index.html instead.
 C.B. Worden, M. Hearne, D.J. Wald, M. Pagani, E.M. Thompson, S.A. Verros, G. Weatherill (2017).
 Complimentary Components of OpenQuake and ShakeMap, *Proc. 16th World Conf. on Eq. Eng.*,
 Santiago, Chile, January 9th to 13th, 2017.
-\
-
-.. _worden2017b:
-
-Worden, C.B., E.M. Thompson, M. Hearne, and D.J. Wald (2017). ShakeMap V4 Manual & Technical Guide,
-U. S. Geological Survey. usgs.github.io/shakemap. DOI: XXX
 \
 
 .. _worden2018:

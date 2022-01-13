@@ -192,10 +192,12 @@ structure. Developers can access these properties using the
 | rupture      | /dictionaries/rupture        | JSON string | Dictionary representation of fault rupture |
 +--------------+------------------------------+-------------+--------------------------------------------+
 
-It also will contain a number of arrays, which, when read with the HDFContainer getGrid() method, return
-a Grid2D object which is a Python representation of a North-up 2D array of data, whose upper-left corner
-coordinate and cell dimensions are known.  The definition of this object can be found `here
-<https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py>`_.
+It also will contain a number of arrays, which, when read with the
+HDFContainer getGrid() method, return a Grid2D object which is a Python
+representation of a North-up 2D array of data, whose upper-left corner
+coordinate and cell dimensions are known.  The definition of this object
+can be found
+`here <https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py>`_.
 
 
 Sampling of grids contained in the HDF:
@@ -229,13 +231,20 @@ Sampling of grids contained in the HDF:
 +-------------------+----------------------------+-------------+----------------------------------------------+
 
 
-Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two 
-datasets: the mean values for each cell and the standard deviations.  
+Each IMT dataset (MMI, PGA, etc.) is stored as a group containing four 
+datasets: the mean values for each cell and three standard deviation
+values: the contitional total standard deviation :math:`\sigma_c`, the
+conditional between-event standard deviation :math:`\tau_c`, and the
+prior within-event standard deviation :math:`\phi_p`. The conditional
+within-event standard devation :math:`\phi_c` may be obtained from
+:math:`\sigma_c` and :math:`\tau_c`:
+:math:`\phi_c = \sqrt{\sigma_c^2 - \tau_c^2}`.
 MMI data for the component 'Larger' will be stored under a group called 
-``imts/MMI_GREATER_OF_TWO_HORIZONTAL``. The mean array will be stored as
-``mean``, and the standard deviation array will be stored as
-``std``.  All IMT grid datasets will be accompanied by a dictionary of
-attributes:
+``imts/GREATER_OF_TWO_HORIZONTAL/MMI``. The mean array will be stored as
+``mean``, :math:`\sigma_c` will be stored as
+``std``, :math:`\phi_p` will be stored as ``phi``, and :math:`\tau_c`
+will be in ``tau``. All IMT grid datasets will be accompanied by a
+dictionary of attributes:
 
 +-----------+------------------------------------------------------+
 | Attr name | Contents                                             |
@@ -261,19 +270,29 @@ attributes:
 | dy        | The grid interval in the y dimension                 |
 +-----------+------------------------------------------------------+
 
-Sampling of IMTs in the HDF file:
+Sampling of possibleIMTs in the HDF file:
 
-+--------------+-----------------------------------------------------+-------------+---------------------+
-| Name         | Location                                            | Python Type | Contents            |
-+==============+=====================================================+=============+=============+=======+
-| MMI Mean     | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/mean     | Grid2D      | MMI Mean Values     | 
-+--------------+-----------------------------------------------------+-------------+---------------------+
-| MMI Std      | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/std      | Grid2D      | MMI Std             | 
-+--------------+-----------------------------------------------------+-------------+---------------------+
-| Sa(0.3) Mean | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/mean | Grid2D      | SA(0.3) Mean Values | 
-+--------------+-----------------------------------------------------+-------------+---------------------+
-| Sa(0.3) Std  | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/std  | Grid2D      | SA(0.3) Std         | 
-+--------------+-----------------------------------------------------+-------------+---------------------+
++--------------+-----------------------------------------------------+-----------------------+
+| Name         | Location                                            | Contents              |
++==============+=====================================================+=============+=========+
+| MMI Mean     | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/mean     | MMI Mean Values       | 
++--------------+-----------------------------------------------------+-----------------------+
+| MMI Sigma    | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/std      | MMI Cond Total Std    | 
++--------------+-----------------------------------------------------+-----------------------+
+| MMI Phi      | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/phi      | MMI Prior W-E Std     | 
++--------------+-----------------------------------------------------+-----------------------+
+| MMI Tau      | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/tau      | MMI Cond B-E Std      | 
++--------------+-----------------------------------------------------+-----------------------+
+| Sa(0.3) Mean | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/mean | SA(0.3) Mean Values   | 
++--------------+-----------------------------------------------------+-----------------------+
+| Sa(0.3) Sigma| /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/std  | SA(0.3) Cond Total Std|
++--------------+-----------------------------------------------------+-----------------------+
+| Sa(0.3) Phi  | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/phi  | SA(0.3) Prior W-E Std |
++--------------+-----------------------------------------------------+-----------------------+
+| Sa(0.3) Tau  | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/tau  | SA(0.3) Cond B-E Std  |
++--------------+-----------------------------------------------------+-----------------------+
+
+The grids are returned as (ny x nx) (rows x cols) numpy grids.
 
 For datasets that are lists of points, the storage of IMTS is the same
 as for grids, except that the data are stored as one-dimensional arrays.
