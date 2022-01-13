@@ -1594,7 +1594,7 @@ class ModelModule(CoreModule):
             #
             # Equation B32 of Engler et al. (2021)
             #
-            C = T_Y0[ss:se, :] - np.dot(rcmatrix_phi, T_D, out=C_tmp1)
+            np.subtract(T_Y0[ss:se, :], np.dot(rcmatrix_phi, T_D, out=C_tmp1), out=C)
             #
             # This is the MVN solution for the conditional mean
             # It is an implementation of the equation just below
