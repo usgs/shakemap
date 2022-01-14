@@ -242,6 +242,8 @@ def _get_event_dictionary(detail, source, scenario):
             "event_type": etype,
             "locstring": detail.location,
         }
+    if edict["locstring"] is None:
+        edict["locstring"] = ""
     return edict
 
 
