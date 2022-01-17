@@ -15,13 +15,13 @@ Submodules
    shakemap.coremods.dyfi
    shakemap.coremods.exception
    shakemap.coremods.gridxml
-   shakemap.coremods.groundmotion
    shakemap.coremods.history
    shakemap.coremods.info
    shakemap.coremods.kml
    shakemap.coremods.mapping
    shakemap.coremods.model
    shakemap.coremods.plotregr
+   shakemap.coremods.pointcsv
    shakemap.coremods.raster
    shakemap.coremods.rupture
    shakemap.coremods.save

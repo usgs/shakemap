@@ -1,4 +1,4 @@
-.. _sec-philosophy:
+.. _sec-philosophy-4:
 
 **********************************************************
 Philosophy of Estimating and Interpolating Ground Motions

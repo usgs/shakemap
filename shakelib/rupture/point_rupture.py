@@ -109,7 +109,9 @@ class PointRupture(Rupture):
         """
         Depth to top of rupture.
         Use the Kaklamanos et al. (2011) formula:
+
             ztor = max((Zhyp - 0.6W * sin(delta)), 0)
+
         with the width coming from W&C 1994 as above.
         The default dip is 90, so we're reduced to:
         """

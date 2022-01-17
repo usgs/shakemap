@@ -45,30 +45,32 @@ See below for details on:
 Coding Style
 ==========================
 
-In general, follow the `PEP-8 style guide
-<https://www.python.org/dev/peps/pep-0008/>`_.
-Modifications/details/re-emphasis:
+We now use the `Black Code Formatter <https://github.com/psf/black>`_ for
+all code formatting. You will be expected to run your code through Black
+before submitting it to us. There are Black extensions for emacs, vim, 
+VSCode, etc. Or you can just run it standalone after you're done editing.
+
+In general, Black follows the `PEP-8 style guide
+<https://www.python.org/dev/peps/pep-0008/>`_. So it's good to follow that
+to start with. 
+
+Other things to keep in mind:
 
 **General**
 
-- Put spaces after commas
-- *Seriously*, put spaces after commas
-- Put spaces after the beginning '#' of comments
-- Put spaces around mathematical operators unless they are part of the
-  argument list of a function.
-- Comment heavily with useful comments
-- Document everything
-- Keep imports on separate lines to the extent that this is reasonable
-- `autopep8 <https://github.com/hhatto/autopep8>`_ is useful for fixing
-  simple whitespace issues (we do not use the more aggressive options).
-- Some of us also use the `spyder
-  <https://pythonhosted.org/spyder/>`_ IDE, which helps catch many errors
-  and style issues. It also has an option for automatically removing
-  trailing whitespace. But there are also Python style/syntax checking
-  modules for many editors, including vim and emacs.
-- Two blank lines between functions. One blank line between methods of a 
-  class.
-- Put spaces after commas
+- Document everything with docstrings.
+- Comment heavily with useful comments. Useful comments don't say what you
+  are doing, they say why you are doing it: ``# Loop over x`` is a useless
+  comment, ``# Update the elements of x with our newly-derived coefficients``
+  at least tells us something.
+- If your changes are extensive or you are adding a significant module,
+  talk to us about adding additional documentation to this manual.
+- All printed, logged, exception, or otherwise formatted strings are now
+  expected to be `f-strings <https://docs.python.org/3/tutorial/inputoutput.html>`_.
+  If you don't want to write f-strings, you can always run 
+  `flynt <https://pypi.org/project/flynt/>`_ on your finished code to 
+  convert. Just remember to run Black afterwards in case flynt breaks any
+  rules.
 
 **Names**
 
@@ -152,10 +154,11 @@ Class instance variable names should be:
 
 **Misc**
 
-- Please follow the 80 character line limit when possible
+- Black will enforce an 88 character line limit when possible
 - 4 *space* indentation for code blocks (not tabs)--most Python 
-  aware editors should support this out of the box
-- Whitespace and indentation should follow PEP 8 style guide
+  aware editors should support this out of the box, Black will enforce
+- Whitespace and indentation should follow PEP 8 style guide, Black will
+  enforce
 - Single letter class and function names are discouraged; 
   single-letter variable names should be restricted to things 
   like indices in loops and arrays and should never be "l", 
@@ -215,7 +218,7 @@ directory on Github.
   def convenience_calculator(value):
       """
       Return the input value multiplied by 5.0.
-    
+
       Args:
           value (float): Input numeric value.
 
@@ -242,16 +245,16 @@ directory on Github.
               calc_string (str): A string.
           """
           self.calc_string = calc_string
-  
+
       def doThingsWithMagnitude(self, mag, mystr):
           """
           Do mysterious things with magnitude.
-  
-          More detailed description of the weird and 
+
+          More detailed description of the weird and
           wonderful things that will be done with magnitude.
-             
+
           Args:
-              mag (float): Input numeric magnitude value, should 
+              mag (float): Input numeric magnitude value, should
                   be 0 < mag < 10.
               mystr (str): String input that isn't used.
 
@@ -259,8 +262,8 @@ directory on Github.
               float: 0.0 or (CONSTANT * mag), depending on the calc_string
               defined in the constructor.
 
-          Raises: 
-              ValueError: If input magnitude is outside the 
+          Raises:
+              ValueError: If input magnitude is outside the
                   accepted range.
           """
           if mag <= 0 or mag >= 10:

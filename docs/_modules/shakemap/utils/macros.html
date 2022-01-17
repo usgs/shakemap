@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.utils.macros &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -39,8 +38,8 @@
 
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="kn">import</span> <span class="n">constants</span>
 
-<span class="n">DATE_STR_FMT</span> <span class="o">=</span> <span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y&#39;</span>
-<span class="n">TIME_OF_DAY_FMT</span> <span class="o">=</span> <span class="s1">&#39;%H:%M:%S&#39;</span>
+<span class="n">DATE_STR_FMT</span> <span class="o">=</span> <span class="s2">&quot;%b </span><span class="si">%d</span><span class="s2">, %Y&quot;</span>
+<span class="n">TIME_OF_DAY_FMT</span> <span class="o">=</span> <span class="s2">&quot;%H:%M:%S&quot;</span>
 
 
 <div class="viewcode-block" id="get_macros"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.macros.html#shakemap.utils.macros.get_macros">[docs]</a><span class="k">def</span> <span class="nf">get_macros</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
@@ -66,26 +65,25 @@
 <span class="sd">              - NETID Earthquake network ID.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">macros</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;MAG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;LOC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">]</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;LAT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;LON&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;DEP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;DATETIME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;origin_time&#39;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;MAG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude&quot;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;LOC&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;location&quot;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;LAT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;LON&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;DEP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;DATETIME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;origin_time&quot;</span><span class="p">]</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">dtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">macros</span><span class="p">[</span><span class="s1">&#39;DATETIME&#39;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+        <span class="n">dtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">macros</span><span class="p">[</span><span class="s2">&quot;DATETIME&quot;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="n">dtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">macros</span><span class="p">[</span><span class="s1">&#39;DATETIME&#39;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;DATE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">DATE_STR_FMT</span><span class="p">)</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIME_OF_DAY_FMT</span><span class="p">)</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;VERSION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
-        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;shakemap_versions&#39;</span><span class="p">][</span><span class="s1">&#39;map_version&#39;</span><span class="p">])</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;EVENTID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
-    <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;PRODUCT_CODE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="s1">&#39;netid&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]:</span>
-        <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;NETID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
+        <span class="n">dtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">macros</span><span class="p">[</span><span class="s2">&quot;DATETIME&quot;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;DATE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">DATE_STR_FMT</span><span class="p">)</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIME_OF_DAY_FMT</span><span class="p">)</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;VERSION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;processing&quot;</span><span class="p">][</span><span class="s2">&quot;shakemap_versions&quot;</span><span class="p">][</span><span class="s2">&quot;map_version&quot;</span><span class="p">])</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;EVENTID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;event_id&quot;</span><span class="p">]</span>
+    <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;PRODUCT_CODE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;productcode&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;netid&quot;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">]:</span>
+        <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;NETID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;netid&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">macros</span><span class="p">[</span><span class="s1">&#39;NETID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">macros</span><span class="p">[</span><span class="s2">&quot;NETID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">macros</span></div>
 </pre></div>
@@ -124,7 +122,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

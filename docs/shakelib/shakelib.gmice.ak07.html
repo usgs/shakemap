@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>shakelib.gmice.ak07 &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -30,11 +31,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-shakelib.gmice.ak07">
+  <section id="module-shakelib.gmice.ak07">
 <span id="shakelib-gmice-ak07"></span><h1>shakelib.gmice.ak07<a class="headerlink" href="#module-shakelib.gmice.ak07" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="shakelib.gmice.ak07.AK07">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.gmice.ak07.</code><code class="sig-name descname">AK07</code><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.gmice.ak07.AK07">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.gmice.ak07.</span></span><span class="sig-name descname"><span class="pre">AK07</span></span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE" title="shakelib.gmice.gmice.GMICE"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.gmice.gmice.GMICE</span></code></a></p>
 <p>Implements the ground motion intensity conversion equations (GMICE) of
 Atkinson and Kaka (2007). This module implements a simplified version.</p>
@@ -45,8 +46,8 @@ United States and California. Bulletin of The Seismological
 Society of America - BULL SEISMOL SOC AMER.
 97. 497-510. 10.1785/0120060154.</p>
 <dl class="py method">
-<dt id="shakelib.gmice.ak07.AK07.getMIfromGM">
-<code class="sig-name descname">getMIfromGM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">amps</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getMIfromGM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getMIfromGM" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.gmice.ak07.AK07.getMIfromGM">
+<span class="sig-name descname"><span class="pre">getMIfromGM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dists</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getMIfromGM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getMIfromGM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to compute macroseismic intensity from ground-motion
 intensity. Supported ground-motion IMTs are PGA, PGV and PSA
 at 0.3, 1.0, and 2.0 sec periods.</p>
@@ -71,8 +72,8 @@ point in question).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.gmice.ak07.AK07.getGMfromMI">
-<code class="sig-name descname">getGMfromMI</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mmi</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">dists</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mag</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getGMfromMI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getGMfromMI" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.gmice.ak07.AK07.getGMfromMI">
+<span class="sig-name descname"><span class="pre">getGMfromMI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dists</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getGMfromMI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getGMfromMI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to tcompute ground-motion intensity from macroseismic
 intensity. Supported IMTs are PGA, PGV and PSA for 0.3, 1.0, and
 3.0 sec periods.</p>
@@ -96,8 +97,8 @@ and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.gmice.ak07.AK07.getGM2MIsd">
-<code class="sig-name descname">getGM2MIsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getGM2MIsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getGM2MIsd" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.gmice.ak07.AK07.getGM2MIsd">
+<span class="sig-name descname"><span class="pre">getGM2MIsd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getGM2MIsd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getGM2MIsd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of standard deviations for the ground-motion
 to MMI conversion. The keys are the ground motion types.</p>
 <dl class="field-list simple">
@@ -108,8 +109,8 @@ to MMI conversion. The keys are the ground motion types.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.gmice.ak07.AK07.getMI2GMsd">
-<code class="sig-name descname">getMI2GMsd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getMI2GMsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getMI2GMsd" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.gmice.ak07.AK07.getMI2GMsd">
+<span class="sig-name descname"><span class="pre">getMI2GMsd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07.getMI2GMsd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07.getMI2GMsd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of standard deviations for the MMI
 to ground-motion conversion. The keys are the ground motion
 types.</p>
@@ -122,7 +123,7 @@ types.</p>
 
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -159,7 +160,7 @@ types.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

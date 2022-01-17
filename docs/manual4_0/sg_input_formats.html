@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>4.4. Input Data Formats &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="4.5. Output Data Formats" href="sg_output_formats.html" />
@@ -32,9 +33,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="input-data-formats">
+  <section id="input-data-formats">
 <span id="sec-input-formats-4"></span><h1><span class="section-number">4.4. </span>Input Data Formats<a class="headerlink" href="#input-data-formats" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="event-xml-file">
+<p>ShakeMap has a number of input files, some of which may be provided in more
+than one format. See below for a discussion of some of them.</p>
+<section id="event-xml-file">
 <span id="subsec-event-xml-file"></span><h2><span class="section-number">4.4.1. </span>Event XML File<a class="headerlink" href="#event-xml-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>required</em>.</p>
 <p>The earthquake origin information is contained in a simple XML file
@@ -110,8 +113,8 @@ supplied to the <strong>shake</strong> program).</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="moment-xml-file">
+</section>
+<section id="moment-xml-file">
 <h2><span class="section-number">4.4.2. </span>Moment XML File<a class="headerlink" href="#moment-xml-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>optional</em>.</p>
 <p>Users may provide moment tensor information in a QuakeML file called
@@ -120,8 +123,8 @@ format is described exhaustively here: <a class="reference external" href="https
 <p>The QuakeML <em>must</em> contain a <em>focalMechanism</em> element with at least
 complete <em>nodalPlanes</em> and <em>principalAxes</em> elements. See the QuakeML
 documentation for details.</p>
-</div>
-<div class="section" id="shakemap-xml-data-file">
+</section>
+<section id="shakemap-xml-data-file">
 <h2><span class="section-number">4.4.3. </span>ShakeMap XML Data File<a class="headerlink" href="#shakemap-xml-data-file" title="Permalink to this headline">¶</a></h2>
 <p>These files are <em>optional</em>.</p>
 <p>To inform your ShakeMap with real data, either macroseismic intensity
@@ -131,7 +134,7 @@ number of XML files ending in “*_dat.xml” as well as one called
 directory. These files consists of a number of <em>elements</em>, with
 defined <em>attributes</em>.</p>
 <p>The <em>earthquake</em> element (optional) is described above in the section
-<span class="xref std std-ref">_subsec-event-xml-file</span>.</p>
+<a class="reference internal" href="#subsec-event-xml-file"><span class="std std-ref">Event XML File</span></a>.</p>
 <p>Following the earthquake element is the <em>stationlist</em> element, which
 has a <em>created</em> attribute, which is the same as the one in the
 earthquake element.</p>
@@ -388,8 +391,8 @@ intensity_flag=&quot;0&quot;&gt;
 </div>
 <p>The earthquake and stationlist XML files are combined in the GeoJSON
 output file provided to the public.</p>
-</div>
-<div class="section" id="shakemap-json-data-file">
+</section>
+<section id="shakemap-json-data-file">
 <span id="subsec-json-input-stations-4"></span><h2><span class="section-number">4.4.4. </span>ShakeMap JSON Data File<a class="headerlink" href="#shakemap-json-data-file" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap will also accept a ShakeMap-produced GeoJSON <em>stationlist.json</em>
 file as input (see <a class="reference internal" href="ug_products.html#subsec-stationlist-geojson"><span class="std std-ref">Stationlist GeoJSON</span></a>). Additional
@@ -560,8 +563,8 @@ in the JSON file, but they will be ignored. Intensity observations
 should have a <strong>netid</strong> as specified for the XML files (see above),
 and should have a <strong>channels</strong> element that is an empty list
 (i.e., “channels: []”).</p>
-</div>
-<div class="section" id="source-text-file">
+</section>
+<section id="source-text-file">
 <h2><span class="section-number">4.4.5. </span>Source Text File<a class="headerlink" href="#source-text-file" title="Permalink to this headline">¶</a></h2>
 <p>Because most ShakeMap installations automatically generate XML input
 files and write them to the input directory, manual changes made by
@@ -578,8 +581,8 @@ unspecified mechanisms, respectively.  Any of the other source
 parameters may also be set: eid, location, time, lat, lon, depth, mag,
 etc.. Blank lines and lines beginning with ‘#’ (i.e., comments) are
 ignored.</p>
-</div>
-<div class="section" id="rupture-specification">
+</section>
+<section id="rupture-specification">
 <h2><span class="section-number">4.4.6. </span>Rupture Specification<a class="headerlink" href="#rupture-specification" title="Permalink to this headline">¶</a></h2>
 <p>There are three classes of rupture objects:</p>
 <ul class="simple">
@@ -629,8 +632,8 @@ only the last one fulfills this criteria.</p></li>
 still support this format for backwards compatibility but we prefer to use the
 GeoJSON format described below. Eventually we will stop support for the older
 <cite>*_fault.txt</cite> file format.</p>
-</div>
-<div class="section" id="rupture-geojson-file">
+</section>
+<section id="rupture-geojson-file">
 <h2><span class="section-number">4.4.7. </span>Rupture GeoJson File<a class="headerlink" href="#rupture-geojson-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>optional</em>.</p>
 <p>Rupture (also referred to as “finite fault”) files are defined in ShakeMap 4
@@ -815,8 +818,8 @@ when specifying a rupture, but the output rupture file is a <em>Point</em> type 
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="generic-amplification-factors">
+</section>
+<section id="generic-amplification-factors">
 <h2><span class="section-number">4.4.8. </span>Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
 <p>The ShakeMap generic amplification factor facility supports the inclusion
 of linear amplifications that are not otherwise supported (by, for example,
@@ -899,8 +902,8 @@ undesirable, the operator should include grids (e.g., of zeros) just below
 and above the shortest and longest periods, respectively. If the interpolation
 between periods is undesirable, then grids matching the output IMTs should be
 provided. Etc.</p>
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
@@ -967,7 +970,7 @@ provided. Etc.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

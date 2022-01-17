@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.coremods.plotregr &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -46,10 +45,12 @@
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
-                                   <span class="n">get_configspec</span><span class="p">,</span>
-                                   <span class="n">get_custom_validator</span><span class="p">,</span>
-                                   <span class="n">config_error</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_config_paths</span><span class="p">,</span>
+    <span class="n">get_configspec</span><span class="p">,</span>
+    <span class="n">get_custom_validator</span><span class="p">,</span>
+    <span class="n">config_error</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="kn">import</span> <span class="n">oq_to_file</span>
 
@@ -59,13 +60,13 @@
 <span class="sd">    plotregr -- Plot the regression curves from a data file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;plotregr&#39;</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/.*_regr\.png&#39;</span><span class="p">]</span>
-    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s2">&quot;plotregr&quot;</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s2">&quot;products/.*_regr\.png&quot;</span><span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;products/shake_result.hdf&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PlotRegr</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s1">&#39;Regression Plots&#39;</span><span class="p">,</span> <span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s2">&quot;Regression Plots&quot;</span><span class="p">,</span> <span class="s2">&quot;regression&quot;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PlotRegr.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.plotregr.html#shakemap.coremods.plotregr.PlotRegr.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -75,22 +76,23 @@
 <span class="sd">                exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
-        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s2">&quot;current&quot;</span><span class="p">,</span> <span class="s2">&quot;products&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
-        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datadir</span><span class="si">}</span><span class="s2"> is not a valid directory.&quot;</span><span class="p">)</span>
+        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">&quot;shake_result.hdf&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datafile</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">oc</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">oc</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;plotregr module can only operate on &#39;</span>
-                                      <span class="s1">&#39;gridded data not sets of points&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">oc</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;plotregr module can only operate on &quot;</span> <span class="s2">&quot;gridded data not sets of points&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># get the path to the products.conf file, load the config</span>
-        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
-        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;products.conf&quot;</span><span class="p">)</span>
+        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s2">&quot;products&quot;</span><span class="p">)</span>
         <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
@@ -99,220 +101,252 @@
 
         <span class="c1"># If mapping runs in parallel, then we want this module too, as well.</span>
         <span class="c1"># Otherwise we get weird errors from matplotlib</span>
-        <span class="n">max_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;max_workers&#39;</span><span class="p">]</span>
+        <span class="n">max_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="s2">&quot;max_workers&quot;</span><span class="p">]</span>
 
-        <span class="c1">#</span>
-        <span class="c1"># Cheating here a bit by assuming that the IMTs are the same</span>
-        <span class="c1"># as the regression IMTs</span>
-        <span class="c1">#</span>
-        <span class="n">rockgrid</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">soilgrid</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">rocksd</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">soilsd</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">imtlist</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">(</span><span class="s1">&#39;GREATER_OF_TWO_HORIZONTAL&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
-            <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span>
-                                             <span class="s1">&#39;mean&#39;</span><span class="p">)</span>
-            <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span>
-                                             <span class="s1">&#39;mean&#39;</span><span class="p">)</span>
-            <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span>
-                                           <span class="s1">&#39;std&#39;</span><span class="p">)</span>
-            <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span>
-                                           <span class="s1">&#39;std&#39;</span><span class="p">)</span>
-        <span class="n">distances</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;distances&#39;</span><span class="p">],</span> <span class="s1">&#39;rrup&#39;</span><span class="p">)</span>
-
-        <span class="n">stations</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">()</span>
-
-        <span class="c1">#</span>
-        <span class="c1"># Make plots</span>
-        <span class="c1">#</span>
-        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;myimt&#39;</span><span class="p">:</span> <span class="n">myimt</span><span class="p">,</span>
-                 <span class="s1">&#39;rockgrid&#39;</span><span class="p">:</span> <span class="n">rockgrid</span><span class="p">,</span>
-                 <span class="s1">&#39;soilgrid&#39;</span><span class="p">:</span> <span class="n">soilgrid</span><span class="p">,</span>
-                 <span class="s1">&#39;rocksd&#39;</span><span class="p">:</span> <span class="n">rocksd</span><span class="p">,</span>
-                 <span class="s1">&#39;soilsd&#39;</span><span class="p">:</span> <span class="n">soilsd</span><span class="p">,</span>
-                 <span class="s1">&#39;stations&#39;</span><span class="p">:</span> <span class="n">stations</span><span class="p">,</span>
-                 <span class="s1">&#39;distances&#39;</span><span class="p">:</span> <span class="n">distances</span><span class="p">,</span>
-                 <span class="s1">&#39;eventid&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span>
-                 <span class="s1">&#39;datadir&#39;</span><span class="p">:</span> <span class="n">datadir</span>
-                 <span class="p">}</span>
-            <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;miRegr&#39;</span><span class="p">,</span> <span class="s1">&#39;Intensity Regression&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;Regression plot of macroseismic &#39;</span>
-                                      <span class="s1">&#39;intensity.&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;mmi_regr.png&#39;</span><span class="p">,</span> <span class="s1">&#39;image/png&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGA&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;pgaRegr&#39;</span><span class="p">,</span> <span class="s1">&#39;PGA Regression&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;Regression plot of peak &#39;</span>
-                                      <span class="s1">&#39;ground acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;pga_regr.png&#39;</span><span class="p">,</span> <span class="s1">&#39;image/png&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;pgvRegr&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV Regression&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;Regression plot of peak ground &#39;</span>
-                                      <span class="s1">&#39;velocity (cm/s).&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;pgv_regr.png&#39;</span><span class="p">,</span> <span class="s1">&#39;image/png&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
-                <span class="n">period</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
-                <span class="n">filebase</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
-                <span class="n">psacap</span> <span class="o">=</span> <span class="s1">&#39;Regression plot of &#39;</span> <span class="o">+</span> <span class="n">period</span> <span class="o">+</span> <span class="s1">&#39; sec 5</span><span class="si">% d</span><span class="s1">amped &#39;</span> \
-                         <span class="s1">&#39;pseudo-spectral acceleration(</span><span class="si">%g</span><span class="s1">).&#39;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">filebase</span> <span class="o">+</span> <span class="s1">&#39;Regr&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;PSA &#39;</span> <span class="o">+</span> <span class="n">period</span> <span class="o">+</span> <span class="s1">&#39; sec Regression&#39;</span><span class="p">,</span>
-                                      <span class="n">psacap</span><span class="p">,</span>
-                                      <span class="n">filebase</span> <span class="o">+</span> <span class="s1">&#39;_regr.png&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;image/png&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">max_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">cf</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-                <span class="n">results</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">make_plots</span><span class="p">,</span> <span class="n">alist</span><span class="p">)</span>
-                <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">adict</span> <span class="ow">in</span> <span class="n">alist</span><span class="p">:</span>
-                <span class="n">make_plots</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
-
-        <span class="c1">#</span>
-        <span class="c1"># Make attenuation_curves.json</span>
-        <span class="c1">#</span>
-        <span class="n">jdict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;eventid&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">}</span>
-        <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">site</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;soil&#39;</span><span class="p">,</span> <span class="s1">&#39;rock&#39;</span><span class="p">]:</span>
-            <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;gmpe&#39;</span><span class="p">][</span><span class="n">site</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getComponents</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+            <span class="c1">#</span>
+            <span class="c1"># Cheating here a bit by assuming that the IMTs are the same</span>
+            <span class="c1"># as the regression IMTs</span>
+            <span class="c1">#</span>
+            <span class="n">rockgrid</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">soilgrid</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">rocksd</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">soilsd</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">imtlist</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
-                <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;gmpe&#39;</span><span class="p">][</span><span class="n">site</span><span class="p">][</span><span class="n">myimt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;gmpe&#39;</span><span class="p">][</span><span class="n">site</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span>
-                    <span class="p">[</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;mean&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
-                        <span class="n">decimals</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-                <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;gmpe&#39;</span><span class="p">][</span><span class="n">site</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;stddev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span>
-                    <span class="p">[</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;std&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
-                        <span class="n">decimals</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;distances&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">]:</span>
-            <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;distances&#39;</span><span class="p">][</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span>
-                <span class="p">[</span><span class="s1">&#39;attenuation&#39;</span><span class="p">,</span> <span class="s1">&#39;distances&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
-                    <span class="n">decimals</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;mean_bias&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">info</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
-            <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;mean_bias&#39;</span><span class="p">][</span><span class="n">myimt</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span>
-                                             <span class="n">myimt</span><span class="p">][</span><span class="s1">&#39;bias&#39;</span><span class="p">]</span>
-        <span class="n">jstring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">jdict</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">jfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;attenuation_curves.json&#39;</span><span class="p">)</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">jfile</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">jstring</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">cap</span> <span class="o">=</span> <span class="s2">&quot;Nominal attenuation curves&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;attenuationCurves&#39;</span><span class="p">,</span> <span class="s1">&#39;Attenuation Curves&#39;</span><span class="p">,</span>
-                              <span class="n">cap</span><span class="p">,</span> <span class="s1">&#39;attenuation_curves.json&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;application/json&#39;</span><span class="p">)</span></div></div>
+                <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="s2">&quot;rock&quot;</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+                <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="s2">&quot;soil&quot;</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+                <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="s2">&quot;rock&quot;</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span>
+                <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="s2">&quot;soil&quot;</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span>
+            <span class="n">distances</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="s2">&quot;distances&quot;</span><span class="p">],</span> <span class="s2">&quot;rrup&quot;</span><span class="p">)</span>
+
+            <span class="n">stations</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">component</span> <span class="o">==</span> <span class="s2">&quot;GREATER_OF_TWO_HORIZONTAL&quot;</span><span class="p">:</span>
+                <span class="n">ctype</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">cfile</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ctype</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">cfile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="c1">#</span>
+            <span class="c1"># Make plots</span>
+            <span class="c1">#</span>
+            <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;myimt&quot;</span><span class="p">:</span> <span class="n">myimt</span><span class="p">,</span>
+                    <span class="s2">&quot;rockgrid&quot;</span><span class="p">:</span> <span class="n">rockgrid</span><span class="p">,</span>
+                    <span class="s2">&quot;soilgrid&quot;</span><span class="p">:</span> <span class="n">soilgrid</span><span class="p">,</span>
+                    <span class="s2">&quot;rocksd&quot;</span><span class="p">:</span> <span class="n">rocksd</span><span class="p">,</span>
+                    <span class="s2">&quot;soilsd&quot;</span><span class="p">:</span> <span class="n">soilsd</span><span class="p">,</span>
+                    <span class="s2">&quot;stations&quot;</span><span class="p">:</span> <span class="n">stations</span><span class="p">,</span>
+                    <span class="s2">&quot;distances&quot;</span><span class="p">:</span> <span class="n">distances</span><span class="p">,</span>
+                    <span class="s2">&quot;eventid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span>
+                    <span class="s2">&quot;datadir&quot;</span><span class="p">:</span> <span class="n">datadir</span><span class="p">,</span>
+                    <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="n">cfile</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span>
+                        <span class="s2">&quot;miRegr&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Intensity Regression&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;Regression plot of macroseismic intensity</span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;mmi_regr</span><span class="si">{</span><span class="n">cfile</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;image/png&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;PGA&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span>
+                        <span class="s2">&quot;pgaRegr&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;PGA Regression&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Regression plot of peak &quot;</span>
+                        <span class="s2">&quot;ground acceleration (</span><span class="si">%%</span><span class="s2">g)</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">ctype</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;pga_regr</span><span class="si">{</span><span class="n">cfile</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;image/png&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;PGV&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span>
+                        <span class="s2">&quot;pgvRegr&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;PGV Regression&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;Regression plot of peak ground velocity (cm/s)</span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;pgv_regr</span><span class="si">{</span><span class="n">cfile</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;image/png&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
+                    <span class="n">period</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+                    <span class="n">filebase</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
+                    <span class="n">psacap</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s2">&quot;Regression plot of &quot;</span>
+                        <span class="o">+</span> <span class="n">period</span>
+                        <span class="o">+</span> <span class="s2">&quot; sec 5</span><span class="si">%%</span><span class="s2"> damped pseudo-spectral &quot;</span>
+                        <span class="s2">&quot;acceleration(</span><span class="si">%%</span><span class="s2">g)</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">ctype</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span>
+                        <span class="n">filebase</span> <span class="o">+</span> <span class="s2">&quot;Regr&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;PSA &quot;</span> <span class="o">+</span> <span class="n">period</span> <span class="o">+</span> <span class="s2">&quot; sec Regression&quot;</span><span class="p">,</span>
+                        <span class="n">psacap</span><span class="p">,</span>
+                        <span class="n">filebase</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_regr</span><span class="si">{</span><span class="n">cfile</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;image/png&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">max_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">cf</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">results</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">make_plots</span><span class="p">,</span> <span class="n">alist</span><span class="p">)</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">adict</span> <span class="ow">in</span> <span class="n">alist</span><span class="p">:</span>
+                    <span class="n">make_plots</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
+
+            <span class="c1">#</span>
+            <span class="c1"># Make attenuation_curves.json</span>
+            <span class="c1">#</span>
+            <span class="n">jdict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;eventid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">}</span>
+            <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;gmpe&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">site</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;soil&quot;</span><span class="p">,</span> <span class="s2">&quot;rock&quot;</span><span class="p">]:</span>
+                <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;gmpe&quot;</span><span class="p">][</span><span class="n">site</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
+                    <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;gmpe&quot;</span><span class="p">][</span><span class="n">site</span><span class="p">][</span><span class="n">myimt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;gmpe&quot;</span><span class="p">][</span><span class="n">site</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;mean&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="p">)</span>
+                    <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;gmpe&quot;</span><span class="p">][</span><span class="n">site</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span><span class="s2">&quot;stddev&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;std&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="p">)</span>
+            <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;repi&quot;</span><span class="p">,</span> <span class="s2">&quot;rhypo&quot;</span><span class="p">,</span> <span class="s2">&quot;rjb&quot;</span><span class="p">,</span> <span class="s2">&quot;rrup&quot;</span><span class="p">]:</span>
+                <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">][</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">oc</span><span class="o">.</span><span class="n">getArray</span><span class="p">([</span><span class="s2">&quot;attenuation&quot;</span><span class="p">,</span> <span class="s2">&quot;distances&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="p">)</span>
+            <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;mean_bias&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">oc</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
+                <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;mean_bias&quot;</span><span class="p">][</span><span class="n">myimt</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;ground_motions&quot;</span><span class="p">][</span><span class="n">myimt</span><span class="p">][</span>
+                    <span class="s2">&quot;bias&quot;</span>
+                <span class="p">]</span>
+            <span class="n">jstring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">jdict</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">jfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;attenuation_curves</span><span class="si">{</span><span class="n">cfile</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">jfile</span><span class="p">,</span> <span class="s2">&quot;wt&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">jstring</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">cap</span> <span class="o">=</span> <span class="s2">&quot;Nominal attenuation curves&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span>
+                <span class="s2">&quot;attenuationCurves&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Attenuation Curves&quot;</span><span class="p">,</span>
+                <span class="n">cap</span><span class="p">,</span>
+                <span class="n">jfile</span><span class="p">,</span>
+                <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="make_plots"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.plotregr.html#shakemap.coremods.plotregr.make_plots">[docs]</a><span class="k">def</span> <span class="nf">make_plots</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>
-    <span class="n">myimt</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;myimt&#39;</span><span class="p">]</span>
-    <span class="n">eventid</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;eventid&#39;</span><span class="p">]</span>
-    <span class="n">datadir</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">]</span>
-    <span class="n">rockgrid</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;rockgrid&#39;</span><span class="p">]</span>
-    <span class="n">soilgrid</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;soilgrid&#39;</span><span class="p">]</span>
-    <span class="n">rocksd</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;rocksd&#39;</span><span class="p">]</span>
-    <span class="n">soilsd</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;soilsd&#39;</span><span class="p">]</span>
-    <span class="n">stations</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;stations&#39;</span><span class="p">]</span>
-    <span class="n">distances</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;distances&#39;</span><span class="p">]</span>
+    <span class="n">myimt</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;myimt&quot;</span><span class="p">]</span>
+    <span class="n">eventid</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;eventid&quot;</span><span class="p">]</span>
+    <span class="n">datadir</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;datadir&quot;</span><span class="p">]</span>
+    <span class="n">rockgrid</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;rockgrid&quot;</span><span class="p">]</span>
+    <span class="n">soilgrid</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;soilgrid&quot;</span><span class="p">]</span>
+    <span class="n">rocksd</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;rocksd&quot;</span><span class="p">]</span>
+    <span class="n">soilsd</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;soilsd&quot;</span><span class="p">]</span>
+    <span class="n">stations</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;stations&quot;</span><span class="p">]</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;distances&quot;</span><span class="p">]</span>
+    <span class="n">cfile</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;component&quot;</span><span class="p">]</span>
 
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 
-    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rock&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;soil&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">+</span> <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;r--&#39;</span><span class="p">,</span>
-                 <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rock +/- stddev&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">-</span> <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">+</span> <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;g--&#39;</span><span class="p">,</span>
-                 <span class="n">label</span><span class="o">=</span><span class="s1">&#39;soil +/- stddev&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">-</span> <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;g--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;rock&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;soil&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+        <span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">+</span> <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;r--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;rock +/- stddev&quot;</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">-</span> <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;r--&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+        <span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">+</span> <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;g--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;soil +/- stddev&quot;</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">-</span> <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s2">&quot;g--&quot;</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stations</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
-        <span class="n">dist</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distances&#39;</span><span class="p">][</span><span class="s1">&#39;rrup&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stations</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]:</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;distances&quot;</span><span class="p">][</span><span class="s2">&quot;rrup&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">distances</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">continue</span>
-        <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;station_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;seismic&#39;</span><span class="p">:</span>
-            <span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;^&#39;</span>
-            <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;station_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;seismic&quot;</span><span class="p">:</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="s2">&quot;^&quot;</span>
+            <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">imtstr</span> <span class="o">=</span> <span class="n">myimt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
-                    <span class="k">if</span> <span class="n">chan</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">)</span> <span class="ow">or</span> \
-                       <span class="n">chan</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;U&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;channels&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">chan</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">chan</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">):</span>
                         <span class="k">continue</span>
-                    <span class="k">for</span> <span class="n">amp</span> <span class="ow">in</span> <span class="n">chan</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
-                        <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">imtstr</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">amp</span> <span class="ow">in</span> <span class="n">chan</span><span class="p">[</span><span class="s2">&quot;amplitudes&quot;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">imtstr</span><span class="p">:</span>
                             <span class="k">continue</span>
-                        <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">amp</span><span class="p">[</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
                             <span class="k">break</span>
-                        <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> \
-                                <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">amp</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
                             <span class="k">break</span>
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-                            <span class="n">thisamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                            <span class="n">thisamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">thisamp</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                            <span class="n">thisamp</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
                         <span class="k">if</span> <span class="n">thisamp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="k">break</span>
-                        <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;PGV&quot;</span><span class="p">:</span>
                             <span class="n">tmpval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">thisamp</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">tmpval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">thisamp</span> <span class="o">/</span> <span class="mf">100.</span><span class="p">)</span>
+                            <span class="n">tmpval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">thisamp</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tmpval</span> <span class="o">&gt;</span> <span class="n">value</span><span class="p">:</span>
                             <span class="n">value</span> <span class="o">=</span> <span class="n">tmpval</span>
                         <span class="k">break</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;o&#39;</span>
-            <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                <span class="n">amp</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span>
-                <span class="n">flag</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_flag&#39;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">amp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">!=</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="s2">&quot;o&quot;</span>
+            <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+                <span class="n">amp</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;intensity_flag&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">flag</span> <span class="o">==</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">amp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">!=</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
                         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">amp</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                             <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amp</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">value</span> <span class="o">=</span> <span class="n">amp</span>
-                        <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span>
-                                     <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+                        <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">imtstr</span> <span class="o">=</span> <span class="n">myimt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgm_from_mmi&#39;</span><span class="p">]:</span>
-                    <span class="k">if</span> <span class="n">thing</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">imtstr</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;pgm_from_mmi&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">thing</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">imtstr</span><span class="p">:</span>
                         <span class="k">continue</span>
-                    <span class="n">amp</span> <span class="o">=</span> <span class="n">thing</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">amp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">!=</span> <span class="s1">&#39;null&#39;</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                    <span class="n">amp</span> <span class="o">=</span> <span class="n">thing</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">amp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">!=</span> <span class="s2">&quot;null&quot;</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;PGV&quot;</span><span class="p">:</span>
                             <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span> <span class="o">/</span> <span class="mf">100.</span><span class="p">)</span>
-                        <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span>
-                                     <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+                            <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
+                        <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
                     <span class="k">break</span>
 
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">eventid</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39; mean&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Rrup (km)&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;PGV ln(cm/s)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">eventid</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="n">myimt</span> <span class="o">+</span> <span class="s2">&quot; mean&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Rrup (km)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;MMI&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s2">&quot;PGV&quot;</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;PGV ln(cm/s)&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39; ln(g)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">myimt</span> <span class="o">+</span> <span class="s2">&quot; ln(g)&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
     <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
-    <span class="n">pfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;_regr.png&#39;</span><span class="p">)</span>
+    <span class="n">pfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">fileimt</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_regr</span><span class="si">{</span><span class="n">cfile</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">pfile</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 </pre></div>
@@ -351,7 +385,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>4.6. Operational Considerations &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="4.9. Guidelines for Contributors" href="sg_contributing.html" />
@@ -32,13 +33,13 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="operational-considerations">
+  <section id="operational-considerations">
 <span id="operational-considerations-4"></span><h1><span class="section-number">4.6. </span>Operational Considerations<a class="headerlink" href="#operational-considerations" title="Permalink to this headline">¶</a></h1>
 <p>Installing and operating a ShakeMap system is a non-trivial endeavor. While the software
 can be easily obtained, and installed and configured with a few hours work, there are a
 great many issues that need to be addressed when an organization considers deploying a
 ShakeMap system. In this section, we will discuss a number of these issues.</p>
-<div class="section" id="seismic-network">
+<section id="seismic-network">
 <h2><span class="section-number">4.6.1. </span>Seismic Network<a class="headerlink" href="#seismic-network" title="Permalink to this headline">¶</a></h2>
 <p>The single most important prerequisite for operating a ShakeMap system is the existence
 of a seismic network capable of determining the location and magnitude of significant
@@ -69,8 +70,8 @@ If a regional network’s parametric data can be made available to the USGS, the
 global ShakeMap system will include that data in the processing, and finished ShakeMap
 products can be delivered via ShakeCast for local consumption. Please contact us if you
 are interested in this kind of arrangement.</p>
-</div>
-<div class="section" id="seismic-stations-and-parametric-data">
+</section>
+<section id="seismic-stations-and-parametric-data">
 <h2><span class="section-number">4.6.2. </span>Seismic Stations and Parametric Data<a class="headerlink" href="#seismic-stations-and-parametric-data" title="Permalink to this headline">¶</a></h2>
 <p>As mentioned above, seismic waveform or parametric data must be communicated to the
 processing center in real-time or near—real–time. The sensors must be “free field” (i.e., not
@@ -94,8 +95,8 @@ errors before a large earthquake strikes.</p>
 regional internet intensity system) is acceptable as input to ShakeMap; however, care
 should be exercised with international DYFI data, as it is often aggregated by city and
 therefore may be too coarse-grained for large-scale maps.</p>
-</div>
-<div class="section" id="triggering-shakemap">
+</section>
+<section id="triggering-shakemap">
 <h2><span class="section-number">4.6.3. </span>Triggering ShakeMap<a class="headerlink" href="#triggering-shakemap" title="Permalink to this headline">¶</a></h2>
 <p>The operator must give careful consideration to the way ShakeMap will be triggered.
 Unless an operator is constantly standing by to run ShakeMap, the system must be
@@ -114,8 +115,8 @@ Earthworm, SeisComP3) will need to develop their own triggering systems.</p>
 event’s input directory. Whether the amplitudes are retrieved from a database or stored in
 files, it is the operator’s responsibility to provide ShakeMap with properly formatted
 files. Again, operators should anticipate that some coding may be necessary.</p>
-</div>
-<div class="section" id="system-configuration">
+</section>
+<section id="system-configuration">
 <h2><span class="section-number">4.6.4. </span>System Configuration<a class="headerlink" href="#system-configuration" title="Permalink to this headline">¶</a></h2>
 <p>While it is relatively easy to install and run the ShakeMap software, a great deal of
 consideration is needed to properly configure the system for a particular region.
@@ -127,13 +128,13 @@ Equation (GMICE) must likewise be chosen. The operator may also elect to use an 
 Prediction Equation (IPE) or to use the default virtual IPE. For best results, the operator
 will need to provide a Vs30 grid, and while the
 <a class="reference external" href="http://earthquake.usgs.gov/hazards/apps/vs30/">USGS’s Vs30 server</a> can supply such a
-grid based on topographic slope, a grid based on regional geology is preferable <a href="#id2"><span class="problematic" id="id3"><span id="id1"></span>[#]_</span></a>.
+grid based on topographic slope, a grid based on regional geology is preferable.
 This is just a partial list of configuration choices. There are numerous other
 configurable parameters, all of which must be carefully chosen.</p>
-<p>For further information on ShakeMap configuration, see <span class="xref std std-ref">&lt;sec-installation-4&gt;</span> and the
+<p>For further information on ShakeMap configuration, see <a class="reference internal" href="sg_installation.html#sec-installation-4"><span class="std std-ref">Installation and Configuration</span></a> and the
 ShakeMap configuration files themselves.</p>
-</div>
-<div class="section" id="operations">
+</section>
+<section id="operations">
 <h2><span class="section-number">4.6.5. </span>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
 <p>Once an organization begins producing and distributing ShakeMaps, end users will begin
 to depend upon them and develop systems that incorporate ShakeMap products into their
@@ -177,8 +178,8 @@ investment houses, and many others. Not only can ShakeMap-improved response effo
 benefit post-earthquake recovery, these organizations can provide much-needed support
 for network and ShakeMap operations. It is highly recommended that regional networks
 considering the implementation of ShakeMap develop a detailed outreach plan.</p>
-</div>
-<div class="section" id="scenarios">
+</section>
+<section id="scenarios">
 <h2><span class="section-number">4.6.6. </span>Scenarios<a class="headerlink" href="#scenarios" title="Permalink to this headline">¶</a></h2>
 <p>One important use of ShakeMap is the generation of earthquake scenarios. Scenarios are
 predictive maps of the potential shaking resulting from hypothetical future (or past) earthquakes.
@@ -192,8 +193,8 @@ best scientific consensus of the probable earthquakes in a region, and should be
 for most uses. Requests for custom scenarios should be carefully evaluated. The
 earthquakes represented should be credible in terms of both the causative fault and the
 magnitude. In most cases, one of the disaggregated hazard scenarios should suffice.</p>
-</div>
-<div class="section" id="backup">
+</section>
+<section id="backup">
 <h2><span class="section-number">4.6.7. </span>Backup<a class="headerlink" href="#backup" title="Permalink to this headline">¶</a></h2>
 <p>Because of the importance of ShakeMap, it is advisable to run redundant systems. Most
 ShakeMap operations have a primary and backup machine. The backup machine runs
@@ -209,9 +210,9 @@ have a backup system operating in a remote location, preferably many kilometers 
 <p>As we have mentioned elsewhere, the USGS makes ShakeMaps for global earthquakes
 and provides backup to U.S. regional networks. If you would like to discuss remote
 backup for your ShakeMap system, please contact us.</p>
-</div>
-</div>
-<div class="section" id="shakemap-implementation-checklist">
+</section>
+</section>
+<section id="shakemap-implementation-checklist">
 <h1><span class="section-number">4.7. </span>ShakeMap Implementation Checklist<a class="headerlink" href="#shakemap-implementation-checklist" title="Permalink to this headline">¶</a></h1>
 <p>The checklist below is based on the one we use when discussing ShakeMap operations with active or
 potential producers within the USGS’s Advanced National Seismic System (ANSS).
@@ -353,18 +354,18 @@ backup?</p></li>
 <li><p><strong>Feedback</strong>:
 Do you have any recommendations for further support, software, features, etc.?</p></li>
 </ol>
-</div>
-<div class="section" id="software-installation">
+</section>
+<section id="software-installation">
 <h1><span class="section-number">4.8. </span>Software Installation<a class="headerlink" href="#software-installation" title="Permalink to this headline">¶</a></h1>
 <p>To install the ShakeMap software, the
 <a class="reference external" href="https://github.com/usgs/shakemap/wiki">ShakeMap Wiki</a>
 provides the easiest and most basic approach. Following the process described
 therein and running some practice events should be the first steps for
 anyone wishing to deploy ShakeMap. From there, careful study of the
-<span class="xref std std-ref">&lt;technical-guide-4&gt;</span> is strongly recommended. Reading the
+<a class="reference internal" href="sm4_technical_guide.html#technical-guide-4"><span class="std std-ref">Technical Guide</span></a> is strongly recommended. Reading the
 <a class="reference internal" href="sm4_users_guide.html#users-guide-4"><span class="std std-ref">User’s Guide</span></a> will be necessary to fully understand the ShakeMap
 system and the products it produces.</p>
-</div>
+</section>
 
 
           </div>
@@ -430,7 +431,7 @@ system and the products it produces.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

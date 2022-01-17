@@ -38,9 +38,9 @@ The value of seismic monitoring and ShakeMap was addressed by a report by the Na
 (NRC) ad-hoc Committee on the Economic Benefits of Improved Seismic
 Monitoring (:ref:`National Research Council, 20006 <NRC2006>`). In Chapter 7, "Benefits for Emergency Response and Recovery”, the
 committee refers to the Oct. 16, 1999 M7.1 Hector Mine, California earthquake (ShakeMap shown
-in :num:`Figure #hector-mine-shakemap`). 
+in :num:`Figure #hector-mine-shakemap-4`). 
 
-.. _nrc-committee-report:
+.. _nrc-committee-report-4:
 
 .. figure:: _static/NRC_11327-450.jpg 
    :align: left
@@ -71,7 +71,7 @@ in :num:`Figure #hector-mine-shakemap`).
     benefits in scaling a response to the consequences of
     an event, including no response for an earthquake that requires none.*
 
-.. _hector-mine-shakemap:
+.. _hector-mine-shakemap-4:
 
 .. figure:: _static/Hector_Mine_ShakeMap.*
    :align: left
@@ -102,7 +102,7 @@ Similarly, a report by the National Science and Technology Council `Subcommittee
     transmission from densely spaced seismic networks.*
 
 One of the earliest examples of the use of ShakeMap for emergency management and response was the 
-the M7.1 Hector Mine earthquake of October 16, 1999 (see :num:`Figure #hector-mine-shakemap`). 
+the M7.1 Hector Mine earthquake of October 16, 1999 (see :num:`Figure #hector-mine-shakemap-4`). 
 This event provides an important lesson in the use of
 ShakeMap to assess the scope of an event and to determine the level of mobilization necessary.
 The Hector Mine earthquake produced ground motion that was widely felt in
@@ -321,7 +321,7 @@ customization of the basemap layers and other content. Such
 interactive maps are in favor in newsrooms and educational contexts. 
 
 However, some of the static maps have made for the most widespread distribution.
-A widely used graphic (:num:`Figure #northridge-nisqually`), for example,
+A widely used graphic (:num:`Figure #northridge-nisqually-4`), for example,
 compares ShakeMap-generated intensities for the 1994 Northridge earthquake, a
 shallow crustal earthquake near Los Angeles, with the 2001 deep, intraslab
 Nisqually, WA earthquake. This figure was reprinted in numerous reports,
@@ -329,7 +329,7 @@ textbooks, classes, reports, and briefings, including `Putting Down Roots
 <http://www.earthquakecountry.org/roots/shaking.html>`_ and the :ref:`National
 Research Council <NRC2006>`.
 
-.. _northridge-nisqually:
+.. _northridge-nisqually-4:
 
 .. figure:: _static/Northridge_Nisqually.*
    :align: left
@@ -377,7 +377,7 @@ tsunami, triggering impacts in the Pacific Northwest. The Department of Defense 
 of the Capstone exercise with a connected "Ardent Sentry" table-top exercise with the
 same ShakeMap input in order for DOD to focus on defense support to civilian authorities.
 
-.. _caribewave-nle:
+.. _caribewave-nle-4:
 
 .. figure:: _static/caribewave_onepager.*
    :align: center
@@ -388,7 +388,7 @@ same ShakeMap input in order for DOD to focus on defense support to civilian aut
 	   
 Internationally, USGS participates (through the National Oceanic and Atmospheric Association, NOAA) in an annual "Caribe
 Wave" earthquake and tsunami exercise for the Caribbean region
-(:ref:`IOC, 2012 <ioc2012>`; see :num:`Figure #caribewave-nle`). The USGS ShakeMap and PAGER group also work directly with the U.S.
+(:ref:`IOC, 2012 <ioc2012>`; see :num:`Figure #caribewave-nle-4`). The USGS ShakeMap and PAGER group also work directly with the U.S.
 Agency for International Development (USAID) Office of Foreign
 Disaster Assistance (OFDA), the World Bank, and Geohazards International (GHI) (among many other agencies, countries, and NGOs) to
 develop global planning exercises and scenarios. 

@@ -24,12 +24,12 @@ def main(args):
     # -------------------------------------------------------------
     # get the human-friendly version of the ShakeMap version
     # -------------------------------------------------------------
-    verstr = "4.0a"
+    verstr = "4.1b"
 
     # -------------------------------------------------------------
     # what is the package called and who are the authors
     # -------------------------------------------------------------
-    SHAKEMAP_PACKAGE = "ShakeMap 4.0a API"
+    SHAKEMAP_PACKAGE = "ShakeMap 4.1b API"
     SHAKELIB_PACKAGE = "ShakeLib API"
     AUTHORS = "Bruce Worden, Eric Thompson, Mike Hearne, David Wald"
 

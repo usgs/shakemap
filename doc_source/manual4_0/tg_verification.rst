@@ -115,7 +115,7 @@ Test 0003
 Verification Test 0003 has a single observation with an amplitude of +1.0
 along a line (see :num:`Figure #verification-test-three`). 
 We start with equations 12 and 13 of
-:ref:`Engler et al. (2021) <engler2022>` (see :ref:`sec-processing-4` for
+:ref:`Engler et al. (2022) <engler2022>` (see :ref:`sec-processing-4` for
 additional discussion of the equations presented below):
 
 .. math::
@@ -185,12 +185,12 @@ The bias is then given by Engler et al. equation 14:
 Thus, the bias is 0.36, as seen in :num:`Figure #verification-test-three` 
 (solid black line) at distance from the observation.
 
-As discussed in :ref:`subsec-engler-mvn-computation-4`, the conditional
-mean and covariance are given by :ref:`Engler et al. (2021) <engler2022>`
+As discussed in :ref:`subsubsec-engler-mvn-computation-4`, the conditional
+mean and covariance are given by :ref:`Engler et al. (2022) <engler2022>`
 equations 19 and 20:
 
 .. math::
-   :label: engler-cond-mean
+   :label: engler-cond-mean-verif
 
     \mathbf{\mu_{Y_1|y_2}} =
         \mathbf{\mu_{Y_1}} +
@@ -201,7 +201,7 @@ equations 19 and 20:
 and the total covariance:
 
 .. math::
-   :label: engler-cond-covariance
+   :label: engler-cond-covariance-verif
 
     \mathbf{\Sigma_{{Y_1}{Y_1}|y_2}} =
         \mathbf{\Sigma_{{W_1}{W_1}|w_2}} +
@@ -488,7 +488,7 @@ Verification Test 0008 demonstrates the effect of uncertainty in the
 value at the observation point. If we consider equations 
 :eq:`mu-given-y2` and :eq:`var-given-y2`, and the supporting equations
 :eq:`c-bivariate` and :eq:`var-given-w2` from Test 0003, the additional
-uncertainty is represented by the term :math"`\sigma_\epsilon`.
+uncertainty is represented by the term :math:`\sigma_\epsilon`.
 :num:`Figure #verification-test-eight`
 illustrates five separate cases to show
 the effect of five values of :math:`\sigma_\epsilon`: 0.0, 0.75,
@@ -545,7 +545,7 @@ At the observation point, we have:
     \sigma|y_2 = \sqrt{0.36} = 0.6
 
 As we see in :num:`Figure #verification-test-three`, at the observation
-point, for the math:`\sigma_\epsilon=0.75` line, the mean is 0.64 (top),
+point, for the :math:`\sigma_\epsilon=0.75` line, the mean is 0.64 (top),
 and the standard deviation is 0.6 (bottom)
 
 At distance from the observation we have:
@@ -574,7 +574,7 @@ At distance from the observation we have:
     \sigma|y_2 = \sqrt{0.9171} = 0.9576
 
 In :num:`Figure #verification-test-three`, at distance from the observation
-point, for the math:`\sigma_\epsilon=0.75` line, the mean is about 0.23
+point, for the :math:`\sigma_\epsilon=0.75` line, the mean is about 0.23
 (top), and the standard deviation is about 0.96 (bottom).
 
 Doing these calculations for all five cases of :math:`\sigma_\epsilon` we

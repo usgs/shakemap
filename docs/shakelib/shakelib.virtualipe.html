@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>shakelib.virtualipe &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -30,11 +31,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-shakelib.virtualipe">
+  <section id="module-shakelib.virtualipe">
 <span id="shakelib-virtualipe"></span><h1>shakelib.virtualipe<a class="headerlink" href="#module-shakelib.virtualipe" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="shakelib.virtualipe.VirtualIPE">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.virtualipe.</code><code class="sig-name descname">VirtualIPE</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/virtualipe.html#VirtualIPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.virtualipe.</span></span><span class="sig-name descname"><span class="pre">VirtualIPE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/virtualipe.html#VirtualIPE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openquake.hazardlib.gsim.base.GMPE</span></code></p>
 <p>Implements a virtual IPE that is the combination of a MultiGMPE
 and a GMICE. Will first attempt to use PGV for the intensities,
@@ -52,73 +53,52 @@ only approximately equal the total uncertainty because the GMPEs
 will only produce combined uncertainties that are approximately
 equal to their total uncertainty.</p>
 <dl class="py attribute">
-<dt id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
-<code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = frozenset({&lt;class 'openquake.hazardlib.imt.MMI'&gt;})</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({&lt;function</span> <span class="pre">MMI&gt;})</span></em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>The OpenQuake IMT this module can produce (‘MMI’ only).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
-<code class="sig-name descname">DEFINED_FOR_STANDARD_DEVIATION_TYPES</code><em class="property"> = frozenset({'Total'})</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({'Total'})</span></em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>The OpenQuake standard deviation types that may be produced (will
 depend on the GMPE provided).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="shakelib.virtualipe.VirtualIPE.REQUIRES_DISTANCES">
-<code class="sig-name descname">REQUIRES_DISTANCES</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE.REQUIRES_DISTANCES">
+<span class="sig-name descname"><span class="pre">REQUIRES_DISTANCES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Distance measures required (will depend on the GMPE provided).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
-<code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
 <dd><p>OpenQuake IMC used (will depend on the GMPE, but “Larger” is
 typical).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
-<code class="sig-name descname">DEFINED_FOR_TECTONIC_REGION_TYPE</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_TECTONIC_REGION_TYPE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determined by the GMPE selected.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="shakelib.virtualipe.VirtualIPE.REQUIRES_RUPTURE_PARAMETERS">
-<code class="sig-name descname">REQUIRES_RUPTURE_PARAMETERS</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE.REQUIRES_RUPTURE_PARAMETERS">
+<span class="sig-name descname"><span class="pre">REQUIRES_RUPTURE_PARAMETERS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determined by the GMPE selected.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="shakelib.virtualipe.VirtualIPE.REQUIRES_SITES_PARAMETERS">
-<code class="sig-name descname">REQUIRES_SITES_PARAMETERS</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE.REQUIRES_SITES_PARAMETERS">
+<span class="sig-name descname"><span class="pre">REQUIRES_SITES_PARAMETERS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determined by the GMPE selected.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.virtualipe.VirtualIPE.fromFuncs">
-<em class="property">classmethod </em><code class="sig-name descname">fromFuncs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpe</span></em>, <em class="sig-param"><span class="n">gmice</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/virtualipe.html#VirtualIPE.fromFuncs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.fromFuncs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new VirtualIPE object with the specified MultiGMPE and
-GMICE. There is no default constructor, you must use this method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>gmpe</strong> – An instance of the MultiGMPE object.</p></li>
-<li><p><strong>gmice</strong> – An instance of a GMICE object.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A new instance of a VirtualIPE object.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#shakelib.virtualipe.VirtualIPE" title="shakelib.virtualipe.VirtualIPE"><code class="xref py py-class docutils literal notranslate"><span class="pre">VirtualIPE</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="shakelib.virtualipe.VirtualIPE.get_mean_and_stddevs">
-<code class="sig-name descname">get_mean_and_stddevs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sx</span></em>, <em class="sig-param"><span class="n">rx</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">stddev_types</span></em>, <em class="sig-param"><span class="n">fd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/virtualipe.html#VirtualIPE.get_mean_and_stddevs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.virtualipe.VirtualIPE.get_mean_and_stddevs">
+<span class="sig-name descname"><span class="pre">get_mean_and_stddevs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/virtualipe.html#VirtualIPE.get_mean_and_stddevs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
 <dd><p>See superclass
 <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs">method</a>
 for parameter definitions. The only acceptable IMT is MMI.</p>
@@ -146,7 +126,7 @@ for a detailed discussion of the way the uncertainty is computed.</p>
 
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -183,7 +163,7 @@ for a detailed discussion of the way the uncertainty is computed.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

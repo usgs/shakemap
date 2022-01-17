@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>shakelib.conversions.imt.abrahamson_bhasin_2020 &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-shakelib.conversions.imt.abrahamson_bhasin_2020">
+<span id="shakelib-conversions-imt-abrahamson-bhasin-2020"></span><h1>shakelib.conversions.imt.abrahamson_bhasin_2020<a class="headerlink" href="#module-shakelib.conversions.imt.abrahamson_bhasin_2020" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.imt.abrahamson_bhasin_2020.</span></span><span class="sig-name descname"><span class="pre">AbrahamsonBhasin2020</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/abrahamson_bhasin_2020.html#AbrahamsonBhasin2020"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Module to make conditional conversions from SA(T) to PGV. The user
+provides a magnitude when an instance and the instance can report back
+what period of SA is appropriate to use for computing PGV. The module
+is based upon:</p>
+<p>Abrahamson, N.A., and Bhasin, S. (2020) Conditional ground-motion model
+for peak ground velocity for active crustal regions. PEER Report 2020/05,
+Pacific Earthquake Engineering Research Center, U.C. Berkeley.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020.getTref">
+<span class="sig-name descname"><span class="pre">getTref</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/abrahamson_bhasin_2020.html#AbrahamsonBhasin2020.getTref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020.getTref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the period of the SA amps suitable for conversion to PGV.
+:param None.:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The period of the SA amps to supply to getPGVandSTDDEVS()</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020.getPGVandSTDDEVS">
+<span class="sig-name descname"><span class="pre">getPGVandSTDDEVS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddevs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdtypes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vs30</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/abrahamson_bhasin_2020.html#AbrahamsonBhasin2020.getPGVandSTDDEVS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020.getPGVandSTDDEVS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to compute the PGVs and inflate the uncertainties based on
+the input SA amps and uncertainties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>psa</strong> (<em>np.array</em>) – An array os SA amp of the appropriate period.</p></li>
+<li><p><strong>stddevs</strong> (<em>np.arrays</em>) – A list of one or more array of standard
+deviations of the psa amps. The list may also contain arrays
+of the stddevs inflated by the point-source adjustments. Each
+array must be the same shape as the psa array.</p></li>
+<li><p><strong>sdtypes</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A list of the types of the standard deviations in
+stddevs (in order). These are OpenQuake const.StdDev types.</p></li>
+<li><p><strong>rrup</strong> (<em>np.array</em>) – Rupture distance to the points in psa. Must be
+the same shape as psa.</p></li>
+<li><p><strong>vs30</strong> (<em>np.array</em>) – The Vs30 value at the points in psa. Must be the
+same shape as psa.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ndarray, list): An array of PGV values, and a list of
+stddev arrays corresponding to the input stddev types, now
+with the uncertainty propagated through the conversion.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020PGA">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.imt.abrahamson_bhasin_2020.</span></span><span class="sig-name descname"><span class="pre">AbrahamsonBhasin2020PGA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/abrahamson_bhasin_2020.html#AbrahamsonBhasin2020PGA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020PGA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020" title="shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020</span></code></a></p>
+<p>An alternative to AbrahamsonBhasin2020 when only PGA is available for
+conversion.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020SA1">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.imt.abrahamson_bhasin_2020.</span></span><span class="sig-name descname"><span class="pre">AbrahamsonBhasin2020SA1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/abrahamson_bhasin_2020.html#AbrahamsonBhasin2020SA1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020SA1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020" title="shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.imt.abrahamson_bhasin_2020.AbrahamsonBhasin2020</span></code></a></p>
+<p>An alternative to AbrahamsonBhasin2020 when only SA(1.0) is available for
+conversion.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

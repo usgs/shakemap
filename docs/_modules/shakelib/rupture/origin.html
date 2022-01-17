@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.rupture.origin &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -80,7 +79,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Construct an Origin object.</span>
+        <span class="sd">&quot;&quot;&quot;Construct an Origin object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            event (dict): Dictionary of values. See list above for required</span>
@@ -108,43 +107,45 @@
                 <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Input event dictionary is missing the following &#39;</span>
-                           <span class="s1">&#39;required keys: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="s2">&quot;Input event dictionary is missing the following &quot;</span>
+                <span class="s1">&#39;required keys: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
+            <span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Check some types, ranges, and defaults</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;event id  must be a string.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;event id  must be a string.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">90</span> <span class="ow">or</span> <span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">90</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;lat must be between -90 and 90 degrees.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">90</span> <span class="ow">or</span> <span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">90</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;lat must be between -90 and 90 degrees.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">180</span> <span class="ow">or</span> <span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;lon must be between -180 and 180 degrees.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">180</span> <span class="ow">or</span> <span class="nb">float</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;lon must be between -180 and 180 degrees.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">ekeys</span> <span class="ow">and</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ekeys</span><span class="p">:</span>
-            <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
-            <span class="k">del</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-                <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_MECH</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mech must be SS, NM, RS, or ALL.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">ekeys</span> <span class="ow">and</span> <span class="s2">&quot;mech&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ekeys</span><span class="p">:</span>
+            <span class="n">event</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;mech&quot;</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">event</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_MECH</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mech must be SS, NM, RS, or ALL.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_MECH</span>
+            <span class="n">event</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_MECH</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Add keys as class attributes</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;rake&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;rake&quot;</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
         <span class="c1"># What about rake?</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;rake&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;rake&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mech</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -208,21 +209,23 @@
 <span class="sd">                default value for mechanism (see table above). Value will be</span>
 <span class="sd">                converted to range between -180 and 180 degrees.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">mechs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="mf">40.0</span><span class="p">},</span>
-                 <span class="s1">&#39;NM&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">},</span>
-                 <span class="s1">&#39;SS&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">},</span>
-                 <span class="s1">&#39;ALL&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="mf">45.0</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">}}</span>
+        <span class="n">mechs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;RS&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;rake&quot;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">,</span> <span class="s2">&quot;dip&quot;</span><span class="p">:</span> <span class="mf">40.0</span><span class="p">},</span>
+            <span class="s2">&quot;NM&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;rake&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="s2">&quot;dip&quot;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">},</span>
+            <span class="s2">&quot;SS&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;rake&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;dip&quot;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">},</span>
+            <span class="s2">&quot;ALL&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;rake&quot;</span><span class="p">:</span> <span class="mf">45.0</span><span class="p">,</span> <span class="s2">&quot;dip&quot;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">},</span>
+        <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">mech</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">mechs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
             <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
-                <span class="s1">&#39;Mechanism must be one of: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span>
-                    <span class="nb">list</span><span class="p">(</span><span class="n">mechs</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+                <span class="sa">f</span><span class="s2">&quot;Mechanism must be one of: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mechs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dip</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dip</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Dip must be in range 0-90 degrees.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Dip must be in range 0-90 degrees.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">dip</span> <span class="o">=</span> <span class="n">mechs</span><span class="p">[</span><span class="n">mech</span><span class="p">][</span><span class="s1">&#39;dip&#39;</span><span class="p">]</span>
+            <span class="n">dip</span> <span class="o">=</span> <span class="n">mechs</span><span class="p">[</span><span class="n">mech</span><span class="p">][</span><span class="s2">&quot;dip&quot;</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">rake</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">rake</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span><span class="p">:</span>
@@ -231,10 +234,10 @@
                 <span class="n">rake</span> <span class="o">-=</span> <span class="mi">360</span>
             <span class="k">if</span> <span class="n">rake</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span> <span class="ow">or</span> <span class="n">rake</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                    <span class="s1">&#39;Rake must be transformable to be in range -180 to 180 &#39;</span>
-                    <span class="s1">&#39;degrees.&#39;</span><span class="p">)</span>
+                    <span class="s2">&quot;Rake must be transformable to be in range -180 to 180 &quot;</span> <span class="s2">&quot;degrees.&quot;</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">rake</span> <span class="o">=</span> <span class="n">mechs</span><span class="p">[</span><span class="n">mech</span><span class="p">][</span><span class="s1">&#39;rake&#39;</span><span class="p">]</span>
+            <span class="n">rake</span> <span class="o">=</span> <span class="n">mechs</span><span class="p">[</span><span class="n">mech</span><span class="p">][</span><span class="s2">&quot;rake&quot;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dip</span> <span class="o">=</span> <span class="n">dip</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">rake</span>
@@ -266,29 +269,28 @@
 <span class="sd">        nothing: Nothing.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;earthquake&#39;</span><span class="p">)</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
-            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;reference&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
-            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
-            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;event_type&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ACTUAL&#39;</span><span class="p">,</span> <span class="s1">&#39;SCENARIO&#39;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-                    <span class="s1">&#39;event_type must be &quot;ACTUAL&quot; or &quot;SCENARIO&quot;&#39;</span><span class="p">)</span>
-            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;earthquake&quot;</span><span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;netid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;netid&quot;</span><span class="p">]</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;mag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;locstring&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;locstring&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;mech&quot;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;reference&quot;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;productcode&quot;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;productcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;productcode&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;event_type&quot;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;event_type&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ACTUAL&quot;</span><span class="p">,</span> <span class="s2">&quot;SCENARIO&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;event_type must be &quot;ACTUAL&quot; or &quot;SCENARIO&quot;&#39;</span><span class="p">)</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;event_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;event_type&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ACTUAL&#39;</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;event_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ACTUAL&quot;</span>
 
         <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
         <span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -356,10 +358,10 @@
         <span class="n">root</span> <span class="o">=</span> <span class="n">dET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
     <span class="c1"># Turn XML content into dictionary</span>
-    <span class="k">if</span> <span class="n">root</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">root</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;earthquake&quot;</span><span class="p">:</span>
         <span class="n">xmldict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">eq</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;earthquake&#39;</span><span class="p">)</span>
+        <span class="n">eq</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;earthquake&quot;</span><span class="p">)</span>
         <span class="n">xmldict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
     <span class="n">eqdict</span> <span class="o">=</span> <span class="p">{}</span>
@@ -383,66 +385,69 @@
     <span class="c1">#########################################################</span>
 
     <span class="c1"># read in the id fields</span>
-    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
     <span class="c1"># This isn&#39;t optional, but maybe it isn&#39;t in some old files</span>
-    <span class="k">if</span> <span class="s1">&#39;network&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;network&quot;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;netid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;netid&quot;</span><span class="p">]</span>
 
     <span class="c1"># look for the productcode attribute in the xml,</span>
     <span class="c1"># otherwise use the event id</span>
-    <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;productcode&quot;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;productcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;productcode&quot;</span><span class="p">]</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eventxml</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;productcode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># It&#39;s up to the user of this data how to construct the</span>
         <span class="c1"># product code</span>
         <span class="k">pass</span>
 
     <span class="c1"># Support old event file date/times</span>
-    <span class="k">if</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
-                <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
-                <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+            <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
-                    <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
-                    <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+                <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                    <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span>
+                <span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t convert </span><span class="si">%s</span><span class="s2"> to HistoricTime&quot;</span> <span class="o">%</span>
-                                 <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Couldn&#39;t convert </span><span class="si">{</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> to HistoricTime&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;year&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> <span class="s1">&#39;month&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> \
-           <span class="s1">&#39;day&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> <span class="s1">&#39;hour&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> \
-           <span class="s1">&#39;minute&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span> <span class="ow">or</span> <span class="s1">&#39;second&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;year&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span>
+            <span class="ow">or</span> <span class="s2">&quot;month&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span>
+            <span class="ow">or</span> <span class="s2">&quot;day&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span>
+            <span class="ow">or</span> <span class="s2">&quot;hour&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span>
+            <span class="ow">or</span> <span class="s2">&quot;minute&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span>
+            <span class="ow">or</span> <span class="s2">&quot;second&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xmldict</span>
+        <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing date/time elements in event file.&quot;</span><span class="p">)</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span>
-            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">],</span>
-            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">],</span>
-            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">],</span>
-            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">],</span>
-            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">],</span>
-            <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;day&quot;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;hour&quot;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;minute&quot;</span><span class="p">],</span>
+            <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;second&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
 
-    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
-    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
-    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">])</span>
-    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">])</span>
-    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">])</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">])</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">])</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;mag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;mag&quot;</span><span class="p">])</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;locstring&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;locstring&quot;</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;mech&quot;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;mech&quot;</span><span class="p">]</span>
     <span class="c1"># Older files may have &quot;type&quot; instead of &quot;mech&quot;</span>
-    <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="s1">&#39;reference&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;reference&quot;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">eqdict</span></div>
 
@@ -482,7 +487,7 @@
 
     <span class="c1"># obspy spits out a bunch of warnings we don&#39;t care about</span>
     <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
         <span class="n">catalog</span> <span class="o">=</span> <span class="n">read_events</span><span class="p">(</span><span class="n">momentfile</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
@@ -493,11 +498,11 @@
     <span class="n">focal</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">focal_mechanisms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># get the source and type information, if possible</span>
-    <span class="n">mtype</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+    <span class="n">mtype</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
     <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">method_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mtype</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">method_id</span>
 
-    <span class="n">msource</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+    <span class="n">msource</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
     <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">creation_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">creation_info</span><span class="o">.</span><span class="n">agency_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">msource</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">creation_info</span><span class="o">.</span><span class="n">agency_id</span>
@@ -513,38 +518,35 @@
             <span class="n">mrp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rp</span>
             <span class="n">mtp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_tp</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">fill_tensor_from_components</span><span class="p">(</span>
-                <span class="n">mrr</span><span class="p">,</span> <span class="n">mtt</span><span class="p">,</span>
-                <span class="n">mpp</span><span class="p">,</span> <span class="n">mrt</span><span class="p">,</span>
-                <span class="n">mrp</span><span class="p">,</span> <span class="n">mtp</span><span class="p">,</span>
-                <span class="n">source</span><span class="o">=</span><span class="n">msource</span><span class="p">,</span>
-                <span class="n">mtype</span><span class="o">=</span><span class="n">mtype</span><span class="p">)</span>
+                <span class="n">mrr</span><span class="p">,</span> <span class="n">mtt</span><span class="p">,</span> <span class="n">mpp</span><span class="p">,</span> <span class="n">mrt</span><span class="p">,</span> <span class="n">mrp</span><span class="p">,</span> <span class="n">mtp</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">msource</span><span class="p">,</span> <span class="n">mtype</span><span class="o">=</span><span class="n">mtype</span>
+            <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">plane1</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_1</span>
         <span class="n">plane2</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_2</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
-            <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
-            <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">rake</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;NP1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;strike&quot;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
+            <span class="s2">&quot;dip&quot;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
+            <span class="s2">&quot;rake&quot;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">rake</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
-            <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
-            <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;NP2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;strike&quot;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
+            <span class="s2">&quot;dip&quot;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
+            <span class="s2">&quot;rake&quot;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
-            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;azimuth&quot;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s2">&quot;plunge&quot;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
-            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;azimuth&quot;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s2">&quot;plunge&quot;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
-            <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">plunge</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;azimuth&quot;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+            <span class="s2">&quot;plunge&quot;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="n">moment</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;moment&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
+    <span class="n">moment</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;moment&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">moment</span></div>
 
 
@@ -559,15 +561,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">isFile</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">isFile</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">sourcefile</span>
     <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
             <span class="k">continue</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="c1"># see if this is some sort of number</span>
@@ -618,7 +620,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

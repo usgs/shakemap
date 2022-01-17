@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.directivity.rowshandel2013 &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -98,8 +97,20 @@
     <span class="n">__c2</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.035</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.10</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.26</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.30</span><span class="p">]</span>
     <span class="n">__periods</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">a_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                 <span class="n">mtype</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">simpleDT</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">origin</span><span class="p">,</span>
+        <span class="n">rup</span><span class="p">,</span>
+        <span class="n">lat</span><span class="p">,</span>
+        <span class="n">lon</span><span class="p">,</span>
+        <span class="n">dep</span><span class="p">,</span>
+        <span class="n">dx</span><span class="p">,</span>
+        <span class="n">T</span><span class="p">,</span>
+        <span class="n">a_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">mtype</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">simpleDT</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor for rowshandel2013.</span>
 
@@ -138,10 +149,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_T</span> <span class="o">=</span> <span class="n">T</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">a_weight</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a_weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;a_weight must be between 0 and 1.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;a_weight must be between 0 and 1.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_a_weight</span> <span class="o">=</span> <span class="n">a_weight</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">mtype</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">mtype</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mtype can onlty be 1 or 2.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mtype can onlty be 1 or 2.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mtype</span> <span class="o">=</span> <span class="n">mtype</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_simpleDT</span> <span class="o">=</span> <span class="n">simpleDT</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_centered</span> <span class="o">=</span> <span class="n">centered</span>
@@ -155,8 +166,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__computeFd</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Rowshandel2013.fromSites"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.fromSites">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromSites</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">a_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                  <span class="n">mtype</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">simpleDT</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fromSites</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">origin</span><span class="p">,</span>
+        <span class="n">rup</span><span class="p">,</span>
+        <span class="n">sites</span><span class="p">,</span>
+        <span class="n">dx</span><span class="p">,</span>
+        <span class="n">T</span><span class="p">,</span>
+        <span class="n">a_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">mtype</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">simpleDT</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct a rowshandel2013 instance from a sites instance.</span>
 
 <span class="sd">        Class method for constructing a rowshandel2013 instance from</span>
@@ -197,8 +218,9 @@
         <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
         <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
         <span class="n">dep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span>
-                   <span class="n">a_weight</span><span class="p">,</span> <span class="n">mtype</span><span class="p">,</span> <span class="n">simpleDT</span><span class="p">,</span> <span class="n">centered</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">a_weight</span><span class="p">,</span> <span class="n">mtype</span><span class="p">,</span> <span class="n">simpleDT</span><span class="p">,</span> <span class="n">centered</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rowshandel2013.getFd"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getFd">[docs]</a>    <span class="k">def</span> <span class="nf">getFd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -267,8 +289,9 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centered</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_fd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">c1sel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_WP</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DT</span> <span class="o">*</span> <span class="n">xcipc</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_fd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">c1sel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xi_prime</span> <span class="o">+</span> <span class="n">c2sel</span><span class="p">)</span> <span class="o">*</span> \
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_LD</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DT</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_WP</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="n">c1sel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xi_prime</span> <span class="o">+</span> <span class="n">c2sel</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LD</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DT</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_WP</span>
+                <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__computeWrup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -290,13 +313,11 @@
         <span class="c1"># First find which quad the hypocenter is on</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
 
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">latlon2ecef</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">latlon2ecef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
         <span class="n">hyp_ecef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">]])</span>
         <span class="n">qdist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nquad</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nquad</span><span class="p">):</span>
-            <span class="n">qdist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_quad_distance</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_rup</span><span class="o">.</span><span class="n">getQuadrilaterals</span><span class="p">()[</span><span class="n">i</span><span class="p">],</span> <span class="n">hyp_ecef</span><span class="p">)</span>
+            <span class="n">qdist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_quad_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rup</span><span class="o">.</span><span class="n">getQuadrilaterals</span><span class="p">()[</span><span class="n">i</span><span class="p">],</span> <span class="n">hyp_ecef</span><span class="p">)</span>
         <span class="n">ind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">qdist</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">qdist</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="c1"># *** check that this doesn&#39;t break with more than one quad</span>
         <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rup</span><span class="o">.</span><span class="n">getQuadrilaterals</span><span class="p">()[</span><span class="n">ind</span><span class="p">]</span>
@@ -305,10 +326,12 @@
         <span class="c1"># Compute Wrup on that quad</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
 
-        <span class="n">pp0</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">geo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span>
-            <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">))</span>
-        <span class="n">hyp_ecef</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">geo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">depth</span><span class="p">))</span>
+        <span class="n">pp0</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span>
+            <span class="n">geo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">hyp_ecef</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span>
+            <span class="n">geo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">hp0</span> <span class="o">=</span> <span class="n">hyp_ecef</span> <span class="o">-</span> <span class="n">pp0</span>
         <span class="n">ddv</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_down_dip_vector</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_Wrup</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ddv</span><span class="p">,</span> <span class="n">hp0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span>
@@ -317,8 +340,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the xi&#39; value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">hypo_ecef</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">geo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">depth</span><span class="p">))</span>
+        <span class="n">hypo_ecef</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span>
+            <span class="n">geo</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyp</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="n">slat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lat</span>
         <span class="n">slon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lon</span>
@@ -331,10 +355,15 @@
         <span class="c1"># Make a 3x(#number of sites) matrix of site locations</span>
         <span class="c1"># (rows are x, y, z) in ECEF</span>
         <span class="n">site_ecef_x</span><span class="p">,</span> <span class="n">site_ecef_y</span><span class="p">,</span> <span class="n">site_ecef_z</span> <span class="o">=</span> <span class="n">latlon2ecef</span><span class="p">(</span>
-            <span class="n">slat</span><span class="p">,</span> <span class="n">slon</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">slon</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
-        <span class="n">site_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">site_ecef_x</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
-                             <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">site_ecef_y</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
-                             <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">site_ecef_z</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))])</span>
+            <span class="n">slat</span><span class="p">,</span> <span class="n">slon</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">slon</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">site_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">site_ecef_x</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">site_ecef_y</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">site_ecef_z</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="n">xi_prime_unscaled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">slat</span><span class="p">)</span>
 
@@ -356,18 +385,18 @@
 
             <span class="c1"># Rupture plane normal vector (ECEF coords)</span>
             <span class="n">rpnv</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_normal</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
-            <span class="n">rpnvcol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">rpnv</span><span class="o">.</span><span class="n">x</span><span class="p">],</span>
-                                <span class="p">[</span><span class="n">rpnv</span><span class="o">.</span><span class="n">y</span><span class="p">],</span>
-                                <span class="p">[</span><span class="n">rpnv</span><span class="o">.</span><span class="n">z</span><span class="p">]])</span>
+            <span class="n">rpnvcol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">rpnv</span><span class="o">.</span><span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="n">rpnv</span><span class="o">.</span><span class="n">y</span><span class="p">],</span> <span class="p">[</span><span class="n">rpnv</span><span class="o">.</span><span class="n">z</span><span class="p">]])</span>
 
-            <span class="n">cp_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh</span><span class="p">[</span><span class="s1">&#39;cpx&#39;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
-                               <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh</span><span class="p">[</span><span class="s1">&#39;cpy&#39;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
-                               <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh</span><span class="p">[</span><span class="s1">&#39;cpz&#39;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))])</span>
+            <span class="n">cp_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;cpx&quot;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;cpy&quot;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh</span><span class="p">[</span><span class="s2">&quot;cpz&quot;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
 
             <span class="c1"># Compute matrix of p vectors</span>
-            <span class="n">hypcol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">hypo_ecef</span><span class="o">.</span><span class="n">x</span><span class="p">],</span>
-                               <span class="p">[</span><span class="n">hypo_ecef</span><span class="o">.</span><span class="n">y</span><span class="p">],</span>
-                               <span class="p">[</span><span class="n">hypo_ecef</span><span class="o">.</span><span class="n">z</span><span class="p">]])</span>
+            <span class="n">hypcol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">hypo_ecef</span><span class="o">.</span><span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="n">hypo_ecef</span><span class="o">.</span><span class="n">y</span><span class="p">],</span> <span class="p">[</span><span class="n">hypo_ecef</span><span class="o">.</span><span class="n">z</span><span class="p">]])</span>
             <span class="n">pmat</span> <span class="o">=</span> <span class="n">cp_mat</span> <span class="o">-</span> <span class="n">hypcol</span>
 
             <span class="c1"># Project pmat onto quad</span>
@@ -390,18 +419,17 @@
 
             <span class="c1"># Strike slip and dip slip components of unit slip vector</span>
             <span class="c1"># (ECEF coords)</span>
-            <span class="n">ds_mat</span><span class="p">,</span> <span class="n">ss_mat</span> <span class="o">=</span> <span class="n">_get_quad_slip_ds_ss</span><span class="p">(</span>
-                <span class="n">q</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rake</span><span class="p">,</span> <span class="n">cp_mat</span><span class="p">,</span> <span class="n">pmatnorm</span><span class="p">)</span>
+            <span class="n">ds_mat</span><span class="p">,</span> <span class="n">ss_mat</span> <span class="o">=</span> <span class="n">_get_quad_slip_ds_ss</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rake</span><span class="p">,</span> <span class="n">cp_mat</span><span class="p">,</span> <span class="n">pmatnorm</span><span class="p">)</span>
 
-            <span class="n">slpmat</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds_mat</span> <span class="o">+</span> <span class="n">ss_mat</span><span class="p">)</span>
+            <span class="n">slpmat</span> <span class="o">=</span> <span class="n">ds_mat</span> <span class="o">+</span> <span class="n">ss_mat</span>
             <span class="n">mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">slpmat</span> <span class="o">*</span> <span class="n">slpmat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
             <span class="n">slpmatnorm</span> <span class="o">=</span> <span class="n">slpmat</span> <span class="o">/</span> <span class="n">mag</span>
 
             <span class="c1"># Loop over sites</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">site_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="n">sitecol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">site_mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]],</span>
-                                    <span class="p">[</span><span class="n">site_mat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]],</span>
-                                    <span class="p">[</span><span class="n">site_mat</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">]]])</span>
+                <span class="n">sitecol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="p">[[</span><span class="n">site_mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]],</span> <span class="p">[</span><span class="n">site_mat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]],</span> <span class="p">[</span><span class="n">site_mat</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">]]]</span>
+                <span class="p">)</span>
 
                 <span class="n">qmat</span> <span class="o">=</span> <span class="n">sitecol</span> <span class="o">-</span> <span class="n">cp_mat</span>  <span class="c1"># 3x(ni*nj), like r2</span>
                 <span class="n">mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">qmat</span> <span class="o">*</span> <span class="n">qmat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
@@ -449,10 +477,10 @@
         <span class="c1"># o Normalize xi_prime_s and xi_prime_p</span>
         <span class="c1"># o Reshape them</span>
         <span class="c1"># o Add them together with the &#39;a&#39; weights</span>
-        <span class="n">xi_prime_tmp</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_a_weight</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">xi_prime_s</span> <span class="o">/</span> <span class="n">nsubs</span><span class="p">)</span> <span class="o">+</span> \
-                       <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_weight</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">xi_prime_p</span> <span class="o">/</span> <span class="n">nsubp</span><span class="p">)</span>
-        <span class="n">xi_prime_unscaled</span> <span class="o">=</span> <span class="n">xi_prime_unscaled</span> <span class="o">+</span> \
-            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xi_prime_tmp</span><span class="p">,</span> <span class="n">slat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">xi_prime_tmp</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_a_weight</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">xi_prime_s</span> <span class="o">/</span> <span class="n">nsubs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_weight</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">xi_prime_p</span> <span class="o">/</span> <span class="n">nsubp</span><span class="p">)</span>
+        <span class="n">xi_prime_unscaled</span> <span class="o">=</span> <span class="n">xi_prime_unscaled</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xi_prime_tmp</span><span class="p">,</span> <span class="n">slat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
         <span class="c1"># Scale so that xi_prime has range (0, 1)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mtype</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -541,18 +569,18 @@
         <span class="n">slat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lat</span>
         <span class="n">slon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lon</span>
         <span class="n">site_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">slat</span><span class="p">)</span>
-        <span class="n">ddict</span> <span class="o">=</span> <span class="n">get_distance</span><span class="p">(</span><span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="n">slat</span><span class="p">,</span> <span class="n">slon</span><span class="p">,</span> <span class="n">site_z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rup</span><span class="p">)</span>
-        <span class="n">Rrup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ddict</span><span class="p">[</span><span class="s1">&#39;rrup&#39;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">))</span>
+        <span class="n">ddict</span> <span class="o">=</span> <span class="n">get_distance</span><span class="p">(</span><span class="s2">&quot;rrup&quot;</span><span class="p">,</span> <span class="n">slat</span><span class="p">,</span> <span class="n">slon</span><span class="p">,</span> <span class="n">site_z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rup</span><span class="p">)</span>
+        <span class="n">Rrup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ddict</span><span class="p">[</span><span class="s2">&quot;rrup&quot;</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
         <span class="n">nsite</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Rrup</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simpleDT</span><span class="p">:</span>   <span class="c1"># eqn 3.10</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simpleDT</span><span class="p">:</span>  <span class="c1"># eqn 3.10</span>
             <span class="n">R1</span> <span class="o">=</span> <span class="mi">35</span>
             <span class="n">R2</span> <span class="o">=</span> <span class="mi">70</span>
             <span class="n">DT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nsite</span><span class="p">)</span>
             <span class="n">ix</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([(</span><span class="n">Rrup</span> <span class="o">&gt;</span> <span class="n">R1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Rrup</span> <span class="o">&lt;</span> <span class="n">R2</span><span class="p">)])</span>
             <span class="n">DT</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">Rrup</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">/</span> <span class="n">R1</span>
             <span class="n">DT</span><span class="p">[</span><span class="n">Rrup</span> <span class="o">&gt;=</span> <span class="n">R2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">else</span><span class="p">:</span>                  <span class="c1"># eqn 3.9</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># eqn 3.9</span>
             <span class="k">if</span> <span class="n">period</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">R1</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
                 <span class="n">R2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">20</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">period</span><span class="p">))</span>
@@ -564,8 +592,7 @@
             <span class="c1"># DT[(Rrup &gt; R1) &amp; (Rrup &lt; R2)] = \</span>
             <span class="c1">#    2 - Rrup[(Rrup &gt; R1) &amp; (Rrup &lt; R2)]/(20 + 10 * np.log(period))</span>
             <span class="c1"># Modification:</span>
-            <span class="n">DT</span><span class="p">[(</span><span class="n">Rrup</span> <span class="o">&gt;</span> <span class="n">R1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Rrup</span> <span class="o">&lt;</span> <span class="n">R2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">-</span> \
-                <span class="n">Rrup</span><span class="p">[(</span><span class="n">Rrup</span> <span class="o">&gt;</span> <span class="n">R1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Rrup</span> <span class="o">&lt;</span> <span class="n">R2</span><span class="p">)]</span> <span class="o">/</span> <span class="n">R1</span>
+            <span class="n">DT</span><span class="p">[(</span><span class="n">Rrup</span> <span class="o">&gt;</span> <span class="n">R1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Rrup</span> <span class="o">&lt;</span> <span class="n">R2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">Rrup</span><span class="p">[(</span><span class="n">Rrup</span> <span class="o">&gt;</span> <span class="n">R1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Rrup</span> <span class="o">&lt;</span> <span class="n">R2</span><span class="p">)]</span> <span class="o">/</span> <span class="n">R1</span>
             <span class="c1"># Note: it is not clear if the above modification is &#39;correct&#39;</span>
             <span class="c1">#       but it gives results that make more sense</span>
             <span class="n">DT</span><span class="p">[</span><span class="n">Rrup</span> <span class="o">&gt;=</span> <span class="n">R2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -596,8 +623,9 @@
         <span class="c1"># Update (Rowshandel, personal communication)</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="mf">0.55</span>
         <span class="n">Tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.04</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_M</span> <span class="o">-</span> <span class="mf">6.0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_WP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">)</span> <span class="o">*</span>
-                            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sig</span> <span class="o">*</span> <span class="n">sig</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_WP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sig</span> <span class="o">*</span> <span class="n">sig</span><span class="p">)</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Rowshandel2013.getPeriods"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">getPeriods</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -636,24 +664,48 @@
     <span class="n">s1_local</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_local_unit_slip_vector_SS</span><span class="p">(</span><span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">)</span>
 
     <span class="c1"># Convert to a column array</span>
-    <span class="n">d1_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">d1_local</span><span class="o">.</span><span class="n">x</span><span class="p">],</span>
-                       <span class="p">[</span><span class="n">d1_local</span><span class="o">.</span><span class="n">y</span><span class="p">],</span>
-                       <span class="p">[</span><span class="n">d1_local</span><span class="o">.</span><span class="n">z</span><span class="p">]])</span>
-    <span class="n">s1_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">s1_local</span><span class="o">.</span><span class="n">x</span><span class="p">],</span>
-                       <span class="p">[</span><span class="n">s1_local</span><span class="o">.</span><span class="n">y</span><span class="p">],</span>
-                       <span class="p">[</span><span class="n">s1_local</span><span class="o">.</span><span class="n">z</span><span class="p">]])</span>
+    <span class="n">d1_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">d1_local</span><span class="o">.</span><span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="n">d1_local</span><span class="o">.</span><span class="n">y</span><span class="p">],</span> <span class="p">[</span><span class="n">d1_local</span><span class="o">.</span><span class="n">z</span><span class="p">]])</span>
+    <span class="n">s1_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">s1_local</span><span class="o">.</span><span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="n">s1_local</span><span class="o">.</span><span class="n">y</span><span class="p">],</span> <span class="p">[</span><span class="n">s1_local</span><span class="o">.</span><span class="n">z</span><span class="p">]])</span>
 
     <span class="c1"># Define &#39;local&#39; coordinate system</span>
     <span class="n">qlats</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">latitude</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">q</span><span class="p">]</span>
     <span class="n">qlons</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">longitude</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">q</span><span class="p">]</span>
     <span class="n">proj</span> <span class="o">=</span> <span class="n">OrthographicProjection</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">qlons</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">qlons</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">qlats</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">qlats</span><span class="p">))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">qlons</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">qlons</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">qlats</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">qlats</span><span class="p">)</span>
+    <span class="p">)</span>
 
     <span class="c1"># Convert p and cp to geographic coords</span>
-    <span class="n">p0lat</span><span class="p">,</span> <span class="n">p0lon</span><span class="p">,</span> <span class="n">p0z</span> <span class="o">=</span> <span class="n">ecef2latlon</span><span class="p">(</span><span class="n">cp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">],</span> <span class="n">cp</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">],</span> <span class="n">cp</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">])</span>
-    <span class="n">p1lat</span><span class="p">,</span> <span class="n">p1lon</span><span class="p">,</span> <span class="n">p1z</span> <span class="o">=</span> <span class="n">ecef2latlon</span><span class="p">(</span><span class="n">cp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">],</span>
-                                    <span class="n">cp</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">],</span>
-                                    <span class="n">cp</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">])</span>
+    <span class="n">p0lat</span><span class="p">,</span> <span class="n">p0lon</span><span class="p">,</span> <span class="n">p0z</span> <span class="o">=</span> <span class="n">ecef2latlon</span><span class="p">(</span>
+        <span class="n">cp</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">cp</span><span class="p">[</span>
+            <span class="mi">1</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">cp</span><span class="p">[</span>
+            <span class="mi">2</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">p1lat</span><span class="p">,</span> <span class="n">p1lon</span><span class="p">,</span> <span class="n">p1z</span> <span class="o">=</span> <span class="n">ecef2latlon</span><span class="p">(</span>
+        <span class="n">cp</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="o">+</span> <span class="n">p</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">cp</span><span class="p">[</span>
+            <span class="mi">1</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="o">+</span> <span class="n">p</span><span class="p">[</span>
+            <span class="mi">1</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">cp</span><span class="p">[</span>
+            <span class="mi">2</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="o">+</span> <span class="n">p</span><span class="p">[</span>
+            <span class="mi">2</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
 
     <span class="c1"># Convert p to &#39;local&#39; coords</span>
     <span class="n">p0x</span><span class="p">,</span> <span class="n">p0y</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">p0lon</span><span class="p">,</span> <span class="n">p0lat</span><span class="p">)</span>
@@ -663,37 +715,81 @@
     <span class="n">pz</span> <span class="o">=</span> <span class="n">p1z</span> <span class="o">-</span> <span class="n">p0z</span>
 
     <span class="c1"># Apply sign changes in &#39;local&#39; coords</span>
-    <span class="n">s1mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">s1_col</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">px</span><span class="p">)],</span>
-                      <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">s1_col</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">py</span><span class="p">)],</span>
-                      <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">s1_col</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pz</span><span class="p">)]])</span>
-<span class="c1">#                      [np.abs(s1_col[2])*np.ones_like(pz)]])</span>
+    <span class="n">s1mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">s1_col</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">px</span><span class="p">)],</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">s1_col</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">py</span><span class="p">)],</span>
+            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">s1_col</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pz</span><span class="p">)],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1">#                      [np.abs(s1_col[2])*np.ones_like(pz)]])</span>
 
     <span class="n">dipsign</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rake</span><span class="p">)))</span>
-    <span class="n">d1mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">d1_col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">px</span><span class="p">)</span> <span class="o">*</span> <span class="n">dipsign</span><span class="p">],</span>
-                      <span class="p">[</span><span class="n">d1_col</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">py</span><span class="p">)</span> <span class="o">*</span> <span class="n">dipsign</span><span class="p">],</span>
-                      <span class="p">[</span><span class="n">d1_col</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">pz</span><span class="p">)</span> <span class="o">*</span> <span class="n">dipsign</span><span class="p">]])</span>
+    <span class="n">d1mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="n">d1_col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">px</span><span class="p">)</span> <span class="o">*</span> <span class="n">dipsign</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">d1_col</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">py</span><span class="p">)</span> <span class="o">*</span> <span class="n">dipsign</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">d1_col</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">pz</span><span class="p">)</span> <span class="o">*</span> <span class="n">dipsign</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="c1"># Need to track &#39;origin&#39;</span>
     <span class="n">s0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
 
     <span class="c1"># Convert from &#39;local&#39; to geographic coords</span>
-    <span class="n">s1_ll</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">s1mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">],</span> <span class="n">s1mat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">d1_ll</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">d1mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">],</span> <span class="n">d1mat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">s1_ll</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span>
+        <span class="n">s1mat</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">s1mat</span><span class="p">[</span>
+            <span class="mi">1</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">d1_ll</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span>
+        <span class="n">d1mat</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">d1mat</span><span class="p">[</span>
+            <span class="mi">1</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">s0_ll</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">s0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># And then back to ECEF:</span>
-    <span class="n">s1_ecef</span> <span class="o">=</span> <span class="n">latlon2ecef</span><span class="p">(</span><span class="n">s1_ll</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s1_ll</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s1mat</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">])</span>
-    <span class="n">d1_ecef</span> <span class="o">=</span> <span class="n">latlon2ecef</span><span class="p">(</span><span class="n">d1_ll</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">d1_ll</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d1mat</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">])</span>
+    <span class="n">s1_ecef</span> <span class="o">=</span> <span class="n">latlon2ecef</span><span class="p">(</span>
+        <span class="n">s1_ll</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">s1_ll</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">s1mat</span><span class="p">[</span>
+            <span class="mi">2</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">d1_ecef</span> <span class="o">=</span> <span class="n">latlon2ecef</span><span class="p">(</span>
+        <span class="n">d1_ll</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">d1_ll</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">d1mat</span><span class="p">[</span>
+            <span class="mi">2</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
     <span class="n">s0_ecef</span> <span class="o">=</span> <span class="n">latlon2ecef</span><span class="p">(</span><span class="n">s0_ll</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s0_ll</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s0</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
     <span class="n">s00</span> <span class="o">=</span> <span class="n">s0_ecef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">s01</span> <span class="o">=</span> <span class="n">s0_ecef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">s02</span> <span class="o">=</span> <span class="n">s0_ecef</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">d_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">d1_ecef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s00</span><span class="p">,</span>
-                      <span class="n">d1_ecef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s01</span><span class="p">,</span>
-                      <span class="n">d1_ecef</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s02</span><span class="p">])</span>
-    <span class="n">s_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s1_ecef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s00</span><span class="p">,</span>
-                      <span class="n">s1_ecef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s01</span><span class="p">,</span>
-                      <span class="n">s1_ecef</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s02</span><span class="p">])</span>
+    <span class="n">d_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">d1_ecef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s00</span><span class="p">,</span>
+            <span class="n">d1_ecef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s01</span><span class="p">,</span>
+            <span class="n">d1_ecef</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s02</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">s_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">s1_ecef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s00</span><span class="p">,</span>
+            <span class="n">s1_ecef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s01</span><span class="p">,</span>
+            <span class="n">s1_ecef</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">s02</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">d_mat</span><span class="p">,</span> <span class="n">s_mat</span>
 
 
@@ -711,9 +807,13 @@
     <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="o">-</span><span class="n">axis</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">aa</span><span class="p">,</span> <span class="n">bb</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">dd</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">*</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">*</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">*</span> <span class="n">d</span>
     <span class="n">bc</span><span class="p">,</span> <span class="n">ad</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="n">ab</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">cd</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="n">c</span><span class="p">,</span> <span class="n">a</span> <span class="o">*</span> <span class="n">d</span><span class="p">,</span> <span class="n">a</span> <span class="o">*</span> <span class="n">c</span><span class="p">,</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">,</span> <span class="n">b</span> <span class="o">*</span> <span class="n">d</span><span class="p">,</span> <span class="n">c</span> <span class="o">*</span> <span class="n">d</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">aa</span> <span class="o">+</span> <span class="n">bb</span> <span class="o">-</span> <span class="n">cc</span> <span class="o">-</span> <span class="n">dd</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">bc</span> <span class="o">+</span> <span class="n">ad</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">bd</span> <span class="o">-</span> <span class="n">ac</span><span class="p">)],</span>
-                     <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">bc</span> <span class="o">-</span> <span class="n">ad</span><span class="p">),</span> <span class="n">aa</span> <span class="o">+</span> <span class="n">cc</span> <span class="o">-</span> <span class="n">bb</span> <span class="o">-</span> <span class="n">dd</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">cd</span> <span class="o">+</span> <span class="n">ab</span><span class="p">)],</span>
-                     <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">bd</span> <span class="o">+</span> <span class="n">ac</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">cd</span> <span class="o">-</span> <span class="n">ab</span><span class="p">),</span> <span class="n">aa</span> <span class="o">+</span> <span class="n">dd</span> <span class="o">-</span> <span class="n">bb</span> <span class="o">-</span> <span class="n">cc</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="n">aa</span> <span class="o">+</span> <span class="n">bb</span> <span class="o">-</span> <span class="n">cc</span> <span class="o">-</span> <span class="n">dd</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">bc</span> <span class="o">+</span> <span class="n">ad</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">bd</span> <span class="o">-</span> <span class="n">ac</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">bc</span> <span class="o">-</span> <span class="n">ad</span><span class="p">),</span> <span class="n">aa</span> <span class="o">+</span> <span class="n">cc</span> <span class="o">-</span> <span class="n">bb</span> <span class="o">-</span> <span class="n">dd</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">cd</span> <span class="o">+</span> <span class="n">ab</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">bd</span> <span class="o">+</span> <span class="n">ac</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">cd</span> <span class="o">-</span> <span class="n">ab</span><span class="p">),</span> <span class="n">aa</span> <span class="o">+</span> <span class="n">dd</span> <span class="o">-</span> <span class="n">bb</span> <span class="o">-</span> <span class="n">cc</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
 </pre></div>
 
           </div>
@@ -750,7 +850,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

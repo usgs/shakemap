@@ -108,11 +108,11 @@ Equation (GMICE) must likewise be chosen. The operator may also elect to use an 
 Prediction Equation (IPE) or to use the default virtual IPE. For best results, the operator 
 will need to provide a Vs30 grid, and while the
 `USGS's Vs30 server <http://earthquake.usgs.gov/hazards/apps/vs30/>`_ can supply such a 
-grid based on topographic slope, a grid based on regional geology is preferable [#]_.
+grid based on topographic slope, a grid based on regional geology is preferable.
 This is just a partial list of configuration choices. There are numerous other 
 configurable parameters, all of which must be carefully chosen.
 
-For further information on ShakeMap configuration, see :ref:`<sec-installation-4>` and the 
+For further information on ShakeMap configuration, see :ref:`sec-installation-4` and the 
 ShakeMap configuration files themselves. 
 
 Operations
@@ -346,7 +346,7 @@ To install the ShakeMap software, the
 provides the easiest and most basic approach. Following the process described
 therein and running some practice events should be the first steps for
 anyone wishing to deploy ShakeMap. From there, careful study of the
-:ref:`<technical-guide-4>` is strongly recommended. Reading the 
+:ref:`technical-guide-4` is strongly recommended. Reading the 
 :ref:`users-guide-4` will be necessary to fully understand the ShakeMap
 system and the products it produces.
 

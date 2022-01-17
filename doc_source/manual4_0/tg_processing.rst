@@ -12,7 +12,7 @@ The interpolation is performed by treating the ground motions as a
 conditional
 multivariate normal distribution (MVN). The MVN approach employed by 
 ShakeMap is described in 
-:ref:`Engler et al., 2021 <engler2022>`. The 
+:ref:`Engler et al., 2022 <engler2022>`. The 
 specifics of ShakeMap's implementation of this method are described below.
 
 Note, this document applies to ShakeMap v4.1 and later. For v4.0.x, see
@@ -470,7 +470,7 @@ Interpolation
 
 :ref:`Worden et al. (2018) <worden2018>` discusses the application of
 the MVN to the interpolation of ground motions.
-:ref:`Engler et al. (2021) <engler2022>` updates and improves upon this
+:ref:`Engler et al. (2022) <engler2022>` updates and improves upon this
 approach. Here, we
 discuss some specific details of their implementation within ShakeMap.
 
@@ -739,10 +739,10 @@ Notation
 
 In this section we introduce some additional notation that will be
 used in the following sections. As discussed above, our vector
-:math:`\bmY` is broken into two parts, with part 1 being the elements we
+:math:`\bm{Y}` is broken into two parts, with part 1 being the elements we
 want to predict, and part 2 being our observations. However, our 
 implementation closely follows that of
-:ref:`Engler et al. (2021) <engler2022>`, Appendix B, so we will use
+:ref:`Engler et al. (2022) <engler2022>`, Appendix B, so we will use
 the notation found therein. Thus, the subscript :math:`Y` denotes elements
 we wish to predict, while :math:`D` denotes those with data.
 
@@ -794,7 +794,7 @@ Event Bias
 
 Once the native data have been prepared for a particular output IMT,
 ShakeMap computes an event term (the "bias").
-:ref:`Engler et al. (2021) <engler2022>`, Appendix B, discusses the
+:ref:`Engler et al. (2022) <engler2022>`, Appendix B, discusses the
 calculation
 of the event term in more detail. Of interest, however, is that Engler 
 et al.'s approach allows the proper calculation of the event term in the
@@ -891,7 +891,7 @@ Computing the MVN
 
 While :ref:`subsubsec-mvn-computation` describes the basic MVN process,
 we follow the more advanced techniques described in
-:ref:`Engler et al. (2021) <engler2022>`, Appendix B, in order to produce
+:ref:`Engler et al. (2022) <engler2022>`, Appendix B, in order to produce
 grids not
 only of the conditional total standard deviation, but also of the conditional
 within-event and between-event standard deviations in the presence of
@@ -952,7 +952,7 @@ Thus, to compute the total, within-, and between-event covariances, one
 only need compute two of the three terms of equation 
 :eq:`engler-cond-covariance`.
 
-As was discussed in the section :ref:`subsec-mvn-computation`, for the sake
+As was discussed in the section :ref:`subsubsec-mvn-computation`, for the sake
 of computational practicality only the diagonal terms of the covariance
 matrices are computed.
 

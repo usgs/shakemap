@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.coremods.kml &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -52,33 +51,34 @@
 <span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="kn">import</span> <span class="n">GeoDict</span>
 <span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="kn">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="n">get_config_paths</span>
 <span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="kn">import</span> <span class="n">contour</span>
 <span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="kn">import</span> <span class="n">ColorPalette</span>
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="kn">import</span> <span class="n">Grid2D</span>
 <span class="kn">from</span> <span class="nn">shakemap.c.pcontour</span> <span class="kn">import</span> <span class="n">pcontour</span>
 
-<span class="n">OVERLAY_IMG</span> <span class="o">=</span> <span class="s1">&#39;ii_overlay.png&#39;</span>
-<span class="n">OVERLAY_KML</span> <span class="o">=</span> <span class="s1">&#39;overlay.kml&#39;</span>
-<span class="n">STATION_KML</span> <span class="o">=</span> <span class="s1">&#39;stations.kml&#39;</span>
-<span class="n">CONTOUR_KML</span> <span class="o">=</span> <span class="s1">&#39;mmi_contour.kml&#39;</span>
-<span class="n">POLYGON_KML</span> <span class="o">=</span> <span class="s1">&#39;polygons_mi.kml&#39;</span>
-<span class="n">KMZ_FILE</span> <span class="o">=</span> <span class="s1">&#39;shakemap.kmz&#39;</span>
-<span class="n">KML_FILE</span> <span class="o">=</span> <span class="s1">&#39;shakemap.kml&#39;</span>
-<span class="n">EPICENTER_URL</span> <span class="o">=</span> \
-    <span class="s1">&#39;http://maps.google.com/mapfiles/kml/shapes/capital_big_highlight.png&#39;</span>
-<span class="n">LEGEND</span> <span class="o">=</span> <span class="s1">&#39;intensity_legend.png&#39;</span>
+<span class="n">OVERLAY_IMG</span> <span class="o">=</span> <span class="s2">&quot;ii_overlay.png&quot;</span>
+<span class="n">OVERLAY_KML</span> <span class="o">=</span> <span class="s2">&quot;overlay.kml&quot;</span>
+<span class="n">STATION_KML</span> <span class="o">=</span> <span class="s2">&quot;stations.kml&quot;</span>
+<span class="n">CONTOUR_KML</span> <span class="o">=</span> <span class="s2">&quot;mmi_contour.kml&quot;</span>
+<span class="n">POLYGON_KML</span> <span class="o">=</span> <span class="s2">&quot;polygons_mi.kml&quot;</span>
+<span class="n">KMZ_FILE</span> <span class="o">=</span> <span class="s2">&quot;shakemap.kmz&quot;</span>
+<span class="n">KML_FILE</span> <span class="o">=</span> <span class="s2">&quot;shakemap.kml&quot;</span>
+<span class="n">EPICENTER_URL</span> <span class="o">=</span> <span class="s2">&quot;http://maps.google.com/mapfiles/kml/shapes/capital_big_highlight.png&quot;</span>
+<span class="n">LEGEND</span> <span class="o">=</span> <span class="s2">&quot;intensity_legend.png&quot;</span>
 
 <span class="n">LOOKAT_ALTITUDE</span> <span class="o">=</span> <span class="mi">500000</span>  <span class="c1"># meters</span>
 
-<span class="n">TRIANGLE</span> <span class="o">=</span> <span class="s1">&#39;triangle.png&#39;</span>
-<span class="n">CIRCLE</span> <span class="o">=</span> <span class="s1">&#39;circle.png&#39;</span>
+<span class="n">TRIANGLE</span> <span class="o">=</span> <span class="s2">&quot;triangle.png&quot;</span>
+<span class="n">CIRCLE</span> <span class="o">=</span> <span class="s2">&quot;circle.png&quot;</span>
 
-<span class="n">IMT_UNITS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pga&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;pgv&#39;</span><span class="p">:</span> <span class="s1">&#39;cm/sec&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;sa(0.3)&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;sa(1.0)&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;sa(3.0)&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">}</span>
+<span class="n">IMT_UNITS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;pga&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pgv&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/sec&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 <span class="n">DEFAULT_FILTER_SIZE</span> <span class="o">=</span> <span class="mi">10</span>
 
@@ -205,7 +205,8 @@
     <span class="s2">&quot;10.8&quot;</span><span class="p">:</span> <span class="s2">&quot;ff0000b5&quot;</span><span class="p">,</span>
     <span class="s2">&quot;10.9&quot;</span><span class="p">:</span> <span class="s2">&quot;ff0000b2&quot;</span><span class="p">,</span>
     <span class="s2">&quot;11&quot;</span><span class="p">:</span> <span class="s2">&quot;ff0000b0&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;11.0&quot;</span><span class="p">:</span> <span class="s2">&quot;ff0000b0&quot;</span><span class="p">}</span>
+    <span class="s2">&quot;11.0&quot;</span><span class="p">:</span> <span class="s2">&quot;ff0000b0&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 <span class="n">arabic2roman</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span>
@@ -217,7 +218,8 @@
     <span class="s2">&quot;7&quot;</span><span class="p">:</span> <span class="s2">&quot;VII&quot;</span><span class="p">,</span>
     <span class="s2">&quot;8&quot;</span><span class="p">:</span> <span class="s2">&quot;VIII&quot;</span><span class="p">,</span>
     <span class="s2">&quot;9&quot;</span><span class="p">:</span> <span class="s2">&quot;IX&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;10&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">}</span>
+    <span class="s2">&quot;10&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="KMLModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.KMLModule">[docs]</a><span class="k">class</span> <span class="nc">KMLModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -225,16 +227,16 @@
 <span class="sd">    kml -- Generate KML/KMZ files for ShakeMap.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;kml&#39;</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/shakemap\.kmz&#39;</span><span class="p">]</span>
-    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s2">&quot;kml&quot;</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s2">&quot;products/shakemap\.kmz&quot;</span><span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;products/shake_result.hdf&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate a KMLModule class with an event ID.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">KMLModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s1">&#39;Ground MOtion KMZ File&#39;</span><span class="p">,</span> <span class="s1">&#39;kml&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s2">&quot;Ground MOtion KMZ File&quot;</span><span class="p">,</span> <span class="s2">&quot;kml&quot;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="KMLModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.KMLModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -246,19 +248,20 @@
 <span class="sd">                exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
-        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s2">&quot;current&quot;</span><span class="p">,</span> <span class="s2">&quot;products&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
-        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datadir</span><span class="si">}</span><span class="s2"> is not a valid directory.&quot;</span><span class="p">)</span>
+        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">&quot;shake_result.hdf&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datafile</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;kml module can only contour &#39;</span>
-                                      <span class="s1">&#39;gridded data, not sets of points&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;kml module can only contour &quot;</span> <span class="s2">&quot;gridded data, not sets of points&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># call create_kmz function</span>
         <span class="n">create_kmz</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span>
@@ -272,10 +275,10 @@
 
     <span class="c1"># create the kml text</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
-    <span class="n">eid</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
-    <span class="n">mag</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span>
-    <span class="n">timestr</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;origin_time&#39;</span><span class="p">]</span>
-    <span class="n">namestr</span> <span class="o">=</span> <span class="s1">&#39;ShakeMap </span><span class="si">%s</span><span class="s1"> M</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">eid</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">timestr</span><span class="p">)</span>
+    <span class="n">eid</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;event_id&quot;</span><span class="p">]</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude&quot;</span><span class="p">]</span>
+    <span class="n">timestr</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;origin_time&quot;</span><span class="p">]</span>
+    <span class="n">namestr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ShakeMap </span><span class="si">{</span><span class="n">eid</span><span class="si">}</span><span class="s2"> M</span><span class="si">{</span><span class="n">mag</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">timestr</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">document</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Kml</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">namestr</span><span class="p">)</span>
     <span class="n">nlc</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">NetworkLinkControl</span><span class="p">(</span><span class="n">minrefreshperiod</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
     <span class="n">document</span><span class="o">.</span><span class="n">networklinkcontrol</span> <span class="o">=</span> <span class="n">nlc</span>
@@ -283,33 +286,32 @@
     <span class="n">set_look</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
 
     <span class="c1"># create intensity overlay</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating intensity overlay...&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating intensity overlay...&quot;</span><span class="p">)</span>
     <span class="n">overlay_image</span> <span class="o">=</span> <span class="n">create_overlay</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
-    <span class="n">kmz_contents</span> <span class="o">+=</span> <span class="p">[</span><span class="n">overlay_image</span><span class="p">]</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created intensity overlay image </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">overlay_image</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">overlay_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kmz_contents</span> <span class="o">+=</span> <span class="p">[</span><span class="n">overlay_image</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created intensity overlay image </span><span class="si">{</span><span class="n">overlay_image</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># create station kml</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating station KML...&#39;</span><span class="p">)</span>
-    <span class="n">triangle_file</span><span class="p">,</span> <span class="n">circle_file</span> <span class="o">=</span> <span class="n">create_stations</span><span class="p">(</span><span class="n">container</span><span class="p">,</span>
-                                                 <span class="n">datadir</span><span class="p">,</span>
-                                                 <span class="n">document</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating station KML...&quot;</span><span class="p">)</span>
+    <span class="n">triangle_file</span><span class="p">,</span> <span class="n">circle_file</span> <span class="o">=</span> <span class="n">create_stations</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
     <span class="n">kmz_contents</span> <span class="o">+=</span> <span class="p">[</span><span class="n">triangle_file</span><span class="p">,</span> <span class="n">circle_file</span><span class="p">]</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created station KML&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created station KML&quot;</span><span class="p">)</span>
 
     <span class="c1"># create contour kml</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating contour KML...&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating contour KML...&quot;</span><span class="p">)</span>
     <span class="n">create_contours</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created contour KML&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created contour KML&quot;</span><span class="p">)</span>
 
     <span class="c1"># create MMI polygon kml</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating polygon KML...&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating polygon KML...&quot;</span><span class="p">)</span>
     <span class="n">create_polygons</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created polygon KML&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created polygon KML&quot;</span><span class="p">)</span>
 
     <span class="c1"># create epicenter KML</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating epicenter KML...&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating epicenter KML...&quot;</span><span class="p">)</span>
     <span class="n">create_epicenter</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created epicenter KML&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created epicenter KML&quot;</span><span class="p">)</span>
 
     <span class="c1"># place ShakeMap legend on the screen</span>
     <span class="n">legend_file</span> <span class="o">=</span> <span class="n">place_legend</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
@@ -323,20 +325,23 @@
     <span class="c1"># assemble all the pieces into a KMZ file, and delete source files</span>
     <span class="c1"># as we go</span>
     <span class="n">kmzfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">KMZ_FILE</span><span class="p">)</span>
-    <span class="n">kmzip</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">kmzfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
-                            <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span>
+    <span class="n">kmzip</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">kmzfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">kfile</span> <span class="ow">in</span> <span class="n">kmz_contents</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">arcname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">kfile</span><span class="p">)</span>
         <span class="n">kmzip</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">kfile</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="n">arcname</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">kfile</span><span class="p">)</span>
     <span class="n">kmzip</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="n">ftype</span> <span class="o">=</span> <span class="s1">&#39;application/vnd.google-earth.kml+xml&#39;</span>
-    <span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="s1">&#39;shakemap_kmz&#39;</span><span class="p">,</span> <span class="s1">&#39;ShakeMap Overview KMZ&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;ShakeMap Overview KMZ.&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;shakemap.kmz&#39;</span><span class="p">,</span> <span class="n">ftype</span><span class="p">)</span>
+    <span class="n">ftype</span> <span class="o">=</span> <span class="s2">&quot;application/vnd.google-earth.kml+xml&quot;</span>
+    <span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span>
+        <span class="s2">&quot;shakemap_kmz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ShakeMap Overview KMZ&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ShakeMap Overview KMZ.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;shakemap.kmz&quot;</span><span class="p">,</span>
+        <span class="n">ftype</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Wrote KMZ container file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kmzfile</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote KMZ container file </span><span class="si">{</span><span class="n">kmzfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">kmzfile</span></div>
 
 
@@ -352,18 +357,21 @@
 <span class="sd">        str: Path to output intensity legend file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">icon</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Icon</span><span class="p">(</span><span class="n">href</span><span class="o">=</span><span class="n">LEGEND</span><span class="p">)</span>
-    <span class="n">overlayxy</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">OverlayXY</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">xunits</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">,</span> <span class="n">yunits</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">)</span>
-    <span class="n">screenxy</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">ScreenXY</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">xunits</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">,</span> <span class="n">yunits</span><span class="o">=</span><span class="s1">&#39;fraction&#39;</span><span class="p">)</span>
-    <span class="n">size</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Size</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xunits</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">,</span> <span class="n">yunits</span><span class="o">=</span><span class="s1">&#39;pixels&#39;</span><span class="p">)</span>
-    <span class="n">document</span><span class="o">.</span><span class="n">newscreenoverlay</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Intensity Legend&#39;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">icon</span><span class="p">,</span>
-                              <span class="n">overlayxy</span><span class="o">=</span><span class="n">overlayxy</span><span class="p">,</span>
-                              <span class="n">screenxy</span><span class="o">=</span><span class="n">screenxy</span><span class="p">,</span>
-                              <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">overlayxy</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">OverlayXY</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">xunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">,</span> <span class="n">yunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">)</span>
+    <span class="n">screenxy</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">ScreenXY</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">xunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">,</span> <span class="n">yunits</span><span class="o">=</span><span class="s2">&quot;fraction&quot;</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Size</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">,</span> <span class="n">yunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">)</span>
+    <span class="n">document</span><span class="o">.</span><span class="n">newscreenoverlay</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Intensity Legend&quot;</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">icon</span><span class="p">,</span>
+        <span class="n">overlayxy</span><span class="o">=</span><span class="n">overlayxy</span><span class="p">,</span>
+        <span class="n">screenxy</span><span class="o">=</span><span class="n">screenxy</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># we need to find the legend file and copy it to</span>
     <span class="c1"># the output directory</span>
     <span class="n">this_dir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
-    <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;mapping&#39;</span><span class="p">)</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;mapping&quot;</span><span class="p">)</span>
     <span class="n">legend_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">LEGEND</span><span class="p">)</span>
     <span class="n">legdest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">LEGEND</span><span class="p">)</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">legend_file</span><span class="p">,</span> <span class="n">legdest</span><span class="p">)</span>
@@ -383,19 +391,22 @@
     <span class="n">style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Style</span><span class="p">(</span><span class="n">iconstyle</span><span class="o">=</span><span class="n">iconstyle</span><span class="p">)</span>
 
     <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
-    <span class="n">lon</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
-    <span class="n">lat</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
-    <span class="n">point</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newpoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Earthquake Epicenter&#39;</span><span class="p">,</span>
-                              <span class="n">coords</span><span class="o">=</span><span class="p">[(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)],</span>
-                              <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span>
+    <span class="n">point</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newpoint</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Earthquake Epicenter&quot;</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">[(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)],</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
     <span class="n">point</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">style</span></div>
 
 
 <div class="viewcode-block" id="create_polygons"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_polygons">[docs]</a><span class="k">def</span> <span class="nf">create_polygons</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
 
-    <span class="n">component</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">component</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s2">&quot;MMI&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">component</span> <span class="o">=</span> <span class="n">component</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">gdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s2">&quot;MMI&quot;</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-    <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     <span class="n">cont_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">fgrid</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.5</span>
     <span class="k">if</span> <span class="n">cont_min</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">cont_min</span> <span class="o">=</span> <span class="mf">0.5</span>
@@ -403,66 +414,73 @@
     <span class="k">if</span> <span class="n">cont_max</span> <span class="o">&gt;</span> <span class="mf">10.5</span><span class="p">:</span>
         <span class="n">cont_max</span> <span class="o">=</span> <span class="mf">10.5</span>
     <span class="n">contour_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">cont_min</span><span class="p">,</span> <span class="n">cont_max</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
-    <span class="n">gjson</span> <span class="o">=</span> <span class="n">pcontour</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span>
-                     <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;dx&#39;</span><span class="p">],</span>
-                     <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;dy&#39;</span><span class="p">],</span>
-                     <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;xmin&#39;</span><span class="p">],</span>
-                     <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;ymax&#39;</span><span class="p">],</span>
-                     <span class="n">contour_levels</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">gjson</span> <span class="o">=</span> <span class="n">pcontour</span><span class="p">(</span>
+        <span class="n">fgrid</span><span class="p">,</span>
+        <span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">],</span>
+        <span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">],</span>
+        <span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;xmin&quot;</span><span class="p">],</span>
+        <span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;ymax&quot;</span><span class="p">],</span>
+        <span class="n">contour_levels</span><span class="p">,</span>
+        <span class="mi">4</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">folder</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;MMI Polygons&quot;</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">gjson</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
-        <span class="n">cv</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;MMI </span><span class="si">%g</span><span class="s2"> Polygons&quot;</span> <span class="o">%</span> <span class="n">cv</span><span class="p">)</span>
-        <span class="n">color</span> <span class="o">=</span> <span class="n">color_hash</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">cv</span><span class="p">]</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;MMI </span><span class="si">%g</span><span class="s2"> Polygon&quot;</span> <span class="o">%</span> <span class="n">cv</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">PolyStyle</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">outline</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-                           <span class="n">colormode</span><span class="o">=</span><span class="s1">&#39;normal&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">plist</span> <span class="ow">in</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">gjson</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]:</span>
+        <span class="n">cv</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;MMI </span><span class="si">{</span><span class="n">cv</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> Polygons&quot;</span><span class="p">)</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">color_hash</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cv</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;MMI </span><span class="si">{</span><span class="n">cv</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> Polygon&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">PolyStyle</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">outline</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">colormode</span><span class="o">=</span><span class="s2">&quot;normal&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">plist</span> <span class="ow">in</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;coordinates&quot;</span><span class="p">]:</span>
             <span class="n">ib</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plist</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">ob</span> <span class="o">=</span> <span class="n">coords</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">ib</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">newpolygon</span><span class="p">(</span><span class="n">outerboundaryis</span><span class="o">=</span><span class="n">ob</span><span class="p">,</span> <span class="n">innerboundaryis</span><span class="o">=</span><span class="n">ib</span><span class="p">,</span>
-                             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">newpolygon</span><span class="p">(</span>
+                <span class="n">outerboundaryis</span><span class="o">=</span><span class="n">ob</span><span class="p">,</span> <span class="n">innerboundaryis</span><span class="o">=</span><span class="n">ib</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">)</span>
             <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">polystyle</span> <span class="o">=</span> <span class="n">s</span>
 
     <span class="c1"># Make the polygon labels</span>
     <span class="n">cont_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">fgrid</span><span class="p">))</span>
     <span class="n">cont_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fgrid</span><span class="p">))</span>
     <span class="n">contour_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">cont_min</span><span class="p">,</span> <span class="n">cont_max</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
-    <span class="n">gjson</span> <span class="o">=</span> <span class="n">pcontour</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span>
-                     <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;dx&#39;</span><span class="p">],</span>
-                     <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;dy&#39;</span><span class="p">],</span>
-                     <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;xmin&#39;</span><span class="p">],</span>
-                     <span class="n">gdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">][</span><span class="s1">&#39;ymax&#39;</span><span class="p">],</span>
-                     <span class="n">contour_levels</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">gjson</span> <span class="o">=</span> <span class="n">pcontour</span><span class="p">(</span>
+        <span class="n">fgrid</span><span class="p">,</span>
+        <span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;dx&quot;</span><span class="p">],</span>
+        <span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;dy&quot;</span><span class="p">],</span>
+        <span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;xmin&quot;</span><span class="p">],</span>
+        <span class="n">gdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;ymax&quot;</span><span class="p">],</span>
+        <span class="n">contour_levels</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">f</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;MMI Labels&quot;</span><span class="p">)</span>
     <span class="n">ic</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">IconStyle</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">gjson</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
-        <span class="n">cv</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">gjson</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]:</span>
+        <span class="n">cv</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="n">cv</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.5&quot;</span><span class="p">):</span>
             <span class="k">continue</span>
-        <span class="k">for</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;coordinates&quot;</span><span class="p">]:</span>
             <span class="n">lc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">lc</span> <span class="o">&lt;</span> <span class="mi">150</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">lc</span> <span class="o">&lt;</span> <span class="mi">500</span><span class="p">:</span>
-                    <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+                    <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span>
                 <span class="k">elif</span> <span class="n">lc</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
-                    <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">lc</span><span class="o">/</span><span class="mi">3</span><span class="p">)]</span>
+                    <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lc</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">4</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">lc</span><span class="o">/</span><span class="mi">4</span><span class="p">)]</span>
+                    <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">lc</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+                <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dopts</span><span class="p">:</span>
-                <span class="n">p</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">newpoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">arabic2roman</span><span class="p">[</span><span class="n">cv</span><span class="p">],</span> <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
-                               <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">newpoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">arabic2roman</span><span class="p">[</span><span class="n">cv</span><span class="p">],</span> <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">iconstyle</span> <span class="o">=</span> <span class="n">ic</span></div>
 
 
@@ -476,7 +494,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO - label contours? gx:labelVisibility doesn&#39;t seem to be working...</span>
 
-    <span class="n">folder</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Contours&#39;</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">folder</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Contours&quot;</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">mmi_line_styles</span> <span class="o">=</span> <span class="n">create_line_styles</span><span class="p">()</span>
     <span class="n">pgm_line_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Style</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="n">skml</span><span class="o">.</span><span class="n">LineStyle</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
     <span class="n">ic</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">IconStyle</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -484,19 +502,19 @@
     <span class="n">component</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">imts</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">imts</span><span class="p">:</span>
-        <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">component</span><span class="p">),</span> <span class="n">imt</span><span class="p">,</span>
-                               <span class="n">DEFAULT_FILTER_SIZE</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span>
+            <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">component</span><span class="p">),</span> <span class="n">imt</span><span class="p">,</span> <span class="n">DEFAULT_FILTER_SIZE</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="p">)</span>
         <span class="c1"># make a folder for the contours</span>
-        <span class="n">imt_folder</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> Contours&#39;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">,</span>
-                                      <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">imt_folder</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">imt</span><span class="si">}</span><span class="s2"> Contours&quot;</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">line_string</span> <span class="ow">in</span> <span class="n">line_strings</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">line_string</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">line_string</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">line_string</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">line_string</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">line_list</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">line_string</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">line_string</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;coordinates&quot;</span><span class="p">]:</span>
                 <span class="n">ctext</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">segment</span><span class="p">:</span>
                     <span class="n">ctext</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vertex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vertex</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
@@ -505,24 +523,22 @@
                 <span class="n">lc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ctext</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">lc</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
                     <span class="n">dopts</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">elif</span> <span class="p">(</span><span class="n">ctext</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ctext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span>
-                      <span class="n">ctext</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">ctext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">elif</span> <span class="n">ctext</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ctext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">ctext</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">ctext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">lc</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
-                        <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+                        <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span>
                     <span class="k">elif</span> <span class="n">lc</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
-                        <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">lc</span><span class="o">/</span><span class="mi">3</span><span class="p">)]</span>
+                        <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lc</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)]</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">4</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">lc</span><span class="o">/</span><span class="mi">4</span><span class="p">)]</span>
+                        <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">lc</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">lc</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+                    <span class="n">dopts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">lc</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dopts</span><span class="p">:</span>
-                    <span class="n">p</span> <span class="o">=</span> <span class="n">imt_folder</span><span class="o">.</span><span class="n">newpoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="n">ctext</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
-                                            <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">imt_folder</span><span class="o">.</span><span class="n">newpoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="n">ctext</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                     <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">iconstyle</span> <span class="o">=</span> <span class="n">ic</span>
-            <span class="n">mg</span> <span class="o">=</span> <span class="n">imt_folder</span><span class="o">.</span><span class="n">newmultigeometry</span><span class="p">(</span><span class="n">geometries</span><span class="o">=</span><span class="n">line_list</span><span class="p">,</span>
-                                             <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                                             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+            <span class="n">mg</span> <span class="o">=</span> <span class="n">imt_folder</span><span class="o">.</span><span class="n">newmultigeometry</span><span class="p">(</span>
+                <span class="n">geometries</span><span class="o">=</span><span class="n">line_list</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">imt</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
                 <span class="n">mg</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">mmi_line_styles</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">mg</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">pgm_line_style</span></div>
@@ -538,12 +554,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># set the view so that we&#39;re looking straight down</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
-    <span class="n">lon</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
-    <span class="n">lat</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
-    <span class="n">document</span><span class="o">.</span><span class="n">lookat</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LookAt</span><span class="p">(</span><span class="n">longitude</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span>
-                                  <span class="n">altitude</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">LOOKAT_ALTITUDE</span><span class="p">,</span>
-                                  <span class="n">altitudemode</span><span class="o">=</span><span class="s1">&#39;absolute&#39;</span><span class="p">,</span>
-                                  <span class="n">tilt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">heading</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;event_information&quot;</span><span class="p">][</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span>
+    <span class="n">document</span><span class="o">.</span><span class="n">lookat</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LookAt</span><span class="p">(</span>
+        <span class="n">longitude</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span>
+        <span class="n">latitude</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span>
+        <span class="n">altitude</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">LOOKAT_ALTITUDE</span><span class="p">,</span>
+        <span class="n">altitudemode</span><span class="o">=</span><span class="s2">&quot;absolute&quot;</span><span class="p">,</span>
+        <span class="n">tilt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">heading</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="create_line_styles"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_line_styles">[docs]</a><span class="k">def</span> <span class="nf">create_line_styles</span><span class="p">():</span>
@@ -552,12 +572,11 @@
 <span class="sd">    Args:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">line_styles</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">cpalette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+    <span class="n">cpalette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s2">&quot;mmi&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">mmi</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">):</span>
-        <span class="n">pid</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mmi</span>
-        <span class="n">rgb</span> <span class="o">=</span> <span class="n">cpalette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">mmi</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s1">&#39;hex&#39;</span><span class="p">)</span>
-        <span class="n">line_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LineStyle</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">flip_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span>
-                                    <span class="n">width</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mmi</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">rgb</span> <span class="o">=</span> <span class="n">cpalette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">mmi</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s2">&quot;hex&quot;</span><span class="p">)</span>
+        <span class="n">line_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LineStyle</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">flip_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
         <span class="n">style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Style</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="n">line_style</span><span class="p">)</span>
         <span class="n">line_styles</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
     <span class="k">return</span> <span class="n">line_styles</span></div>
@@ -576,16 +595,15 @@
     <span class="c1"># create the overlay image file</span>
     <span class="n">overlay_img_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">OVERLAY_IMG</span><span class="p">)</span>
     <span class="n">geodict</span> <span class="o">=</span> <span class="n">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">overlay_img_file</span><span class="p">)</span>
-    <span class="n">box</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LatLonBox</span><span class="p">(</span><span class="n">north</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">ymax</span><span class="p">,</span> <span class="n">south</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span>
-                         <span class="n">east</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">west</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">xmin</span><span class="p">)</span>
-    <span class="n">icon</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Icon</span><span class="p">(</span><span class="n">refreshinterval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
-                     <span class="n">refreshmode</span><span class="o">=</span><span class="s1">&#39;onInterval&#39;</span><span class="p">,</span>
-                     <span class="n">href</span><span class="o">=</span><span class="n">OVERLAY_IMG</span><span class="p">)</span>
-    <span class="n">document</span><span class="o">.</span><span class="n">newgroundoverlay</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;IntensityOverlay&#39;</span><span class="p">,</span>
-                              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;ffffffff&#39;</span><span class="p">,</span>
-                              <span class="n">draworder</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                              <span class="n">latlonbox</span><span class="o">=</span><span class="n">box</span><span class="p">,</span>
-                              <span class="n">icon</span><span class="o">=</span><span class="n">icon</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">geodict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LatLonBox</span><span class="p">(</span>
+        <span class="n">north</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">ymax</span><span class="p">,</span> <span class="n">south</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">east</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">west</span><span class="o">=</span><span class="n">geodict</span><span class="o">.</span><span class="n">xmin</span>
+    <span class="p">)</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Icon</span><span class="p">(</span><span class="n">refreshinterval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">refreshmode</span><span class="o">=</span><span class="s2">&quot;onInterval&quot;</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="n">OVERLAY_IMG</span><span class="p">)</span>
+    <span class="n">document</span><span class="o">.</span><span class="n">newgroundoverlay</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;IntensityOverlay&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;ffffffff&quot;</span><span class="p">,</span> <span class="n">draworder</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">latlonbox</span><span class="o">=</span><span class="n">box</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">icon</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">overlay_img_file</span></div>
 
@@ -600,37 +618,39 @@
 <span class="sd">        GeoDict: GeoDict object for the intensity grid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># extract the intensity data from the container</span>
-    <span class="n">comp</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
-    <span class="n">mmigrid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
-    <span class="n">gd</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">])</span>
+    <span class="n">comp</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s2">&quot;MMI&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">comp</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s2">&quot;MMI&quot;</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
+    <span class="n">mmigrid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span>
+    <span class="n">gd</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">imtdict</span><span class="p">[</span><span class="s2">&quot;mean_metadata&quot;</span><span class="p">])</span>
     <span class="n">imtdata</span> <span class="o">=</span> <span class="n">mmigrid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">imtdata</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="c1"># get the intensity colormap</span>
-    <span class="n">palette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+    <span class="n">palette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s2">&quot;mmi&quot;</span><span class="p">)</span>
 
     <span class="c1"># map intensity values into</span>
     <span class="c1"># RGBA array</span>
-    <span class="n">rgba</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">imtdata</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s1">&#39;array&#39;</span><span class="p">)</span>
+    <span class="n">rgba</span> <span class="o">=</span> <span class="n">palette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">imtdata</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">)</span>
 
     <span class="c1"># set the alpha value to 255 wherever we have MMI 0</span>
     <span class="n">rgba</span><span class="p">[</span><span class="n">imtdata</span> <span class="o">&lt;=</span> <span class="mf">1.5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">if</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;CALLED_FROM_PYTEST&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
         <span class="c1"># mask off the areas covered by ocean</span>
-        <span class="n">oceans</span> <span class="o">=</span> <span class="n">shpreader</span><span class="o">.</span><span class="n">natural_earth</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s1">&#39;physical&#39;</span><span class="p">,</span>
-                                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ocean&#39;</span><span class="p">,</span>
-                                         <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">)</span>
+        <span class="n">oceans</span> <span class="o">=</span> <span class="n">shpreader</span><span class="o">.</span><span class="n">natural_earth</span><span class="p">(</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;physical&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ocean&quot;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;10m&quot;</span>
+        <span class="p">)</span>
         <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">oceans</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
             <span class="n">tshapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">))</span>
             <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">tshp</span> <span class="ow">in</span> <span class="n">tshapes</span><span class="p">:</span>
-                <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">tshp</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]))</span>
+                <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">tshp</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">):</span>
-                <span class="n">oceangrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">rasterizeFromGeometry</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span>
-                                                         <span class="n">fillValue</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+                <span class="n">oceangrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">rasterizeFromGeometry</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span> <span class="n">fillValue</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
                 <span class="n">rgba</span><span class="p">[</span><span class="n">oceangrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># save rgba image as png</span>
@@ -652,22 +672,20 @@
 
     <span class="c1"># get a color palette object to convert intensity values to</span>
     <span class="c1"># html colors</span>
-    <span class="n">cpalette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+    <span class="n">cpalette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s2">&quot;mmi&quot;</span><span class="p">)</span>
 
     <span class="c1"># get the station data from the container</span>
     <span class="n">station_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">()</span>
 
     <span class="c1"># Group the MMI and instrumented stations separately</span>
-    <span class="n">mmi_folder</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Macroseismic Stations&quot;</span><span class="p">,</span>
-                                    <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">ins_folder</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Instrumented Stations&quot;</span><span class="p">,</span>
-                                    <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">mmi_folder</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Macroseismic Stations&quot;</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ins_folder</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">newfolder</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Instrumented Stations&quot;</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">station_dict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">station_dict</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]:</span>
         <span class="n">intensity</span> <span class="o">=</span> <span class="n">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
-        <span class="n">rgb</span> <span class="o">=</span> <span class="n">cpalette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">intensity</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s1">&#39;hex&#39;</span><span class="p">)</span>
+        <span class="n">rgb</span> <span class="o">=</span> <span class="n">cpalette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">intensity</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s2">&quot;hex&quot;</span><span class="p">)</span>
         <span class="n">color</span> <span class="o">=</span> <span class="n">flip_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;station_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;seismic&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;station_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;seismic&quot;</span><span class="p">:</span>
             <span class="n">style_map</span> <span class="o">=</span> <span class="n">create_styles</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">TRIANGLE</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
             <span class="n">make_placemark</span><span class="p">(</span><span class="n">ins_folder</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="n">cpalette</span><span class="p">,</span> <span class="n">style_map</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -677,7 +695,7 @@
     <span class="c1"># we need to find the triangle and circle icons and copy them to</span>
     <span class="c1"># the output directory</span>
     <span class="n">this_dir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
-    <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;mapping&#39;</span><span class="p">)</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;mapping&quot;</span><span class="p">)</span>
     <span class="n">triangle_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">TRIANGLE</span><span class="p">)</span>
     <span class="n">circle_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">CIRCLE</span><span class="p">)</span>
     <span class="n">tridest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">TRIANGLE</span><span class="p">)</span>
@@ -697,11 +715,13 @@
 <span class="sd">        cpalette (ColorPalette): Object allowing user to convert MMI to color.</span>
 <span class="sd">        style_map (skml.StyleMap): The style map for the station type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">point</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">newpoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
-                            <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                            <span class="n">description</span><span class="o">=</span><span class="n">get_description_table</span><span class="p">(</span><span class="n">station</span><span class="p">),</span>
-                            <span class="n">altitudemode</span><span class="o">=</span><span class="s1">&#39;clampToGround&#39;</span><span class="p">,</span>
-                            <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">])])</span>
+    <span class="n">point</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">newpoint</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">station</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+        <span class="n">visibility</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">get_description_table</span><span class="p">(</span><span class="n">station</span><span class="p">),</span>
+        <span class="n">altitudemode</span><span class="o">=</span><span class="s2">&quot;clampToGround&quot;</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;coordinates&quot;</span><span class="p">])],</span>
+    <span class="p">)</span>
     <span class="n">point</span><span class="o">.</span><span class="n">stylemap</span> <span class="o">=</span> <span class="n">style_map</span></div>
 
 
@@ -714,16 +734,15 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        float: Intensity value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">intensity</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">intensity</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
-        <span class="n">channels</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]]</span>
-        <span class="k">if</span> <span class="s1">&#39;mmi&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+    <span class="n">intensity</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;intensity&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">intensity</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;channels&quot;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="s2">&quot;mmi&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
             <span class="n">intensity</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mmi_idx</span> <span class="o">=</span> <span class="n">channels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
-            <span class="n">mmid</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">][</span><span class="n">mmi_idx</span><span class="p">]</span>
-            <span class="n">intensity</span> <span class="o">=</span> <span class="n">mmid</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="n">mmi_idx</span> <span class="o">=</span> <span class="n">channels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;mmi&quot;</span><span class="p">)</span>
+            <span class="n">mmid</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;channels&quot;</span><span class="p">][</span><span class="n">mmi_idx</span><span class="p">]</span>
+            <span class="n">intensity</span> <span class="o">=</span> <span class="n">mmid</span><span class="p">[</span><span class="s2">&quot;amplitudes&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">intensity</span></div>
 
 
@@ -736,51 +755,44 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        str: String containing HTML table describing station.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">table</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">border</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="n">border</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;INTENSITY&#39;</span><span class="p">,</span> <span class="s1">&#39;DYFI&#39;</span><span class="p">,</span> <span class="s1">&#39;CIIM&#39;</span><span class="p">]:</span>
-        <span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;DYFI&#39;</span>
+    <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;network&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;INTENSITY&quot;</span><span class="p">,</span> <span class="s2">&quot;DYFI&quot;</span><span class="p">,</span> <span class="s2">&quot;CIIM&quot;</span><span class="p">]:</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="s2">&quot;DYFI&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">network</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
-    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">,</span> <span class="n">network</span><span class="p">)</span>
-    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Station ID&#39;</span><span class="p">,</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
-    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Location&#39;</span><span class="p">,</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">])</span>
-    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span>
-             <span class="s1">&#39;Lat&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span>
-             <span class="s1">&#39;Lon&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span>
-             <span class="s1">&#39;Distance to source&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">])</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;network&quot;</span><span class="p">]</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;Network&quot;</span><span class="p">,</span> <span class="n">network</span><span class="p">)</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;Station ID&quot;</span><span class="p">,</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;Location&quot;</span><span class="p">,</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;location&quot;</span><span class="p">])</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;Lat&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;Lon&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;Distance to source&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="n">intensity_string</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
-    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Intensity&#39;</span><span class="p">,</span> <span class="n">intensity_string</span><span class="p">)</span>
+    <span class="n">intensity_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">intensity_string</span><span class="p">)</span>
 
     <span class="c1"># get the list of IMTs in the station tag</span>
     <span class="n">imt_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
-        <span class="k">for</span> <span class="n">amplitude</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">amplitude</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;mmi&#39;</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;channels&quot;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">amplitude</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">[</span><span class="s2">&quot;amplitudes&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">amplitude</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;mmi&quot;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">imt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amplitude</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+            <span class="n">imt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amplitude</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
 
     <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">imt_list</span><span class="p">:</span>
         <span class="n">imt_str</span> <span class="o">=</span> <span class="n">imt_to_string</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
         <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">imt_str</span><span class="p">,</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">imt</span><span class="p">))</span>
 
-    <span class="n">desc_xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+    <span class="n">desc_xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">desc_xml</span></div>
 
 
 <div class="viewcode-block" id="imt_to_string"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.imt_to_string">[docs]</a><span class="k">def</span> <span class="nf">imt_to_string</span><span class="p">(</span><span class="n">imt</span><span class="p">):</span>
-    <span class="n">non_spectrals</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pga&#39;</span><span class="p">:</span> <span class="s1">&#39;PGA&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;pgv&#39;</span><span class="p">:</span> <span class="s1">&#39;PGV&#39;</span><span class="p">}</span>
+    <span class="n">non_spectrals</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pga&quot;</span><span class="p">:</span> <span class="s2">&quot;PGA&quot;</span><span class="p">,</span> <span class="s2">&quot;pgv&quot;</span><span class="p">:</span> <span class="s2">&quot;PGV&quot;</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">non_spectrals</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">non_spectrals</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
     <span class="n">period</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+\.\d+&quot;</span><span class="p">,</span> <span class="n">imt</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>  <span class="c1"># noqa</span>
-    <span class="n">imt_string</span> <span class="o">=</span> <span class="s1">&#39;PSA </span><span class="si">%s</span><span class="s1"> sec&#39;</span> <span class="o">%</span> <span class="n">period</span>
+    <span class="n">imt_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PSA </span><span class="si">{</span><span class="n">period</span><span class="si">}</span><span class="s2"> sec&quot;</span>
     <span class="k">return</span> <span class="n">imt_string</span></div>
 
 
@@ -793,10 +805,10 @@
 <span class="sd">        value (str): Text for right hand column of row.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">row</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;tr&#39;</span><span class="p">)</span>
-    <span class="n">row_col1</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;td&#39;</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;tr&quot;</span><span class="p">)</span>
+    <span class="n">row_col1</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;td&quot;</span><span class="p">)</span>
     <span class="n">row_col1</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">key</span>
-    <span class="n">row_col2</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;td&#39;</span><span class="p">)</span>
+    <span class="n">row_col2</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;td&quot;</span><span class="p">)</span>
     <span class="n">row_col2</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">value</span></div>
 
 
@@ -810,72 +822,72 @@
 <span class="sd">        str: String containing HTML definition list describing station.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dl</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;dl&quot;</span><span class="p">)</span>
-    <span class="n">network_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">network_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;NETWORK:&#39;</span>
-    <span class="n">network_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;INTENSITY&#39;</span><span class="p">,</span> <span class="s1">&#39;DYFI&#39;</span><span class="p">,</span> <span class="s1">&#39;CIIM&#39;</span><span class="p">]:</span>
-        <span class="n">network_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;DYFI&#39;</span>
+    <span class="n">network_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">network_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;NETWORK:&quot;</span>
+    <span class="n">network_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;network&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;INTENSITY&quot;</span><span class="p">,</span> <span class="s2">&quot;DYFI&quot;</span><span class="p">,</span> <span class="s2">&quot;CIIM&quot;</span><span class="p">]:</span>
+        <span class="n">network_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;DYFI&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">network_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
+        <span class="n">network_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;network&quot;</span><span class="p">]</span>
 
-    <span class="n">station_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">station_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Station ID:&#39;</span>
-    <span class="n">station_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">station_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+    <span class="n">station_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">station_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Station ID:&quot;</span>
+    <span class="n">station_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">station_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
 
-    <span class="n">location_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">location_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Location:&#39;</span>
-    <span class="n">location_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">location_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">]</span>
+    <span class="n">location_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">location_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Location:&quot;</span>
+    <span class="n">location_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">location_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;location&quot;</span><span class="p">]</span>
 
-    <span class="n">lat_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">lat_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Lat:&#39;</span>
-    <span class="n">lat_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">lat_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">lat_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">lat_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Lat:&quot;</span>
+    <span class="n">lat_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">lat_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="n">lon_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">lon_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Lon:&#39;</span>
-    <span class="n">lon_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">lon_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">lon_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">lon_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Lon:&quot;</span>
+    <span class="n">lon_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">lon_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="n">distance_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">distance_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Distance to source:&#39;</span>
-    <span class="n">distance_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">distance_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span>
+    <span class="n">distance_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">distance_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Distance to source:&quot;</span>
+    <span class="n">distance_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">distance_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="n">intensity_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">intensity_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Intensity:&#39;</span>
-    <span class="n">intensity_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">intensity_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+    <span class="n">intensity_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">intensity_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Intensity:&quot;</span>
+    <span class="n">intensity_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">intensity_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="c1"># get the names of all the IMTs</span>
     <span class="c1"># TODO: Get list of IMTs dynamically from the data.</span>
-    <span class="n">pga_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">pga_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PGA:&#39;</span>
-    <span class="n">pga_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">pga_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;pga&#39;</span><span class="p">)</span>
+    <span class="n">pga_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">pga_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;PGA:&quot;</span>
+    <span class="n">pga_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">pga_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s2">&quot;pga&quot;</span><span class="p">)</span>
 
-    <span class="n">pgv_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">pgv_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PGV:&#39;</span>
-    <span class="n">pgv_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">pgv_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;pgv&#39;</span><span class="p">)</span>
+    <span class="n">pgv_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">pgv_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;PGV:&quot;</span>
+    <span class="n">pgv_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">pgv_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s2">&quot;pgv&quot;</span><span class="p">)</span>
 
-    <span class="n">psa03_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">psa03_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PSA 0.3 sec:&#39;</span>
-    <span class="n">psa03_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">psa03_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;sa(0.3)&#39;</span><span class="p">)</span>
+    <span class="n">psa03_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">psa03_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;PSA 0.3 sec:&quot;</span>
+    <span class="n">psa03_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">psa03_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">)</span>
 
-    <span class="n">psa10_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">psa10_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PSA 1.0 sec:&#39;</span>
-    <span class="n">psa10_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">psa10_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;sa(1.0)&#39;</span><span class="p">)</span>
+    <span class="n">psa10_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">psa10_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;PSA 1.0 sec:&quot;</span>
+    <span class="n">psa10_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">psa10_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">)</span>
 
-    <span class="n">psa30_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
-    <span class="n">psa30_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PSA 3.0 sec:&#39;</span>
-    <span class="n">psa30_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
-    <span class="n">psa30_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;sa(3.0)&#39;</span><span class="p">)</span>
+    <span class="n">psa30_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">)</span>
+    <span class="n">psa30_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;PSA 3.0 sec:&quot;</span>
+    <span class="n">psa30_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">)</span>
+    <span class="n">psa30_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">)</span>
 
-    <span class="n">desc_xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">dl</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+    <span class="n">desc_xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">dl</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">desc_xml</span></div>
 
 
@@ -891,23 +903,23 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">imt_max</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="n">units</span> <span class="o">=</span> <span class="n">IMT_UNITS</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">channel</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;channels&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">channel</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">):</span>
             <span class="k">continue</span>
-        <span class="k">for</span> <span class="n">amplitude</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">amplitude</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">imt</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">amplitude</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">[</span><span class="s2">&quot;amplitudes&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">amplitude</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">imt</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">imt_value</span> <span class="o">=</span> <span class="n">amplitude</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">imt_value</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+            <span class="n">imt_value</span> <span class="o">=</span> <span class="n">amplitude</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">imt_value</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="k">if</span> <span class="n">imt_value</span> <span class="o">&gt;</span> <span class="n">imt_max</span><span class="p">:</span>
                 <span class="n">imt_max</span> <span class="o">=</span> <span class="n">imt_value</span>
 
     <span class="k">if</span> <span class="n">imt_max</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">imt_text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_max</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
+        <span class="n">imt_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">imt_max</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">units</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">imt_text</span> <span class="o">=</span> <span class="s1">&#39;nan </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">imt_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;nan </span><span class="si">{</span><span class="n">units</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">return</span> <span class="n">imt_text</span></div>
 
 
@@ -917,13 +929,10 @@
 <span class="sd">    Args:</span>
 <span class="sd">        document (Element): LXML KML Document element.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">style_normal</span> <span class="o">=</span> <span class="n">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">icon_text</span><span class="p">,</span> <span class="n">scale_normal</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
-                                  <span class="n">color</span><span class="p">)</span>
-    <span class="n">style_highlight</span> <span class="o">=</span> <span class="n">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">icon_text</span><span class="p">,</span> <span class="n">scale_highlight</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span>
-                                     <span class="n">color</span><span class="p">)</span>
+    <span class="n">style_normal</span> <span class="o">=</span> <span class="n">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">icon_text</span><span class="p">,</span> <span class="n">scale_normal</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+    <span class="n">style_highlight</span> <span class="o">=</span> <span class="n">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">icon_text</span><span class="p">,</span> <span class="n">scale_highlight</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
 
-    <span class="n">style_map</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">StyleMap</span><span class="p">(</span><span class="n">normalstyle</span><span class="o">=</span><span class="n">style_normal</span><span class="p">,</span>
-                              <span class="n">highlightstyle</span><span class="o">=</span><span class="n">style_highlight</span><span class="p">)</span>
+    <span class="n">style_map</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">StyleMap</span><span class="p">(</span><span class="n">normalstyle</span><span class="o">=</span><span class="n">style_normal</span><span class="p">,</span> <span class="n">highlightstyle</span><span class="o">=</span><span class="n">style_highlight</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">style_map</span></div>
 
 
@@ -937,17 +946,16 @@
 <span class="sd">        label_scale (float): The label scale.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">icon</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Icon</span><span class="p">(</span><span class="n">href</span><span class="o">=</span><span class="n">icon_text</span><span class="p">)</span>
-    <span class="n">icon_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">IconStyle</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">icon_scale</span><span class="p">,</span>
-                                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-                                <span class="n">icon</span><span class="o">=</span><span class="n">icon</span><span class="p">)</span>
-    <span class="n">label_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LabelStyle</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">label_scale</span><span class="p">)</span>
-<span class="c1">#    list_style = skml.ListStyle(listitemtype=&#39;checkHideChildren&#39;)</span>
-    <span class="n">balloon_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">BalloonStyle</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;$[description]&#39;</span><span class="p">)</span>
+    <span class="n">icon_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">IconStyle</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">icon_scale</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">icon</span><span class="p">)</span>
+    <span class="n">label_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">LabelStyle</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label_scale</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1">#    list_style = skml.ListStyle(listitemtype=&#39;checkHideChildren&#39;)</span>
+    <span class="n">balloon_style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">BalloonStyle</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;$[description]&quot;</span><span class="p">)</span>
 
-<span class="c1">#    style = skml.Style(iconstyle=icon_style, labelstyle=label_style,</span>
-<span class="c1">#                       liststyle=list_style, balloonstyle=balloon_style)</span>
-    <span class="n">style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Style</span><span class="p">(</span><span class="n">iconstyle</span><span class="o">=</span><span class="n">icon_style</span><span class="p">,</span> <span class="n">labelstyle</span><span class="o">=</span><span class="n">label_style</span><span class="p">,</span>
-                       <span class="n">balloonstyle</span><span class="o">=</span><span class="n">balloon_style</span><span class="p">)</span>
+    <span class="c1">#    style = skml.Style(iconstyle=icon_style, labelstyle=label_style,</span>
+    <span class="c1">#                       liststyle=list_style, balloonstyle=balloon_style)</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="n">skml</span><span class="o">.</span><span class="n">Style</span><span class="p">(</span>
+        <span class="n">iconstyle</span><span class="o">=</span><span class="n">icon_style</span><span class="p">,</span> <span class="n">labelstyle</span><span class="o">=</span><span class="n">label_style</span><span class="p">,</span> <span class="n">balloonstyle</span><span class="o">=</span><span class="n">balloon_style</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">style</span></div>
 
 
@@ -965,8 +973,8 @@
     <span class="c1"># so given #E1C2D3, (red E1, green C2, blue D3) convert to #ffd3c2e1</span>
     <span class="c1"># where the first hex pair is transparency and the others are in</span>
     <span class="c1"># reverse order.</span>
-    <span class="n">abgr</span> <span class="o">=</span> <span class="n">rgb</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="n">abgr</span> <span class="o">=</span> <span class="s1">&#39;#FF&#39;</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">abgr</span> <span class="o">=</span> <span class="n">rgb</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">abgr</span> <span class="o">=</span> <span class="s2">&quot;#FF&quot;</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">abgr</span> <span class="o">=</span> <span class="n">abgr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">abgr</span></div>
 </pre></div>
@@ -1005,7 +1013,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

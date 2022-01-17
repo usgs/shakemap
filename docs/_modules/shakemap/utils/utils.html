@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.utils.utils &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -46,8 +45,9 @@
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="kn">import</span> <span class="n">ConfigObj</span>
 
 <span class="c1"># url template for json file describing everything we know about a network</span>
-<span class="n">NETWORK_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://earthquake.usgs.gov/data/comcat/&#39;</span>
-                    <span class="s1">&#39;contributor/[NETID]/index.json&#39;</span><span class="p">)</span>
+<span class="n">NETWORK_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;https://earthquake.usgs.gov/data/comcat/&quot;</span> <span class="s2">&quot;contributor/[NETID]/index.json&quot;</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="migrate_gmpe"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.migrate_gmpe">[docs]</a><span class="k">def</span> <span class="nf">migrate_gmpe</span><span class="p">(</span><span class="n">old_gmpe</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -68,34 +68,41 @@
     <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">install_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">install_path</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">install_path</span><span class="p">)</span>
-        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;migrate.conf&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">install_path</span><span class="si">}</span><span class="s2"> is not a valid directory.&quot;</span><span class="p">)</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;migrate.conf&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
             <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> not found.&#39;</span> <span class="o">%</span> <span class="n">config_file</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">old_gmpe</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-            <span class="s1">&#39;ShakeMap 3.5 GMPE </span><span class="si">%s</span><span class="s1"> not found in migrate.conf.&#39;</span> <span class="o">%</span> <span class="n">old_gmpe</span><span class="p">)</span>
-    <span class="n">new_gmpe</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">][</span><span class="n">old_gmpe</span><span class="p">][</span><span class="s1">&#39;openquake&#39;</span><span class="p">]</span>
-    <span class="n">reference</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">][</span><span class="n">old_gmpe</span><span class="p">][</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config_file</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">old_gmpe</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ShakeMap 3.5 GMPE </span><span class="si">{</span><span class="n">old_gmpe</span><span class="si">}</span><span class="s2"> not found in migrate.conf.&quot;</span><span class="p">)</span>
+    <span class="n">new_gmpe</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">][</span><span class="n">old_gmpe</span><span class="p">][</span><span class="s2">&quot;openquake&quot;</span><span class="p">]</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">][</span><span class="n">old_gmpe</span><span class="p">][</span><span class="s2">&quot;reference&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">new_gmpe</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="set_gmpe"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.set_gmpe">[docs]</a><span class="k">def</span> <span class="nf">set_gmpe</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
     <span class="n">gmpe_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">gmpe</span><span class="p">]</span>
     <span class="n">weight_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
-    <span class="n">gmpe_set</span> <span class="o">=</span> <span class="s1">&#39;gmpe_&#39;</span> <span class="o">+</span> <span class="n">eventid</span> <span class="o">+</span> <span class="s1">&#39;_custom&#39;</span>
-    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmpe_set</span>
-    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;gmpe_sets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
-        <span class="p">(</span><span class="n">gmpe_set</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">([</span>
-            <span class="p">(</span><span class="s1">&#39;gmpes&#39;</span><span class="p">,</span> <span class="n">gmpe_list</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;weights&#39;</span><span class="p">,</span> <span class="n">weight_list</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;weights_large_dist&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;dist_cutoff&#39;</span><span class="p">,</span> <span class="s1">&#39;nan&#39;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;site_gmpes&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s1">&#39;weights_site_gmpes&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">)</span>
-        <span class="p">]))])</span>
+    <span class="n">gmpe_set</span> <span class="o">=</span> <span class="s2">&quot;gmpe_&quot;</span> <span class="o">+</span> <span class="n">eventid</span> <span class="o">+</span> <span class="s2">&quot;_custom&quot;</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modeling&quot;</span><span class="p">][</span><span class="s2">&quot;gmpe&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmpe_set</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;gmpe_sets&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">gmpe_set</span><span class="p">,</span>
+                <span class="n">OrderedDict</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">(</span><span class="s2">&quot;gmpes&quot;</span><span class="p">,</span> <span class="n">gmpe_list</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">&quot;weights&quot;</span><span class="p">,</span> <span class="n">weight_list</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">&quot;weights_large_dist&quot;</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">&quot;dist_cutoff&quot;</span><span class="p">,</span> <span class="s2">&quot;nan&quot;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">&quot;site_gmpes&quot;</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">&quot;weights_site_gmpes&quot;</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">config</span></div>
 
 
@@ -109,25 +116,27 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        str: Network name, or &quot;unknown&quot; if input netid is invalid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="n">NETWORK_TEMPLATE</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[NETID]&#39;</span><span class="p">,</span> <span class="n">netid</span><span class="p">)</span>
-    <span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">NETWORK_TEMPLATE</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;[NETID]&quot;</span><span class="p">,</span> <span class="n">netid</span><span class="p">)</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
     <span class="n">fails</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">fails</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fh</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
             <span class="n">jdict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="n">network</span> <span class="o">=</span> <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+            <span class="n">network</span> <span class="o">=</span> <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span>
         <span class="k">except</span> <span class="n">HTTPError</span><span class="p">:</span>
-            <span class="n">error_str</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;No network description found for </span><span class="si">%s</span><span class="s1">. You may &#39;</span>
-                         <span class="s1">&#39;want to make sure that the pages of the form </span><span class="si">%s</span><span class="s1"> &#39;</span>
-                         <span class="s1">&#39;still exist and contact the ShakeMap developers &#39;</span>
-                         <span class="s1">&#39;if they do not.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">netid</span><span class="p">,</span> <span class="n">NETWORK_TEMPLATE</span><span class="p">))</span>
+            <span class="n">error_str</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;No network description found for </span><span class="si">%s</span><span class="s2">. You may &quot;</span>
+                <span class="s2">&quot;want to make sure that the pages of the form </span><span class="si">%s</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;still exist and contact the ShakeMap developers &quot;</span>
+                <span class="s2">&quot;if they do not.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">netid</span><span class="p">,</span> <span class="n">NETWORK_TEMPLATE</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
             <span class="n">fails</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Error in get_network_name: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in get_network_name: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Will try </span><span class="si">%d</span><span class="s2"> more times&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="n">fails</span><span class="p">))</span>
             <span class="n">fails</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
@@ -162,7 +171,7 @@
 <span class="sd">            in the config file..</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cls_abbr</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">obj</span><span class="p">]</span>
-    <span class="n">mods</span> <span class="o">=</span> <span class="n">obj</span> <span class="o">+</span> <span class="s1">&#39;_modules&#39;</span>
+    <span class="n">mods</span> <span class="o">=</span> <span class="n">obj</span> <span class="o">+</span> <span class="s2">&quot;_modules&quot;</span>
     <span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="n">mpath</span><span class="p">)</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">mods</span><span class="p">][</span><span class="n">cls_abbr</span><span class="p">]</span>
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">import_module</span><span class="p">(</span><span class="n">mpath</span><span class="p">),</span> <span class="n">cname</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
@@ -184,8 +193,7 @@
 <span class="sd">        bool: The &quot;answer&quot; return value is True for &quot;yes&quot; or False for &quot;no&quot;.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">valid</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;yes&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;ye&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-             <span class="s2">&quot;no&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;yes&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;ye&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot; [y/n] &quot;</span>
     <span class="k">elif</span> <span class="n">default</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
@@ -193,18 +201,17 @@
     <span class="k">elif</span> <span class="n">default</span> <span class="o">==</span> <span class="s2">&quot;no&quot;</span><span class="p">:</span>
         <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot; [y/N] &quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid default answer: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">default</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid default answer: &#39;</span><span class="si">{</span><span class="n">default</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">question</span> <span class="o">+</span> <span class="n">prompt</span><span class="p">)</span>
         <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">choice</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">choice</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">valid</span><span class="p">[</span><span class="n">default</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">valid</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">valid</span><span class="p">[</span><span class="n">choice</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Please respond with &#39;yes&#39; or &#39;no&#39; &quot;</span>
-                             <span class="s2">&quot;(or &#39;y&#39; or &#39;n&#39;).</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Please respond with &#39;yes&#39; or &#39;no&#39; &quot;</span> <span class="s2">&quot;(or &#39;y&#39; or &#39;n&#39;).</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -241,7 +248,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

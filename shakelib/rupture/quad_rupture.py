@@ -491,12 +491,15 @@ class QuadRupture(Rupture):
             strike (array): Array or list of strike angles (floats).
             dip (array): Array or list of dip angles (floats).
             origin (Origin): Reference to a ShakeMap Origin object.
+
         Returns:
+
             QuadRupture instance.
 
         Raises:
             ShakeLibException: if the lengths of the points arrays are not
                 all equal.
+
         """
         # Verify that arrays are of equal length
         if (

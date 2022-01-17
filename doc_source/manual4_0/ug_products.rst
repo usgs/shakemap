@@ -154,7 +154,7 @@ or datasets, and can contain a dictionary-like set of *attributes*.
 Datasets consist of arrays holding data values, and
 metadata in the form of attributes.  A very good introduction to
 the HDF5 data format can be found
-`here <https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf>`_.
+`at the HDF5 group site <https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf>`_.
 
 *shake_result.hdf* consists of a number of groups and datasets. Our
 implementation of HDF5 uses groups to contain Python dictionaries,
@@ -649,7 +649,7 @@ The following features should be noted:
 - **ln_tau** is the logarithm of the between-even standard deviarion, **ln_phi**
   is the logarithm of the within-even standard deviation, and **ln_sigma**
   is the logarithm of the total standard deviation.
-- Standard deviations for MMI are linear and omit the 'ln_' prefix.
+- Standard deviations for MMI are linear and omit the "ln\_" prefix.
 - If the **flag** attribute is "0" or the empty string, the amplitude is 
   considered unflagged; any other value means the amplitude is flagged and
   therefore not included in the processing.
@@ -817,15 +817,15 @@ seismic station (above), except:
   PGM (i.e., they will have the value 'null').
 
 The station list JSON file is rendered by the online web pages. See
-:num:`Figure #napa-station-table` for an example.
+:num:`Figure #napa-station-table-4` for an example.
 
-.. _napa-station-table:
+.. _napa-station-table-4:
 .. figure:: _static/Napa_station_table.png
    :width: 650px
    :align: left
 
    Station table view from ShakeMap event-specific webpages. Link is at
-   right of tabs above the map (see :num:`Figure #napa-event-page`).
+   right of tabs above the map (see :num:`Figure #napa-event-page-4`).
 
 
 Static Maps and Plots (Images)
@@ -840,9 +840,9 @@ be depicted. Nonetheless, these static maps are ShakeMap’s signature products
 and serve as maps of record and for other purposes, as described below.
 Static maps
 can be accessed and selected using tabs along the top of the USGS earthquake
-event page, as shown in the example in :num:`Figure #napa-event-page`.
+event page, as shown in the example in :num:`Figure #napa-event-page-4`.
 
-.. _napa-event-page:
+.. _napa-event-page-4:
 
 .. figure:: _static/Napa_Event_Page.png  
    :width: 650px	
@@ -877,7 +877,7 @@ provided as described in detail in the :ref:`technical-guide-4`.
 	  
 Strong motion and intensity data symbols default to "see-through” (unfilled)
 mode for the intensity map shown in :num:`Figure #napa-shakemap-mmi` and are
-color-filled for peak ground motion maps (:num:`Figure #napa-pga`). ShakeMap
+color-filled for peak ground motion maps (:num:`Figure #napa-pga-4`). ShakeMap
 operators may chose to modify these defaults using alternative mapping
 configurations.
 
@@ -896,7 +896,7 @@ configurations.
    Note: Map Version Number reflects separate offline processing for this
    Manual.
 
-.. _napa-pga:
+.. _napa-pga-4:
 .. figure:: _static/Napa_ShakeMap_PGA.*
    :width: 650px
    :align: left
@@ -922,7 +922,7 @@ indicate the ground motion of the station converted to intensity.
 The ground-motion values are converted to the intensity color scheme via the
 selected ground-motion--intensity conversion equation (GMICE), and the
 corresponding color scale bar is provided at the bottom of the map (see
-example in :num:`Figure #napa-pga`). 
+example in :num:`Figure #napa-pga-4`). 
 
 Interactive Maps
 -----------------
@@ -934,18 +934,18 @@ layers are provided via GeoJSON, KML, GIS, Raster, and other formats. The
 USGS Earthquake Program Web
 pages employ `Leaflet <http://leafletjs.com/>`_, an open-source JavaScript
 library that is suitable for mobile-friendly interactive maps (see, for
-example, :num:`Figure #napa-contours`). Many of the
+example, :num:`Figure #napa-contours-4`). Many of the
 interactive features are geared towards balancing the experience for both
-desktop and mobile visitors (:num:`Figure #napa-mobile`). Since
+desktop and mobile visitors (:num:`Figure #napa-mobile-4`). Since
 the interactive maps are zoomable, it is convenient to select
 individual stations to query station
 information and amplitudes (see the example in
-:num:`Figure #napa-stationpopup`).
+:num:`Figure #napa-stationpopup-4`).
 The interactive map also allows users to select and show/hide specific layers,
 including seismic stations and DYFI geocoded intensity
-stations (:num:`Figure #napa-dyfi`). 	  
+stations (:num:`Figure #napa-dyfi-4`). 	  
 
-.. _napa-contours:
+.. _napa-contours-4:
 
 .. figure:: _static/Napa_contours_station.png
    :width: 650px
@@ -958,7 +958,7 @@ stations (:num:`Figure #napa-dyfi`).
    by :ref:`Worden et al. \(2012\) <worden2012>`.
 
 
-.. _napa-mobile:
+.. _napa-mobile-4:
 
 .. figure:: _static/Napa_mobile_shakemap.png
    :scale: 40 %
@@ -969,7 +969,7 @@ stations (:num:`Figure #napa-dyfi`).
    (triangles) are color-coded according to their intensity value.
     
 
-.. _napa-stationpopup:
+.. _napa-stationpopup-4:
 
 .. figure:: _static/Napa_contours_station_popup.*
    :width: 650px
@@ -979,7 +979,7 @@ stations (:num:`Figure #napa-dyfi`).
    earthquake showing station information pop-up. 
 
 	   
-.. _napa-dyfi:
+.. _napa-dyfi-4:
 
 .. figure:: _static/Napa_contours-stas-dyfi.png
    :width: 650px
@@ -1025,13 +1025,13 @@ producing the ShakeMap is running an older version of ShakeMap than V4.0.
 
 ShakeMap also produces static graphs of the observational data
 plotted with the biased and unbiased GMPE. For example,
-:num:`Figure #northridge-mi-regr-w-dyfi` shows the 1994 M6.7 Northridge
-earthquake MMI data, and :num:`Figure #northridge-pga-regr-w-dyfi` shows the
+:num:`Figure #northridge-mi-regr-w-dyfi-4` shows the 1994 M6.7 Northridge
+earthquake MMI data, and :num:`Figure #northridge-pga-regr-w-dyfi-4` shows the
 PGA data and GMPE.
 
 
 
-.. _northridge-mi-regr-w-dyfi:
+.. _northridge-mi-regr-w-dyfi-4:
 .. figure:: _static/northridge_mi_regr_w_dyfi.*
    :width: 650px
    :align: left 
@@ -1041,7 +1041,7 @@ PGA data and GMPE.
    plotted with the unbiased (red line) and biased (green line) IPE. The
    dashed green lines show the biased IPE ±3 standard deviations.
 
-.. _northridge-pga-regr-w-dyfi:
+.. _northridge-pga-regr-w-dyfi-4:
 .. figure:: _static/northridge_pga_regr_w_dyfi.*
    :width: 650px
    :align: left 
@@ -1632,14 +1632,16 @@ can be found on the ShakeCast `homepage
 <http://earthquake.usgs.gov/research/software/shakecast.php>`_ and the
 documentation provided therein. 
 
+.. _pdl-client-4:
+
 Product Distribution Layer (PDL) Client
------------------------------------
+---------------------------------------
 
 Finally, for academic and government users, ShakeMap products (and other
 earthquake products) are communicated through the USGS’s `Product Distribution
 Layer (PDL) <http://earthquake.usgs.gov/research/software/#PDL>`_. 
 
-.. _gis_services:
+.. _gis-services-4:
 
 Web Mapping (GIS) Services 
 --------------------------
@@ -1648,7 +1650,7 @@ In addition to the downloadable GIS-formatted ShakeMaps (including shapefiles) t
 readily available for each ShakeMap event, USGS also hosts a real-time
 `30-day Signficant Earthquake GIS ShakeMap Feed
 <https://earthquake.usgs.gov/arcgis/rest/services/eq/sm_ShakeMap30DaySignificant/MapServer>`_.
-`ESRI <http://www.esri.com/>`_ provides a separate
+`ESRI Inc. <http://www.esri.com/>`_ provides a separate
 `Disaster Response ArcGIS service
 <https://www.esri.com/en-us/disaster-response/disasters/earthquakes>`_,
 providing `live feeds

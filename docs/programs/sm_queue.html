@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>sm_queue &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="getdyfi" href="getdyfi.html" />
@@ -32,7 +33,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="sm-queue">
+  <section id="sm-queue">
 <span id="id1"></span><h1>sm_queue<a class="headerlink" href="#sm-queue" title="Permalink to this headline">¶</a></h1>
 <p><blockquote>
 <div><p>Run a daemon process to accept origin, rupture, fault, etc., messages
@@ -42,8 +43,8 @@ and run shake on the event.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">sm_queue</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="section" id="Named Arguments">
-<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
+<section id="options">
+<h2>options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <dl class="option-list">
 <dt><kbd>-a, --attached</kbd></dt>
 <dd><p>Inhibit daemonization and remain attached to the terminal.</p>
@@ -52,8 +53,8 @@ and run shake on the event.</p>
 <dd><p>If the pid lock file can’t be acquired, break the existing lock and acquire a new lock. Do this only if you are certain tha no other sm_queue processes are running.</p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
@@ -87,7 +88,7 @@ and run shake on the event.</p>
 <li class="toctree-l2"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm_profile.html">sm_profile</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">sm_queue</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#options">options</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="getdyfi.html">getdyfi</a></li>
@@ -102,7 +103,7 @@ and run shake on the event.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

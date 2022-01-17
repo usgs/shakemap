@@ -1,4 +1,4 @@
-.. _sec-tg-intensity:
+.. _sec-tg-intensity-4:
 
 *********************************************
 Representing Macroseismic Intensity on Maps

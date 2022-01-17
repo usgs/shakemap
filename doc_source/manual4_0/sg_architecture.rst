@@ -7,7 +7,7 @@ Software Architecture
 Overview
 ========
 
-ShakeMap 4.0 is designed to allow flexibility in the organization of
+ShakeMap v4 is designed to allow flexibility in the organization of
 computing resources. :num:`Figure #architecture-overview` illustrates an
 idealized implementation where data preparation, processing, and rendering
 all take place within separate computational units. The processing sequence
@@ -543,7 +543,7 @@ transfer
 
 There are three main ``transfer`` programs: ``transfer_email`` (which sends
 email to a list of users), ``transfer_pdl`` (which inserts the ShakeMap
-products into the `PDL system <>`_), and ``transfer_scp`` (which does a 
+products into the `PDL system <pdl-client-4>`_), and ``transfer_scp`` (which does a 
 local or remote copy of the products to another filesystem). These programs
 allow the operator to transfer ShakeMap products to
 other systems via PDL or ssh, and notify users with an email with the event
@@ -619,7 +619,7 @@ list of options.
 sm_migrate
 -----------
 
-Migrates a directory of ShakeMap 3.5 data files into ShakeMap 4.0 inputs.
+Migrates a directory of ShakeMap 3.5 data files into ShakeMap v4 inputs.
 The migration of GMPEs is configurable via the *migrate.conf* configuration
 file.
 
