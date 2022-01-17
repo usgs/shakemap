@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>shakelib.distance &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -30,11 +31,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-shakelib.distance">
+  <section id="module-shakelib.distance">
 <span id="shakelib-distance"></span><h1>shakelib.distance<a class="headerlink" href="#module-shakelib.distance" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="shakelib.distance.Distance">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.distance.</code><code class="sig-name descname">Distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpe</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">dep</span></em>, <em class="sig-param"><span class="n">rupture</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#Distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.distance.Distance" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.distance.Distance">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.distance.</span></span><span class="sig-name descname"><span class="pre">Distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rupture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#Distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.distance.Distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class for distance calculations. Primary method is ‘get_distance’. To
 handle multiple segment ruptures, many of the distances are based on the
@@ -62,8 +63,8 @@ can be individual instance or list of instances.</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="shakelib.distance.Distance.fromSites">
-<em class="property">classmethod </em><code class="sig-name descname">fromSites</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpe</span></em>, <em class="sig-param"><span class="n">sites</span></em>, <em class="sig-param"><span class="n">rup</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#Distance.fromSites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.distance.Distance.fromSites" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.distance.Distance.fromSites">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fromSites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#Distance.fromSites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.distance.Distance.fromSites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience class method to construct a Distance object from a sites
 object.</p>
 <dl class="field-list simple">
@@ -83,8 +84,8 @@ can be individual instance or list of instances.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.distance.Distance.getDistanceContext">
-<code class="sig-name descname">getDistanceContext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#Distance.getDistanceContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.distance.Distance.getDistanceContext" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.distance.Distance.getDistanceContext">
+<span class="sig-name descname"><span class="pre">getDistanceContext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#Distance.getDistanceContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.distance.Distance.getDistanceContext" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Openquake distance context
@@ -96,8 +97,8 @@ can be individual instance or list of instances.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakelib.distance.get_distance_measures">
-<code class="sig-prename descclassname">shakelib.distance.</code><code class="sig-name descname">get_distance_measures</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#get_distance_measures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.distance.get_distance_measures" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.distance.get_distance_measures">
+<span class="sig-prename descclassname"><span class="pre">shakelib.distance.</span></span><span class="sig-name descname"><span class="pre">get_distance_measures</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#get_distance_measures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.distance.get_distance_measures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of strings specifying the distance measure types
 (e.g. “repi”, “rhypo”) available for the “methods” argument to
 get_diistance().</p>
@@ -109,8 +110,8 @@ get_diistance().</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakelib.distance.get_distance">
-<code class="sig-prename descclassname">shakelib.distance.</code><code class="sig-name descname">get_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methods</span></em>, <em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">dep</span></em>, <em class="sig-param"><span class="n">rupture</span></em>, <em class="sig-param"><span class="n">dx</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#get_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.distance.get_distance" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.distance.get_distance">
+<span class="sig-prename descclassname"><span class="pre">shakelib.distance.</span></span><span class="sig-name descname"><span class="pre">get_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methods</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rupture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/distance.html#get_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.distance.get_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate distance using any one of a number of distance measures.
 One of quadlist OR hypo must be specified. The following table gives
 the allowed distance strings and a description of each.</p>
@@ -185,7 +186,7 @@ EdgeRupture subclass.</p></li>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -222,7 +223,7 @@ EdgeRupture subclass.</p></li>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

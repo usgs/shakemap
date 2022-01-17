@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>shakelib.multigmpe &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -30,156 +31,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-shakelib.multigmpe">
+  <section id="module-shakelib.multigmpe">
 <span id="shakelib-multigmpe"></span><h1>shakelib.multigmpe<a class="headerlink" href="#module-shakelib.multigmpe" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt id="shakelib.multigmpe.MultiGMPE">
-<em class="property">class </em><code class="sig-prename descclassname">shakelib.multigmpe.</code><code class="sig-name descname">MultiGMPE</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openquake.hazardlib.gsim.base.GMPE</span></code></p>
-<p>Implements a GMPE that is the combination of multiple GMPEs.</p>
-<dl class="py attribute">
-<dt id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
-<code class="sig-name descname">DEFINED_FOR_TECTONIC_REGION_TYPE</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
-<code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
-<code class="sig-name descname">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
-<code class="sig-name descname">DEFINED_FOR_STANDARD_DEVIATION_TYPES</code><em class="property"> = frozenset({'Total'})</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS">
-<code class="sig-name descname">REQUIRES_SITES_PARAMETERS</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS">
-<code class="sig-name descname">REQUIRES_RUPTURE_PARAMETERS</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES">
-<code class="sig-name descname">REQUIRES_DISTANCES</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs">
-<code class="sig-name descname">get_mean_and_stddevs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sites</span></em>, <em class="sig-param"><span class="n">rup</span></em>, <em class="sig-param"><span class="n">dists</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">stddev_types</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.get_mean_and_stddevs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
-<dd><p>See superclass <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs">method</a>.</p>
-<p>Unlike the superclass method, the stddev list returned by this
-function will have twice as many arrays as are requested in
-stddev_types: The first set will include the standard deviation
-inflation due to the point-source to finite fault conversion (if
-any), and the second set will not include this inflation. In the
-case where a finite rupture is provided (and, thus, no point-source
-to finite rupture adjustments are made) the two sets of stddev
-arrays will be identical. Thus, if:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stddev_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTRA_EVENT</span><span class="p">,</span>
-                <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>the returned stddev list will contain six arrays: the first three
-will include the point-source inflation, and the second three will
-not.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="shakelib.multigmpe.MultiGMPE.from_config">
-<em class="property">classmethod </em><code class="sig-name descname">from_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conf</span></em>, <em class="sig-param"><span class="n">filter_imt</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.from_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a MultiGMPE from a config file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>conf</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of config options.</p></li>
-<li><p><strong>filter_imt</strong> (<em>IMT</em>) – An optional IMT to filter/reweight the GMPE list.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>MultiGMPE object.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="shakelib.multigmpe.MultiGMPE.from_list">
-<em class="property">classmethod </em><code class="sig-name descname">from_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpes</span></em>, <em class="sig-param"><span class="n">weights</span></em>, <em class="sig-param"><span class="n">imc</span><span class="o">=</span><span class="default_value">'Greater of two horizontal'</span></em>, <em class="sig-param"><span class="n">default_gmpes_for_site</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_gmpes_for_site_weights</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference_vs30</span><span class="o">=</span><span class="default_value">760</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.from_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.from_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a MultiGMPE instance from lists of GMPEs and weights.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>gmpes</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of OpenQuake
-<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims">GMPE</a>
-instances.</p></li>
-<li><p><strong>weights</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of weights; must sum to 1.0.</p></li>
-<li><p><strong>imc</strong> – Requested intensity measure component. Must be one listed
-<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC">here</a>.
-The amplitudes returned by the GMPEs will be converted to this
-IMT. Default is ‘GREATER_OF_TWO_HORIZONTAL’, which is used by
-ShakeMap. See discussion in
-<a class="reference external" href="http://usgs.github.io/shakemap/tg_choice_of_parameters.html#use-of-peak-values-rather-than-mean">this section</a>
-of the ShakeMap manual.</p></li>
-<li><p><strong>default_gmpes_for_site</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – <p>Optional list of OpenQuake GMPE instance to use as a site term
-for any of the GMPEs that do not have a site term.</p>
-<p class="rubric">Notes</p>
-<ul>
-<li><p>We do not check for consistency in the reference rock
-defintion, so the user nees to be aware of this issue and
-holds responsibiilty for ensuring compatibility.</p></li>
-<li><p>We check whether or not a GMPE has a site term by c
-hecking the REQUIRES_SITES_PARAMETERS slot for vs30.</p></li>
-</ul>
-</p></li>
-<li><p><strong>default_gmpes_for_site_weights</strong> – Weights for default_gmpes_for_site.
-Must sum to one and be same length as default_gmpes_for_site.
-If None, then weights are set to be equal.</p></li>
-<li><p><strong>reference_vs30</strong> – Reference rock Vs30 in m/s. We do not check that this matches
-the reference rock in the GMPEs so this is the responsibility
-of the user.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="shakelib.multigmpe.MultiGMPE.get_site_factors">
-<code class="sig-name descname">get_site_factors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sites</span></em>, <em class="sig-param"><span class="n">rup</span></em>, <em class="sig-param"><span class="n">dists</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.get_site_factors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.get_site_factors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for computing site amplification factors from the defalut GMPE
-to be applied to GMPEs which do not have a site term.</p>
-<p><strong>NOTE</strong> Amps are calculated in natural log units and so the ln(amp)
-is returned.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sites</strong> (<em>SitesContext</em>) – Instance of SitesContext.</p></li>
-<li><p><strong>rup</strong> (<em>RuptureContext</em>) – Instance of RuptureContext.</p></li>
-<li><p><strong>dists</strong> (<em>DistancesContext</em>) – Instance of DistancesContext.</p></li>
-<li><p><strong>imt</strong> – An instance openquake.hazardlib.imt.</p></li>
-<li><p><strong>default</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Boolean of whether or not to return the
-amplificaiton factors for the gmpes or default_gmpes_for_site.
-This argument is primarily only intended to be used internally
-for when we just need to access the default amplifications to
-apply to those GMPEs that do not have site terms.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Site amplifications in natural log units.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="shakelib.multigmpe.MultiGMPE.set_sites_depth_parameters">
-<em class="property">static </em><code class="sig-name descname">set_sites_depth_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sites</span></em>, <em class="sig-param"><span class="n">gmpe</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.set_sites_depth_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.set_sites_depth_parameters" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="shakelib.multigmpe.set_sites_depth_parameters">
+<span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">set_sites_depth_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#set_sites_depth_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.set_sites_depth_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Need to select the appropriate z1pt0 value for different GMPEs.
 Note that these are required site parameters, so even though
 OQ has these equations built into the class in most cases.
@@ -200,67 +56,150 @@ requested GMPE.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="shakelib.multigmpe.MultiGMPE.describe">
-<code class="sig-name descname">describe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.describe" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a dictionary that describes the MultiGMPE.</p>
-<p>Note: For simplicity, this method ignores issues related to
-GMPEs used for the site term and changes in the GMPE with
-distance. For this level of detail, please see the config files.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="shakelib.multigmpe.stuff_context">
+<span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">stuff_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dists</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#stuff_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.stuff_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to fill a rupture context with the contents of all of the
+other contexts.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dictionary representation of the MultiGMPE.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sites</strong> (<em>SiteCollection</em>) – A SiteCollection object.</p></li>
+<li><p><strong>rup</strong> (<em>RuptureContext</em>) – A RuptureContext object.</p></li>
+<li><p><strong>dists</strong> (<em>DistanceContext</em>) – A DistanceContext object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A new RuptureContext whose attributes are all of
+the elements of the three inputs.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>RuptureContext</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="shakelib.multigmpe.MultiGMPE.inflatePSSigma">
-<code class="sig-name descname">inflatePSSigma</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpe</span></em>, <em class="sig-param"><span class="n">lmean</span></em>, <em class="sig-param"><span class="n">lsd</span></em>, <em class="sig-param"><span class="n">sites</span></em>, <em class="sig-param"><span class="n">rup</span></em>, <em class="sig-param"><span class="n">dists</span></em>, <em class="sig-param"><span class="n">imt</span></em>, <em class="sig-param"><span class="n">stddev_types</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.inflatePSSigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.inflatePSSigma" title="Permalink to this definition">¶</a></dt>
-<dd><p>If the point-source to finite-fault factors are used, we need to
-inflate the intra-event and total standard deviations. We do this
-by standard propagation of error techniques: taking the (numerical)
-derivative of the GMPE (as a function of distance) squared times the
-additional variance from the conversion, added
-to the variance of the GMPE (then taking the square root). We do
-this separately for each of Rrup and Rjb and sum the results.
-If Rrup and Rjb are calculated from a finite rupture model, their
-variance arrays will be “None” and lsd will remain unchanged.
-Otherwise the error inflation will be applied. Normally one or the
-other of Rrup/Rjb will not be used and so that term will be zero; in
-some cases both may be used and both may result in non-zero
-derivatives.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="shakelib.multigmpe.get_gmpe_from_name">
+<span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">get_gmpe_from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#get_gmpe_from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.get_gmpe_from_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">MultiGMPE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openquake.hazardlib.gsim.base.GMPE</span></code></p>
+<p>Implements a GMPE that is the combination of multiple GMPEs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_TECTONIC_REGION_TYPE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference to a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">tectonic</span> <span class="pre">region</span> <span class="pre">type</span></code> this GSIM
+is defined for. One GSIM can implement only one tectonic region type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set of <code class="xref py py-mod docutils literal notranslate"><span class="pre">intensity</span> <span class="pre">measure</span> <span class="pre">types</span></code>
+this GSIM can
+calculate. A set should contain classes from module
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">openquake.hazardlib.imt</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>intensity measure component type
+&lt;openquake.hazardlib.const.IMC&gt;</cite> this GSIM can calculate mean
+and standard
+deviation for.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>gmpe</strong> – The GMPE to use for the calculations. Must be a base GMPE and
-not a GMPE set, otherwise no action is taken.</p></li>
-<li><p><strong>lmean</strong> – The mean values returned by the “normal” evaluation of the
-GMPE.</p></li>
-<li><p><strong>lsd</strong> – The standard deviations returned by the “normal” evaluation
-of the GMPE.</p></li>
-<li><p><strong>sites</strong> – The sites context required by the GMPE.</p></li>
-<li><p><strong>rup</strong> – The rupture context required by the GMPE.</p></li>
-<li><p><strong>dists</strong> – The distance context required by the GMPE.</p></li>
-<li><p><strong>imt</strong> – The intensity measure type being evaluated.</p></li>
-<li><p><strong>stddev_types</strong> – The list of stddev types found in lsd.</p></li>
-</ul>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Reference to a</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list of arrays of inflated standard deviations
-corresponding to the elements of lsd.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>class</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({'Total'})</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">standard</span> <span class="pre">deviation</span> <span class="pre">types</span></code>
+this GSIM can calculate.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS">
+<span class="sig-name descname"><span class="pre">REQUIRES_SITES_PARAMETERS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set of site parameters names this GSIM needs. The set should include
+strings that match names of the attributes of a <code class="xref py py-class docutils literal notranslate"><span class="pre">site</span></code> object.
+Those attributes are then available in the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SitesContext</span></code> object with the same names.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS">
+<span class="sig-name descname"><span class="pre">REQUIRES_RUPTURE_PARAMETERS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set of rupture parameters (excluding distance information) required
+by GSIM. Supported parameters are:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">mag</span></code></dt><dd><p>Magnitude of the rupture.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">dip</span></code></dt><dd><p>Rupture’s surface dip angle in decimal degrees.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rake</span></code></dt><dd><p>Angle describing the slip propagation on the rupture surface,
+in decimal degrees. See <code class="xref py py-mod docutils literal notranslate"><span class="pre">nodalplane</span></code>
+for more detailed description of dip and rake.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ztor</span></code></dt><dd><p>Depth of rupture’s top edge in km. See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_top_edge_depth()</span></code>.</p>
+</dd>
+</dl>
+<p>These parameters are available from the <code class="xref py py-class docutils literal notranslate"><span class="pre">RuptureContext</span></code> object
+attributes with same names.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES">
+<span class="sig-name descname"><span class="pre">REQUIRES_DISTANCES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dppvalue()</span></code>.
+<code class="docutils literal notranslate"><span class="pre">rvolc</span></code></p>
+<blockquote>
+<div><p>Source to site distance passing through surface projection of volcanic zone</p>
+</div></blockquote>
+<p>All the distances are available from the <code class="xref py py-class docutils literal notranslate"><span class="pre">DistancesContext</span></code>
+object attributes with same names. Values are in kilometers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs">
+<span class="sig-name descname"><span class="pre">get_mean_and_stddevs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev_types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.get_mean_and_stddevs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
+<dd><p>See superclass <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs">method</a>.</p>
+<p>Unlike the superclass method, the stddev list returned by this
+function will have twice as many arrays as are requested in
+stddev_types: The first set will include the standard deviation
+inflation due to the point-source to finite fault conversion (if
+any), and the second set will not include this inflation. In the
+case where a finite rupture is provided (and, thus, no point-source
+to finite rupture adjustments are made) the two sets of stddev
+arrays will be identical. Thus, if:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stddev_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTRA_EVENT</span><span class="p">,</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>the returned stddev list will contain six arrays: the first three
+will include the point-source inflation, and the second three will
+not.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakelib.multigmpe.filter_gmpe_list">
-<code class="sig-prename descclassname">shakelib.multigmpe.</code><code class="sig-name descname">filter_gmpe_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpes</span></em>, <em class="sig-param"><span class="n">wts</span></em>, <em class="sig-param"><span class="n">imt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#filter_gmpe_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.filter_gmpe_list" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.multigmpe.filter_gmpe_list">
+<span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">filter_gmpe_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmpes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#filter_gmpe_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.filter_gmpe_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to remove GMPEs from the GMPE list that are not applicable
 to a specific IMT. Rescales the weights to sum to one.</p>
 <dl class="field-list simple">
@@ -281,8 +220,8 @@ to a specific IMT. Rescales the weights to sum to one.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakelib.multigmpe.get_gmpe_sa_periods">
-<code class="sig-prename descclassname">shakelib.multigmpe.</code><code class="sig-name descname">get_gmpe_sa_periods</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpe</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#get_gmpe_sa_periods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.get_gmpe_sa_periods" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.multigmpe.get_gmpe_sa_periods">
+<span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">get_gmpe_sa_periods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#get_gmpe_sa_periods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.get_gmpe_sa_periods" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to extract the SA periods defined by a GMPE.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -296,8 +235,8 @@ to a specific IMT. Rescales the weights to sum to one.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakelib.multigmpe.get_gmpe_coef_table">
-<code class="sig-prename descclassname">shakelib.multigmpe.</code><code class="sig-name descname">get_gmpe_coef_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gmpe</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#get_gmpe_coef_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.get_gmpe_coef_table" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.multigmpe.get_gmpe_coef_table">
+<span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">get_gmpe_coef_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#get_gmpe_coef_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.get_gmpe_coef_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for finding the (or “a”) GMPE table.</p>
 <p class="rubric">Notes</p>
 <ul class="simple">
@@ -318,7 +257,7 @@ tables.</p></li>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -355,7 +294,7 @@ tables.</p></li>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

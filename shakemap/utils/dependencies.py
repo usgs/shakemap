@@ -244,6 +244,7 @@ class CommandDatabase(object):
                 out-of-date: the dependencies are newer than the output, so
                     the command should be run
                 okay: The output is up to date relative to the dependencies
+
         """
         tree = self.__buildDependencyTree(cmd)
 

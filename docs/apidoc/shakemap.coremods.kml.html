@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>shakemap.coremods.kml &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap.coremods.mapping" href="shakemap.coremods.mapping.html" />
@@ -32,32 +33,32 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-shakemap.coremods.kml">
+  <section id="module-shakemap.coremods.kml">
 <span id="shakemap-coremods-kml"></span><h1>shakemap.coremods.kml<a class="headerlink" href="#module-shakemap.coremods.kml" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="shakemap.coremods.kml.KMLModule">
-<em class="property">class </em><code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">KMLModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#KMLModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.KMLModule" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.KMLModule">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">KMLModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#KMLModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.KMLModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <p>kml – Generate KML/KMZ files for ShakeMap.</p>
 <p>Instantiate a KMLModule class with an event ID.</p>
 <dl class="py attribute">
-<dt id="shakemap.coremods.kml.KMLModule.command_name">
-<code class="sig-name descname">command_name</code><em class="property"> = 'kml'</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.command_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.KMLModule.command_name">
+<span class="sig-name descname"><span class="pre">command_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'kml'</span></em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="shakemap.coremods.kml.KMLModule.targets">
-<code class="sig-name descname">targets</code><em class="property"> = ['products/shakemap\\.kmz']</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.targets" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.KMLModule.targets">
+<span class="sig-name descname"><span class="pre">targets</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['products/shakemap\\.kmz']</span></em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.targets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="shakemap.coremods.kml.KMLModule.dependencies">
-<code class="sig-name descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.dependencies" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.KMLModule.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[('products/shake_result.hdf',</span> <span class="pre">True)]</span></em><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.coremods.kml.KMLModule.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#KMLModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.execute" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.KMLModule.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#KMLModule.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.KMLModule.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create KML files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -73,13 +74,13 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_kmz">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_kmz</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">contents</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_kmz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_kmz" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_kmz">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_kmz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_kmz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_kmz" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.place_legend">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">place_legend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#place_legend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.place_legend" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.place_legend">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">place_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#place_legend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.place_legend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Place the ShakeMap intensity legend in the upper left corner of
 the viewer’s map.</p>
 <dl class="field-list simple">
@@ -99,8 +100,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_epicenter">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_epicenter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_epicenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_epicenter" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_epicenter">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_epicenter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_epicenter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_epicenter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Place a star marker at earthquake epicenter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -113,13 +114,13 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_polygons">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_polygons</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_polygons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_polygons" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_polygons">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_polygons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_polygons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_polygons" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_contours">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_contours</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_contours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_contours" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_contours">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_contours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_contours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_contours" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a KML file containing MMI contour lines.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -133,8 +134,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.set_look">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">set_look</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">document</span></em>, <em class="sig-param"><span class="n">container</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#set_look"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.set_look" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.set_look">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">set_look</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#set_look"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.set_look" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the view location, altitude, and angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -147,15 +148,15 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_line_styles">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_line_styles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_line_styles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_line_styles" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_line_styles">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_line_styles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_line_styles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_line_styles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create line styles for contour KML.</p>
 <p>Args:</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_overlay">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_overlay</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_overlay">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_overlay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a KML file and intensity map.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -175,8 +176,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_overlay_image">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_overlay_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay_image" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_overlay_image">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_overlay_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_overlay_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_overlay_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a semi-transparent PNG image of intensity.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -195,8 +196,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_stations">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_stations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">datadir</span></em>, <em class="sig-param"><span class="n">document</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_stations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_stations" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_stations">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_stations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_stations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_stations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a KMZ file containing station KML and necessary icons files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -216,8 +217,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.make_placemark">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">make_placemark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder</span></em>, <em class="sig-param"><span class="n">station</span></em>, <em class="sig-param"><span class="n">cpalette</span></em>, <em class="sig-param"><span class="n">style_map</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#make_placemark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.make_placemark" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.make_placemark">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">make_placemark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpalette</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style_map</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#make_placemark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.make_placemark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a placemark element in station KML.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -232,8 +233,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.get_intensity">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">get_intensity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">station</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_intensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_intensity" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.get_intensity">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">get_intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_intensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.get_intensity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the intensity value from a station dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -249,8 +250,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.get_description_table">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">get_description_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">station</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_description_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_description_table" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.get_description_table">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">get_description_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_description_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.get_description_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get station description as HTML table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -266,13 +267,13 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.imt_to_string">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">imt_to_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#imt_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.imt_to_string" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.imt_to_string">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">imt_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#imt_to_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.imt_to_string" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.make_row">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">make_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#make_row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.make_row" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.make_row">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">make_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#make_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.make_row" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a row in the description table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -286,8 +287,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.get_description">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">get_description</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">station</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_description" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.get_description">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">get_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.get_description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get station description as HTML definition list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -303,8 +304,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.get_imt_text">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">get_imt_text</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">station</span></em>, <em class="sig-param"><span class="n">imt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_imt_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.get_imt_text" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.get_imt_text">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">get_imt_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#get_imt_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.get_imt_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a text string describing the value of input IMT.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -323,8 +324,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.create_styles">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">create_styles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">document</span></em>, <em class="sig-param"><span class="n">icon_text</span></em>, <em class="sig-param"><span class="n">scale_normal</span></em>, <em class="sig-param"><span class="n">scale_highlight</span></em>, <em class="sig-param"><span class="n">color</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_styles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.create_styles" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.create_styles">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">create_styles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">icon_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_normal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_highlight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#create_styles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.create_styles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create styles/style maps for station KML.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -334,8 +335,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.add_icon_style">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">add_icon_style</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">document</span></em>, <em class="sig-param"><span class="n">icon_text</span></em>, <em class="sig-param"><span class="n">icon_scale</span></em>, <em class="sig-param"><span class="n">label_scale</span></em>, <em class="sig-param"><span class="n">color</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#add_icon_style"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.add_icon_style" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.add_icon_style">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">add_icon_style</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">icon_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">icon_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#add_icon_style"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.add_icon_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create Style tag around Icon in KML.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -350,8 +351,8 @@ the viewer’s map.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.coremods.kml.flip_rgb">
-<code class="sig-prename descclassname">shakemap.coremods.kml.</code><code class="sig-name descname">flip_rgb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rgb</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#flip_rgb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.kml.flip_rgb" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.kml.flip_rgb">
+<span class="sig-prename descclassname"><span class="pre">shakemap.coremods.kml.</span></span><span class="sig-name descname"><span class="pre">flip_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/kml.html#flip_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.kml.flip_rgb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reverse order of RGB hex string, prepend ‘ff’ for transparency.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -366,7 +367,7 @@ the viewer’s map.</p>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -405,13 +406,13 @@ the viewer’s map.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.exception.html">shakemap.coremods.exception</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.groundmotion.html">shakemap.coremods.groundmotion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.kml</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.pointcsv.html">shakemap.coremods.pointcsv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.save.html">shakemap.coremods.save</a></li>
@@ -441,7 +442,7 @@ the viewer’s map.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.gmice.wald99 &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -66,37 +65,50 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_max</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Wald et al. (1999)&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="s1">&#39;scale_wald99.ps&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Wald et al. (1999)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="s2">&quot;scale_wald99.ps&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C1&#39;</span><span class="p">:</span>  <span class="mf">3.66</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.66</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span>  <span class="mf">2.20</span><span class="p">,</span> <span class="s1">&#39;C4&#39;</span><span class="p">:</span> <span class="mf">1.00</span><span class="p">,</span>
-                        <span class="s1">&#39;T1&#39;</span><span class="p">:</span>  <span class="mf">1.82</span><span class="p">,</span> <span class="s1">&#39;T2&#39;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">,</span> <span class="s1">&#39;SMMI&#39;</span><span class="p">:</span> <span class="mf">1.08</span><span class="p">,</span> <span class="s1">&#39;SPGM&#39;</span><span class="p">:</span> <span class="mf">0.295</span><span class="p">},</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C1&#39;</span><span class="p">:</span>  <span class="mf">3.47</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span>  <span class="mf">2.35</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span>  <span class="mf">2.10</span><span class="p">,</span> <span class="s1">&#39;C4&#39;</span><span class="p">:</span> <span class="mf">3.40</span><span class="p">,</span>
-                        <span class="s1">&#39;T1&#39;</span><span class="p">:</span>  <span class="mf">0.76</span><span class="p">,</span> <span class="s1">&#39;T2&#39;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">,</span> <span class="s1">&#39;SMMI&#39;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span> <span class="s1">&#39;SPGM&#39;</span><span class="p">:</span> <span class="mf">0.282</span><span class="p">},</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;C1&quot;</span><span class="p">:</span> <span class="mf">3.66</span><span class="p">,</span>
+                <span class="s2">&quot;C2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.66</span><span class="p">,</span>
+                <span class="s2">&quot;C3&quot;</span><span class="p">:</span> <span class="mf">2.20</span><span class="p">,</span>
+                <span class="s2">&quot;C4&quot;</span><span class="p">:</span> <span class="mf">1.00</span><span class="p">,</span>
+                <span class="s2">&quot;T1&quot;</span><span class="p">:</span> <span class="mf">1.82</span><span class="p">,</span>
+                <span class="s2">&quot;T2&quot;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">,</span>
+                <span class="s2">&quot;SMMI&quot;</span><span class="p">:</span> <span class="mf">1.08</span><span class="p">,</span>
+                <span class="s2">&quot;SPGM&quot;</span><span class="p">:</span> <span class="mf">0.295</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;C1&quot;</span><span class="p">:</span> <span class="mf">3.47</span><span class="p">,</span>
+                <span class="s2">&quot;C2&quot;</span><span class="p">:</span> <span class="mf">2.35</span><span class="p">,</span>
+                <span class="s2">&quot;C3&quot;</span><span class="p">:</span> <span class="mf">2.10</span><span class="p">,</span>
+                <span class="s2">&quot;C4&quot;</span><span class="p">:</span> <span class="mf">3.40</span><span class="p">,</span>
+                <span class="s2">&quot;T1&quot;</span><span class="p">:</span> <span class="mf">0.76</span><span class="p">,</span>
+                <span class="s2">&quot;T2&quot;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">,</span>
+                <span class="s2">&quot;SMMI&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
+                <span class="s2">&quot;SPGM&quot;</span><span class="p">:</span> <span class="mf">0.282</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
-            <span class="n">PGA</span><span class="p">,</span>
-            <span class="n">PGV</span>
-        <span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_SA_PERIODS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
 
 <div class="viewcode-block" id="Wald99.getPreferredMI"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getPreferredMI">[docs]</a>    <span class="k">def</span> <span class="nf">getPreferredMI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span> <span class="ow">or</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-                <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;PGV&#39;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PGV&#39;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-                <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;PGA&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span> <span class="ow">or</span> <span class="s2">&quot;PGV&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;PGV&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+                <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;PGV&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PGV&quot;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="s2">&quot;PGA&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
+                <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;PGA&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PGA&quot;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">)</span>
-        <span class="n">mmi_pga</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;PGA&quot;</span><span class="p">)</span>
+        <span class="n">mmi_pga</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PGA&quot;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">ix_nan_pga</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mmi_pga</span><span class="p">)</span>
-        <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;PGV&#39;</span><span class="p">)</span>
-        <span class="n">mmi_pgv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PGV&#39;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;PGV&quot;</span><span class="p">)</span>
+        <span class="n">mmi_pgv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PGV&quot;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">mag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">ix_nan_pgv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mmi_pgv</span><span class="p">)</span>
         <span class="n">ix_nan</span> <span class="o">=</span> <span class="n">ix_nan_pga</span> <span class="o">|</span> <span class="n">ix_nan_pgv</span>
         <span class="n">vscale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mmi_pga</span><span class="p">)</span>
@@ -105,8 +117,11 @@
         <span class="n">vscale</span><span class="p">[</span><span class="n">vscale</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">ascale</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">vscale</span>
         <span class="n">mmi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">mmi_pga</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-        <span class="n">mmi</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mmi_pga</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">*</span> <span class="n">ascale</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">+</span>
-                               <span class="n">mmi_pgv</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">*</span> <span class="n">vscale</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">mmi</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+            <span class="n">mmi_pga</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">*</span> <span class="n">ascale</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">+</span> <span class="n">mmi_pgv</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">*</span> <span class="n">vscale</span><span class="p">[</span><span class="o">~</span><span class="n">ix_nan</span><span class="p">],</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="mi">10</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">mmi</span><span class="p">[</span><span class="n">ix_nan_pgv</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmi_pga</span><span class="p">[</span><span class="n">ix_nan_pgv</span><span class="p">]</span>
         <span class="n">mmi</span><span class="p">[</span><span class="n">ix_nan_pga</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmi_pgv</span><span class="p">[</span><span class="n">ix_nan_pga</span><span class="p">]</span>
         <span class="n">ix_nan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mmi</span><span class="p">)</span>
@@ -164,15 +179,15 @@
         <span class="c1">#</span>
         <span class="c1"># This is the upper segment of the bi-linear fit</span>
         <span class="c1">#</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">lamps</span> <span class="o">&gt;=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;T1&#39;</span><span class="p">]</span>
-        <span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lamps</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-        <span class="n">dmmi_damp</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">lamps</span> <span class="o">&gt;=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;T1&quot;</span><span class="p">]</span>
+        <span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C2&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C1&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lamps</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">dmmi_damp</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C1&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span>
         <span class="c1">#</span>
         <span class="c1"># This is the lower segment of the bi-linear fit</span>
         <span class="c1">#</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">lamps</span> <span class="o">&lt;</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;T1&#39;</span><span class="p">]</span>
-        <span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C4&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lamps</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-        <span class="n">dmmi_damp</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">lamps</span> <span class="o">&lt;</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;T1&quot;</span><span class="p">]</span>
+        <span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C4&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C3&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lamps</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">dmmi_damp</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C3&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span>
 
         <span class="n">mmi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mmi</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
         <span class="n">mmi</span><span class="p">[</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -214,15 +229,15 @@
         <span class="c1">#</span>
         <span class="c1"># Upper segment of bi-linear relationship</span>
         <span class="c1">#</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">mmi</span> <span class="o">&gt;=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;T2&#39;</span><span class="p">]</span>
-        <span class="n">pgm</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C2&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">])</span>
-        <span class="n">dpgm_dmmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">mmi</span> <span class="o">&gt;=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;T2&quot;</span><span class="p">]</span>
+        <span class="n">pgm</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C2&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C1&quot;</span><span class="p">])</span>
+        <span class="n">dpgm_dmmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;C1&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Lower segment of bi-linear relationship</span>
         <span class="c1">#</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">mmi</span> <span class="o">&lt;</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;T2&#39;</span><span class="p">]</span>
-        <span class="n">pgm</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C4&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">])</span>
-        <span class="n">dpgm_dmmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">mmi</span> <span class="o">&lt;</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;T2&quot;</span><span class="p">]</span>
+        <span class="n">pgm</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C4&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;C3&quot;</span><span class="p">])</span>
+        <span class="n">dpgm_dmmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;C3&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span>
             <span class="n">units</span> <span class="o">=</span> <span class="mf">981.0</span>
@@ -243,8 +258,10 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Dictionary of GM to MI sigmas (in MMI units).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">]}</span></div>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">][</span><span class="s2">&quot;SMMI&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">][</span><span class="s2">&quot;SMMI&quot;</span><span class="p">],</span>
+        <span class="p">}</span></div>
 
 <div class="viewcode-block" id="Wald99.getMI2GMsd"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getMI2GMsd">[docs]</a>    <span class="k">def</span> <span class="nf">getMI2GMsd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -259,8 +276,10 @@
         <span class="c1"># Need to convert log10 to ln units</span>
         <span class="c1">#</span>
         <span class="n">lfact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">]}</span></div>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">][</span><span class="s2">&quot;SPGM&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">][</span><span class="s2">&quot;SPGM&quot;</span><span class="p">],</span>
+        <span class="p">}</span></div>
 
     <span class="k">def</span> <span class="nf">_getConsts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -306,7 +325,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

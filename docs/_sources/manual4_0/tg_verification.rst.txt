@@ -114,89 +114,207 @@ Test 0003
 
 Verification Test 0003 has a single observation with an amplitude of +1.0
 along a line (see :num:`Figure #verification-test-three`). 
-If we apply equation 11 of :ref:`Worden et al. (2018) <worden2018>` we 
-can determine the expected bias:
+We start with equations 12 and 13 of
+:ref:`Engler et al. (2022) <engler2022>` (see :ref:`sec-processing-4` for
+additional discussion of the equations presented below):
 
 .. math::
 
-    \mu_{\delta B_{i,m}} = 
-    \frac{\bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2Y_2},i} 
-    \bm{\zeta}_i }
-    {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
-    \bm{Z}_i},
+    \sigma_{H|y_2}^2 =
+        \frac{1}{1 + \mathbf{\tau_2^T \Sigma_{{W_2}{W_2}}^{-1}\tau_2}},
 
-In the bivariate case, this reduces to:
+and
 
 .. math::
 
-    \mu_{\delta B_{i,m}} = 
-    \frac{z \frac{1}{\phi^2} \zeta}  
-    {\tau_{i, m}^{-2} + z \frac{1}{\phi^2} z}
+    \mu_{H|y_2} =
+        \mathbf{\tau_2^T \Sigma_{{W_2}{W_2}}^{-1}
+        \left(y_2-\mu_{y_2}\right)}
+        \sigma_{H|y_2}^2.
 
-In our case the GMPE mean is 0 and the observation is 1, giving 
-:math:`\zeta = 1.0`. Because the observed IMT is the same as the
-desired output IMT, the factors :math:`z` are 1.0. The within-event
-standard deviation (:math:`\phi`) is 0.8, 
-and the between-event standard deviation (:math:`\tau`) is 0.6. Thus
-we have
+In the bivariate case, these reduce to:
 
 .. math::
 
-    \mu_{\delta B_{i,m}} = 
-    \frac{1 \times \frac{1}{0.8^2} \times 1}  
-    {\frac{1}{0.6^2} + 1 \times \frac{1}{0.8^2} \times 1}
+    \sigma_{H|y_2}^2 =
+        \frac{1}{1 + \frac{\tau^2}{\phi^2 + \sigma_\epsilon^2}},
 
-or,
-
+and
 
 .. math::
 
-    \mu_{\delta B_{i,m}} = 0.36
+    \mu_{H|y_2} =
+        \frac{\tau}{\sigma^2 + \sigma_\epsilon^2}
+        \left(y_2-\mu_{y_2}\right)
+        \sigma_{H|y_2}^2.
+
+In our case the GMPE mean is 0 and the observation is 1.
+The within-event standard deviation (:math:`\phi`) is 0.8, 
+and the between-event standard deviation (:math:`\tau`) is 0.6.
+The term :math:`\sigma_\epsilon` is the standard deviation of an
+observation when the observation is uncertain. In this case
+:math:`\sigma_\epsilon=0`, however in later tests it will become
+important.  Thus we have:
+
+.. math::
+   :label: var-H-y2
+
+    \sigma_{H|y_2}^2 =
+        \frac{1}{1 + \frac{0.6^2}{0.8^2 + 0.0^2}}
+        = 0.64,
+
+and
+
+.. math::
+   :label: mu-H-y2
+
+    \mu_{H|y_2} =
+        \frac{0.6}{0.8^2 + 0.0^2}
+        \left(1.0-0.0\right)
+        0.64
+        = 0.6.
+
+The bias is then given by Engler et al. equation 14:
+
+.. math::
+   :label: mu-Bk-y2
+
+    \mathbf{\mu_{B_k|y_2}} = \mathbf{\tau_k}\mu_{H|y_2}
+        = \tau\mu_{H|y_2} = 0.6 \times 0.6 = 0.36
 
 Thus, the bias is 0.36, as seen in :num:`Figure #verification-test-three` 
 (solid black line) at distance from the observation.
 
-The standard deviation of the bias is given by equation 12 of 
-:ref:`Worden et al. (2018) <worden2018>`. The bivariate form is:
+As discussed in :ref:`subsubsec-engler-mvn-computation-4`, the conditional
+mean and covariance are given by :ref:`Engler et al. (2022) <engler2022>`
+equations 19 and 20:
+
+.. math::
+   :label: engler-cond-mean-verif
+
+    \mathbf{\mu_{Y_1|y_2}} =
+        \mathbf{\mu_{Y_1}} +
+        \mathbf{\mu_{B_1|y_2}} +
+        \mathbf{\Sigma_{{W_1}{W_2}}\Sigma_{{W_2}{W_2}}^{-1}
+            \left(y_2 - \mu_{y_2} - \mu_{B_2|y_2}\right)},
+
+and the total covariance:
+
+.. math::
+   :label: engler-cond-covariance-verif
+
+    \mathbf{\Sigma_{{Y_1}{Y_1}|y_2}} =
+        \mathbf{\Sigma_{{W_1}{W_1}|w_2}} +
+        \mathbf{cc^T}\sigma_{H|y_2}^2,
+
+where
 
 .. math::
 
-    \sigma_{\delta B_{i,m}} = 
-    \frac{1}  
-    {\tau_{i, m}^{-2} + 1 \times \frac{1}{\phi^2} \times 1},
+    \mathbf{c} =
+        \mathbf{\tau_1} -
+        \mathbf{\Sigma_{{W_1}{W_2}}\Sigma_{{W_2}{W_2}}^{-1}\tau_2},
 
-which, in our case, is
-
-.. math::
-
-    \sigma^2_{\delta B_{i,m}} = 
-    \frac{1}  
-    {\frac{1}{0.6^2} + \frac{1}{0.8^2}},
-
-or,
+and
 
 .. math::
 
-    \sigma_{\delta B_{i,m}} = 0.48.
+    \mathbf{\Sigma_{{W_1}{W_1}|w_2}} =
+        \mathbf{\Sigma_{{W_1}{W_1}}} -
+        \mathbf{\Sigma_{{W_1}{W_2}}
+                \Sigma_{{W_2}{W_2}}^{-1}
+                \Sigma_{{W_2}{W_1}}}.
 
-Thus, the conditional standard deviation at great distance from 
-an observation will be (as given by equation 13 of 
-:ref:`Worden et al. (2018) <worden2018>`):
+In the bivariate case, these equations reduce to, respecively:
+
+.. math::
+   :label: mu-given-y2
+
+    \mu|y_2 =
+        \mu +
+        \mu_{B_1|y_2} +
+        \frac{\sigma_{{W_1}{W_2}}^2}{\phi^2+\sigma_\epsilon^2}
+            \left(y_2 - \mu_{y_2} - \mu_{B_2|y_2}\right),
+
+.. math::
+   :label: var-given-y2
+
+    \sigma^2|y_2 =
+        \sigma^2|w_2 +                                      
+        c^2\sigma_{H|y_2}^2,                                         
+
+.. math::
+   :label: c-bivariate
+
+    c =
+        \tau -
+        \frac{\sigma_{{W_1}{W_2}}^2}{\phi^2+\sigma_\epsilon^2} \tau,
+
+.. math::
+   :label: var-given-w2
+
+    \sigma^2|w_2 =
+        \phi^2 -
+        \frac{\sigma_{{W_1}{W_2}}^4}{\phi^2+\sigma_\epsilon^2}.
+
+where the term :math:`\sigma_{{W_1}{W_2}}^2` is a cross-covariance term.
+When the output point is located at the observation point, the correlation
+is 1, and :math:`\sigma_{{W_1}{W_2}}^2 = \phi^2`. When the output
+point is distant from the observation point, the correlation is zero, and
+:math:`\sigma_{{W_1}{W_2}}^2 = 0`. Thus, at the observation point, we have:
 
 .. math::
 
-    \sigma_{\delta W_{i,m}} = \sqrt{\phi^2_{i,m} + \sigma^2_{\delta B_{i,m}}},
-
-or,
+    \mu|y_2 =
+        0 + 0.36 + \frac{0.8^2}{0.8^2 + 0.0}\left(1.0 - 0.0 - 0.36\right)
+        = 1.0
 
 .. math::
 
-    \sigma_{\delta W_{i,m}} = \sqrt{0.8^2 + 0.48^2} = 0.933,
+    c =
+        0.6 - \frac{0.8^2}{0.8^2 + 0.0} 0.6 = 0
 
+.. math::
 
-as we see in :num:`Figure #verification-test-three` (red dashed line)
-and can verify from the data produced by ShakeMap. 
+    \sigma^2|w_2 =
+        0.8^2 - \frac{0.8^4}{0.8^2 + 0.0} = 0
 
+.. math::
+
+    \sigma^2|y_2 = 0 + 0^2 \times 0.64 = 0
+
+As we see in :num:`Figure #verification-test-three`, at the observation
+point, the mean is 1.0 (top), and the standard deviation is 0.0 (bottom).
+
+At distance from the observation (where :math:`\sigma_{{W_1}{W_2}}^2 = 0`),
+we have:
+
+.. math::
+
+    \mu|y_2 =
+        0 + 0.36 + \frac{0.0^2}{0.8^2 + 0.0}\left(1.0 - 0.0 - 0.36\right)
+        = 0.36
+
+.. math::
+
+    c =
+        0.6 - \frac{0.0^2}{0.8^2 + 0.0} 0.6 = 0.6
+
+.. math::
+
+    \sigma^2|w_2 =
+        0.8^2 - \frac{0.0^4}{0.8^2 + 0.0} = 0.8^2
+
+.. math::
+
+    \sigma^2|y_2 = 0.8^2 + 0.6^2 \times 0.64 = 0.8704
+
+    \sigma|y_2 = \sqrt{0.8704} = 0.93295
+
+Again, in :num:`Figure #verification-test-three` we see at distance from the
+observation point, the mean is 0.36 (top), and the standard deviation is
+about 0.933 (bottom), verifying that our implementation of the MVN appears
+to be working as intended.
 
 .. _verification-test-three:
 
@@ -367,127 +485,103 @@ Test 0008
 ====================
 
 Verification Test 0008 demonstrates the effect of uncertainty in the
-value at the observation point. 
+value at the observation point. If we consider equations 
+:eq:`mu-given-y2` and :eq:`var-given-y2`, and the supporting equations
+:eq:`c-bivariate` and :eq:`var-given-w2` from Test 0003, the additional
+uncertainty is represented by the term :math:`\sigma_\epsilon`.
 :num:`Figure #verification-test-eight`
 illustrates five separate cases to show
-the effect of five values of additional standard deviation: 0.0, 0.75,
+the effect of five values of :math:`\sigma_\epsilon`: 0.0, 0.75,
 1.5, 3.0, and 6.0 on an observation with an amplitude of 1.0 (as in 
 Test 0003).  As we did with Test 0003, we can compute the bias and 
 the adjusted within-event standard deviation for each of the five cases.
+The case for :math:`\sigma_\epsilon=0.0` was demonstrated in Test 0003.
+Here we will demonstrate :math:`\sigma_\epsilon=0.75`.
+
+First we recompute the bias variance and the bias:
 
 .. math::
 
-    \mu_{\delta B_{i,m}} = 
-    \frac{z \frac{1}{\phi^2} \zeta}  
-    {\tau_{i, m}^{-2} + z \frac{1}{\phi^2} z}
-
-Here, however, the factors :math:`z` and the residual must be 
-mutiplited by the "omega factors" to compensate for the 
-uncertainty in the observation (see Equation 32 of 
-:ref:`Worden et al. (2018) <worden2018>`):
+    \sigma_{H|y_2}^2 =
+        \frac{1}{1 + \frac{0.6^2}{0.8^2 + 0.75^2}}
+        = 0.7696
 
 .. math::
 
-    \omega = \sqrt{\frac{\sigma^2}{\sigma^2 + \sigma^2_\epsilon}}
-
-In our case, for the five values of :math:`\sigma_\epsilon`, and using
-a within-event standard deviation of :math:`\sigma = 0.8`, 
-:math:`\omega` is approximately 1.0, 0.73, 0.47, 0.26, and 0.13. As
-we saw in 
-Test 0003, the bias for the case of :math:`\sigma_\epsilon = 0` is
-0.36. For the second case, where :math:`\sigma_\epsilon = 0.75` we
-have:
+    \mu_{H|y_2} =
+        \frac{0.6}{0.8^2 + 0.75^2}
+        \left(1.0-0.0\right)
+        0.7696
+        = 0.384
 
 .. math::
 
-    \mu_{\delta B_{i,m}} = 
-    \frac{0.73 \times \frac{1}{0.8^2} \times 0.73}  
-    {\frac{1}{0.6^2} + 0.73 \times \frac{1}{0.8^2} \times 0.73}
+    \mu_{B_k|y_2} =
+        \tau\mu_{H|y_2} = 0.6 \times 0.384 = 0.2304
 
-or,
-
-.. math::
-
-    \mu_{\delta B_{i,m}} = 0.23
-
-By application of the same process, we find the bias values for the
-other cases. Thus, the bias values for the five cases are about 0.36,
-0.23, 0.11, 0.037, and 0.01.
-These values can be observed in the top plot in 
-:num:`Figure #verification-test-eight`
-at distance from the observation point.
-
-Similarly the standard deviation of the bias,
+At the observation point, we have:
 
 .. math::
 
-    \sigma_{\delta B_{i,m}} = 
-    \frac{1}  
-    {\tau_{i, m}^{-2} + z \frac{1}{\phi^2} z},
-
-for each of the cases is approximately 0.48, 0.53, 0.57, 0.59,
-and 0.60. Thus, using the formula:
+    \mu|y_2 =
+        0 + 0.2304 +
+            \frac{0.8^2}{0.8^2 + 0.75^2}\left(1.0 - 0.0 - 0.2304\right)
+        = 0.64
 
 .. math::
 
-    \sigma_{\delta W_{i,m}} = \sqrt{\phi^2_{i,m} + \sigma^2_{\delta B_{i,m}}},
-
-we get values for the revised within-event standard deviation of 0.93, 0.96,
-0.98, 0.99, and 1.0. These values are illustrated in the bottom half of
-:num:`Figure #verification-test-eight`
-at distance from the observation point.
-
-Equations 42 and 43 of :ref:`Worden et al. (2018) <worden2018>`
-apply to the bivariate case where the observation is at the site we
-wish to estimate. The mean and variance are given by:
+    c =
+        0.6 - \frac{0.8^2}{0.8^2 + 0.75^2} 0.6 = 0.2807
 
 .. math::
 
-    \mu | z = \mu + \frac{\sigma^2}{\sigma^2 + \sigma^2_\epsilon}\left( z - \mu \right),
-
-and
-
-.. math::
-
-    \sigma^2 | z = \frac{\sigma^2 \sigma^2_\epsilon}{\sigma^2 + \sigma^2_\epsilon}.
-
-Note that in this case, we wish to use the revised within-event standard 
-deviation for :math:`\sigma`, and the bias value for :math:`\mu` (since the mean
-value returned by the GMPE is 0). Again, for the case of
-:math:`\sigma_\epsilon = 0.75`, we have
+    \sigma^2|w_2 =
+        0.8^2 - \frac{0.8^4}{0.8^2 + 0.75^2} = 0.2994
 
 .. math::
 
-    \mu | z = 0.23 + \frac{0.96^2}{0.96^2 + 0.75^2}\left( 1.0 - 0.23 \right),
+    \sigma^2|y_2 = 0.2994 + 0.2887^2 \times 0.7696 = 0.36
 
-or
+    \sigma|y_2 = \sqrt{0.36} = 0.6
 
-.. math::
+As we see in :num:`Figure #verification-test-three`, at the observation
+point, for the :math:`\sigma_\epsilon=0.75` line, the mean is 0.64 (top),
+and the standard deviation is 0.6 (bottom)
 
-    \mu | z = 0.71.
-
-Then
-
-.. math::
-
-    \sigma | z = \sqrt{\frac{0.96^2 \times 0.75^2}{0.96^2 + 0.75^2}},
-
-or
+At distance from the observation we have:
 
 .. math::
 
-    \sigma | z = 0.59
+    \mu|y_2 =
+        0 + 0.2304 +
+            \frac{0.0^2}{0.8^2 + 0.75^2}\left(1.0 - 0.0 - 0.2304\right)
+        = 0.2304
 
-Thus, at 
-the observation point we get mean values for each of our five cases of 1.0, 0.71,
-0.38, 0.13, and 0.04. These values can be seen for each of the five lines in 
-:num:`Figure #verification-test-eight`
-at the location of the observation point. Similarly, the standard deviation 
-at the observation
-point for each case is 0.0, 0.59, 0.82, 0.94, and 0.99. These values also
-correspond to what we see in the lower plot of 
-:num:`Figure #verification-test-eight`.
+.. math::
 
+    c =
+        0.6 - \frac{0.0^2}{0.8^2 + 0.75^2} 0.6 = 0.6
+
+.. math::
+
+    \sigma^2|w_2 =
+        0.8^2 - \frac{0.0^4}{0.8^2 + 0.75^2} = 0.8^2
+
+.. math::
+
+    \sigma^2|y_2 = 0.8^2 + 0.6^2 \times 0.7696 = 0.9171
+
+    \sigma|y_2 = \sqrt{0.9171} = 0.9576
+
+In :num:`Figure #verification-test-three`, at distance from the observation
+point, for the :math:`\sigma_\epsilon=0.75` line, the mean is about 0.23
+(top), and the standard deviation is about 0.96 (bottom).
+
+Doing these calculations for all five cases of :math:`\sigma_\epsilon` we
+find the mean at the observation point to be about (1.0, 0.64, 0.31, 0.1,
+0.03), with standard deviations (0.0, 0.6, 0.83, 0.95, 0.99). At distance,
+the means are (0.36, 0.23, 0.11, 0.04, 0.01) with standard deviations
+(0.93, 0.96, 0.98, 0.99, 1.0).
 
 .. _verification-test-eight:
 

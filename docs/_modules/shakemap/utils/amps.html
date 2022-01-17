@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.utils.amps &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -52,51 +51,61 @@
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="kn">import</span> <span class="n">constants</span>
 
 <span class="c1"># define all of the tables as dictionaries</span>
-<span class="n">EVENT</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER PRIMARY KEY&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;eventid&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT UNIQUE&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;netid&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;network&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;depth&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;magnitude&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;locstring&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;repeats&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;lastrun&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">)])</span>
+<span class="n">EVENT</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER PRIMARY KEY&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;eventid&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT UNIQUE&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;netid&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;depth&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;magnitude&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;locstring&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;repeats&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;lastrun&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
-<span class="n">STATION</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER PRIMARY KEY&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;network&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">)])</span>
+<span class="n">STATION</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER PRIMARY KEY&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
-<span class="n">CHANNEL</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER PRIMARY KEY&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;station_id&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;INTEGER REFERENCES station(id) ON DELETE CASCADE&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
-                       <span class="p">(</span><span class="s1">&#39;loc&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">)])</span>
+<span class="n">CHANNEL</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER PRIMARY KEY&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;station_id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER REFERENCES station(id) ON DELETE CASCADE&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;loc&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
-<span class="n">PGM</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER PRIMARY KEY&#39;</span><span class="p">),</span>
-                   <span class="p">(</span><span class="s1">&#39;channel_id&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;INTEGER REFERENCES channel(id) ON DELETE CASCADE&#39;</span><span class="p">),</span>
-                   <span class="p">(</span><span class="s1">&#39;imt&#39;</span><span class="p">,</span> <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
-                   <span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;REAL&#39;</span><span class="p">)])</span>
+<span class="n">PGM</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER PRIMARY KEY&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;channel_id&quot;</span><span class="p">,</span> <span class="s2">&quot;INTEGER REFERENCES channel(id) ON DELETE CASCADE&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;imt&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;REAL&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
-<span class="n">TABLES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="n">EVENT</span><span class="p">,</span>
-          <span class="s1">&#39;station&#39;</span><span class="p">:</span> <span class="n">STATION</span><span class="p">,</span>
-          <span class="s1">&#39;channel&#39;</span><span class="p">:</span> <span class="n">CHANNEL</span><span class="p">,</span>
-          <span class="s1">&#39;pgm&#39;</span><span class="p">:</span> <span class="n">PGM</span><span class="p">}</span>
+<span class="n">TABLES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">EVENT</span><span class="p">,</span> <span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="n">STATION</span><span class="p">,</span> <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="n">CHANNEL</span><span class="p">,</span> <span class="s2">&quot;pgm&quot;</span><span class="p">:</span> <span class="n">PGM</span><span class="p">}</span>
 
 <span class="c1"># database file name</span>
-<span class="n">DBFILE</span> <span class="o">=</span> <span class="s1">&#39;amps.db&#39;</span>
+<span class="n">DBFILE</span> <span class="o">=</span> <span class="s2">&quot;amps.db&quot;</span>
 
-<span class="n">IMTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;acc&#39;</span><span class="p">,</span> <span class="s1">&#39;vel&#39;</span><span class="p">,</span> <span class="s1">&#39;sa&#39;</span><span class="p">,</span> <span class="s1">&#39;pga&#39;</span><span class="p">,</span> <span class="s1">&#39;pgv&#39;</span><span class="p">]</span>
+<span class="n">IMTS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;acc&quot;</span><span class="p">,</span> <span class="s2">&quot;vel&quot;</span><span class="p">,</span> <span class="s2">&quot;sa&quot;</span><span class="p">,</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span> <span class="s2">&quot;pgv&quot;</span><span class="p">]</span>
 <span class="c1"># sometimes (sigh) pga/pgv labeled as acc/vel</span>
-<span class="n">IMTDICT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;acc&#39;</span><span class="p">:</span> <span class="s1">&#39;pga&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;vel&#39;</span><span class="p">:</span> <span class="s1">&#39;pgv&#39;</span><span class="p">}</span>
+<span class="n">IMTDICT</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;acc&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span> <span class="s2">&quot;vel&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">}</span>
 
 <span class="c1"># association algorithm - any peak with:</span>
 <span class="c1"># time &gt; origin - TMIN and time &lt; origin + TMAX</span>
@@ -118,41 +127,34 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Instantiate amplitude handler with ShakeMap profile paths.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate amplitude handler with ShakeMap profile paths.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_path</span> <span class="o">=</span> <span class="n">data_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">DBFILE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">DBFILE</span><span class="p">)</span>
         <span class="n">db_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dbfile</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connect</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">db_exists</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">tdict</span> <span class="ow">in</span> <span class="n">TABLES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">createcmd</span> <span class="o">=</span> <span class="s1">&#39;CREATE TABLE </span><span class="si">%s</span><span class="s1"> (&#39;</span> <span class="o">%</span> <span class="n">table</span>
+                <span class="n">createcmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CREATE TABLE </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> (&quot;</span>
                 <span class="n">nuggets</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">column</span><span class="p">,</span> <span class="n">ctype</span> <span class="ow">in</span> <span class="n">tdict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">nuggets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">ctype</span><span class="p">))</span>
-                <span class="n">createcmd</span> <span class="o">+=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nuggets</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                    <span class="n">nuggets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">createcmd</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nuggets</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">createcmd</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX station_index ON &#39;</span>
-                                 <span class="s1">&#39;channel(station_id)&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX channel_index ON &#39;</span>
-                                 <span class="s1">&#39;pgm(channel_id)&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX eventid_index ON &#39;</span>
-                                 <span class="s1">&#39;event(eventid)&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX stacode_index ON &#39;</span>
-                                 <span class="s1">&#39;station(code)&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX stanet_index ON &#39;</span>
-                                 <span class="s1">&#39;station(network)&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;PRAGMA journal_mode = WAL&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE INDEX station_index ON &quot;</span> <span class="s2">&quot;channel(station_id)&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE INDEX channel_index ON &quot;</span> <span class="s2">&quot;pgm(channel_id)&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE INDEX eventid_index ON &quot;</span> <span class="s2">&quot;event(eventid)&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE INDEX stacode_index ON &quot;</span> <span class="s2">&quot;station(code)&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;CREATE INDEX stanet_index ON &quot;</span> <span class="s2">&quot;station(network)&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA journal_mode = WAL&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dbfile</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Could not connect to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbfile</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">isolation_level</span> <span class="o">=</span> <span class="s1">&#39;EXCLUSIVE&#39;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not connect to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dbfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">isolation_level</span> <span class="o">=</span> <span class="s2">&quot;EXCLUSIVE&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;PRAGMA foreign_keys = ON&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;PRAGMA journal_mode = WAL&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA foreign_keys = ON&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA journal_mode = WAL&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -162,8 +164,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="AmplitudeHandler.commit"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.commit">[docs]</a>    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Commit any operations to the database.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Commit any operations to the database.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AmplitudeHandler.insertEvent"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.insertEvent">[docs]</a>    <span class="k">def</span> <span class="nf">insertEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -191,45 +192,54 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            nothing: Nothing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">EVENT</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">EVENT</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s2">&quot;id&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
             <span class="c1"># This makes a string like &#39;eventid = ?, netid = ?, ...&#39;</span>
-            <span class="n">einsert</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;UPDATE event SET &#39;</span>
-                       <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39; = &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">zip_longest</span><span class="p">(</span>
-                           <span class="n">cols</span><span class="p">,</span> <span class="p">[],</span> <span class="n">fillvalue</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">)])</span>
-                       <span class="o">+</span> <span class="s1">&#39; WHERE eventid = &quot;&#39;</span>
-                       <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
-                       <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+            <span class="n">einsert</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;UPDATE event SET &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span><span class="s2">&quot; = &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">zip_longest</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="p">[],</span> <span class="n">fillvalue</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">)]</span>
+                <span class="p">)</span>
+                <span class="o">+</span> <span class="s1">&#39; WHERE eventid = &quot;&#39;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+                <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">einsert</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;INSERT INTO event (&#39;</span>
-                       <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-                       <span class="o">+</span> <span class="s1">&#39;) VALUES (&#39;</span>
-                       <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;?&#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
-                       <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;network&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
-            <span class="n">network</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
+            <span class="n">einsert</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;INSERT INTO event (&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;) VALUES (&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;?&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+                <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;network&quot;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="n">network</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span> <span class="s1">&#39;repeats&#39;</span> <span class="ow">in</span> <span class="n">event</span> <span class="ow">and</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">]</span> <span class="ow">and</span> \
-           <span class="nb">len</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">repeats</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">])</span>
+            <span class="n">network</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;repeats&quot;</span> <span class="ow">in</span> <span class="n">event</span> <span class="ow">and</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;repeats&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;repeats&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">repeats</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;repeats&quot;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">repeats</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s1">&#39;lastrun&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
-            <span class="n">lastrun</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;lastrun&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;lastrun&quot;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="n">lastrun</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;lastrun&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">lastrun</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">einsert</span><span class="p">,</span> <span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
-                                       <span class="n">event</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">],</span>
-                                       <span class="n">network</span><span class="p">,</span>
-                                       <span class="n">timestr_to_timestamp</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]),</span>
-                                       <span class="n">event</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">],</span>
-                                       <span class="n">event</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span>
-                                       <span class="n">event</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">],</span>
-                                       <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">],</span>
-                                       <span class="n">event</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">],</span>
-                                       <span class="n">repeats</span><span class="p">,</span>
-                                       <span class="n">lastrun</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">einsert</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="n">event</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                <span class="n">event</span><span class="p">[</span><span class="s2">&quot;netid&quot;</span><span class="p">],</span>
+                <span class="n">network</span><span class="p">,</span>
+                <span class="n">timestr_to_timestamp</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]),</span>
+                <span class="n">event</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">],</span>
+                <span class="n">event</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">],</span>
+                <span class="n">event</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">],</span>
+                <span class="n">event</span><span class="p">[</span><span class="s2">&quot;mag&quot;</span><span class="p">],</span>
+                <span class="n">event</span><span class="p">[</span><span class="s2">&quot;locstring&quot;</span><span class="p">],</span>
+                <span class="n">repeats</span><span class="p">,</span>
+                <span class="n">lastrun</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="k">return</span></div>
@@ -245,7 +255,7 @@
 <span class="sd">            their values for the the event; a None is</span>
 <span class="sd">            returned if the event is not in the database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;SELECT * FROM event WHERE eventid = ?&#39;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM event WHERE eventid = ?&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">eventid</span><span class="p">,))</span>
         <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -256,14 +266,15 @@
         <span class="c1"># Deal with differences between the database column names</span>
         <span class="c1"># and the event keys</span>
         <span class="c1">#</span>
-        <span class="n">event</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;eventid&#39;</span><span class="p">]</span>
-        <span class="k">del</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;eventid&#39;</span><span class="p">]</span>
-        <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span>
-        <span class="k">del</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span>
-        <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span>\
-            <span class="n">strftime</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">]:</span>
-            <span class="n">event</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;repeats&#39;</span><span class="p">])</span>
+        <span class="n">event</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;eventid&quot;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;eventid&quot;</span><span class="p">]</span>
+        <span class="n">event</span><span class="p">[</span><span class="s2">&quot;mag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;magnitude&quot;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;magnitude&quot;</span><span class="p">]</span>
+        <span class="n">event</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span> <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+            <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;repeats&quot;</span><span class="p">]:</span>
+            <span class="n">event</span><span class="p">[</span><span class="s2">&quot;repeats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;repeats&quot;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">event</span></div>
 
 <div class="viewcode-block" id="AmplitudeHandler.deleteEvent"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.deleteEvent">[docs]</a>    <span class="k">def</span> <span class="nf">deleteEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
@@ -275,7 +286,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            nothing: Nothing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;DELETE FROM event WHERE eventid = ?&#39;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;DELETE FROM event WHERE eventid = ?&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">eventid</span><span class="p">,))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="k">return</span></div>
@@ -290,8 +301,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (list): List of tuples of (eventid, origin_time, [repeats]).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT eventid, time, repeats FROM event WHERE &quot;</span>\
-                <span class="s2">&quot;repeats IS NOT NULL&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT eventid, time, repeats FROM event WHERE &quot;</span> <span class="s2">&quot;repeats IS NOT NULL&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="n">repeats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
         <span class="n">replist</span> <span class="o">=</span> <span class="p">[]</span>
@@ -317,7 +327,7 @@
 <span class="sd">            list: The event IDs of the events for which associated data</span>
 <span class="sd">            were found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">equery</span> <span class="o">=</span> <span class="s1">&#39;SELECT eventid, time, lat, lon FROM event&#39;</span>
+        <span class="n">equery</span> <span class="o">=</span> <span class="s2">&quot;SELECT eventid, time, lat, lon FROM event&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">equery</span><span class="p">)</span>
         <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
 
@@ -356,7 +366,7 @@
 <span class="sd">            int: The number of amps associated with the specified event.</span>
 <span class="sd">            -1 is returned if the event is not found in the database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">equery</span> <span class="o">=</span> <span class="s1">&#39;SELECT time, lat, lon FROM event where eventid = ?&#39;</span>
+        <span class="n">equery</span> <span class="o">=</span> <span class="s2">&quot;SELECT time, lat, lon FROM event where eventid = ?&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">equery</span><span class="p">,</span> <span class="p">(</span><span class="n">eventid</span><span class="p">,))</span>
         <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 
@@ -402,9 +412,11 @@
 <span class="sd">                       - flag: Value will be 0.</span>
 <span class="sd">                       - loccode: The location code of the instrument.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;BEGIN EXCLUSIVE&#39;</span><span class="p">)</span>
-        <span class="n">time_query</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SELECT id, timestamp, lat, lon, code, network &#39;</span>
-                      <span class="s1">&#39;FROM station WHERE timestamp &gt; ? AND timestamp &lt; ? &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;BEGIN EXCLUSIVE&quot;</span><span class="p">)</span>
+        <span class="n">time_query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;SELECT id, timestamp, lat, lon, code, network &quot;</span>
+            <span class="s2">&quot;FROM station WHERE timestamp &gt; ? AND timestamp &lt; ? &quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">time_query</span><span class="p">,</span> <span class="p">((</span><span class="n">eqtime</span> <span class="o">-</span> <span class="n">TMIN</span><span class="p">),</span> <span class="p">(</span><span class="n">eqtime</span> <span class="o">+</span> <span class="n">TMAX</span><span class="p">)))</span>
         <span class="c1"># numpy array of id, timestamp, lat, lon</span>
         <span class="n">eqdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">())</span>
@@ -413,8 +425,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="n">dist</span> <span class="o">=</span> <span class="n">geodetic_distance</span><span class="p">(</span><span class="n">eqlon</span><span class="p">,</span> <span class="n">eqlat</span><span class="p">,</span> <span class="n">eqdata</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
-                                 <span class="n">eqdata</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">geodetic_distance</span><span class="p">(</span>
+            <span class="n">eqlon</span><span class="p">,</span> <span class="n">eqlat</span><span class="p">,</span> <span class="n">eqdata</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">eqdata</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">inear</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist</span> <span class="o">&lt;</span> <span class="n">DISTANCE</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">eqdata</span> <span class="o">=</span> <span class="n">eqdata</span><span class="p">[</span><span class="n">inear</span><span class="p">]</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="n">inear</span><span class="p">]</span>
@@ -424,42 +437,47 @@
             <span class="n">sid</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">network</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
             <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">network</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stadict</span><span class="p">:</span>
-                <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">code</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span>
-                                           <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span>
-                                           <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="n">dist</span><span class="p">[</span><span class="n">idx</span><span class="p">]}}</span>
+                <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">code</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;sid&quot;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span> <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span> <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">dist</span><span class="p">[</span><span class="n">idx</span><span class="p">]}</span>
+                <span class="p">}</span>
                 <span class="k">continue</span>
             <span class="k">elif</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">]:</span>
-                <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">][</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span>
-                                          <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span>
-                                          <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="n">dist</span><span class="p">[</span><span class="n">idx</span><span class="p">]}</span>
+                <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">][</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;sid&quot;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span>
+                    <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span>
+                    <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">dist</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="p">}</span>
                 <span class="k">continue</span>
             <span class="n">traveltime</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">/</span> <span class="mf">4.2</span>
             <span class="n">new_dt</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">eqtime</span> <span class="o">-</span> <span class="n">timestamp</span><span class="p">)</span> <span class="o">-</span> <span class="n">traveltime</span><span class="p">)</span>
-            <span class="n">old_dt</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">eqtime</span> <span class="o">-</span> <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">][</span><span class="n">code</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span>
-                         <span class="o">-</span> <span class="n">traveltime</span><span class="p">)</span>
+            <span class="n">old_dt</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">eqtime</span> <span class="o">-</span> <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">][</span><span class="n">code</span><span class="p">][</span><span class="s2">&quot;timestamp&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="n">traveltime</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">old_dt</span> <span class="o">&lt;</span> <span class="n">new_dt</span><span class="p">:</span>
                 <span class="n">junk_sids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="n">junk_sids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">][</span><span class="n">code</span><span class="p">][</span><span class="s1">&#39;sid&#39;</span><span class="p">])</span>
-            <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">][</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span>
-                                      <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span>
-                                      <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="n">dist</span><span class="p">[</span><span class="n">idx</span><span class="p">]}</span>
+            <span class="n">junk_sids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">][</span><span class="n">code</span><span class="p">][</span><span class="s2">&quot;sid&quot;</span><span class="p">])</span>
+            <span class="n">stadict</span><span class="p">[</span><span class="n">network</span><span class="p">][</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;sid&quot;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span>
+                <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">dist</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+            <span class="p">}</span>
 
         <span class="n">sta_sids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">netd</span> <span class="ow">in</span> <span class="n">stadict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">coded</span> <span class="ow">in</span> <span class="n">netd</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="n">sta_sids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coded</span><span class="p">[</span><span class="s1">&#39;sid&#39;</span><span class="p">])</span>
+                <span class="n">sta_sids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coded</span><span class="p">[</span><span class="s2">&quot;sid&quot;</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">sta_sids</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="n">amp_query</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SELECT s.network, s.name, s.code, s.lat, s.lon, &#39;</span>
-                     <span class="s1">&#39;c.channel, c.loc, p.imt, p.value FROM station s, &#39;</span>
-                     <span class="s1">&#39;channel c, pgm p WHERE s.id IN </span><span class="si">%s</span><span class="s1"> AND &#39;</span>
-                     <span class="s1">&#39;c.station_id = s.id AND p.channel_id = c.id &#39;</span>
-                     <span class="s1">&#39;ORDER BY s.network, s.code, c.channel, p.imt&#39;</span><span class="p">)</span>
-        <span class="n">delete_query</span> <span class="o">=</span> <span class="s1">&#39;DELETE FROM station where id in </span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="n">amp_query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;SELECT s.network, s.name, s.code, s.lat, s.lon, &quot;</span>
+            <span class="s2">&quot;c.channel, c.loc, p.imt, p.value FROM station s, &quot;</span>
+            <span class="s2">&quot;channel c, pgm p WHERE s.id IN </span><span class="si">%s</span><span class="s2"> AND &quot;</span>
+            <span class="s2">&quot;c.station_id = s.id AND p.channel_id = c.id &quot;</span>
+            <span class="s2">&quot;ORDER BY s.network, s.code, c.channel, p.imt&quot;</span>
+        <span class="p">)</span>
+        <span class="n">delete_query</span> <span class="o">=</span> <span class="s2">&quot;DELETE FROM station where id in </span><span class="si">%s</span><span class="s2">&quot;</span>
 
         <span class="c1"># data_list will hold the rows of the dataframe</span>
         <span class="n">nstas</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sta_sids</span><span class="p">)</span>
@@ -469,17 +487,26 @@
             <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">MAX_VARS</span>
             <span class="k">if</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="n">nstas</span><span class="p">:</span>
                 <span class="n">end</span> <span class="o">=</span> <span class="n">nstas</span>
-            <span class="n">varstr</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;?&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">sta_sids</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]))</span>
+            <span class="n">varstr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;?&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">sta_sids</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span><span class="si">}</span><span class="s2">)&quot;</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">amp_query</span> <span class="o">%</span> <span class="n">varstr</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">sta_sids</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
             <span class="n">amprows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">amprows</span><span class="p">:</span>
                 <span class="c1"># data_row = (code, channel_name, imt, value, lat, lon,</span>
                 <span class="c1">#             network, name, distance, flag, loccode)</span>
-                <span class="n">data_row</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
-                            <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                            <span class="n">stadict</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="s1">&#39;distance&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+                <span class="n">data_row</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">stadict</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="s2">&quot;distance&quot;</span><span class="p">],</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+                <span class="p">)</span>
                 <span class="n">data_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_row</span><span class="p">)</span>
             <span class="c1"># Delete the stations now, since we have them queued up</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">delete_query</span> <span class="o">%</span> <span class="n">varstr</span><span class="p">,</span> <span class="n">sta_sids</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
@@ -492,8 +519,7 @@
             <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">MAX_VARS</span>
             <span class="k">if</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="n">njunk</span><span class="p">:</span>
                 <span class="n">end</span> <span class="o">=</span> <span class="n">njunk</span>
-            <span class="n">varstr</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;?&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">junk_sids</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]))</span>
+            <span class="n">varstr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;?&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">junk_sids</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span><span class="si">}</span><span class="s2">)&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">delete_query</span> <span class="o">%</span> <span class="n">varstr</span><span class="p">,</span> <span class="n">junk_sids</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">end</span>
 
@@ -529,10 +555,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            nothing: Nothing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;shakemap-data&#39;</span><span class="p">,</span> <span class="n">code_version</span><span class="o">=</span><span class="s2">&quot;4.0&quot;</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;shakemap-data&quot;</span><span class="p">,</span> <span class="n">code_version</span><span class="o">=</span><span class="s2">&quot;4.0&quot;</span><span class="p">)</span>
         <span class="n">create_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
-        <span class="n">stationlist</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;stationlist&#39;</span><span class="p">,</span>
-                                    <span class="n">created</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">create_time</span><span class="p">)</span>
+        <span class="n">stationlist</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;stationlist&quot;</span><span class="p">,</span> <span class="n">created</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">create_time</span><span class="p">)</span>
         <span class="n">oldnet</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">oldcode</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">oldchan</span> <span class="o">=</span> <span class="kc">None</span>
@@ -540,52 +565,56 @@
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data_list</span><span class="p">:</span>
             <span class="n">code</span><span class="p">,</span> <span class="n">chan</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">flag</span><span class="p">,</span> <span class="n">loc</span> <span class="o">=</span> <span class="n">row</span>
             <span class="k">if</span> <span class="n">net</span> <span class="o">!=</span> <span class="n">oldnet</span> <span class="ow">or</span> <span class="n">code</span> <span class="o">!=</span> <span class="n">oldcode</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">code</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">net</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">):</span>
-                    <span class="n">stacode</span> <span class="o">=</span> <span class="n">net</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">code</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">code</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">net</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">):</span>
+                    <span class="n">stacode</span> <span class="o">=</span> <span class="n">net</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">code</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">stacode</span> <span class="o">=</span> <span class="n">code</span>
-                <span class="n">station</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">stationlist</span><span class="p">,</span> <span class="s1">&#39;station&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">stacode</span><span class="p">,</span>
-                                        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">insttype</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-                                        <span class="n">lat</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">lat</span><span class="p">,</span>
-                                        <span class="n">lon</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">lon</span><span class="p">,</span>
-                                        <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">dist</span><span class="p">,</span> <span class="n">netid</span><span class="o">=</span><span class="n">net</span><span class="p">,</span>
-                                        <span class="n">commtype</span><span class="o">=</span><span class="s2">&quot;DIG&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">station</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+                    <span class="n">stationlist</span><span class="p">,</span>
+                    <span class="s2">&quot;station&quot;</span><span class="p">,</span>
+                    <span class="n">code</span><span class="o">=</span><span class="n">stacode</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">insttype</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="n">lat</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lat</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">lon</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lon</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">dist</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dist</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">netid</span><span class="o">=</span><span class="n">net</span><span class="p">,</span>
+                    <span class="n">commtype</span><span class="o">=</span><span class="s2">&quot;DIG&quot;</span><span class="p">,</span>
+                    <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
                 <span class="n">oldnet</span> <span class="o">=</span> <span class="n">net</span>
                 <span class="n">oldcode</span> <span class="o">=</span> <span class="n">code</span>
                 <span class="n">oldchan</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">oldloc</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">chan</span> <span class="o">!=</span> <span class="n">oldchan</span> <span class="ow">or</span> <span class="n">loc</span> <span class="o">!=</span> <span class="n">oldloc</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">chan</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">loc</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">):</span>
-                    <span class="n">comp</span> <span class="o">=</span> <span class="n">loc</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">chan</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">chan</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">loc</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">):</span>
+                    <span class="n">comp</span> <span class="o">=</span> <span class="n">loc</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">chan</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">comp</span> <span class="o">=</span> <span class="n">chan</span>
-                <span class="n">component</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;comp&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">comp</span><span class="p">)</span>
+                <span class="n">component</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s2">&quot;comp&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">comp</span><span class="p">)</span>
                 <span class="n">oldchan</span> <span class="o">=</span> <span class="n">chan</span>
                 <span class="n">oldloc</span> <span class="o">=</span> <span class="n">loc</span>
-            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.6f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">,</span>
-                          <span class="n">flag</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">flag</span><span class="p">))</span>
+            <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">data_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_path</span><span class="p">,</span> <span class="n">eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">)</span>
+        <span class="n">data_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_path</span><span class="p">,</span> <span class="n">eventid</span><span class="p">,</span> <span class="s2">&quot;current&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">data_folder</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">data_folder</span><span class="p">)</span>
-        <span class="n">amptime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">%H%M%S&#39;</span><span class="p">)</span>
-        <span class="n">xmlfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_folder</span><span class="p">,</span> <span class="s1">&#39;unassoc_</span><span class="si">%s</span><span class="s1">_dat.xml&#39;</span> <span class="o">%</span> <span class="n">amptime</span><span class="p">)</span>
+        <span class="n">amptime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">)</span>
+        <span class="n">xmlfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;unassoc_</span><span class="si">{</span><span class="n">amptime</span><span class="si">}</span><span class="s2">_dat.xml&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">pretty_print</span><span class="p">:</span>
             <span class="n">pstring</span> <span class="o">=</span> <span class="n">prettify</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                 <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pstring</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-            <span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span></div>
 
     <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Destructor.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_connection&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Destructor.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_connection&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_disconnect</span><span class="p">()</span>
 
 <div class="viewcode-block" id="AmplitudeHandler.insertAmps"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.insertAmps">[docs]</a>    <span class="k">def</span> <span class="nf">insertAmps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmlfile</span><span class="p">):</span>
@@ -596,90 +625,93 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">xmlstr</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">xmlstr</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="c1"># sometimes these records have non-ascii bytes in them</span>
-            <span class="n">newxmlstr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^\x00-\x7F]+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">xmlstr</span><span class="p">)</span>
+            <span class="n">newxmlstr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^\x00-\x7F]+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">xmlstr</span><span class="p">)</span>
             <span class="c1"># newxmlstr = _invalid_xml_remove(xmlstr)</span>
-            <span class="n">newxmlstr</span> <span class="o">=</span> <span class="n">newxmlstr</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">)</span>
+            <span class="n">newxmlstr</span> <span class="o">=</span> <span class="n">newxmlstr</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;xmlcharrefreplace&quot;</span><span class="p">)</span>
             <span class="n">amps</span> <span class="o">=</span> <span class="n">dET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">newxmlstr</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Could not parse </span><span class="si">%s</span><span class="s1">, due to error &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span>
-                            <span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not parse </span><span class="si">{</span><span class="n">xmlfile</span><span class="si">}</span><span class="s1">, due to error &quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">amps</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="s1">&#39;amplitudes&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not appear to be an amplitude XML &#39;</span>
-                            <span class="s1">&#39;file.&#39;</span> <span class="o">%</span> <span class="n">xmlfile</span><span class="p">)</span>
-        <span class="n">agency</span> <span class="o">=</span> <span class="n">amps</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;agency&#39;</span><span class="p">)</span>
-        <span class="n">record</span> <span class="o">=</span> <span class="n">amps</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;record&#39;</span><span class="p">)</span>
-        <span class="n">timing</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;timing&#39;</span><span class="p">)</span>
-        <span class="n">reference</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;reference&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">amps</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="s2">&quot;amplitudes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">xmlfile</span><span class="si">}</span><span class="s2"> does not appear to be an amplitude XML file.&quot;</span><span class="p">)</span>
+        <span class="n">agency</span> <span class="o">=</span> <span class="n">amps</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agency&quot;</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">amps</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)</span>
+        <span class="n">timing</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;timing&quot;</span><span class="p">)</span>
+        <span class="n">reference</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;reference&quot;</span><span class="p">)</span>
         <span class="n">has_pgm</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">time_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">reference</span><span class="o">.</span><span class="n">iter</span><span class="p">():</span>
             <span class="n">node_name</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span>
-            <span class="k">if</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s1">&#39;PGMTime&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;PGMTime&quot;</span><span class="p">:</span>
                 <span class="n">has_pgm</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span>
-                <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span>
-                <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s1">&#39;day&#39;</span><span class="p">:</span>
-                <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s1">&#39;hour&#39;</span><span class="p">:</span>
-                <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s1">&#39;minute&#39;</span><span class="p">:</span>
-                <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s1">&#39;second&#39;</span><span class="p">:</span>
-                <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s1">&#39;msec&#39;</span><span class="p">:</span>
-                <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;msec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;year&quot;</span><span class="p">:</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;month&quot;</span><span class="p">:</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;day&quot;</span><span class="p">:</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;day&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;hour&quot;</span><span class="p">:</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;hour&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;minute&quot;</span><span class="p">:</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;minute&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;second&quot;</span><span class="p">:</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;second&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;msec&quot;</span><span class="p">:</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;msec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">has_pgm</span><span class="p">:</span>
-            <span class="n">pgmtime_str</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;PGMTime&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+            <span class="n">pgmtime_str</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;PGMTime&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">tfmt</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-                <span class="n">pgmdate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
-                    <span class="n">pgmtime_str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">19</span><span class="p">],</span> <span class="n">tfmt</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+                <span class="n">tfmt</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">pgmdate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">pgmtime_str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">19</span><span class="p">],</span> <span class="n">tfmt</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span>
+                <span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="n">tfmt</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-                <span class="n">pgmdate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
-                    <span class="n">pgmtime_str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">19</span><span class="p">],</span> <span class="n">tfmt</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+                <span class="n">tfmt</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">pgmdate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">pgmtime_str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">19</span><span class="p">],</span> <span class="n">tfmt</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span>
+                <span class="p">)</span>
             <span class="n">pgmtime</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt_to_timestamp</span><span class="p">(</span><span class="n">pgmdate</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">time_dict</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No time data for file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No time data for file </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">return</span>
-            <span class="n">pgmdate</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">],</span>
-                               <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">],</span>
-                               <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">],</span>
-                               <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">],</span>
-                               <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">],</span>
-                               <span class="n">time_dict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
+            <span class="n">pgmdate</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">],</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">],</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;day&quot;</span><span class="p">],</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;hour&quot;</span><span class="p">],</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;minute&quot;</span><span class="p">],</span>
+                <span class="n">time_dict</span><span class="p">[</span><span class="s2">&quot;second&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
             <span class="n">pgmtime</span> <span class="o">=</span> <span class="n">dt_to_timestamp</span><span class="p">(</span><span class="n">pgmdate</span><span class="p">)</span>
 
         <span class="c1"># there are often multiple stations per file, but they&#39;re</span>
         <span class="c1"># all duplicates of each other, so just grab the information</span>
         <span class="c1"># from the first one</span>
-        <span class="n">station</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;station&#39;</span><span class="p">)</span>
+        <span class="n">station</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)</span>
         <span class="n">attrib</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">station</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-        <span class="n">lat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
-        <span class="n">lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
-        <span class="n">code</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;net&#39;</span> <span class="ow">in</span> <span class="n">attrib</span><span class="p">:</span>
-            <span class="n">network</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="s1">&#39;netid&#39;</span> <span class="ow">in</span> <span class="n">attrib</span><span class="p">:</span>
-            <span class="n">network</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">])</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">])</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;net&quot;</span> <span class="ow">in</span> <span class="n">attrib</span><span class="p">:</span>
+            <span class="n">network</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s2">&quot;netid&quot;</span> <span class="ow">in</span> <span class="n">attrib</span><span class="p">:</span>
+            <span class="n">network</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;netid&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">network</span> <span class="o">=</span> <span class="n">agency</span>
         <span class="c1">#</span>
         <span class="c1"># The station (at this pgmtime +/- 10 seconds) might already exist</span>
         <span class="c1"># in the DB; if it does, use it</span>
         <span class="c1">#</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;BEGIN EXCLUSIVE&#39;</span><span class="p">)</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SELECT id, timestamp FROM station where network = ? and &#39;</span>
-                 <span class="s1">&#39;code = ? and timestamp &gt; ? and timestamp &lt; ?&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span>
-                             <span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">pgmtime</span> <span class="o">-</span> <span class="mi">10</span><span class="p">,</span> <span class="n">pgmtime</span> <span class="o">+</span> <span class="mi">10</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;BEGIN EXCLUSIVE&quot;</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;SELECT id, timestamp FROM station where network = ? and &quot;</span>
+            <span class="s2">&quot;code = ? and timestamp &gt; ? and timestamp &lt; ?&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">pgmtime</span> <span class="o">-</span> <span class="mi">10</span><span class="p">,</span> <span class="n">pgmtime</span> <span class="o">+</span> <span class="mi">10</span><span class="p">))</span>
         <span class="c1">#</span>
         <span class="c1"># It&#39;s possible that the query returned more than one station; pick</span>
         <span class="c1"># the one closest to the new station&#39;s pgmtime</span>
@@ -694,9 +726,11 @@
                 <span class="n">best_sid</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">inserted_station</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">best_sid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fmt</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;INSERT INTO station &#39;</span>
-                   <span class="s1">&#39;(timestamp, lat, lon, name, code, network) &#39;</span>
-                   <span class="s1">&#39;VALUES (?, ?, ?, ?, ?, ?)&#39;</span><span class="p">)</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;INSERT INTO station &quot;</span>
+                <span class="s2">&quot;(timestamp, lat, lon, name, code, network) &quot;</span>
+                <span class="s2">&quot;VALUES (?, ?, ?, ?, ?, ?)&quot;</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="p">(</span><span class="n">pgmtime</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">network</span><span class="p">))</span>
             <span class="n">best_sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">lastrowid</span>
             <span class="n">inserted_station</span> <span class="o">=</span> <span class="kc">True</span>
@@ -706,25 +740,23 @@
         <span class="c1">#</span>
         <span class="n">existing_channels</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">inserted_station</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">chan_query</span> <span class="o">=</span> <span class="s1">&#39;SELECT channel, id FROM channel where station_id = ?&#39;</span>
+            <span class="n">chan_query</span> <span class="o">=</span> <span class="s2">&quot;SELECT channel, id FROM channel where station_id = ?&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">chan_query</span><span class="p">,</span> <span class="p">(</span><span class="n">best_sid</span><span class="p">,))</span>
             <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
             <span class="n">existing_channels</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
         <span class="c1"># might need these</span>
-        <span class="n">insert_channel</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;INSERT INTO channel &#39;</span>
-                          <span class="s1">&#39;(station_id, channel, loc)&#39;</span>
-                          <span class="s1">&#39;VALUES (?, ?, ?)&#39;</span><span class="p">)</span>
-        <span class="n">insert_pgm</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;INSERT INTO pgm &#39;</span>
-                      <span class="s1">&#39;(channel_id, imt, value)&#39;</span>
-                      <span class="s1">&#39;VALUES (?, ?, ?)&#39;</span><span class="p">)</span>
+        <span class="n">insert_channel</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;INSERT INTO channel &quot;</span> <span class="s2">&quot;(station_id, channel, loc)&quot;</span> <span class="s2">&quot;VALUES (?, ?, ?)&quot;</span>
+        <span class="p">)</span>
+        <span class="n">insert_pgm</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO pgm &quot;</span> <span class="s2">&quot;(channel_id, imt, value)&quot;</span> <span class="s2">&quot;VALUES (?, ?, ?)&quot;</span>
 
         <span class="c1"># loop over components</span>
         <span class="n">channels_inserted</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">iter</span><span class="p">(</span><span class="s1">&#39;component&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">iter</span><span class="p">(</span><span class="s2">&quot;component&quot;</span><span class="p">):</span>
             <span class="c1"># We don&#39;t want channels with qual &gt; 4 (assuming qual is Cosmos</span>
             <span class="c1"># table 6 value)</span>
-            <span class="n">qual</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;qual&#39;</span><span class="p">)</span>
+            <span class="n">qual</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;qual&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">qual</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">iqual</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">qual</span><span class="p">)</span>
@@ -735,10 +767,10 @@
                 <span class="n">iqual</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">if</span> <span class="n">iqual</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">loc</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;loc&#39;</span><span class="p">)</span>
+            <span class="n">loc</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;loc&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">loc</span><span class="p">:</span>
-                <span class="n">loc</span> <span class="o">=</span> <span class="s1">&#39;--&#39;</span>
-            <span class="n">cname</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+                <span class="n">loc</span> <span class="o">=</span> <span class="s2">&quot;--&quot;</span>
+            <span class="n">cname</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">cname</span> <span class="ow">in</span> <span class="n">existing_channels</span><span class="p">:</span>
                 <span class="n">best_cid</span> <span class="o">=</span> <span class="n">existing_channels</span><span class="p">[</span><span class="n">cname</span><span class="p">]</span>
                 <span class="n">inserted_channel</span> <span class="o">=</span> <span class="kc">False</span>
@@ -755,7 +787,7 @@
             <span class="c1">#</span>
             <span class="n">existing_pgms</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="n">inserted_channel</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="n">pgm_query</span> <span class="o">=</span> <span class="s1">&#39;SELECT imt, id FROM pgm where channel_id = ?&#39;</span>
+                <span class="n">pgm_query</span> <span class="o">=</span> <span class="s2">&quot;SELECT imt, id FROM pgm where channel_id = ?&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">pgm_query</span><span class="p">,</span> <span class="p">(</span><span class="n">best_cid</span><span class="p">,))</span>
                 <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
                 <span class="n">existing_pgms</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
@@ -766,18 +798,18 @@
                 <span class="k">if</span> <span class="n">imt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">IMTS</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pgm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">))</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pgm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                     <span class="c1">#</span>
                     <span class="c1"># Couldn&#39;t interpret the value for some reason</span>
                     <span class="c1">#</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;sa&#39;</span><span class="p">:</span>
-                    <span class="n">imt</span> <span class="o">=</span> <span class="s1">&#39;p&#39;</span><span class="o">+</span><span class="n">imt</span><span class="o">+</span><span class="n">pgm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;period&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s2">&quot;sa&quot;</span><span class="p">:</span>
+                    <span class="n">imt</span> <span class="o">=</span> <span class="s2">&quot;p&quot;</span> <span class="o">+</span> <span class="n">imt</span> <span class="o">+</span> <span class="n">pgm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="mf">9.81</span>
                 <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">IMTDICT</span><span class="p">:</span>
                     <span class="n">imt</span> <span class="o">=</span> <span class="n">IMTDICT</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;pga&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s2">&quot;pga&quot;</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="mf">9.81</span>
                 <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">existing_pgms</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -792,7 +824,7 @@
                 <span class="c1"># If we didn&#39;t insert any amps, but we inserted the channel,</span>
                 <span class="c1"># delete the channel</span>
                 <span class="c1">#</span>
-                <span class="n">channel_delete</span> <span class="o">=</span> <span class="s1">&#39;DELETE FROM channel WHERE id = ?&#39;</span>
+                <span class="n">channel_delete</span> <span class="o">=</span> <span class="s2">&quot;DELETE FROM channel WHERE id = ?&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">channel_delete</span><span class="p">,</span> <span class="p">(</span><span class="n">best_cid</span><span class="p">,))</span>
                 <span class="n">channels_inserted</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="c1"># End of pgm loop</span>
@@ -802,7 +834,7 @@
         <span class="c1"># If we inserted the station but no channels, delete the station</span>
         <span class="c1">#</span>
         <span class="k">if</span> <span class="n">channels_inserted</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">inserted_station</span><span class="p">:</span>
-            <span class="n">station_delete</span> <span class="o">=</span> <span class="s1">&#39;DELETE FROM station WHERE id = ?&#39;</span>
+            <span class="n">station_delete</span> <span class="o">=</span> <span class="s2">&quot;DELETE FROM station WHERE id = ?&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">station_delete</span><span class="p">,</span> <span class="p">(</span><span class="n">best_sid</span><span class="p">,))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -818,9 +850,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            int: Number of stations deleted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">thresh_date</span> <span class="o">=</span> <span class="n">dt_to_timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span>
-                                      <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">threshold</span><span class="p">))</span>
-        <span class="n">squery</span> <span class="o">=</span> <span class="s1">&#39;DELETE FROM station WHERE timestamp &lt; ?&#39;</span>
+        <span class="n">thresh_date</span> <span class="o">=</span> <span class="n">dt_to_timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">threshold</span><span class="p">))</span>
+        <span class="n">squery</span> <span class="o">=</span> <span class="s2">&quot;DELETE FROM station WHERE timestamp &lt; ?&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">squery</span><span class="p">,</span> <span class="p">[</span><span class="n">thresh_date</span><span class="p">])</span>
         <span class="n">nrows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">rowcount</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -835,9 +866,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            int: Number of events deleted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">thresh_date</span> <span class="o">=</span> <span class="n">dt_to_timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span>
-                                      <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">threshold</span><span class="p">))</span>
-        <span class="n">equery</span> <span class="o">=</span> <span class="s1">&#39;DELETE FROM event WHERE time &lt; </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">thresh_date</span>
+        <span class="n">thresh_date</span> <span class="o">=</span> <span class="n">dt_to_timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">threshold</span><span class="p">))</span>
+        <span class="n">equery</span> <span class="o">=</span> <span class="s2">&quot;DELETE FROM event WHERE time &lt; </span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">thresh_date</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">equery</span><span class="p">)</span>
         <span class="n">nevents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">rowcount</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -863,44 +893,40 @@
         <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># event stuff</span>
-        <span class="n">equery</span> <span class="o">=</span> <span class="s1">&#39;SELECT count(*), min(time), max(time) FROM event&#39;</span>
+        <span class="n">equery</span> <span class="o">=</span> <span class="s2">&quot;SELECT count(*), min(time), max(time) FROM event&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">equery</span><span class="p">)</span>
         <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;events&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;event_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;event_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;event_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;event_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;event_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                                                          <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;event_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                                                          <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;event_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;event_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
 
         <span class="c1"># station stuff</span>
-        <span class="n">squery</span> <span class="o">=</span> <span class="s1">&#39;SELECT count(*), min(timestamp), max(timestamp) FROM station&#39;</span>
+        <span class="n">squery</span> <span class="o">=</span> <span class="s2">&quot;SELECT count(*), min(timestamp), max(timestamp) FROM station&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">squery</span><span class="p">)</span>
         <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;stations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;stations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;station_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;station_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;station_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;station_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;station_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                                                            <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
-            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;station_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                                                            <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;station_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;station_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
 
         <span class="c1"># channels</span>
-        <span class="n">cquery</span> <span class="o">=</span> <span class="s1">&#39;SELECT count(*) FROM channel&#39;</span>
+        <span class="n">cquery</span> <span class="o">=</span> <span class="s2">&quot;SELECT count(*) FROM channel&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">cquery</span><span class="p">)</span>
         <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;channels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># pgms</span>
-        <span class="n">pquery</span> <span class="o">=</span> <span class="s1">&#39;SELECT count(*) FROM pgm&#39;</span>
+        <span class="n">pquery</span> <span class="o">=</span> <span class="s2">&quot;SELECT count(*) FROM pgm&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">pquery</span><span class="p">)</span>
         <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
-        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;pgms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;pgms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">results</span></div></div>
 
@@ -912,17 +938,23 @@
 
 <div class="viewcode-block" id="timestr_to_timestamp"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.amps.html#shakemap.utils.amps.timestr_to_timestamp">[docs]</a><span class="k">def</span> <span class="nf">timestr_to_timestamp</span><span class="p">(</span><span class="n">timestr</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timestr</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span><span class="o">.</span>
-                        <span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timestr</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
+        <span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timestr</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span><span class="o">.</span>
-                        <span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timestr</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">timestamp</span></div>
 
 
 <span class="c1"># def _invalid_xml_remove(c):</span>
-    <span class="c1"># http://stackoverflow.com/questions/1707890/fast-way-to-filter-illegal-xml-unicode-chars-in-python</span>
-    <span class="c1"># noqa</span>
+<span class="c1"># http://stackoverflow.com/questions/1707890/fast-way-to-filter-illegal-xml-unicode-chars-in-python</span>
+<span class="c1"># noqa</span>
 <span class="c1">#    illegal_unichrs = [(0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F),</span>
 <span class="c1">#                       (0xD800, 0xDFFF), (0xFDD0, 0xFDDF), (0xFFFE, 0xFFFF),</span>
 <span class="c1">#                       (0x1FFFE, 0x1FFFF), (0x2FFFE, 0x2FFFF),</span>
@@ -948,9 +980,8 @@
 
 
 <div class="viewcode-block" id="prettify"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.amps.html#shakemap.utils.amps.prettify">[docs]</a><span class="k">def</span> <span class="nf">prettify</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return a pretty-printed XML string.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rough_string</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Return a pretty-printed XML string.&quot;&quot;&quot;</span>
+    <span class="n">rough_string</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="n">reparsed</span> <span class="o">=</span> <span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">rough_string</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">reparsed</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="s2">&quot;  &quot;</span><span class="p">)</span></div>
 </pre></div>
@@ -989,7 +1020,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

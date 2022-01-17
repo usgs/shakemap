@@ -8,13 +8,13 @@ Submodules
 
    shakemap.utils.amps
    shakemap.utils.config
+   shakemap.utils.dataframe
    shakemap.utils.dependencies
    shakemap.utils.exception
    shakemap.utils.generic_amp
    shakemap.utils.layers
    shakemap.utils.logging
    shakemap.utils.macros
-   shakemap.utils.pgm_convert
    shakemap.utils.probs
    shakemap.utils.queue
    shakemap.utils.utils

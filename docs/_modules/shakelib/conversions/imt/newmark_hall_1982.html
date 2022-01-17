@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.conversions.imt.newmark_hall_1982 &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
    
@@ -66,13 +65,12 @@
 <span class="sd">        Newmark, N. M., &amp; Hall, W. J. (1982). Earthquake spectra and design.</span>
 <span class="sd">        Earthquake Engineering Research Institute, El Cerrito, California.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># output_input dictionary where the key is the output</span>
         <span class="c1"># and the value is a list of the possible inputs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_input</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;PGV&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PSA10&#39;</span><span class="p">]</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_input</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;PGV&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;PSA10&quot;</span><span class="p">]}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lnfact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">37.27</span> <span class="o">*</span> <span class="mf">2.54</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conversion_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lnfact</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lnsigma</span> <span class="o">=</span> <span class="mf">0.5146578</span>
@@ -99,12 +97,10 @@
         <span class="n">imt_in</span> <span class="o">=</span> <span class="n">imt_in</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">imt_out</span> <span class="o">=</span> <span class="n">imt_out</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">conversion_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lnfact</span>
-        <span class="k">if</span> <span class="n">imt_in</span> <span class="o">==</span> <span class="s1">&#39;PSA10&#39;</span> <span class="ow">and</span> <span class="n">imt_out</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
-            <span class="n">new_imt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convertToPGV</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span>
-                    <span class="n">conversion_factor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">imt_in</span> <span class="o">==</span> <span class="s2">&quot;PSA10&quot;</span> <span class="ow">and</span> <span class="n">imt_out</span> <span class="o">==</span> <span class="s2">&quot;PGV&quot;</span><span class="p">:</span>
+            <span class="n">new_imt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convertToPGV</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">conversion_factor</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No conversion available from </span><span class="si">%r</span><span class="s1"> to </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_in</span><span class="p">,</span>
-                    <span class="n">imt_out</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No conversion available from </span><span class="si">{</span><span class="n">imt_in</span><span class="si">!r}</span><span class="s2"> to </span><span class="si">{</span><span class="n">imt_out</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_imt</span></div>
 
 <div class="viewcode-block" id="NewmarkHall1982.convertSigmas"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertSigmas">[docs]</a>    <span class="k">def</span> <span class="nf">convertSigmas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_in</span><span class="p">,</span> <span class="n">imt_out</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
@@ -124,8 +120,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verifyConversion</span><span class="p">(</span><span class="n">imt_in</span><span class="p">,</span> <span class="n">imt_out</span><span class="p">)</span>
         <span class="n">lnsigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lnsigma</span>
-        <span class="n">sigmaTot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
-                           <span class="p">(</span><span class="n">lnsigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">sigmaTot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">lnsigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">sigmaTot</span></div>
 
 <div class="viewcode-block" id="NewmarkHall1982.getLnSigma"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getLnSigma">[docs]</a>    <span class="k">def</span> <span class="nf">getLnSigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -190,7 +185,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

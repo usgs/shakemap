@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.utils.utils &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -36,6 +35,7 @@
 
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.valid</span> <span class="kn">import</span> <span class="n">gsim</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="kn">import</span> <span class="n">OrthographicProjection</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">SitesContext</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">DistancesContext</span>
@@ -45,32 +45,15 @@
 <span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="kn">import</span> <span class="n">EdgeRupture</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="kn">import</span> <span class="n">QuadRupture</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="kn">import</span> <span class="n">Rupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="kn">import</span> <span class="n">MultiGMPE</span>
-<span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="kn">import</span> <span class="n">Sites</span>
+<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="kn">import</span> <span class="n">MultiGMPE</span><span class="p">,</span> <span class="n">set_sites_depth_parameters</span>
 <span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="kn">import</span> <span class="n">StationList</span>
 
 <span class="kn">from</span> <span class="nn">strec.gmreg</span> <span class="kn">import</span> <span class="n">Regionalizer</span>
 
 <span class="c1"># ACR GMPE/GMICE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.abrahamson_2014</span> <span class="kn">import</span> <span class="n">AbrahamsonEtAl2014</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CampbellBozorgnia2014</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.chiou_youngs_2014</span> <span class="kn">import</span> <span class="n">ChiouYoungs2014</span>
 <span class="kn">from</span> <span class="nn">shakelib.gmice.wgrw12</span> <span class="kn">import</span> <span class="n">WGRW12</span>
 
 <span class="c1"># SCR GMPE/GMICE</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.frankel_1996</span> <span class="kn">import</span> <span class="n">FrankelEtAl1996MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.toro_1997</span> <span class="kn">import</span> <span class="n">ToroEtAl1997MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.silva_2002</span> <span class="kn">import</span> <span class="n">SilvaEtAl2002MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_2003</span> <span class="kn">import</span> <span class="n">Campbell2003MwNSHMP2008</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.tavakoli_pezeshk_2005</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">TavakoliPezeshk2005MwNSHMP2008</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.atkinson_boore_2006</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AtkinsonBoore2006Modified2011</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.pezeshk_2011</span> <span class="kn">import</span> <span class="n">PezeshkEtAl2011</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_atkinson_2011</span> <span class="kn">import</span> <span class="n">Atkinson2008prime</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.somerville_2001</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SomervilleEtAl2001NSHMP2008</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">shakelib.gmice.ak07</span> <span class="kn">import</span> <span class="n">AK07</span>
 
 
@@ -94,16 +77,18 @@
     <span class="c1"># reach into the internal database and find the instrumented stations</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">stations</span><span class="o">.</span><span class="n">db</span>
     <span class="n">cursor</span> <span class="o">=</span> <span class="n">stations</span><span class="o">.</span><span class="n">cursor</span>
-    <span class="n">query1</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SELECT id from station WHERE instrumented = &#39;</span>
-              <span class="s1">&#39;0 and (network = &quot;DYFI&quot; or network=&quot;CIIM&quot;)&#39;</span><span class="p">)</span>
+    <span class="n">query1</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;SELECT id from station WHERE instrumented = &quot;</span>
+        <span class="s1">&#39;0 and (network = &quot;DYFI&quot; or network=&quot;CIIM&quot;)&#39;</span>
+    <span class="p">)</span>
     <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query1</span><span class="p">)</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
         <span class="n">sid</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">query2</span> <span class="o">=</span> <span class="s1">&#39;DELETE FROM amp WHERE station_id=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">sid</span>
+        <span class="n">query2</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;DELETE FROM amp WHERE station_id=&quot;</span><span class="si">{</span><span class="n">sid</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
         <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query2</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-        <span class="n">query3</span> <span class="o">=</span> <span class="s1">&#39;DELETE FROM station where id=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">sid</span>
+        <span class="n">query3</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;DELETE FROM station where id=&quot;</span><span class="si">{</span><span class="n">sid</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
         <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query3</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
 
@@ -121,7 +106,7 @@
 <span class="sd">          file, or</span>
 <span class="sd">        - it can be based on the MultiGMPE for the event.</span>
 
-<span class="sd">    All methods except for the first requires a rupture object.</span>
+<span class="sd">    All methods except for the first require a rupture object.</span>
 
 <span class="sd">    If no config is provided then a rupture is required and the extent is based</span>
 <span class="sd">    on a generic set of active/stable.</span>
@@ -131,8 +116,8 @@
 <span class="sd">        config (ConfigObj): ShakeMap config object.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        tuple: lonmin, lonmax, latmin, latmax rounded to the nearest</span>
-<span class="sd">        arc-minute..</span>
+<span class="sd">        tuple: lonmin, lonmax, latmin, latmax rounded outward to the nearest</span>
+<span class="sd">        30 arc seconds.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -143,29 +128,36 @@
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">offsets</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;extent&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;magnitude_spans&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude_spans&#39;</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude_spans&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-                        <span class="n">spans</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude_spans&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s1">&#39;bounds&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="s1">&#39;extent&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">]:</span>
-                    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">999.0</span><span class="p">:</span>
-                        <span class="n">bounds</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;extent&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s1">&#39;relative_offset&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;relative_offset&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                    <span class="n">offsets</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;relative_offset&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;extent&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;magnitude_spans&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">spans</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;bounds&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s2">&quot;extent&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">][</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">999.0</span><span class="p">:</span>
+                        <span class="n">bounds</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">][</span><span class="s2">&quot;extent&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;relative_offset&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;relative_offset&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">offsets</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;relative_offset&quot;</span><span class="p">]</span>
 
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># Simplest option: extent was specified in the config, use that and exit.</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
         <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">bounds</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">thirty_sec_min</span><span class="p">(</span><span class="n">xmin</span><span class="p">),</span>
+            <span class="n">thirty_sec_max</span><span class="p">(</span><span class="n">xmax</span><span class="p">),</span>
+            <span class="n">thirty_sec_min</span><span class="p">(</span><span class="n">ymin</span><span class="p">),</span>
+            <span class="n">thirty_sec_max</span><span class="p">(</span><span class="n">ymax</span><span class="p">),</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">rupture</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">Rupture</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;get_extent() requires a rupture object if the extent &#39;</span>
-                        <span class="s1">&#39;is not specified in the config object.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;get_extent() requires a rupture object if the extent &quot;</span>
+            <span class="s2">&quot;is not specified in the config object.&quot;</span>
+        <span class="p">)</span>
 
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># Second simplest option: spans are hardcoded based on magnitude</span>
@@ -181,7 +173,13 @@
         <span class="n">extent</span> <span class="o">=</span> <span class="n">_get_extent_from_multigmpe</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">offsets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">extent</span>
+        <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">extent</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">thirty_sec_min</span><span class="p">(</span><span class="n">xmin</span><span class="p">),</span>
+            <span class="n">thirty_sec_max</span><span class="p">(</span><span class="n">xmax</span><span class="p">),</span>
+            <span class="n">thirty_sec_min</span><span class="p">(</span><span class="n">ymin</span><span class="p">),</span>
+            <span class="n">thirty_sec_max</span><span class="p">(</span><span class="n">ymax</span><span class="p">),</span>
+        <span class="p">)</span>
 
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># Apply relative offsets</span>
@@ -196,7 +194,12 @@
     <span class="n">ymin</span> <span class="o">+=</span> <span class="n">yspan</span> <span class="o">*</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">ymax</span> <span class="o">+=</span> <span class="n">yspan</span> <span class="o">*</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">thirty_sec_min</span><span class="p">(</span><span class="n">xmin</span><span class="p">),</span>
+        <span class="n">thirty_sec_max</span><span class="p">(</span><span class="n">xmax</span><span class="p">),</span>
+        <span class="n">thirty_sec_min</span><span class="p">(</span><span class="n">ymin</span><span class="p">),</span>
+        <span class="n">thirty_sec_max</span><span class="p">(</span><span class="n">ymax</span><span class="p">),</span>
+    <span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_get_extent_from_spans</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">spans</span><span class="o">=</span><span class="p">[]):</span>
@@ -212,10 +215,10 @@
     <span class="n">ymax</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">spankey</span><span class="p">,</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">spans</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="n">span</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mag</span> <span class="o">&lt;=</span> <span class="n">span</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="n">ymin</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-            <span class="n">ymax</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-            <span class="n">xmin</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-            <span class="n">xmax</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">ymax</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">xmax</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
             <span class="k">break</span>
     <span class="k">if</span> <span class="n">xmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
@@ -229,8 +232,8 @@
     <span class="p">(</span><span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">)</span> <span class="o">=</span> <span class="n">_rupture_center</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
     <span class="n">origin</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="n">gmice</span> <span class="o">=</span> <span class="n">get_object_from_config</span><span class="p">(</span><span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="s1">&#39;modeling&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">__from_config__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">gmice</span> <span class="o">=</span> <span class="n">get_object_from_config</span><span class="p">(</span><span class="s2">&quot;gmice&quot;</span><span class="p">,</span> <span class="s2">&quot;modeling&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span> <span class="ow">in</span> <span class="n">gmice</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
             <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">imt</span><span class="o">.</span><span class="n">PGV</span> <span class="ow">in</span> <span class="n">gmice</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
@@ -240,56 +243,51 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Put in some default values for conf</span>
         <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;extent&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;mmi&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;threshold&#39;</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span>
-                    <span class="s1">&#39;mindist&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
-                    <span class="s1">&#39;maxdist&#39;</span><span class="p">:</span> <span class="mi">1000</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
+            <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mmi&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span> <span class="s2">&quot;mindist&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;maxdist&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}}</span>
         <span class="p">}</span>
 
         <span class="c1"># Generic GMPEs choices based only on active vs stable</span>
         <span class="c1"># as defaults...</span>
         <span class="n">stable</span> <span class="o">=</span> <span class="n">is_stable</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">stable</span><span class="p">:</span>
-            <span class="n">ASK14</span> <span class="o">=</span> <span class="n">AbrahamsonEtAl2014</span><span class="p">()</span>
-            <span class="n">CB14</span> <span class="o">=</span> <span class="n">CampbellBozorgnia2014</span><span class="p">()</span>
-            <span class="n">CY14</span> <span class="o">=</span> <span class="n">ChiouYoungs2014</span><span class="p">()</span>
+            <span class="n">ASK14</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;AbrahamsonEtAl2014&quot;</span><span class="p">)</span>
+            <span class="n">CB14</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;CampbellBozorgnia2014&quot;</span><span class="p">)</span>
+            <span class="n">CY14</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;ChiouYoungs2014&quot;</span><span class="p">)</span>
             <span class="n">gmpes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ASK14</span><span class="p">,</span> <span class="n">CB14</span><span class="p">,</span> <span class="n">CY14</span><span class="p">]</span>
             <span class="n">site_gmpes</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mf">3.0</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mf">3.0</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mf">3.0</span><span class="p">]</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">]</span>
             <span class="n">gmice</span> <span class="o">=</span> <span class="n">WGRW12</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">Fea96</span> <span class="o">=</span> <span class="n">FrankelEtAl1996MwNSHMP2008</span><span class="p">()</span>
-            <span class="n">Tea97</span> <span class="o">=</span> <span class="n">ToroEtAl1997MwNSHMP2008</span><span class="p">()</span>
-            <span class="n">Sea02</span> <span class="o">=</span> <span class="n">SilvaEtAl2002MwNSHMP2008</span><span class="p">()</span>
-            <span class="n">C03</span> <span class="o">=</span> <span class="n">Campbell2003MwNSHMP2008</span><span class="p">()</span>
-            <span class="n">TP05</span> <span class="o">=</span> <span class="n">TavakoliPezeshk2005MwNSHMP2008</span><span class="p">()</span>
-            <span class="n">AB06p</span> <span class="o">=</span> <span class="n">AtkinsonBoore2006Modified2011</span><span class="p">()</span>
-            <span class="n">Pea11</span> <span class="o">=</span> <span class="n">PezeshkEtAl2011</span><span class="p">()</span>
-            <span class="n">Atk08p</span> <span class="o">=</span> <span class="n">Atkinson2008prime</span><span class="p">()</span>
-            <span class="n">Sea01</span> <span class="o">=</span> <span class="n">SomervilleEtAl2001NSHMP2008</span><span class="p">()</span>
-            <span class="n">gmpes</span> <span class="o">=</span> <span class="p">[</span><span class="n">Fea96</span><span class="p">,</span> <span class="n">Tea97</span><span class="p">,</span> <span class="n">Sea02</span><span class="p">,</span> <span class="n">C03</span><span class="p">,</span>
-                     <span class="n">TP05</span><span class="p">,</span> <span class="n">AB06p</span><span class="p">,</span> <span class="n">Pea11</span><span class="p">,</span> <span class="n">Atk08p</span><span class="p">,</span> <span class="n">Sea01</span><span class="p">]</span>
+            <span class="n">Fea96</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;FrankelEtAl1996MwNSHMP2008&quot;</span><span class="p">)</span>
+            <span class="n">Tea97</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;ToroEtAl1997MwNSHMP2008&quot;</span><span class="p">)</span>
+            <span class="n">Sea02</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;SilvaEtAl2002MwNSHMP2008&quot;</span><span class="p">)</span>
+            <span class="n">C03</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;Campbell2003MwNSHMP2008&quot;</span><span class="p">)</span>
+            <span class="n">TP05</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;TavakoliPezeshk2005MwNSHMP2008&quot;</span><span class="p">)</span>
+            <span class="n">AB06p</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;AtkinsonBoore2006Modified2011&quot;</span><span class="p">)</span>
+            <span class="n">Pea11</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;PezeshkEtAl2011&quot;</span><span class="p">)</span>
+            <span class="n">Atk08p</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;Atkinson2008prime&quot;</span><span class="p">)</span>
+            <span class="n">Sea01</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;SomervilleEtAl2001NSHMP2008&quot;</span><span class="p">)</span>
+            <span class="n">gmpes</span> <span class="o">=</span> <span class="p">[</span><span class="n">Fea96</span><span class="p">,</span> <span class="n">Tea97</span><span class="p">,</span> <span class="n">Sea02</span><span class="p">,</span> <span class="n">C03</span><span class="p">,</span> <span class="n">TP05</span><span class="p">,</span> <span class="n">AB06p</span><span class="p">,</span> <span class="n">Pea11</span><span class="p">,</span> <span class="n">Atk08p</span><span class="p">,</span> <span class="n">Sea01</span><span class="p">]</span>
             <span class="n">site_gmpes</span> <span class="o">=</span> <span class="p">[</span><span class="n">AB06p</span><span class="p">]</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.16</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
             <span class="n">gmice</span> <span class="o">=</span> <span class="n">AK07</span><span class="p">()</span>
 
-        <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span>
-            <span class="n">gmpes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">default_gmpes_for_site</span><span class="o">=</span><span class="n">site_gmpes</span><span class="p">)</span>
+        <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">__from_list__</span><span class="p">(</span>
+            <span class="n">gmpes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">default_gmpes_for_site</span><span class="o">=</span><span class="n">site_gmpes</span>
+        <span class="p">)</span>
         <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 
-    <span class="n">min_mmi</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;mmi&#39;</span><span class="p">][</span><span class="s1">&#39;threshold&#39;</span><span class="p">]</span>
+    <span class="n">min_mmi</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;mmi&quot;</span><span class="p">][</span><span class="s2">&quot;threshold&quot;</span><span class="p">]</span>
     <span class="n">sd_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">]</span>
 
     <span class="c1"># Distance context</span>
     <span class="n">dx</span> <span class="o">=</span> <span class="n">DistancesContext</span><span class="p">()</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="mi">2000</span>
     <span class="c1"># This imposes minimum/ maximum distances of:</span>
     <span class="c1">#   80 and 800 km; could make this configurable</span>
-    <span class="n">d_min</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;mmi&#39;</span><span class="p">][</span><span class="s1">&#39;mindist&#39;</span><span class="p">]</span>
-    <span class="n">d_max</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;mmi&#39;</span><span class="p">][</span><span class="s1">&#39;maxdist&#39;</span><span class="p">]</span>
-    <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">d_min</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">d_max</span><span class="p">),</span> <span class="mi">2000</span><span class="p">)</span>
+    <span class="n">d_min</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;mmi&quot;</span><span class="p">][</span><span class="s2">&quot;mindist&quot;</span><span class="p">]</span>
+    <span class="n">d_max</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;mmi&quot;</span><span class="p">][</span><span class="s2">&quot;maxdist&quot;</span><span class="p">]</span>
+    <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">d_min</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">d_max</span><span class="p">),</span> <span class="n">size</span><span class="p">)</span>
     <span class="c1"># Details don&#39;t matter for this; assuming vertical surface rupturing fault</span>
     <span class="c1"># with epicenter at the surface.</span>
     <span class="n">dx</span><span class="o">.</span><span class="n">rrup</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span>
@@ -302,24 +300,23 @@
     <span class="c1"># Sites context</span>
     <span class="n">sx</span> <span class="o">=</span> <span class="n">SitesContext</span><span class="p">()</span>
     <span class="c1"># Set to soft soil conditions</span>
-    <span class="n">sx</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">dx</span><span class="o">.</span><span class="n">rjb</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
-    <span class="n">sx</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">set_sites_depth_parameters</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">)</span>
-    <span class="n">sx</span><span class="o">.</span><span class="n">vs30measured</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">sx</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-    <span class="n">sx</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_addDepthParameters</span><span class="p">(</span><span class="n">sx</span><span class="p">)</span>
-    <span class="n">sx</span><span class="o">.</span><span class="n">backarc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">sx</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">sx</span><span class="o">.</span><span class="n">sids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">sx</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
+    <span class="n">set_sites_depth_parameters</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">)</span>
+    <span class="n">sx</span><span class="o">.</span><span class="n">vs30measured</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">sx</span><span class="o">.</span><span class="n">backarc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
     <span class="c1"># Rupture context</span>
     <span class="n">rx</span> <span class="o">=</span> <span class="n">RuptureContext</span><span class="p">()</span>
     <span class="n">rx</span><span class="o">.</span><span class="n">mag</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
     <span class="n">rx</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="c1"># From WC94...</span>
-    <span class="n">rx</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">0.76</span> <span class="o">+</span> <span class="mf">0.27</span><span class="o">*</span><span class="n">rx</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
+    <span class="n">rx</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.76</span> <span class="o">+</span> <span class="mf">0.27</span> <span class="o">*</span> <span class="n">rx</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
     <span class="n">rx</span><span class="o">.</span><span class="n">dip</span> <span class="o">=</span> <span class="mf">90.0</span>
     <span class="n">rx</span><span class="o">.</span><span class="n">ztor</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span>
     <span class="n">rx</span><span class="o">.</span><span class="n">hypo_depth</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span>
 
-    <span class="n">gmpe_imt_mean</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-        <span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">default_imt</span><span class="p">,</span> <span class="n">sd_types</span><span class="p">)</span>
+    <span class="n">gmpe_imt_mean</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">default_imt</span><span class="p">,</span> <span class="n">sd_types</span><span class="p">)</span>
 
     <span class="c1"># Convert to MMI</span>
     <span class="n">gmpe_to_mmi</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gmice</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">gmpe_imt_mean</span><span class="p">,</span> <span class="n">default_imt</span><span class="p">)</span>
@@ -335,8 +332,7 @@
     <span class="n">proj</span> <span class="o">=</span> <span class="n">OrthographicProjection</span><span class="p">(</span><span class="n">clon</span> <span class="o">-</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clon</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clat</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clat</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="p">(</span><span class="n">QuadRupture</span><span class="p">,</span> <span class="n">EdgeRupture</span><span class="p">)):</span>
         <span class="n">ruptx</span><span class="p">,</span> <span class="n">rupty</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span>
-            <span class="n">rupture</span><span class="o">.</span><span class="n">lons</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">lons</span><span class="p">)],</span>
-            <span class="n">rupture</span><span class="o">.</span><span class="n">lats</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">lats</span><span class="p">)]</span>
+            <span class="n">rupture</span><span class="o">.</span><span class="n">lons</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">lons</span><span class="p">)],</span> <span class="n">rupture</span><span class="o">.</span><span class="n">lats</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">lats</span><span class="p">)]</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ruptx</span><span class="p">,</span> <span class="n">rupty</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">)</span>
@@ -371,10 +367,13 @@
     <span class="c1"># output grid register with common grid resolutions (60c, 30c,</span>
     <span class="c1"># 15c, 7.5c)</span>
     <span class="c1">#</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Extent: </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span>
-                  <span class="p">(</span><span class="n">lonmin</span><span class="p">,</span> <span class="n">lonmax</span><span class="p">,</span> <span class="n">latmin</span><span class="p">,</span> <span class="n">latmax</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">lonmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">lonmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> \
-        <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmax</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extent: </span><span class="si">{</span><span class="n">lonmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">lonmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">latmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">latmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">_round_coord</span><span class="p">(</span><span class="n">lonmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">_round_coord</span><span class="p">(</span><span class="n">lonmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_rupture_center</span><span class="p">(</span><span class="n">rupture</span><span class="p">):</span>
@@ -411,6 +410,20 @@
     <span class="k">return</span> <span class="n">imm</span> <span class="o">*</span> <span class="n">dm</span>
 
 
+<div class="viewcode-block" id="thirty_sec_min"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.thirty_sec_min">[docs]</a><span class="k">def</span> <span class="nf">thirty_sec_min</span><span class="p">(</span><span class="n">coord</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Round a number to the floor of 30 arc-seconds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">coord</span> <span class="o">*</span> <span class="mf">120.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">120.0</span></div>
+
+
+<div class="viewcode-block" id="thirty_sec_max"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.thirty_sec_max">[docs]</a><span class="k">def</span> <span class="nf">thirty_sec_max</span><span class="p">(</span><span class="n">coord</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Round a number to the ceiling of 30 arc-seconds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">coord</span> <span class="o">*</span> <span class="mf">120.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">120.0</span></div>
+
+
 <div class="viewcode-block" id="is_stable"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.is_stable">[docs]</a><span class="k">def</span> <span class="nf">is_stable</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine if point is located in the US stable tectonic region. This uses</span>
@@ -425,7 +438,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">reg</span> <span class="o">=</span> <span class="n">Regionalizer</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
     <span class="n">region_info</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">getRegions</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">region_info</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Stable&#39;</span></div>
+    <span class="k">return</span> <span class="n">region_info</span><span class="p">[</span><span class="s2">&quot;TectonicRegion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Stable&quot;</span></div>
 </pre></div>
 
           </div>
@@ -462,7 +475,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

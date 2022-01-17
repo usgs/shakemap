@@ -1,4 +1,4 @@
-.. _sec-tg-parameters:
+.. _sec-tg-parameters-4:
 
 *************************************
 Recorded Ground-motion Parameters
@@ -155,11 +155,11 @@ provided in the *shakelib/gmice* directory of the ShakeMap software package.
 
 We have implemented a convention for maps and regression plots that seismic
 stations are represented with triangles and macroseismic data are depicted
-with circles (see :num:`Figure #figure1-1`, for example). This convention
+with circles (see :num:`Figure #figure1-1-4`, for example). This convention
 is forward-looking: not all seismic networks were 
 currently following this convention at the time of this writing.  
 
-.. _figure1-1:
+.. _figure1-1-4:
  
 .. figure:: _static/south_napa.*
    :align: left
@@ -174,10 +174,10 @@ currently following this convention at the time of this writing.
    near the epicenter (black star). Note: Map Version Number reflects 
    separate offline processing for this Manual. 
 
-:num:`Figure #figure-hawaii-interactive` shows a different representation of the 
+:num:`Figure #figure-hawaii-interactive-4` shows a different representation of the 
 intensity map  on the newer, interactive maps on the USGS web site.
 
-.. _figure-hawaii-interactive:
+.. _figure-hawaii-interactive-4:
 
 .. figure:: _static/Hawaii_interactive.*
    :align: left

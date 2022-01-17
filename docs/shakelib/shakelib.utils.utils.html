@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>shakelib.utils.utils &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -30,11 +31,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-shakelib.utils.utils">
+  <section id="module-shakelib.utils.utils">
 <span id="shakelib-utils-utils"></span><h1>shakelib.utils.utils<a class="headerlink" href="#module-shakelib.utils.utils" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="shakelib.utils.utils.replace_dyfi">
-<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">replace_dyfi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stationfile</span></em>, <em class="sig-param"><span class="n">dyfi_xml</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#replace_dyfi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.replace_dyfi" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.utils.utils.replace_dyfi">
+<span class="sig-prename descclassname"><span class="pre">shakelib.utils.utils.</span></span><span class="sig-name descname"><span class="pre">replace_dyfi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stationfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dyfi_xml</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#replace_dyfi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.utils.utils.replace_dyfi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove any non-instrumented data from station file, add DYFI.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -55,8 +56,8 @@ instrumented station data.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakelib.utils.utils.get_extent">
-<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">get_extent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rupture</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#get_extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.get_extent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.utils.utils.get_extent">
+<span class="sig-prename descclassname"><span class="pre">shakelib.utils.utils.</span></span><span class="sig-name descname"><span class="pre">get_extent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rupture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#get_extent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.utils.utils.get_extent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to compute map extent from rupture. There are numerous methods for
 getting the extent:</p>
 <blockquote>
@@ -67,7 +68,7 @@ file, or</p></li>
 <li><p>it can be based on the MultiGMPE for the event.</p></li>
 </ul>
 </div></blockquote>
-<p>All methods except for the first requires a rupture object.</p>
+<p>All methods except for the first require a rupture object.</p>
 <p>If no config is provided then a rupture is required and the extent is based
 on a generic set of active/stable.</p>
 <dl class="field-list simple">
@@ -78,8 +79,8 @@ on a generic set of active/stable.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>lonmin, lonmax, latmin, latmax rounded to the nearest
-arc-minute..</p>
+<dd class="field-even"><p>lonmin, lonmax, latmin, latmax rounded outward to the nearest
+30 arc seconds.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
@@ -88,8 +89,20 @@ arc-minute..</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakelib.utils.utils.is_stable">
-<code class="sig-prename descclassname">shakelib.utils.utils.</code><code class="sig-name descname">is_stable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">lat</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#is_stable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.utils.is_stable" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.utils.utils.thirty_sec_min">
+<span class="sig-prename descclassname"><span class="pre">shakelib.utils.utils.</span></span><span class="sig-name descname"><span class="pre">thirty_sec_min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#thirty_sec_min"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.utils.utils.thirty_sec_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round a number to the floor of 30 arc-seconds</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shakelib.utils.utils.thirty_sec_max">
+<span class="sig-prename descclassname"><span class="pre">shakelib.utils.utils.</span></span><span class="sig-name descname"><span class="pre">thirty_sec_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#thirty_sec_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.utils.utils.thirty_sec_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round a number to the ceiling of 30 arc-seconds</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shakelib.utils.utils.is_stable">
+<span class="sig-prename descclassname"><span class="pre">shakelib.utils.utils.</span></span><span class="sig-name descname"><span class="pre">is_stable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/utils.html#is_stable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.utils.utils.is_stable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if point is located in the US stable tectonic region. This uses
 STREC but only makes use of the stable tectonic region. Any location that
 is not mapped as stable is classified as active.</p>
@@ -109,7 +122,7 @@ is not mapped as stable is classified as active.</p>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -146,7 +159,7 @@ is not mapped as stable is classified as active.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

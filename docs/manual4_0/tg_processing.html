@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>2.3. Data Processing &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="2.4. Ground Motion Model Selection" href="tg_select.html" />
@@ -32,7 +33,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="data-processing">
+  <section id="data-processing">
 <span id="sec-processing-4"></span><h1><span class="section-number">2.3. </span>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">¶</a></h1>
 <p>The <strong>model</strong> module is ShakeMap’s primary data processing module. It
 gathers data, performs quality control, and interpolates ground motions
@@ -40,11 +41,14 @@ to a grid or pre-selected set of points.</p>
 <p>The interpolation is performed by treating the ground motions as a
 conditional
 multivariate normal distribution (MVN). The MVN approach employed by
-ShakeMap is described in <a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al., 2018</span></a>. The
+ShakeMap is described in
+<a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al., 2022</span></a>. The
 specifics of ShakeMap’s implementation of this method are described below.</p>
-<div class="section" id="ground-motion-prediction">
+<p>Note, this document applies to ShakeMap v4.1 and later. For v4.0.x, see
+<a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al., 2018</span></a>.</p>
+<section id="ground-motion-prediction">
 <span id="subsec-ground-motion-prediction-4"></span><h2><span class="section-number">2.3.1. </span>Ground-Motion Prediction<a class="headerlink" href="#ground-motion-prediction" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="ground-motion-models">
+<section id="ground-motion-models">
 <h3><span class="section-number">2.3.1.1. </span>Ground Motion Models<a class="headerlink" href="#ground-motion-models" title="Permalink to this headline">¶</a></h3>
 <p>ShakeMap uses ground-motion prediction equations (GMPEs) to provide the
 initial estimates of ground motions. The GMPEs are drawn from the set
@@ -61,8 +65,8 @@ is specified with the <code class="docutils literal notranslate"><span class="pr
 The MultiGMPE class allows for smooth transitions between tectonic
 environments, as well as consistency with the methodology of other
 projects, such as the <a class="reference external" href="https://www.usgs.gov/natural-hazards/earthquake-hazards/hazards/">USGS National Seismic Hazard Model</a>.</p>
-</div>
-<div class="section" id="ground-motion-model-sets">
+</section>
+<section id="ground-motion-model-sets">
 <h3><span class="section-number">2.3.1.2. </span>Ground Motion Model Sets<a class="headerlink" href="#ground-motion-model-sets" title="Permalink to this headline">¶</a></h3>
 <p>By default, ShakeMap comes with a few GMPE sets pre-configured, and we review a
 few of the important ones here. One example is the “active_crustal_nshmp2014,”
@@ -77,13 +81,23 @@ use with magnitudes less than 4. Our implementation includes an extension of the
 model to smaller magnitudes that extrapolates the small-magnitude scaling of
 ground motions. The slope of this adustment varies with period and distance,
 as illustrated in .</p>
-<div class="figure align-left" id="id1">
+<figure class="align-left" id="id1">
 <span id="nga-east-sope"></span><a class="reference internal image-reference" href="../_images/nga-east_smallM_slopes.png"><img alt="../_images/nga-east_smallM_slopes.png" src="../_images/nga-east_smallM_slopes.png" style="width: 500px;" /></a>
-<p class="caption"><span class="caption-text">Figure 1: Estimated small-magnitue scaling of the NGA-East median ground motion model
+<figcaption>
+<p><span class="caption-text">Figure 1: Estimated small-magnitue scaling of the NGA-East median ground motion model
 as a function of period and distance.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-</div>
-<div class="section" id="uncertainty-from-multiple-models">
+</figcaption>
+</figure>
+<p>Another issue with the NGA East models is that some of the seed models
+were not developed with parameters for peak ground velocity (PGV). We
+accommodate this deficiency by using the conditional PGV model of
+<a class="reference internal" href="sm4_references.html#abrahamson2020"><span class="std std-ref">Abrahamson and Bhasin (2020)</span></a> to compute PGV
+from spectral
+acceleration of an appropriate period given the magnitude of the
+earthquake in question. This treatment is consistent with the approach
+used by NSHM.</p>
+</section>
+<section id="uncertainty-from-multiple-models">
 <h3><span class="section-number">2.3.1.3. </span>Uncertainty from Multiple Models<a class="headerlink" href="#uncertainty-from-multiple-models" title="Permalink to this headline">¶</a></h3>
 <p>The MultiGMPE module uses a list of GMPEs and their weights to
 produce a weighted mean at each location. If we treat the outputs of the
@@ -126,36 +140,40 @@ somewhat lower value near the source than at distance.
 Upon inspection of the cross-section plots and scale, however,
 we find that the variation is very small in amplitude. This
 variation is due to the heteroscedastic nature of the GMPEs.</p>
-<div class="figure align-left" id="id2">
+<figure class="align-left" id="id2">
 <span id="gmpe-test-mean"></span><a class="reference internal image-reference" href="../_images/gmpe_test_PSA3p0.png"><img alt="../_images/gmpe_test_PSA3p0.png" src="../_images/gmpe_test_PSA3p0.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 2: The mean ground motion field for a 50-50 combination of the
+<figcaption>
+<p><span class="caption-text">Figure 2: The mean ground motion field for a 50-50 combination of the
 <a class="reference internal" href="sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
-<div class="figure align-left" id="id3">
+</figcaption>
+</figure>
+<figure class="align-left" id="id3">
 <span id="gmpe-test-sd"></span><a class="reference internal image-reference" href="../_images/gmpe_test_PSA3p0_sd.png"><img alt="../_images/gmpe_test_PSA3p0_sd.png" src="../_images/gmpe_test_PSA3p0_sd.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 3: The standard deviation of the ground motion field for a 50-50
+<figcaption>
+<p><span class="caption-text">Figure 3: The standard deviation of the ground motion field for a 50-50
 combination of the
 <a class="reference internal" href="sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</div>
+</figcaption>
+</figure>
 <p>If the requested IMT is PGV, and some of the selected GMPEs do not
 produce PGV, then those GMPEs are removed from the list and the list
 is re-weighted with the remaining GMPEs in accordance with their
 original proportional weights. If none of the GMPEs in a set
-produce PGV, then MultiGMPE computs 1.0 s spectral acceleration and
-uses the <a class="reference internal" href="sm4_references.html#newmark1982"><span class="std std-ref">Newmark and Hall (1982)</span></a> equations to
-convert to PGV.</p>
+produce PGV, then MultiGMPE uses the conditional model of
+<a class="reference internal" href="sm4_references.html#abrahamson2020"><span class="std std-ref">Abrahamson and Bhasin (2020)</span></a> to compute PGV from
+a spectral acceleration period appropriate to the earthquake magnitude.</p>
 <p>The MultiGMPE class will also accept a second set of GMPEs and weights
 to use beyond a specified distance.</p>
-</div>
-<div class="section" id="site-corrections">
+</section>
+<section id="site-corrections">
 <span id="subsec-site-amplification-4"></span><h3><span class="section-number">2.3.1.4. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this headline">¶</a></h3>
-<p>Near-surface conditions can have a substantial effect on ground motions. Ground motions
-at soft-soil sites, for instance, will typically be amplified relative to sites on bedrock.
-Because we wish to interpolate sparse data to a grid over which site characteristics may
-vary greatly, we compute our residuals and predicted ground motions using
-site amplification factors.</p>
+<p>Near-surface conditions can have a substantial effect on ground motions.
+Ground motions at soft-soil sites, for instance, will typically be amplified
+relative to sites on bedrock.  Because we wish to interpolate sparse data
+to a grid over which site characteristics may vary greatly, we compute our
+residuals and predicted ground motions using site amplification factors.</p>
 <p>A third set of GMPEs may be supplied to the MultiGMPE class
 if all of the GMPEs in the primary set do not support Vs30-based site
 amplification. The GMPEs in this set will be used to compute the site
@@ -164,46 +182,52 @@ Otherwise, the individual GMPEs will each apply site corrections to the
 ground motions they provide to the mean. As Vs30 has become a near-ubiquitous
 site amplification proxy parameter in current-genereation GMPEs, the latter
 approach usually applies.</p>
-</div>
-<div class="section" id="site-characterization-map">
+</section>
+<section id="site-characterization-map">
 <h3><span class="section-number">2.3.1.5. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this headline">¶</a></h3>
 <p>In general, site amplifications are computed using a Vs30 grid supplied
 by the operator (see the Vs30 parameters <code class="docutils literal notranslate"><span class="pre">vs30file</span></code> and <code class="docutils literal notranslate"><span class="pre">vs30default</span></code>
 in the <code class="docutils literal notranslate"><span class="pre">data</span></code> section of <em>model.conf</em> for configuration information.)
-Each region wishing to implement ShakeMap should have a Vs30 map that covers the
-entire area they wish to map.</p>
-<p>Some ShakeMap operators have employed existing geotechnically- or geologically-based
+Each region wishing to implement ShakeMap should have a Vs30 map that covers
+the entire area they wish to map.</p>
+<p>Some ShakeMap operators have employed existing geotechnically- or
+geologically-based
 Vs30 maps, or have developed their own Vs30 map for the area covered by their
-ShakeMap system. For regions lacking such maps (including most of globe) operators often
-employ the approach of <a class="reference internal" href="sm4_references.html#wald2007"><span class="std std-ref">Wald and Allen (2007)</span></a>, revised by <a class="reference internal" href="sm4_references.html#allen2009b"><span class="std std-ref">Allen and Wald, (2009b)</span></a>,
-which provides estimates of Vs30 as a function of more readily available topographic
-slope data. Wald and Allen’s slope-based Vs30-mapping proxy is employed by the Global
-ShakeMap (GSM) system.</p>
+ShakeMap system. For regions lacking such maps (including most of globe)
+operators often
+employ the approach of <a class="reference internal" href="sm4_references.html#wald2007"><span class="std std-ref">Wald and Allen (2007)</span></a>,
+revised by <a class="reference internal" href="sm4_references.html#allen2009b"><span class="std std-ref">Allen and Wald, (2009b)</span></a>,
+which provides estimates of Vs30 as a function of more readily available
+topographic slope data. Wald and Allen’s slope-based Vs30-mapping proxy is
+employed by the Global ShakeMap (GSM) system.</p>
 <p>Recent developments by <a class="reference internal" href="sm4_references.html#wald2011a"><span class="std std-ref">Wald et al. (2011d)</span></a> and
-<a class="reference internal" href="sm4_references.html#thompson2012"><span class="std std-ref">Thompson et al. (2012</span></a>; <a class="reference internal" href="sm4_references.html#thompson2014"><span class="std std-ref">2014</span></a>) provide a
-basis for refining Vs30 maps when Vs30 data constraints are abundant. Their method
-employs not only geologic units and topographic slope, but also explicitly constrains map
-values near Vs30 observations using kriging-with-a-trend to introduce the level of spatial
-variations seen in the Vs30 data (<a class="reference internal" href="sm4_references.html#thompson2014"><span class="std std-ref">Thompson et al., 2014</span></a>).
+<a class="reference internal" href="sm4_references.html#thompson2012"><span class="std std-ref">Thompson et al. (2012</span></a>; <a class="reference internal" href="sm4_references.html#thompson2014"><span class="std std-ref">2014</span></a>)
+provide a basis for refining Vs30 maps when Vs30 data constraints are
+abundant. Their method employs not only geologic units and topographic
+slope, but also explicitly constrains map values near Vs30 observations
+using kriging-with-a-trend to introduce the level of spatial variations
+seen in the Vs30 data (<a class="reference internal" href="sm4_references.html#thompson2014"><span class="std std-ref">Thompson et al., 2014</span></a>).
 An example of Vs30 for California using this approach is provided in
 <a class="pageref" href="#thompson-vs30">Figure  4</a>. Thompson et al. describe how
-differences among Vs30 base maps translate into variations in site amplification in
-ShakeMap.</p>
-<div class="figure align-left" id="id4">
+differences among Vs30 base maps translate into variations in site
+amplification in ShakeMap.</p>
+<figure class="align-left" id="id4">
 <span id="thompson-vs30"></span><a class="reference internal image-reference" href="../_images/thompson_vs30.png"><img alt="../_images/thompson_vs30.png" src="../_images/thompson_vs30.png" style="width: 650px;" /></a>
-<p class="caption"><span class="caption-text">Figure 4: Revised California Vs30 Map (<a class="reference internal" href="sm4_references.html#thompson2014"><span class="std std-ref">Thompson et al., 2014</span></a>).
+<figcaption>
+<p><span class="caption-text">Figure 4: Revised California Vs30 Map (<a class="reference internal" href="sm4_references.html#thompson2014"><span class="std std-ref">Thompson et al., 2014</span></a>).
 This map combines geology, topographic slope, and constraints of map
 values near Vs30 observations using kriging-with-a-trend.  Inset shows
 Los Angeles region, with Los Angeles Basin indicating low Vs30 velocities.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
-</div>
+</figcaption>
+</figure>
 <p><a class="reference internal" href="sm4_references.html#worden2015"><span class="std std-ref">Worden et al. (2015)</span></a> and
 <a class="reference internal" href="sm4_references.html#heath2020"><span class="std std-ref">Heath et al. (2020)</span></a> further consolidate readily
 available Vs30 map grids used for ShakeMaps at global regional seismic networks
 with background derived from the topographic-based Vs30 proxy to develop a
 consistently scaled mosaic of <a class="reference external" href="https://github.com/usgs/earthquake-global_vs30">Vs30 maps for the globe</a>
 with smooth transitions from tile to tile.</p>
-</div>
-<div class="section" id="generic-amplification-factors">
+</section>
+<section id="generic-amplification-factors">
 <h3><span class="section-number">2.3.1.6. </span>Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h3>
 <p>Shakemap does not currently support operator-supplied basin
 depths. Some modern GMPEs use basin depths (typically “Z1.0” or “Z2.5”)
@@ -221,9 +245,9 @@ grids should taper to zero at the edges, and are assumed to be zero
 everywhere outside of the supplied grid(s). See the module
 <a class="reference internal" href="../apidoc/shakemap.utils.generic_amp.html#module-shakemap.utils.generic_amp" title="shakemap.utils.generic_amp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">shakemap.utils.generic_amp</span></code></a> for more on the generic amplification
 factors.</p>
-</div>
-</div>
-<div class="section" id="ground-motion-to-intensity-conversions">
+</section>
+</section>
+<section id="ground-motion-to-intensity-conversions">
 <span id="subsec-gmice"></span><h2><span class="section-number">2.3.2. </span>Ground Motion to Intensity Conversions<a class="headerlink" href="#ground-motion-to-intensity-conversions" title="Permalink to this headline">¶</a></h2>
 <p>While ideally we would have cross-correlation functions available
 between macroseismic intenstiy and other IMTs (see
@@ -250,8 +274,8 @@ discussed in <a class="reference internal" href="#subsubsec-imt-selection"><span
 <p>The available GMICE are specified in the modules.conf configuration file,
 and configured with the <code class="docutils literal notranslate"><span class="pre">gmice</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">modeling</span></code> section
 of <em>model.conf</em>.</p>
-</div>
-<div class="section" id="intensity-prediction-equations">
+</section>
+<section id="intensity-prediction-equations">
 <h2><span class="section-number">2.3.3. </span>Intensity Prediction Equations<a class="headerlink" href="#intensity-prediction-equations" title="Permalink to this headline">¶</a></h2>
 <p>A small number of intensity prediction equations (IPEs) are currently
 available. The available IPEs are for active tectonic and stable
@@ -295,33 +319,39 @@ displays a dramatic drop in the standard deviation at the
 point where the two lines of the bi-linear relationship meet.
 Neither of these features is likely physical, but are a
 consequence of the bilinear form of the GMICE.</p>
-<div class="figure align-left" id="id5">
+<figure class="align-left" id="id5">
 <span id="wgrw12-pgv-mmi"></span><a class="reference internal image-reference" href="../_images/wgrw12_figure_6.png"><img alt="../_images/wgrw12_figure_6.png" src="../_images/wgrw12_figure_6.png" style="width: 550px;" /></a>
-<p class="caption"><span class="caption-text">Figure 5: MMI vs. PGV for the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>
+<figcaption>
+<p><span class="caption-text">Figure 5: MMI vs. PGV for the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>
 GMICE. Note the bi-linear relationship of the three GMICE
 plotted. (Figure from <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>.)</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
-</div>
-<div class="figure align-left" id="id6">
+</figcaption>
+</figure>
+<figure class="align-left" id="id6">
 <span id="gmice-test-mean"></span><a class="reference internal image-reference" href="../_images/gmpe_test_MMI.png"><img alt="../_images/gmpe_test_MMI.png" src="../_images/gmpe_test_MMI.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 6: The mean MMI field for a VirtualIPE comprised of a 50-50
+<figcaption>
+<p><span class="caption-text">Figure 6: The mean MMI field for a VirtualIPE comprised of a 50-50
 combination of the
 <a class="reference internal" href="sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs, and
 the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> GMICE.</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
-</div>
-<div class="figure align-left" id="id7">
+</figcaption>
+</figure>
+<figure class="align-left" id="id7">
 <span id="gmice-test-sd"></span><a class="reference internal image-reference" href="../_images/gmpe_test_MMI_sd.png"><img alt="../_images/gmpe_test_MMI_sd.png" src="../_images/gmpe_test_MMI_sd.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 7: The standard deviation of the MMI field for a VirtualIPE
+<figcaption>
+<p><span class="caption-text">Figure 7: The standard deviation of the MMI field for a VirtualIPE
 comprised of a 50-50 combination of the
 <a class="reference internal" href="sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs, and
 the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> GMICE.</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
-</div>
+</figcaption>
+</figure>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-</div>
-<div class="section" id="cross-correlation-functions">
+</section>
+<section id="cross-correlation-functions">
 <span id="subsec-cross-correlation"></span><h2><span class="section-number">2.3.4. </span>Cross-correlation Functions<a class="headerlink" href="#cross-correlation-functions" title="Permalink to this headline">¶</a></h2>
 <p>There is, as yet, a very limited number of cross-correlation functions
 in the literature.
@@ -349,8 +379,8 @@ MMI, while its correlation structure is unknown, is closely
 correlated with PGV.</p>
 <p>As suitable cross-correlation functions become available
 for additional IMTs, we will incorporate them into ShakeMap.</p>
-</div>
-<div class="section" id="data-handling-and-outliers">
+</section>
+<section id="data-handling-and-outliers">
 <h2><span class="section-number">2.3.5. </span>Data Handling and Outliers<a class="headerlink" href="#data-handling-and-outliers" title="Permalink to this headline">¶</a></h2>
 <p>As a general rule, ShakeMap assumes that by the time data reach
 <strong>model</strong> they have undergone fairly rigorous quality control.
@@ -389,13 +419,15 @@ from that station are unaffected (unless they, too, are
 flagged). Derived parameters are, however, flagged if their source
 parameter is flagged (e.g., if PGV is flagged, then the MMI derived
 from it is also flagged).</p>
-</div>
-<div class="section" id="interpolation">
+</section>
+<section id="interpolation">
 <h2><span class="section-number">2.3.6. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> discusses the application of
-the MVN to the interpolation of ground motions. Here, we
-discuss some specific details of its implementation within ShakeMap.</p>
-<div class="section" id="computation">
+the MVN to the interpolation of ground motions.
+<a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a> updates and improves upon this
+approach. Here, we
+discuss some specific details of their implementation within ShakeMap.</p>
+<section id="computation">
 <span id="subsubsec-mvn-computation"></span><h3><span class="section-number">2.3.6.1. </span>Computation<a class="headerlink" href="#computation" title="Permalink to this headline">¶</a></h3>
 <p>The conditional MVN can be summarized as a case in which we have a
 random variable of interest <img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/> where we wish to compute
@@ -434,17 +466,28 @@ two components:</p>
     \right]."/></p>
 </div><p>where <img class="math" src="../_images/math/3f8a8dd7e4ad14aa78b604995970a96aea83bed2.png" alt="M \times M"/>, <img class="math" src="../_images/math/950508a6d3d497eaf069578cd21a96a7f884cecf.png" alt="M \times N"/>, <img class="math" src="../_images/math/647a6ba7f8980014dc1b9d145acc363cb2b4e241.png" alt="N \times M"/>, and
 <img class="math" src="../_images/math/e50881b48961b9238e27e7b7094a4ca31ee7aa3a.png" alt="N \times N"/> give the dimensions of the partitioned matrices. The
-mean values may be taken from a GMPE or other ground motion model. The
-elements of the covariance matrix are given by:</p>
+mean values may be taken from a GMPE or other ground motion model.</p>
+<p>The residuals are treated as a linear mixed effects model:</p>
 <div class="math">
-<p><img src="../_images/math/fb86578afaaf08401832cb36446133879f6c6aeb.png" alt="\Sigma_{{Y_i},{Y_j}} = \rho_{{Y_i},{Y_j}}\phi_{Y_i}\phi_{Y_j},"/></p>
+<p><img src="../_images/math/0838eca21e5703e793cebcbf725896eb8897612f.png" alt="Y_i=\mu_{Y_i}+B_i+W_i"/></p>
+</div><p>where “math”<cite>B_i</cite> is the between-event residual and <img class="math" src="../_images/math/b0abfd9bb0f90564b47cb4e7616d66b8b3046ecc.png" alt="W_i"/> is the
+within-event residual. The within-event residual is assumed to be a spatially
+varying random process, and the between-event residual is assumed to be a
+perfectly correlated random process.  The elements of the covariance matrix
+are given by:</p>
+<div class="math">
+<p><img src="../_images/math/50c2b82063cfa812e93699c7809302027a34a1fc.png" alt="\Sigma_{{Y_i},{Y_j}} =
+    \rho_{{Y_i},{Y_j}}\phi_{Y_i}\phi_{Y_j} + \tau_{Y_i}\tau{Y_j},"/></p>
 </div><p>where
 <img class="math" src="../_images/math/245afb82d762d62adb23dbd17c80178102466f7b.png" alt="\Sigma_{{Y_i},{Y_j}}"/> is the element of the covariance matrix at
-position <em>(i, j)</em>,
-<img class="math" src="../_images/math/0eb89c34afc0414d2d9d09bbbc9a84bfe4920840.png" alt="\rho_{{Y_i},{Y_j}}"/> is the correlation between the elements
-<img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/> of the vector <img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/>, and
+position <em>(i, j)</em> in the matrix,
+<img class="math" src="../_images/math/0eb89c34afc0414d2d9d09bbbc9a84bfe4920840.png" alt="\rho_{{Y_i},{Y_j}}"/> is the correlation between
+<img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/> of the vector <img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/>,
 <img class="math" src="../_images/math/64521bfb78baef3acea7c9e1f24689c2a79b7f4f.png" alt="\phi_{Y_i}"/> and <img class="math" src="../_images/math/ed3009af01a05eccbbc61d08d5e4d100f5d9cfba.png" alt="\phi_{Y_j}"/> are the within-event standard
-deviations of the elements <img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/>. We note that the
+deviations of the elements <img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/>, and
+<img class="math" src="../_images/math/e6b03b6fac9dd8d9b5abecd14561d6aaef3ce31b.png" alt="\tau_{Y_i}"/> and <img class="math" src="../_images/math/491598b87912a90e7a2bd5aeaeec2bffe0926bea.png" alt="\tau_{Y_j}"/> are the between-event standard
+deviations of the elements <img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/>.
+Note that the
 correlation between <img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/> may be a function of
 distance: either physical separation, spectral separation, or both.</p>
 <p>Given a set of observations <img class="math" src="../_images/math/3839b2f8dc512b2de250bf7fb0c594b9abf43800.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, and
@@ -517,8 +560,8 @@ diagonal elements of <img class="math" src="../_images/math/f59b0b74da65499430a8
 particular partitioning of the <img class="math" src="../_images/math/80ae1a10616f968c357e755c369d3ae588b58db7.png" alt="\bm{Y_1}"/> vector. For ShakeMap
 purposes, it is both convenient and computationally efficient to process
 each row of the output grid for each IMT separately.</p>
-</div>
-<div class="section" id="imt-selection">
+</section>
+<section id="imt-selection">
 <span id="subsubsec-imt-selection"></span><h3><span class="section-number">2.3.6.2. </span>IMT Selection<a class="headerlink" href="#imt-selection" title="Permalink to this headline">¶</a></h3>
 <p>In a typical ShakeMap operational environment, it is common for each
 seismic station to produce a number of IMT observations, some of
@@ -560,19 +603,22 @@ no difference between the uncertainties. These figures were generated using the
 <a class="reference internal" href="sm4_references.html#baker2008"><span class="std std-ref">Baker and Jayaram (2008)</span></a> spectral correlation function.
 The odd kink in the mean plots at around 0.2 seconds is a result of the
 specifics of the correlation function.</p>
-<div class="figure align-left" id="id8">
+<figure class="align-left" id="id8">
 <span id="cond-spectra-mean"></span><a class="reference internal image-reference" href="../_images/Figure_mu_compare.png"><img alt="../_images/Figure_mu_compare.png" src="../_images/Figure_mu_compare.png" style="width: 450px;" /></a>
-<p class="caption"><span class="caption-text">Figure 8: Conditional spectra for two sets of conditioning observations:
+<figcaption>
+<p><span class="caption-text">Figure 8: Conditional spectra for two sets of conditioning observations:
 One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
 set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).
 The gray line is the spectrum of the GMM. The solid black line is
 the spectrum conditioned on 3 periods; the dashed line is the
 spectrum conditioned on 7 periods. The circles represent the periods
 and amplitudes of the conditioning observations.</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
-</div>
-<div class="figure align-left" id="id9">
+</figcaption>
+</figure>
+<figure class="align-left" id="id9">
 <span id="cond-spectra-sd"></span><a class="reference internal image-reference" href="../_images/Figure_sigma_compare.png"><img alt="../_images/Figure_sigma_compare.png" src="../_images/Figure_sigma_compare.png" style="width: 450px;" /></a>
-<p class="caption"><span class="caption-text">Figure 9: The standard deviations of conditional spectra for two sets of
+<figcaption>
+<p><span class="caption-text">Figure 9: The standard deviations of conditional spectra for two sets of
 conditioning observations:
 One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
 set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).
@@ -581,43 +627,101 @@ solid black line is the standard deviation of the spectrum conditioned
 on 3 periods; the dashed line is the standard deviation of the
 spectrum conditioned on 7 periods. The circles represent the periods
 and amplitudes of the conditioning observations.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
-</div>
-</div>
-<div class="section" id="event-bias">
-<h3><span class="section-number">2.3.6.3. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this headline">¶</a></h3>
-<p>Prior to computing the MVN as described in the section
-<a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a>
-above, ShakeMap computes the event term (the “bias”).
-<a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> discusses the calculation
-of the event term in more detail.</p>
-<p>The bias at site <em>m</em> for IMT <em>i</em> is given by:</p>
+</figcaption>
+</figure>
+</section>
+<section id="notation">
+<h3><span class="section-number">2.3.6.3. </span>Notation<a class="headerlink" href="#notation" title="Permalink to this headline">¶</a></h3>
+<p>In this section we introduce some additional notation that will be
+used in the following sections. As discussed above, our vector
+<img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/> is broken into two parts, with part 1 being the elements we
+want to predict, and part 2 being our observations. However, our
+implementation closely follows that of
+<a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>, Appendix B, so we will use
+the notation found therein. Thus, the subscript <img class="math" src="../_images/math/4110a8d3e36e3743ebaacfc0e277ceaadc533335.png" alt="Y"/> denotes elements
+we wish to predict, while <img class="math" src="../_images/math/e2bb3efda8323fb5e02e3d31234224eeedc7a270.png" alt="D"/> denotes those with data.</p>
+</section>
+<section id="weighting-of-residuals">
+<span id="subsubsec-weighting-residuals"></span><h3><span class="section-number">2.3.6.4. </span>Weighting of Residuals<a class="headerlink" href="#weighting-of-residuals" title="Permalink to this headline">¶</a></h3>
+<p>In some situations (such as with seismic station data), our observations
+are treated as having no uncertainty. In other cases, however, the data
+are uncertain, that is, they may each be viewed as an element of a
+distribution having a mean and a standard deviation.
+The additional standard deviation of a residual (which we call
+<img class="math" src="../_images/math/d57101a2375bec32adb3616bdcd0469ae3f496c8.png" alt="\sigma_{\epsilon}"/>) can come from a number of
+sources. Observations converted from one IMT to another (via, for example,
+the GMICE) will carry the additional uncertainty of the conversion process.
+Or non-native IMTs that are derived from native IMTs using conditional models
+or the MVN dwill have an inherent uncertainty.
+Intensity observations themselves – such as those obtained through the
+“Did You Feel It?” system – have an uncertainty due to the
+averaging process in their derivation.
+This standard deviation may be specified by the ShakeMap
+operator via the data input file. If it is not specified, ShakeMap assigns a
+user-configurable standard deviation to intensity measurements. Other
+observations may have non-zero uncertainty for reasons of
+instrument or site characteristics. This uncertainty may be specified
+in the input file using the <em>ln_stddev</em> attribute of the amplitude tag.</p>
+<p>As discussed in <a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> uncertain data
+can be accommodated in the MVN structure through the use of the “omega
+factors”. However, we have found it easier and simpler to add the
+additional variance to the diagonal of the covariance matrix of the
+residuals. If <img class="math" src="../_images/math/93afb2c278bff78e8d3cbebefbc2cd965597eb92.png" alt="\mathbf\sigma_{D,\epsilon}^2"/> is a vector of the additional
+variance of the residuals (some elements of which may be zero), then
+the covariance of the residuals is modified:</p>
 <div class="math">
-<p><img src="../_images/math/c939697960784441f9989deefd4230d9b22e5136.png" alt="\mu_{\delta B_{i,m}} =
-\frac{\bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2Y_2},i}
-\bm{\zeta}_i }
-{\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
-\bm{Z}_i},"/></p>
-</div><p>where
-<img class="math" src="../_images/math/7b65cceaf2a3c97d6bd28baa01e56c039efdcd6e.png" alt="\bm{\zeta}_i"/>
-are the total residuals of IMT i (or its closest surrogates, as discussed
-in the section <a class="reference internal" href="#subsubsec-imt-selection"><span class="std std-ref">IMT Selection</span></a>, above),
-<img class="math" src="../_images/math/16e42b03668b4cdf6f0bd3e1b6fa1b2464735107.png" alt="\mathbf{\Sigma}_{\mathbf{Y_2Y_2},i}"/>
-is the covariance matrix of the within-event standard deviations of
-that particualr set of residuals,
-<img class="math" src="../_images/math/9e7d7f8fc6ed461d19249974df43c762aafa3bac.png" alt="\tau_{i, m}"/>
-is the between-event standard deviation of IMT <em>i</em> at site <em>m</em>, and
-<img class="math" src="../_images/math/0dadb846814a198e76c2480ee4c361ff05597806.png" alt="\bm{Z}_i"/>
-is the correlation between IMT <em>i</em> and the IMTs comprising the rows
-of <img class="math" src="../_images/math/7b65cceaf2a3c97d6bd28baa01e56c039efdcd6e.png" alt="\bm{\zeta}_i"/> multiplied by the “omega factors”,
-<img class="math" src="../_images/math/54b13c716a26b7352618030ff7594f8db4c78c26.png" alt="\bm{\omega}"/>,
-of the residuals [for a discussion, see
-<a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>].</p>
-<p>The variance of the bias terms is given by:</p>
-<div class="math" id="equation-bias-sigma">
-<p><span class="eqno">(3)<a class="headerlink" href="#equation-bias-sigma" title="Permalink to this equation">¶</a></span><img src="../_images/math/4ee763b44b47b88797dc954fb87b25373455bcf7.png" alt="\sigma^2_{\delta B_{i,m}} =
- \frac{1}
- {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
- \bm{Z}_i}."/></p>
+<p><img src="../_images/math/1dbebe47cbd3c19cea78d969bf94f54c64aa955f.png" alt="diag\left(\mathbf{\Sigma_{{W_D}{W_D}}}\right) =
+    diag\left(\mathbf{\Sigma_{{W_D}{W_D}}}\right) +
+    \mathbf\sigma_{D,\epsilon}^2"/></p>
+</div><p>This version of <img class="math" src="../_images/math/1787ff57e66be240e039e64472a771468579bdab.png" alt="\mathbf{\Sigma_{{W_D}{W_D}}}"/> is used in all of the
+calculations below.</p>
+</section>
+<section id="event-bias">
+<h3><span class="section-number">2.3.6.5. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this headline">¶</a></h3>
+<p>Once the native data have been prepared for a particular output IMT,
+ShakeMap computes an event term (the “bias”).
+<a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>, Appendix B, discusses the
+calculation
+of the event term in more detail. Of interest, however, is that Engler
+et al.’s approach allows the proper calculation of the event term in the
+presence of a heterscedastic between-event standard deviation.</p>
+<p>Following Engler et al., equations B9 and B8, we define two convenient
+variables:</p>
+<div class="math" id="equation-var-hh-yd">
+<p><span class="eqno">(3)<a class="headerlink" href="#equation-var-hh-yd" title="Permalink to this equation">¶</a></span><img src="../_images/math/77224359ea5cba17d631bd6b3a9c610b6f6698f0.png" alt="\mathbf{\Sigma_{{H_D}{H_D}|y_D}}=
+     \left(\mathbf{T_D^T\Sigma_{{W_D}{W_D}}^{-1}T_D} +
+     \mathbf{\Sigma_{{H_D}{H_D}}^{-1}}\right)^{-1}"/></p>
+</div><p>and</p>
+<div class="math" id="equation-mu-h-yd">
+<p><span class="eqno">(4)<a class="headerlink" href="#equation-mu-h-yd" title="Permalink to this equation">¶</a></span><img src="../_images/math/0e77cc337c51bfba822859b0fbce971ad7c8708e.png" alt="\mathbf{\mu_{{H_D}|y_D}}=
+     \mathbf{\Sigma_{{H_D}{H_D}|y_D}}
+     \mathbf{T_D^T\Sigma_{{W_D}{W_D}}^{-1}\left(y_D-\mu_{Y_D}\right)}"/></p>
+</div><p>Note that because of our notation change,
+<img class="math" src="../_images/math/9d14a6b2a1eb68cf808ba031b9abd31659914c0e.png" alt="\mathbf{\Sigma_{{W_D}{W_D}}^{-1}}"/> is simply our familar
+<img class="math" src="../_images/math/4bfec5a020fb749df3a3fb82d890fabca4e70e6f.png" alt="\mathbf{\Sigma_{{2}{2}}^{-1}}"/>, the inverse of the data within-event
+covariance matrix from earlier, arranged here so that the contributing IMTs
+are in a specific order. The Matrix
+<img class="math" src="../_images/math/eeec18f6b6e6e4e1b98d33a70f9b6ef24ec773b5.png" alt="\mathbf{\Sigma_{{H_D}{H_D}}^{-1}}"/> is a small matrix that is the
+inverse of the covariance
+(correlation, really) of the IMTs contributing to the output IMT (again,
+in the same order), and</p>
+<div class="math">
+<p><img src="../_images/math/64b6cc73e3cf17354e70bb35be83feaf4c558da6.png" alt="\mathbf{T_D} = \mathbf{\left[\begin{matrix}
+    \tau_N &amp; 0 &amp; \cdots &amp; 0 \\
+    0 &amp; \tau_1 &amp; \ddots &amp; \vdots \\
+    \vdots &amp; \ddots &amp; \ddots &amp; \vdots \\
+    0 &amp; \cdots &amp; 0 &amp; \tau_M \\
+    \end{matrix}\right]},"/></p>
+</div><p>where each <img class="math" src="../_images/math/161309afeae4a9dfdb01648e760762a6005edf08.png" alt="\tau_i"/> is a column vector of the between event
+standard deviations of intensity measure <em>i</em>, where IMT <em>N</em> is the native
+measure, and measures <em>1</em> through <em>M</em> are non-native..</p>
+<p>The event terms and covariance are then given by:</p>
+<div class="math" id="equation-deltab-yd">
+<p><span class="eqno">(5)<a class="headerlink" href="#equation-deltab-yd" title="Permalink to this equation">¶</a></span><img src="../_images/math/054caa4df252b8d134834fd9157c51b24d4d0c9b.png" alt="\mathbf{\delta B|{y_D}} = \mathbf{T_{D} \mu_{{H_D}|y_D}}"/></p>
+</div><p>and</p>
+<div class="math" id="equation-cov-deltab-yd">
+<p><span class="eqno">(6)<a class="headerlink" href="#equation-cov-deltab-yd" title="Permalink to this equation">¶</a></span><img src="../_images/math/ba0de7aaf17fd149bdfbb6a0b1d7a277ee01a00e.png" alt="\mathbf{\Sigma_{{\delta B}|y_D}} =
+     \mathbf{T_{D}\Sigma_{{H_D}{H_D}|y_D}T_{D}^T}"/></p>
 </div><p>Unlike the bias calculated by earlier versions of ShakeMap, this approach
 in non-iterative and does not seek to directly minimize the misfit of the
 residuals. The approach described here apportions to the event term the
@@ -628,9 +732,10 @@ is only one residual. <a class="pageref" href="#event-term-number-obs">Figure  1
 illustrates this effect using a uniform set
 of residuals. The event term only approaches the mean of the residuals as
 the number of observations becomes large.</p>
-<div class="figure align-left" id="id10">
+<figure class="align-left" id="id10">
 <span id="event-term-number-obs"></span><a class="reference internal image-reference" href="../_images/event_term_number_obs.png"><img alt="../_images/event_term_number_obs.png" src="../_images/event_term_number_obs.png" style="width: 450px;" /></a>
-<p class="caption"><span class="caption-text">Figure 10: The event term as a function of the number of residuals. Here all
+<figcaption>
+<p><span class="caption-text">Figure 10: The event term as a function of the number of residuals. Here all
 of the residuals have a uniform value of 1.0. The within-event
 and between-event standard deviations are 0.7 and 0.3, respectively.
 The blue dots indicate the event term computed given a particular
@@ -638,100 +743,80 @@ number of residuals, and the black bars indicate the uncertainty
 of the event term (i.e., +/- one standard deviation). As the number
 of observations increases, the event term approaches the mean of
 the residuals, and the standard deviation decreases.</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
-</div>
-<p>In the ShakeMap implementation, the residuals used to compute the bias
-are limited to a subset within a distance of <code class="docutils literal notranslate"><span class="pre">max_range</span></code> km from the
-source (<code class="docutils literal notranslate"><span class="pre">max_range</span></code> is found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code> sub-section of the
-<code class="docutils literal notranslate"><span class="pre">modeling</span></code> section of <em>model.conf</em>). As with the outlier flagging, the
-operator may
-also set a <code class="docutils literal notranslate"><span class="pre">max_mag</span></code> for the bias (also found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code>
-sub-section of <em>model.conf</em>). If an earthquake exceeds <code class="docutils literal notranslate"><span class="pre">max_mag</span></code>,
-and no rupture model is available, the bias computations will be
-skipped.</p>
-<p>The calculation and application of the bias may be turned off by
-setting the parameter <code class="docutils literal notranslate"><span class="pre">do_bias</span></code> (found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code> sub-section
-of the <code class="docutils literal notranslate"><span class="pre">modeling</span></code> section of <em>model.conf</em>) to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
-</div>
-<div class="section" id="updating-the-within-event-standard-deviation">
-<h3><span class="section-number">2.3.6.4. </span>Updating the Within-Event Standard Deviation<a class="headerlink" href="#updating-the-within-event-standard-deviation" title="Permalink to this headline">¶</a></h3>
-<p>Once the bias calculation has been performed, the residuals may be
-computed from the biased estimates of the ground motions. Similarly,
-the adjusted within-event standard deviation of the residuals may be
-calculated:</p>
+</figcaption>
+</figure>
+</section>
+<section id="computing-the-mvn">
+<span id="subsubsec-engler-mvn-computation-4"></span><h3><span class="section-number">2.3.6.6. </span>Computing the MVN<a class="headerlink" href="#computing-the-mvn" title="Permalink to this headline">¶</a></h3>
+<p>While <a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a> describes the basic MVN process,
+we follow the more advanced techniques described in
+<a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>, Appendix B, in order to produce
+grids not
+only of the conditional total standard deviation, but also of the conditional
+within-event and between-event standard deviations in the presence of
+heteroscedastic between-event standard deviation. Engler et al. show that
+the conditional mean is given by:</p>
+<div class="math" id="equation-engler-cond-mean">
+<p><span class="eqno">(7)<a class="headerlink" href="#equation-engler-cond-mean" title="Permalink to this equation">¶</a></span><img src="../_images/math/1671f559433215e0e3c9a1e3c82110b360dbf867.png" alt="\mathbf{\mu_{Y|y_D}} =
+     \mathbf{\mu_{Y}} +
+     \mathbf{C\mu_{H_D|y_D}} +
+     \mathbf{\Sigma_{{W_Y}{W_D}}\Sigma_{{W_D}{W_D}}^{-1}
+         \left(y_D - \mu_{y_D}\right)},"/></p>
+</div><p>and the total covariance:</p>
+<div class="math" id="equation-engler-cond-covariance">
+<p><span class="eqno">(8)<a class="headerlink" href="#equation-engler-cond-covariance" title="Permalink to this equation">¶</a></span><img src="../_images/math/e57de12c3f92553d994ed123f1573e291bda1859.png" alt="\mathbf{\Sigma_{{Y}{Y}|y_D}} =
+     \mathbf{\Sigma_{{W_Y}{W_Y}|w_D}} +
+     \mathbf{C\Sigma_{{H_D}{H_D}|y_D}C^T},"/></p>
+</div><p>where</p>
 <div class="math">
-<p><img src="../_images/math/e324e098c04dc7aa45853cdfc50155c7fc675bb1.png" alt="\hat{\phi}_{i,m} = \sqrt{\phi^2_{i,m} + \sigma^2_{\delta B_{i,m}}}"/></p>
-</div><p>where
-<img class="math" src="../_images/math/07165da280c3e881c3046e28e85dda76691d40dd.png" alt="\hat{\phi}_{i,m}"/> is the adjusted within-event standard deviation
-of IMT <em>i</em> at site <em>m</em>,
-<img class="math" src="../_images/math/5f3279341ff8393d69917b2b58c1f37b7f1e7f43.png" alt="\phi_{i,m}"/> is the within-event standard deviation of IMT <em>i</em>
-at site <em>m</em>, and
-<img class="math" src="../_images/math/eb79623c66f79f1a3fda782e518c5aa2ced103d7.png" alt="\sigma_{\delta B_{i,m}}"/> is the standard deviation of the bias
-as calculated by Equation <a class="reference internal" href="#equation-bias-sigma">(3)</a>.</p>
-<p>With the adjusted within-event residuals, the elements of the covariance
-matrix are given by:</p>
+<p><img src="../_images/math/88ad5dbc5c0b4d579d06cdd1870f46d342b69718.png" alt="\mathbf{\Sigma_{{W_Y}{W_Y}|w_D}} =
+    \mathbf{\Sigma_{{W_Y}{W_Y}}} -
+    \mathbf{\Sigma_{{W_Y}{W_D}}
+            \Sigma_{{W_D}{W_D}}^{-1}
+            \Sigma_{{W_D}{W_Y}}}."/></p>
+</div><p>and</p>
 <div class="math">
-<p><img src="../_images/math/46f471aa86f0ad0a32d6e833d6408f1f355c3ddf.png" alt="\Sigma_{{Y_i},{Y_j}} = \rho_{{Y_i},{Y_j}}\hat{\phi}_{Y_i}\hat{\phi}_{Y_j},"/></p>
-</div><p>where the variables are defined as they were in the section
-<a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a>, but with
-<img class="math" src="../_images/math/8c097330d0668cba806544fd5aae12d8021bf1dd.png" alt="\hat{\phi}"/> replacing <img class="math" src="../_images/math/6f126c303e689f2500a88bfd08000a4c1c16f0b2.png" alt="\phi"/>.</p>
-</div>
-<div class="section" id="weighting-of-residuals">
-<span id="subsubsec-weighting-residuals"></span><h3><span class="section-number">2.3.6.5. </span>Weighting of Residuals<a class="headerlink" href="#weighting-of-residuals" title="Permalink to this headline">¶</a></h3>
-<p>As discussed in <a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> uncertain data
-can be accommodated in the MVN structure through the use of the “omega
-factors”. In our implementation, these factors are based on the adjusted
-within-event standard deviation computed for each residual:</p>
+<p><img src="../_images/math/1c984640b9b2895042a5eeb737f6777b7d158a72.png" alt="\mathbf{C} =
+    \mathbf{T_{Y0}} -
+    \mathbf{\Sigma_{{W_Y}{W_D}}\Sigma_{{W_D}{W_D}}^{-1}T_D},"/></p>
+</div><p>with</p>
 <div class="math">
-<p><img src="../_images/math/0cd2e0c43530ef7ee085e5c5761141f44de535c4.png" alt="\omega_{i,m} = \sqrt{\frac{\hat{\phi}^2_{i,m}}
-                          {\hat{\phi}^2_{i,m} + \sigma^2_{\epsilon,i,m}}}"/></p>
-</div><p>where
-<img class="math" src="../_images/math/fc55e08121cff7dce9affed06171b5b8ded46fe3.png" alt="\sigma_{\epsilon,i,m}"/> is the additional standard deviation of the
-observation of IMT <em>i</em> at site <em>m</em>. These factors are then applied to the
-covariance matrix and the residuals, as discussed in Worden et al.
-Analogous factors, using the unadjusted within-event standard deviation
-(<img class="math" src="../_images/math/5f3279341ff8393d69917b2b58c1f37b7f1e7f43.png" alt="\phi_{i,m}"/>) rather than the adjusted standard deviation
-(<img class="math" src="../_images/math/07165da280c3e881c3046e28e85dda76691d40dd.png" alt="\hat{\phi}_{i,m}"/>) are used to modify the <img class="math" src="../_images/math/0dadb846814a198e76c2480ee4c361ff05597806.png" alt="\bm{Z}_i"/>
-vectors and residuals when computing the bias.</p>
-<p>The additional standard deviation of a residual (i.e.,
-<img class="math" src="../_images/math/fc55e08121cff7dce9affed06171b5b8ded46fe3.png" alt="\sigma_{\epsilon,i,m}"/>) can come from a number of
-sources. Observations converted from one IMT to another (via, for example,
-the GMICE) will carry the additional uncertainty of the conversion process.
-Intensity observations themselves – such as those obtained through the
-“Did You Feel It?” system – have an inherent uncertainty due to the
-averaging process in their derivation.
-This standard deviation may be specified by the
-operator in the input file. If it is not specified, ShakeMap assigns a
-default standard deviation to intensity measurements of 0.3 intensity
-units. Other observations may have non-zero uncertainty for reasons of
-instrument or site characteristics. This uncertainty may be specified
-in the input file using the <em>ln_stddev</em> attribute of the amplitude tag.</p>
-</div>
-<div class="section" id="summary">
-<h3><span class="section-number">2.3.6.6. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
-<p>The interpolation process begins with the calculation of the bias, where
-the covariance matrix, <img class="math" src="../_images/math/087014623fa1747cd1cd5737de3ac01e5a7cd687.png" alt="\bm{\Sigma_{Y_2,Y_2}}"/>, and the
-“omega factorrs”, <img class="math" src="../_images/math/54b13c716a26b7352618030ff7594f8db4c78c26.png" alt="\bm{\omega}"/>, are assembled from
-the unadjusted within-event standard deviations, and the
-residuals, <img class="math" src="../_images/math/f0bb93886adc451f38ae816779f6b2c42f327844.png" alt="\bm{\zeta}"/>, are the total residuals computed from
-the unbiased estimates.</p>
-<p>Once the bias values and the adjusted within-event standard deviations
-are known, the covariance matrix and the “omega factors” can be
-re-computed (using the adjusted within-event standard deviations),
-and the residuals are recomputed from the bias-adjusted estimates.
-These updated factors (including the bias-adjusted estimates) are
-then used in the MVN procedure as described in section
-<a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a>.</p>
-</div>
-</div>
-<div class="section" id="finite-rupture-approximations">
+<p><img src="../_images/math/a81aae8a5b8c78a9e684b99d0b5dad3ff8b144d2.png" alt="\mathbf{T_{Y0}} = \mathbf{\left[\begin{matrix}
+    \tau_{Y_1} &amp; 0 &amp; \cdots &amp; 0 \\
+    \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+    \tau_{Y_K} &amp; 0 &amp; \cdots &amp; 0 \\
+    \end{matrix}\right]}."/></p>
+</div><p>Note that <img class="math" src="../_images/math/8052afa025e6f18db6acdfc55a4e689af7956003.png" alt="\mathbf{\Sigma_{{W_Y}{W_Y}|w_D}}"/> is the conditional
+within-event covariance, and <img class="math" src="../_images/math/07e4b8509228649b55d525165d05a426d64a6624.png" alt="\mathbf{C\Sigma_{{H_D}{H_D}|y_D}C^T}"/>
+is the conditional between-event covariance.
+Thus, to compute the total, within-, and between-event covariances, one
+only need compute two of the three terms of equation
+<a class="reference internal" href="#equation-engler-cond-covariance">(8)</a>.</p>
+<p>As was discussed in the section <a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a>, for the sake
+of computational practicality only the diagonal terms of the covariance
+matrices are computed.</p>
+</section>
+<section id="summary">
+<h3><span class="section-number">2.3.6.7. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<p>The interpolation process begins with the collectior or calculation of the
+native data for the output IMT in question. Next, the bias is calculated,
+where the covariance matrix, <img class="math" src="../_images/math/0b1ee5a8c58d05e6f1f400f0b5c28ed8b6c8f81b.png" alt="\mathbf{\Sigma_{{W_2}{W_2}}}"/> is
+assembled.
+With the bias terms, the adjusted residuals and GMM predictions can be
+calculated. We can then iterate piecemeal through the rows of
+<img class="math" src="../_images/math/a656d24d1a350c0a51f830d7ddfc21cdd205e9cd.png" alt="\mathbf{\Sigma_{{W_1}{W_2}}}"/> to build the outputs of equations
+<a class="reference internal" href="#equation-engler-cond-mean">(7)</a> and <a class="reference internal" href="#equation-engler-cond-covariance">(8)</a>.</p>
+</section>
+</section>
+<section id="finite-rupture-approximations">
 <span id="sec-point-source"></span><h2><span class="section-number">2.3.7. </span>Finite-rupture Approximations<a class="headerlink" href="#finite-rupture-approximations" title="Permalink to this headline">¶</a></h2>
 <p>In situations where no finite rupture model has been specified,
 ShakeMap will approximate distances (and adjust the uncertainties
 of predicted ground motions)
 using the point-source to finite-rupture equations developed
 by <a class="reference internal" href="sm4_references.html#thompson2018"><span class="std std-ref">Thompson and Worden (2018)</span></a></p>
-</div>
-<div class="section" id="output-points-vs-grids">
+</section>
+<section id="output-points-vs-grids">
 <h2><span class="section-number">2.3.8. </span>Output: Points vs. Grids<a class="headerlink" href="#output-points-vs-grids" title="Permalink to this headline">¶</a></h2>
 <p>The typical application of ShakeMap is to compute ground motions
 over a gridded region. The grid is centered on the epicenter of
@@ -751,10 +836,10 @@ identifier (with the columns being separated by whitespace).
 The file may then be specified with the <code class="docutils literal notranslate"><span class="pre">file</span></code> parameter in
 the <code class="docutils literal notranslate"><span class="pre">prediction_location</span></code> sub-section of the <code class="docutils literal notranslate"><span class="pre">interp</span></code> section
 of <em>model.conf</em>.</p>
-</div>
-<div class="section" id="performance-considerations">
+</section>
+<section id="performance-considerations">
 <h2><span class="section-number">2.3.9. </span>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="multithreading">
+<section id="multithreading">
 <h3><span class="section-number">2.3.9.1. </span>Multithreading<a class="headerlink" href="#multithreading" title="Permalink to this headline">¶</a></h3>
 <p>The run time of ShakeMap is most strongly controlled by the number
 of input seismic stations (and macroseismic observations), the size
@@ -777,8 +862,8 @@ error of the type:</p>
 <p>then <code class="docutils literal notranslate"><span class="pre">max_workers</span></code> should be reduced (or, you can obtain or
 compile BLAS libraries that are reentrant-safe – a topic which is
 far beyond the scope of this manual.)</p>
-</div>
-<div class="section" id="grid-size">
+</section>
+<section id="grid-size">
 <h3><span class="section-number">2.3.9.2. </span>Grid Size<a class="headerlink" href="#grid-size" title="Permalink to this headline">¶</a></h3>
 <p>At a given grid resolution (as specified in <em>model.conf</em>), the number
 of points in the grid can grow very large for maps that cover several
@@ -794,9 +879,9 @@ by increasing the X and Y grid spacing until the limit is not exceeded.
 The default value of 500,000 seems to provide a good balance between
 resolution and run time, but the operator may adjust the value to suit
 their needs.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
           </div>
@@ -844,10 +929,11 @@ their needs.</p>
 <li class="toctree-l4"><a class="reference internal" href="#interpolation">2.3.6. Interpolation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#computation">2.3.6.1. Computation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#imt-selection">2.3.6.2. IMT Selection</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#event-bias">2.3.6.3. Event Bias</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#updating-the-within-event-standard-deviation">2.3.6.4. Updating the Within-Event Standard Deviation</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#weighting-of-residuals">2.3.6.5. Weighting of Residuals</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#summary">2.3.6.6. Summary</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#notation">2.3.6.3. Notation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#weighting-of-residuals">2.3.6.4. Weighting of Residuals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#event-bias">2.3.6.5. Event Bias</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#computing-the-mvn">2.3.6.6. Computing the MVN</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#summary">2.3.6.7. Summary</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="#finite-rupture-approximations">2.3.7. Finite-rupture Approximations</a></li>
@@ -880,7 +966,7 @@ their needs.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

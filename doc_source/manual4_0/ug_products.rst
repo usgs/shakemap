@@ -154,7 +154,7 @@ or datasets, and can contain a dictionary-like set of *attributes*.
 Datasets consist of arrays holding data values, and
 metadata in the form of attributes.  A very good introduction to
 the HDF5 data format can be found
-`here <https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf>`_.
+`at the HDF5 group site <https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf>`_.
 
 *shake_result.hdf* consists of a number of groups and datasets. Our
 implementation of HDF5 uses groups to contain Python dictionaries,
@@ -192,10 +192,12 @@ structure. Developers can access these properties using the
 | rupture      | /dictionaries/rupture        | JSON string | Dictionary representation of fault rupture |
 +--------------+------------------------------+-------------+--------------------------------------------+
 
-It also will contain a number of arrays, which, when read with the HDFContainer getGrid() method, return
-a Grid2D object which is a Python representation of a North-up 2D array of data, whose upper-left corner
-coordinate and cell dimensions are known.  The definition of this object can be found `here
-<https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py>`_.
+It also will contain a number of arrays, which, when read with the
+HDFContainer getGrid() method, return a Grid2D object which is a Python
+representation of a North-up 2D array of data, whose upper-left corner
+coordinate and cell dimensions are known.  The definition of this object
+can be found
+`here <https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py>`_.
 
 
 Sampling of grids contained in the HDF:
@@ -229,13 +231,20 @@ Sampling of grids contained in the HDF:
 +-------------------+----------------------------+-------------+----------------------------------------------+
 
 
-Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two 
-datasets: the mean values for each cell and the standard deviations.  
+Each IMT dataset (MMI, PGA, etc.) is stored as a group containing four 
+datasets: the mean values for each cell and three standard deviation
+values: the contitional total standard deviation :math:`\sigma_c`, the
+conditional between-event standard deviation :math:`\tau_c`, and the
+prior within-event standard deviation :math:`\phi_p`. The conditional
+within-event standard devation :math:`\phi_c` may be obtained from
+:math:`\sigma_c` and :math:`\tau_c`:
+:math:`\phi_c = \sqrt{\sigma_c^2 - \tau_c^2}`.
 MMI data for the component 'Larger' will be stored under a group called 
-``imts/MMI_GREATER_OF_TWO_HORIZONTAL``. The mean array will be stored as
-``mean``, and the standard deviation array will be stored as
-``std``.  All IMT grid datasets will be accompanied by a dictionary of
-attributes:
+``imts/GREATER_OF_TWO_HORIZONTAL/MMI``. The mean array will be stored as
+``mean``, :math:`\sigma_c` will be stored as
+``std``, :math:`\phi_p` will be stored as ``phi``, and :math:`\tau_c`
+will be in ``tau``. All IMT grid datasets will be accompanied by a
+dictionary of attributes:
 
 +-----------+------------------------------------------------------+
 | Attr name | Contents                                             |
@@ -261,19 +270,29 @@ attributes:
 | dy        | The grid interval in the y dimension                 |
 +-----------+------------------------------------------------------+
 
-Sampling of IMTs in the HDF file:
+Sampling of possibleIMTs in the HDF file:
 
-+--------------+-----------------------------------------------------+-------------+---------------------+
-| Name         | Location                                            | Python Type | Contents            |
-+==============+=====================================================+=============+=============+=======+
-| MMI Mean     | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/mean     | Grid2D      | MMI Mean Values     | 
-+--------------+-----------------------------------------------------+-------------+---------------------+
-| MMI Std      | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/std      | Grid2D      | MMI Std             | 
-+--------------+-----------------------------------------------------+-------------+---------------------+
-| Sa(0.3) Mean | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/mean | Grid2D      | SA(0.3) Mean Values | 
-+--------------+-----------------------------------------------------+-------------+---------------------+
-| Sa(0.3) Std  | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/std  | Grid2D      | SA(0.3) Std         | 
-+--------------+-----------------------------------------------------+-------------+---------------------+
++--------------+-----------------------------------------------------+-----------------------+
+| Name         | Location                                            | Contents              |
++==============+=====================================================+=============+=========+
+| MMI Mean     | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/mean     | MMI Mean Values       | 
++--------------+-----------------------------------------------------+-----------------------+
+| MMI Sigma    | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/std      | MMI Cond Total Std    | 
++--------------+-----------------------------------------------------+-----------------------+
+| MMI Phi      | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/phi      | MMI Prior W-E Std     | 
++--------------+-----------------------------------------------------+-----------------------+
+| MMI Tau      | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/MMI/tau      | MMI Cond B-E Std      | 
++--------------+-----------------------------------------------------+-----------------------+
+| Sa(0.3) Mean | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/mean | SA(0.3) Mean Values   | 
++--------------+-----------------------------------------------------+-----------------------+
+| Sa(0.3) Sigma| /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/std  | SA(0.3) Cond Total Std|
++--------------+-----------------------------------------------------+-----------------------+
+| Sa(0.3) Phi  | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/phi  | SA(0.3) Prior W-E Std |
++--------------+-----------------------------------------------------+-----------------------+
+| Sa(0.3) Tau  | /arrays/imts/GREATER_OF_TWO_HORIZONTAL/SA(0.3)/tau  | SA(0.3) Cond B-E Std  |
++--------------+-----------------------------------------------------+-----------------------+
+
+The grids are returned as (ny x nx) (rows x cols) numpy grids.
 
 For datasets that are lists of points, the storage of IMTS is the same
 as for grids, except that the data are stored as one-dimensional arrays.
@@ -630,7 +649,7 @@ The following features should be noted:
 - **ln_tau** is the logarithm of the between-even standard deviarion, **ln_phi**
   is the logarithm of the within-even standard deviation, and **ln_sigma**
   is the logarithm of the total standard deviation.
-- Standard deviations for MMI are linear and omit the 'ln_' prefix.
+- Standard deviations for MMI are linear and omit the "ln\_" prefix.
 - If the **flag** attribute is "0" or the empty string, the amplitude is 
   considered unflagged; any other value means the amplitude is flagged and
   therefore not included in the processing.
@@ -798,15 +817,15 @@ seismic station (above), except:
   PGM (i.e., they will have the value 'null').
 
 The station list JSON file is rendered by the online web pages. See
-:num:`Figure #napa-station-table` for an example.
+:num:`Figure #napa-station-table-4` for an example.
 
-.. _napa-station-table:
+.. _napa-station-table-4:
 .. figure:: _static/Napa_station_table.png
    :width: 650px
    :align: left
 
    Station table view from ShakeMap event-specific webpages. Link is at
-   right of tabs above the map (see :num:`Figure #napa-event-page`).
+   right of tabs above the map (see :num:`Figure #napa-event-page-4`).
 
 
 Static Maps and Plots (Images)
@@ -821,9 +840,9 @@ be depicted. Nonetheless, these static maps are ShakeMap’s signature products
 and serve as maps of record and for other purposes, as described below.
 Static maps
 can be accessed and selected using tabs along the top of the USGS earthquake
-event page, as shown in the example in :num:`Figure #napa-event-page`.
+event page, as shown in the example in :num:`Figure #napa-event-page-4`.
 
-.. _napa-event-page:
+.. _napa-event-page-4:
 
 .. figure:: _static/Napa_Event_Page.png  
    :width: 650px	
@@ -858,7 +877,7 @@ provided as described in detail in the :ref:`technical-guide-4`.
 	  
 Strong motion and intensity data symbols default to "see-through” (unfilled)
 mode for the intensity map shown in :num:`Figure #napa-shakemap-mmi` and are
-color-filled for peak ground motion maps (:num:`Figure #napa-pga`). ShakeMap
+color-filled for peak ground motion maps (:num:`Figure #napa-pga-4`). ShakeMap
 operators may chose to modify these defaults using alternative mapping
 configurations.
 
@@ -877,7 +896,7 @@ configurations.
    Note: Map Version Number reflects separate offline processing for this
    Manual.
 
-.. _napa-pga:
+.. _napa-pga-4:
 .. figure:: _static/Napa_ShakeMap_PGA.*
    :width: 650px
    :align: left
@@ -903,7 +922,7 @@ indicate the ground motion of the station converted to intensity.
 The ground-motion values are converted to the intensity color scheme via the
 selected ground-motion--intensity conversion equation (GMICE), and the
 corresponding color scale bar is provided at the bottom of the map (see
-example in :num:`Figure #napa-pga`). 
+example in :num:`Figure #napa-pga-4`). 
 
 Interactive Maps
 -----------------
@@ -915,18 +934,18 @@ layers are provided via GeoJSON, KML, GIS, Raster, and other formats. The
 USGS Earthquake Program Web
 pages employ `Leaflet <http://leafletjs.com/>`_, an open-source JavaScript
 library that is suitable for mobile-friendly interactive maps (see, for
-example, :num:`Figure #napa-contours`). Many of the
+example, :num:`Figure #napa-contours-4`). Many of the
 interactive features are geared towards balancing the experience for both
-desktop and mobile visitors (:num:`Figure #napa-mobile`). Since
+desktop and mobile visitors (:num:`Figure #napa-mobile-4`). Since
 the interactive maps are zoomable, it is convenient to select
 individual stations to query station
 information and amplitudes (see the example in
-:num:`Figure #napa-stationpopup`).
+:num:`Figure #napa-stationpopup-4`).
 The interactive map also allows users to select and show/hide specific layers,
 including seismic stations and DYFI geocoded intensity
-stations (:num:`Figure #napa-dyfi`). 	  
+stations (:num:`Figure #napa-dyfi-4`). 	  
 
-.. _napa-contours:
+.. _napa-contours-4:
 
 .. figure:: _static/Napa_contours_station.png
    :width: 650px
@@ -939,7 +958,7 @@ stations (:num:`Figure #napa-dyfi`).
    by :ref:`Worden et al. \(2012\) <worden2012>`.
 
 
-.. _napa-mobile:
+.. _napa-mobile-4:
 
 .. figure:: _static/Napa_mobile_shakemap.png
    :scale: 40 %
@@ -950,7 +969,7 @@ stations (:num:`Figure #napa-dyfi`).
    (triangles) are color-coded according to their intensity value.
     
 
-.. _napa-stationpopup:
+.. _napa-stationpopup-4:
 
 .. figure:: _static/Napa_contours_station_popup.*
    :width: 650px
@@ -960,7 +979,7 @@ stations (:num:`Figure #napa-dyfi`).
    earthquake showing station information pop-up. 
 
 	   
-.. _napa-dyfi:
+.. _napa-dyfi-4:
 
 .. figure:: _static/Napa_contours-stas-dyfi.png
    :width: 650px
@@ -1006,13 +1025,13 @@ producing the ShakeMap is running an older version of ShakeMap than V4.0.
 
 ShakeMap also produces static graphs of the observational data
 plotted with the biased and unbiased GMPE. For example,
-:num:`Figure #northridge-mi-regr-w-dyfi` shows the 1994 M6.7 Northridge
-earthquake MMI data, and :num:`Figure #northridge-pga-regr-w-dyfi` shows the
+:num:`Figure #northridge-mi-regr-w-dyfi-4` shows the 1994 M6.7 Northridge
+earthquake MMI data, and :num:`Figure #northridge-pga-regr-w-dyfi-4` shows the
 PGA data and GMPE.
 
 
 
-.. _northridge-mi-regr-w-dyfi:
+.. _northridge-mi-regr-w-dyfi-4:
 .. figure:: _static/northridge_mi_regr_w_dyfi.*
    :width: 650px
    :align: left 
@@ -1022,7 +1041,7 @@ PGA data and GMPE.
    plotted with the unbiased (red line) and biased (green line) IPE. The
    dashed green lines show the biased IPE ±3 standard deviations.
 
-.. _northridge-pga-regr-w-dyfi:
+.. _northridge-pga-regr-w-dyfi-4:
 .. figure:: _static/northridge_pga_regr_w_dyfi.*
    :width: 650px
    :align: left 
@@ -1613,14 +1632,16 @@ can be found on the ShakeCast `homepage
 <http://earthquake.usgs.gov/research/software/shakecast.php>`_ and the
 documentation provided therein. 
 
+.. _pdl-client-4:
+
 Product Distribution Layer (PDL) Client
------------------------------------
+---------------------------------------
 
 Finally, for academic and government users, ShakeMap products (and other
 earthquake products) are communicated through the USGS’s `Product Distribution
 Layer (PDL) <http://earthquake.usgs.gov/research/software/#PDL>`_. 
 
-.. _gis_services:
+.. _gis-services-4:
 
 Web Mapping (GIS) Services 
 --------------------------
@@ -1629,7 +1650,7 @@ In addition to the downloadable GIS-formatted ShakeMaps (including shapefiles) t
 readily available for each ShakeMap event, USGS also hosts a real-time
 `30-day Signficant Earthquake GIS ShakeMap Feed
 <https://earthquake.usgs.gov/arcgis/rest/services/eq/sm_ShakeMap30DaySignificant/MapServer>`_.
-`ESRI <http://www.esri.com/>`_ provides a separate
+`ESRI Inc. <http://www.esri.com/>`_ provides a separate
 `Disaster Response ArcGIS service
 <https://www.esri.com/en-us/disaster-response/disasters/earthquakes>`_,
 providing `live feeds

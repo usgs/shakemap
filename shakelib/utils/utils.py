@@ -84,7 +84,7 @@ def get_extent(rupture=None, config=None):
         config (ConfigObj): ShakeMap config object.
 
     Returns:
-        tuple: lonmin, lonmax, latmin, latmax rounded outward to the 9nearest
+        tuple: lonmin, lonmax, latmin, latmax rounded outward to the nearest
         30 arc seconds.
 
     """

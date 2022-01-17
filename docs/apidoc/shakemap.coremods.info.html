@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>shakemap.coremods.info &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap.coremods.kml" href="shakemap.coremods.kml.html" />
@@ -32,32 +33,32 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-shakemap.coremods.info">
+  <section id="module-shakemap.coremods.info">
 <span id="shakemap-coremods-info"></span><h1>shakemap.coremods.info<a class="headerlink" href="#module-shakemap.coremods.info" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="shakemap.coremods.info.InfoModule">
-<em class="property">class </em><code class="sig-prename descclassname">shakemap.coremods.info.</code><code class="sig-name descname">InfoModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eventid</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/info.html#InfoModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.info.InfoModule" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.info.InfoModule">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.info.</span></span><span class="sig-name descname"><span class="pre">InfoModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/info.html#InfoModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.info.InfoModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <p>info – Extract info.json from shake_result.hdf and write it as a file.</p>
 <p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="py attribute">
-<dt id="shakemap.coremods.info.InfoModule.command_name">
-<code class="sig-name descname">command_name</code><em class="property"> = 'info'</em><a class="headerlink" href="#shakemap.coremods.info.InfoModule.command_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.info.InfoModule.command_name">
+<span class="sig-name descname"><span class="pre">command_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'info'</span></em><a class="headerlink" href="#shakemap.coremods.info.InfoModule.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="shakemap.coremods.info.InfoModule.targets">
-<code class="sig-name descname">targets</code><em class="property"> = ['products/info\\.json']</em><a class="headerlink" href="#shakemap.coremods.info.InfoModule.targets" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.info.InfoModule.targets">
+<span class="sig-name descname"><span class="pre">targets</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['products/info\\.json']</span></em><a class="headerlink" href="#shakemap.coremods.info.InfoModule.targets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="shakemap.coremods.info.InfoModule.dependencies">
-<code class="sig-name descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.info.InfoModule.dependencies" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.info.InfoModule.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[('products/shake_result.hdf',</span> <span class="pre">True)]</span></em><a class="headerlink" href="#shakemap.coremods.info.InfoModule.dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.coremods.info.InfoModule.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/info.html#InfoModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.info.InfoModule.execute" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.info.InfoModule.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/info.html#InfoModule.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.info.InfoModule.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write info.json metadata file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -72,7 +73,7 @@
 
 </dd></dl>
 
-</div>
+</section>
 
 
           </div>
@@ -111,13 +112,13 @@
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.exception.html">shakemap.coremods.exception</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.groundmotion.html">shakemap.coremods.groundmotion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.kml.html">shakemap.coremods.kml</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.pointcsv.html">shakemap.coremods.pointcsv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.save.html">shakemap.coremods.save</a></li>
@@ -147,7 +148,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

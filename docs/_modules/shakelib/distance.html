@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.distance &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -80,8 +79,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_rupture</span> <span class="o">=</span> <span class="n">rupture</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_distance_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calcDistanceContext</span><span class="p">(</span>
-            <span class="n">gmpe</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_distance_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calcDistanceContext</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Distance.fromSites"><a class="viewcode-back" href="../../shakelib/shakelib.distance.html#shakelib.distance.Distance.fromSites">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromSites</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">):</span>
@@ -134,26 +132,28 @@
             <span class="n">gmpe</span> <span class="o">=</span> <span class="p">[</span><span class="n">gmpe</span><span class="p">]</span>
 
         <span class="c1"># require rhypo always</span>
-        <span class="n">requires</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">])</span>
+        <span class="n">requires</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;repi&quot;</span><span class="p">,</span> <span class="s2">&quot;rhypo&quot;</span><span class="p">,</span> <span class="s2">&quot;rrup&quot;</span><span class="p">,</span> <span class="s2">&quot;rjb&quot;</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">ig</span> <span class="ow">in</span> <span class="n">gmpe</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">GMPE</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="s1">&#39;getDistanceContext() cannot work with objects of &#39;</span>
-                    <span class="s1">&#39;type &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">ig</span><span class="p">))</span>
+                    <span class="s2">&quot;getDistanceContext() cannot work with objects of &quot;</span>
+                    <span class="s1">&#39;type &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="n">requires</span> <span class="o">=</span> <span class="n">requires</span> <span class="o">|</span> <span class="n">ig</span><span class="o">.</span><span class="n">REQUIRES_DISTANCES</span>
 
         <span class="n">context</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">DistancesContext</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rupture</span><span class="p">,</span> <span class="n">EdgeRupture</span><span class="p">):</span>
-            <span class="n">ddict</span> <span class="o">=</span> <span class="n">get_distance</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">requires</span><span class="p">),</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rupture</span><span class="p">,</span>
-                                 <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rupture</span><span class="o">.</span><span class="n">_mesh_dx</span><span class="p">)</span>
+            <span class="n">ddict</span> <span class="o">=</span> <span class="n">get_distance</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">requires</span><span class="p">),</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rupture</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rupture</span><span class="o">.</span><span class="n">_mesh_dx</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ddict</span> <span class="o">=</span> <span class="n">get_distance</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">requires</span><span class="p">),</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rupture</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">requires</span><span class="p">:</span>
             <span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)[</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">):</span>
-                <span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)[</span><span class="n">method</span> <span class="o">+</span> <span class="s1">&#39;_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="n">method</span> <span class="o">+</span> <span class="s1">&#39;_var&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;rrup&quot;</span><span class="p">,</span> <span class="s2">&quot;rjb&quot;</span><span class="p">):</span>
+                <span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)[</span><span class="n">method</span> <span class="o">+</span> <span class="s2">&quot;_var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="n">method</span> <span class="o">+</span> <span class="s2">&quot;_var&quot;</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">context</span></div>
 
@@ -168,8 +168,7 @@
 <span class="sd">        A list of strings.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rx&#39;</span><span class="p">,</span> <span class="s1">&#39;ry&#39;</span><span class="p">,</span> <span class="s1">&#39;ry0&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;rvolc&#39;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;repi&quot;</span><span class="p">,</span> <span class="s2">&quot;rhypo&quot;</span><span class="p">,</span> <span class="s2">&quot;rjb&quot;</span><span class="p">,</span> <span class="s2">&quot;rrup&quot;</span><span class="p">,</span> <span class="s2">&quot;rx&quot;</span><span class="p">,</span> <span class="s2">&quot;ry&quot;</span><span class="p">,</span> <span class="s2">&quot;ry0&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;rvolc&quot;</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="get_distance"><a class="viewcode-back" href="../../shakelib/shakelib.distance.html#shakelib.distance.get_distance">[docs]</a><span class="k">def</span> <span class="nf">get_distance</span><span class="p">(</span><span class="n">methods</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
@@ -234,40 +233,39 @@
     <span class="n">methods_available</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">get_distance_measures</span><span class="p">())</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">methods</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">methods_available</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s1">&#39;One or more requested distance method is not &#39;</span>
-            <span class="s1">&#39;valid or is not implemented yet&#39;</span><span class="p">)</span>
+            <span class="s2">&quot;One or more requested distance method is not &quot;</span>
+            <span class="s2">&quot;valid or is not implemented yet&quot;</span>
+        <span class="p">)</span>
 
     <span class="c1"># Check dimensions of site coordinates</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">lon</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="s1">&#39;lat, lon, and dep must have the same shape.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="s2">&quot;lat, lon, and dep must have the same shape.&quot;</span><span class="p">)</span>
 
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># Point distances</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
-    <span class="k">if</span> <span class="s1">&#39;rhypo&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
-        <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;rhypo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">computeRhyp</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;rhypo&quot;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">distdict</span><span class="p">[</span><span class="s2">&quot;rhypo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">computeRhyp</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s1">&#39;repi&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
-        <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;repi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">computeRepi</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;repi&quot;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">distdict</span><span class="p">[</span><span class="s2">&quot;repi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">computeRepi</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
 
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># Rupture distances</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
-    <span class="n">gc2_distances</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;rx&#39;</span><span class="p">,</span> <span class="s1">&#39;ry&#39;</span><span class="p">,</span> <span class="s1">&#39;ry0&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="s1">&#39;rrup&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
-        <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;rrup&#39;</span><span class="p">],</span> <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;rrup_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">computeRrup</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span>
-                                                                     <span class="n">dep</span><span class="p">)</span>
+    <span class="n">gc2_distances</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span> <span class="s2">&quot;ry&quot;</span><span class="p">,</span> <span class="s2">&quot;ry0&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">&quot;rrup&quot;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">distdict</span><span class="p">[</span><span class="s2">&quot;rrup&quot;</span><span class="p">],</span> <span class="n">distdict</span><span class="p">[</span><span class="s2">&quot;rrup_var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">computeRrup</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s1">&#39;rjb&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
-        <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;rjb&#39;</span><span class="p">],</span> <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;rjb_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">computeRjb</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span>
-                                                                  <span class="n">dep</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;rjb&quot;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">distdict</span><span class="p">[</span><span class="s2">&quot;rjb&quot;</span><span class="p">],</span> <span class="n">distdict</span><span class="p">[</span><span class="s2">&quot;rjb_var&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">computeRjb</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
 
     <span class="c1"># If any of the GC2-related distances are requested, may as well do all</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">methods</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">gc2_distances</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">distdict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">computeGC2</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="s1">&#39;rvolc&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
-        <span class="n">distdict</span><span class="p">[</span><span class="s1">&#39;rvolc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;rvolc&quot;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">distdict</span><span class="p">[</span><span class="s2">&quot;rvolc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">distdict</span></div>
 </pre></div>
@@ -306,7 +304,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

@@ -51,6 +51,7 @@ def send_queue(command, data, port=9755):
         RuntimeError: If the serialized data is larger than MAX_SIZE.
         OSError: If there is a problem with the socket or connection.
         TypeError: If the supplied data is not JSON serializable.
+
     """
     qdata = {"type": command, "data": data}
     qstr = json.dumps(qdata).encode("utf8")
@@ -75,7 +76,7 @@ def str_to_seconds(tstring):
 
     Args:
         tstring (str): An integer followed by an (optional)
-                       'm', 'h', 'd', 'y'.
+            'm', 'h', 'd', 'y'.
 
     Returns
         int: The number of seconds represented by the input string. If
@@ -84,6 +85,7 @@ def str_to_seconds(tstring):
 
     Raises:
         ValueError: If the value cannot be converted to seconds.
+
     """
     if tstring.endswith("m"):
         secs = 60 * int(tstring.replace("m", ""))

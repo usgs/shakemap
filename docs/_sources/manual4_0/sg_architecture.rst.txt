@@ -543,7 +543,7 @@ transfer
 
 There are three main ``transfer`` programs: ``transfer_email`` (which sends
 email to a list of users), ``transfer_pdl`` (which inserts the ShakeMap
-products into the `PDL system <>`_), and ``transfer_scp`` (which does a 
+products into the `PDL system <pdl-client-4>`_), and ``transfer_scp`` (which does a 
 local or remote copy of the products to another filesystem). These programs
 allow the operator to transfer ShakeMap products to
 other systems via PDL or ssh, and notify users with an email with the event

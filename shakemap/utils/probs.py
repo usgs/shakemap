@@ -107,8 +107,7 @@ def get_probs(origin, config):
       - The probabilities of acr, scr, volcanic, and subduction should sum to
         one.
       - The probabilities of acr_X,scr_X,volcanic_X, crustal, interface and
-        intraslab
-        should sum to 1.
+        intraslab should sum to 1.
       - The probabilities of acr_X should sum to acr, and so on.
 
     Args:
@@ -423,6 +422,7 @@ def get_probability(x, x1, p1, x2, p2):
 
     The subsections and parameters below reflect a series of ramp functions
     we use to calculate various probabilities.
+    ::
       p1  |----+
           |     \
           |      \
@@ -431,6 +431,7 @@ def get_probability(x, x1, p1, x2, p2):
           |
           +-----------------
                x1  x2
+
     Args:
         x (float): Quantity for which we want corresponding probability.
         x1 (float): Minimum X value.
@@ -440,6 +441,7 @@ def get_probability(x, x1, p1, x2, p2):
 
     Returns:
         float: Probability at input x value.
+
     """
     if x <= x1:
         prob = p1

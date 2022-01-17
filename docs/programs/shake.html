@@ -4,16 +4,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>shake &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sm_compare" href="sm_compare.html" />
@@ -32,16 +33,16 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="shake">
+  <section id="shake">
 <span id="id1"></span><h1>shake<a class="headerlink" href="#shake" title="Permalink to this headline">¶</a></h1>
 <p><blockquote>
 <div><p>Run specified ShakeMap modules.</p>
 </div></blockquote>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">shake</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="o">|</span> <span class="o">-</span><span class="n">q</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="n">eventid</span> <span class="o">...</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">shake</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">q</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COMMENT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">x</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">y</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="n">eventid</span> <span class="o">...</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
+<section id="Positional Arguments">
 <h2>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h2>
 <dl class="option-list">
 <dt><kbd>eventid</kbd></dt>
@@ -51,9 +52,9 @@
 <dd><p>The modules to run.</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="Named Arguments">
-<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="options">
+<h2>options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <dl class="option-list">
 <dt><kbd>-d, --debug</kbd></dt>
 <dd><p>Print all informational messages.</p>
@@ -67,17 +68,20 @@
 <dt><kbd>-f, --force</kbd></dt>
 <dd><p>Force the command(s) to run regardless of out of date dependencies.</p>
 </dd>
-<dt><kbd>-c, --cancel</kbd></dt>
+<dt><kbd>-c, --comment</kbd></dt>
+<dd><p>Provide a comment for ‘assemble’ in this version of the ShakeMap. If the comment has spaces, the string should be quoted (e.g., –comment “This is a comment.”)</p>
+</dd>
+<dt><kbd>-x, --cancel</kbd></dt>
 <dd><p>Cancel shakemap; execute cancel_modules list in shake.conf.</p>
 </dd>
-<dt><kbd>-a, --autorun</kbd></dt>
-<dd><p>No-op; we are keeping this argument for backward compatibility but it no longer does anything. It is now the default behavior to use the autorun_modules in shake.conf when no modules are sepcified.</p>
+<dt><kbd>-y, --dryrun</kbd></dt>
+<dd><p>Print a command line that would be executed if the process was called without this flag, and then exit without other action.</p>
 </dd>
 <dt><kbd>-v, --version</kbd></dt>
 <dd><p>Print the version of ShakeMap and quit.</p>
 </dd>
 </dl>
-</div>
+</section>
 <p><dl class="simple">
 <dt>Available modules:</dt><dd><ul class="simple">
 <li><dl class="simple">
@@ -104,13 +108,13 @@
 <li><p>dyfi – Search ComCat for DYFI data and turn it into a ShakeMap data file.</p></li>
 <li><p>Module to raise an exception for testing purposes.</p></li>
 <li><p>gridxml – Create grid.xml and uncertainty.xml files from shake_result.hdf.</p></li>
-<li><p>groundmotion – Search ComCat for GroundMotion data and turn it into a ShakeMap data file.</p></li>
 <li><p>history – Output the version history of an event.</p></li>
 <li><p>info – Extract info.json from shake_result.hdf and write it as a file.</p></li>
 <li><p>kml – Generate KML/KMZ files for ShakeMap.</p></li>
 <li><p>mapping – Generate maps of the IMTs found in shake_result.hdf.</p></li>
 <li><p>model – Interpolate ground motions to a grid or list of locations.</p></li>
 <li><p>plotregr – Plot the regression curves from a data file</p></li>
+<li><p>info – Extract point data from shake_result.hdf and write as CSV file.</p></li>
 <li><dl class="simple">
 <dt>raster – Generate GIS raster files of all IMT values from</dt><dd><p>shake_result.hdf.</p>
 </dd>
@@ -132,7 +136,7 @@
 <p>found in shake_result.hdf.</p>
 <p>Use “shake help command” to see the options for a specific command.</p>
 </p>
-</div>
+</section>
 
 
           </div>
@@ -162,7 +166,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="programs.html">ShakeMap 4.0 Command Line Interface</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">shake</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#options">options</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="sm_compare.html">sm_compare</a></li>
@@ -182,7 +186,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>

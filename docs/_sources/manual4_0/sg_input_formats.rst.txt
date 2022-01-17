@@ -4,6 +4,9 @@
 Input Data Formats
 ****************************
 
+ShakeMap has a number of input files, some of which may be provided in more 
+than one format. See below for a discussion of some of them.
+
 .. _subsec-event-xml-file:
 
 Event XML File
@@ -89,7 +92,7 @@ directory. These files consists of a number of *elements*, with
 defined *attributes*.
 
 The *earthquake* element (optional) is described above in the section
-:ref:`_subsec-event-xml-file`.
+:ref:`subsec-event-xml-file`.
 
 Following the earthquake element is the *stationlist* element, which
 has a *created* attribute, which is the same as the one in the

@@ -6,14 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.coremods.uncertaintymaps &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -35,6 +34,7 @@
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
+
 <span class="c1"># from multiprocessing import Pool</span>
 <span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">cf</span>
 <span class="kn">import</span> <span class="nn">copy</span>
@@ -58,17 +58,19 @@
 <span class="kn">from</span> <span class="nn">impactutils.mapping.city</span> <span class="kn">import</span> <span class="n">Cities</span>
 
 
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
-                                   <span class="n">get_configspec</span><span class="p">,</span>
-                                   <span class="n">get_custom_validator</span><span class="p">,</span>
-                                   <span class="n">config_error</span><span class="p">,</span>
-                                   <span class="n">check_extra_values</span><span class="p">,</span>
-                                   <span class="n">get_data_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_config_paths</span><span class="p">,</span>
+    <span class="n">get_configspec</span><span class="p">,</span>
+    <span class="n">get_custom_validator</span><span class="p">,</span>
+    <span class="n">config_error</span><span class="p">,</span>
+    <span class="n">check_extra_values</span><span class="p">,</span>
+    <span class="n">get_data_path</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
 <span class="kn">from</span> <span class="nn">shakemap.mapping.mapmaker</span> <span class="kn">import</span> <span class="n">draw_uncertainty_map</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="kn">import</span> <span class="n">oq_to_file</span>
 
-<span class="n">WATERCOLOR</span> <span class="o">=</span> <span class="s1">&#39;#7AA1DA&#39;</span>
+<span class="n">WATERCOLOR</span> <span class="o">=</span> <span class="s2">&quot;#7AA1DA&quot;</span>
 
 
 <div class="viewcode-block" id="UncertaintymapsModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.uncertaintymaps.html#shakemap.coremods.uncertaintymaps.UncertaintymapsModule">[docs]</a><span class="k">class</span> <span class="nc">UncertaintymapsModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -77,34 +79,41 @@
 <span class="sd">    found in shake_result.hdf.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;uncertaintymaps&#39;</span>
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s2">&quot;uncertaintymaps&quot;</span>
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="sa">r</span><span class="s1">&#39;products/intensity_uncertainty\.jpg&#39;</span><span class="p">,</span>
-        <span class="sa">r</span><span class="s1">&#39;products/intensity_uncertainty\.pdf&#39;</span><span class="p">,</span>
-        <span class="sa">r</span><span class="s1">&#39;products/pga_uncertainty\.jpg&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/pga_uncertainty\.pdf&#39;</span><span class="p">,</span>
-        <span class="sa">r</span><span class="s1">&#39;products/pgv_uncertainty\.jpg&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/pgv_uncertainty\.pdf&#39;</span><span class="p">,</span>
-        <span class="sa">r</span><span class="s1">&#39;products/psa_uncertainty.*p.*\.jpg&#39;</span><span class="p">,</span>
-        <span class="sa">r</span><span class="s1">&#39;products/psa_uncertainty.*p.*\.pdf&#39;</span><span class="p">]</span>
-    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
-    <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;products.conf&#39;</span><span class="p">]</span>
+        <span class="sa">r</span><span class="s2">&quot;products/intensity_sigma\.jpg&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;products/intensity_sigma\.pdf&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;products/pga_sigma\.jpg&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;products/pga_sigma\.pdf&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;products/pgv_sigma\.jpg&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;products/pgv_sigma\.pdf&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;products/psa_sigma.*p.*\.jpg&quot;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s2">&quot;products/psa_sigma.*p.*\.pdf&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;products/shake_result.hdf&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
+    <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;products.conf&quot;</span><span class="p">]</span>
 
     <span class="n">display_magnitude</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">UncertaintymapsModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">eventid</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span><span class="s1">&#39;Ground Motion Uncertainty Maps&#39;</span><span class="p">,</span>
-                                 <span class="s1">&#39;uncertainty_maps&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">Contents</span><span class="p">(</span>
+            <span class="s2">&quot;Ground Motion Uncertainty Maps&quot;</span><span class="p">,</span> <span class="s2">&quot;uncertainty_maps&quot;</span><span class="p">,</span> <span class="n">eventid</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="UncertaintymapsModule.parseArgs"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.uncertaintymaps.html#shakemap.coremods.uncertaintymaps.UncertaintymapsModule.parseArgs">[docs]</a>    <span class="k">def</span> <span class="nf">parseArgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arglist</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set up the object to accept the --display-magnitude flag</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
-            <span class="n">prog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">command_name</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">))</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--display-magnitude&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Override the magnitude displayed in &#39;</span>
-                            <span class="s1">&#39;map labels.&#39;</span><span class="p">)</span>
+            <span class="n">prog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">command_name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--display-magnitude&quot;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Override the magnitude displayed in &quot;</span> <span class="s2">&quot;map labels.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># This line should be in any modules that overrides this</span>
         <span class="c1"># one. It will collect up everything after the current</span>
@@ -113,8 +122,7 @@
         <span class="c1"># will not work as it will suck up any later modules&#39;</span>
         <span class="c1"># options that are the same as this one&#39;s.</span>
         <span class="c1">#</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;rem&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
-                            <span class="n">help</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">SUPPRESS</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;rem&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">SUPPRESS</span><span class="p">)</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">arglist</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">display_magnitude</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">display_magnitude</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">display_magnitude</span>
@@ -128,23 +136,25 @@
 <span class="sd">                exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
-        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s2">&quot;current&quot;</span><span class="p">,</span> <span class="s2">&quot;products&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
-        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datadir</span><span class="si">}</span><span class="s2"> is not a valid directory.&quot;</span><span class="p">)</span>
+        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">&quot;shake_result.hdf&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datafile</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;uncertaintymaps module can only &#39;</span>
-                                      <span class="s1">&#39;operate on gridded data, not sets of &#39;</span>
-                                      <span class="s1">&#39;points&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;uncertaintymaps module can only &quot;</span>
+                <span class="s2">&quot;operate on gridded data, not sets of &quot;</span>
+                <span class="s2">&quot;points&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># get the path to the products.conf file, load the config</span>
-        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
-        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;products.conf&quot;</span><span class="p">)</span>
+        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s2">&quot;products&quot;</span><span class="p">)</span>
         <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
@@ -153,32 +163,32 @@
             <span class="n">config_error</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
 
         <span class="c1"># create contour files</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Uncertainty mapping...&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Uncertainty mapping...&quot;</span><span class="p">)</span>
 
         <span class="c1"># get the operator setting from config</span>
-        <span class="n">operator</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;operator&#39;</span><span class="p">]</span>
+        <span class="n">operator</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="s2">&quot;operator&quot;</span><span class="p">]</span>
 
         <span class="c1"># get all of the pieces needed for the uncertainty mapping functions</span>
-        <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;countries&#39;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;countries&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="n">countries_file</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;countries&#39;</span><span class="p">]</span>
+        <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="s2">&quot;layers&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;countries&quot;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;countries&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">countries_file</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;countries&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">countries_file</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s1">&#39;states_provs&#39;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;states_provs&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="n">states_provs_file</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;states_provs&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;states_provs&quot;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;states_provs&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">states_provs_file</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;states_provs&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">states_provs_file</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s1">&#39;oceans&#39;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="n">oceans_file</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;oceans&quot;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;oceans&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">oceans_file</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;oceans&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">oceans_file</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s1">&#39;lakes&#39;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;lakes&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="n">lakes_file</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;lakes&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;lakes&quot;</span> <span class="ow">in</span> <span class="n">layers</span> <span class="ow">and</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;lakes&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">lakes_file</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;lakes&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">lakes_file</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Get the number of parallel workers</span>
-        <span class="n">max_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;max_workers&#39;</span><span class="p">]</span>
+        <span class="n">max_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="s2">&quot;max_workers&quot;</span><span class="p">]</span>
 
         <span class="c1"># Reading HDF5 files currently takes a long time, due to poor</span>
         <span class="c1"># programming in MapIO.  To save us some time until that issue is</span>
@@ -186,14 +196,12 @@
         <span class="c1"># it into both mapping functions</span>
         <span class="c1"># get the bounds of the map</span>
         <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
-        <span class="n">xmin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;min&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
-        <span class="n">xmax</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
-        <span class="n">ymin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;min&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
-        <span class="n">ymax</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
-        <span class="n">dy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">]</span>
-                   <span class="p">[</span><span class="s1">&#39;grid_spacing&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">])</span>
-        <span class="n">dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">]</span>
-                   <span class="p">[</span><span class="s1">&#39;grid_spacing&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">])</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;map_information&quot;</span><span class="p">][</span><span class="s2">&quot;min&quot;</span><span class="p">][</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;map_information&quot;</span><span class="p">][</span><span class="s2">&quot;max&quot;</span><span class="p">][</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;map_information&quot;</span><span class="p">][</span><span class="s2">&quot;min&quot;</span><span class="p">][</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;map_information&quot;</span><span class="p">][</span><span class="s2">&quot;max&quot;</span><span class="p">][</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;map_information&quot;</span><span class="p">][</span><span class="s2">&quot;grid_spacing&quot;</span><span class="p">][</span><span class="s2">&quot;latitude&quot;</span><span class="p">])</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;map_information&quot;</span><span class="p">][</span><span class="s2">&quot;grid_spacing&quot;</span><span class="p">][</span><span class="s2">&quot;longitude&quot;</span><span class="p">])</span>
         <span class="n">padx</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">dx</span>
         <span class="n">pady</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">dy</span>
         <span class="n">sxmin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmin</span><span class="p">)</span> <span class="o">-</span> <span class="n">padx</span>
@@ -201,9 +209,7 @@
         <span class="n">symin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ymin</span><span class="p">)</span> <span class="o">-</span> <span class="n">pady</span>
         <span class="n">symax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ymax</span><span class="p">)</span> <span class="o">+</span> <span class="n">pady</span>
 
-        <span class="n">sampledict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromBox</span><span class="p">(</span><span class="n">sxmin</span><span class="p">,</span> <span class="n">sxmax</span><span class="p">,</span>
-                                               <span class="n">symin</span><span class="p">,</span> <span class="n">symax</span><span class="p">,</span>
-                                               <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+        <span class="n">sampledict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromBox</span><span class="p">(</span><span class="n">sxmin</span><span class="p">,</span> <span class="n">sxmax</span><span class="p">,</span> <span class="n">symin</span><span class="p">,</span> <span class="n">symax</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
         <span class="n">tdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="n">sampledict</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">sampledict</span><span class="o">.</span><span class="n">nx</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="n">topogrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tdata</span><span class="p">,</span> <span class="n">geodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">)</span>
 
@@ -211,14 +217,17 @@
 
         <span class="n">imtlist</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">()</span>
 
-        <span class="n">textfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;mapping&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;map_strings.&#39;</span> <span class="o">+</span>
-                                <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;language&#39;</span><span class="p">])</span>
+        <span class="n">textfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">get_data_path</span><span class="p">(),</span>
+            <span class="s2">&quot;mapping&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;map_strings.&quot;</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="s2">&quot;language&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
         <span class="n">text_dict</span> <span class="o">=</span> <span class="n">get_text_strings</span><span class="p">(</span><span class="n">textfile</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;fontfamily&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.family&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;fontfamily&#39;</span><span class="p">]</span>
-            <span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.unicode_minus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="s2">&quot;fontfamily&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span>
+                <span class="s2">&quot;fontfamily&quot;</span>
+            <span class="p">]</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;axes.unicode_minus&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="n">allcities</span> <span class="o">=</span> <span class="n">Cities</span><span class="o">.</span><span class="n">fromDefault</span><span class="p">()</span>
         <span class="n">states_provs</span> <span class="o">=</span> <span class="kc">None</span>
@@ -230,13 +239,16 @@
         <span class="k">if</span> <span class="n">states_provs_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">states_provs</span> <span class="o">=</span> <span class="n">ShapelyFeature</span><span class="p">(</span>
                 <span class="n">Reader</span><span class="p">(</span><span class="n">states_provs_file</span><span class="p">)</span><span class="o">.</span><span class="n">geometries</span><span class="p">(),</span>
-                <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;CALLED_FROM_PYTEST&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
             <span class="n">states_provs</span> <span class="o">=</span> <span class="n">cfeature</span><span class="o">.</span><span class="n">NaturalEarthFeature</span><span class="p">(</span>
-                <span class="n">category</span><span class="o">=</span><span class="s1">&#39;cultural&#39;</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;admin_1_states_provinces_lines&#39;</span><span class="p">,</span>
-                <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span>
-                <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+                <span class="n">category</span><span class="o">=</span><span class="s2">&quot;cultural&quot;</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;admin_1_states_provinces_lines&quot;</span><span class="p">,</span>
+                <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;10m&quot;</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="c1"># The feature constructor doesn&#39;t necessarily download the</span>
             <span class="c1"># data, but we want it to so that multiple threads don&#39;t</span>
             <span class="c1"># try to do it at once when they actually access the data.</span>
@@ -247,84 +259,116 @@
         <span class="k">if</span> <span class="n">countries_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">countries</span> <span class="o">=</span> <span class="n">ShapelyFeature</span><span class="p">(</span>
                 <span class="n">Reader</span><span class="p">(</span><span class="n">countries_file</span><span class="p">)</span><span class="o">.</span><span class="n">geometries</span><span class="p">(),</span>
-                <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;CALLED_FROM_PYTEST&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
             <span class="n">countries</span> <span class="o">=</span> <span class="n">cfeature</span><span class="o">.</span><span class="n">NaturalEarthFeature</span><span class="p">(</span>
-                <span class="n">category</span><span class="o">=</span><span class="s1">&#39;cultural&#39;</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;admin_0_countries&#39;</span><span class="p">,</span>
-                <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span>
-                <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+                <span class="n">category</span><span class="o">=</span><span class="s2">&quot;cultural&quot;</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;admin_0_countries&quot;</span><span class="p">,</span>
+                <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;10m&quot;</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">_</span> <span class="o">=</span> <span class="n">countries</span><span class="o">.</span><span class="n">geometries</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">oceans_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">oceans</span> <span class="o">=</span> <span class="n">ShapelyFeature</span><span class="p">(</span>
                 <span class="n">Reader</span><span class="p">(</span><span class="n">oceans_file</span><span class="p">)</span><span class="o">.</span><span class="n">geometries</span><span class="p">(),</span>
-                <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;CALLED_FROM_PYTEST&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
             <span class="n">oceans</span> <span class="o">=</span> <span class="n">cfeature</span><span class="o">.</span><span class="n">NaturalEarthFeature</span><span class="p">(</span>
-                <span class="n">category</span><span class="o">=</span><span class="s1">&#39;physical&#39;</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ocean&#39;</span><span class="p">,</span>
-                <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span>
-                <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">)</span>
+                <span class="n">category</span><span class="o">=</span><span class="s2">&quot;physical&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ocean&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;10m&quot;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span>
+            <span class="p">)</span>
             <span class="n">_</span> <span class="o">=</span> <span class="n">oceans</span><span class="o">.</span><span class="n">geometries</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">lakes_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">lakes</span> <span class="o">=</span> <span class="n">ShapelyFeature</span><span class="p">(</span>
                 <span class="n">Reader</span><span class="p">(</span><span class="n">lakes_file</span><span class="p">)</span><span class="o">.</span><span class="n">geometries</span><span class="p">(),</span>
-                <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;CALLED_FROM_PYTEST&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
             <span class="n">lakes</span> <span class="o">=</span> <span class="n">cfeature</span><span class="o">.</span><span class="n">NaturalEarthFeature</span><span class="p">(</span>
-                <span class="n">category</span><span class="o">=</span><span class="s1">&#39;physical&#39;</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;lakes&#39;</span><span class="p">,</span>
-                <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;10m&#39;</span><span class="p">,</span>
-                <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">)</span>
+                <span class="n">category</span><span class="o">=</span><span class="s2">&quot;physical&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lakes&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;10m&quot;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span>
+            <span class="p">)</span>
             <span class="n">_</span> <span class="o">=</span> <span class="n">lakes</span><span class="o">.</span><span class="n">geometries</span><span class="p">()</span>
 
         <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">llogo</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;license_logo&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
-        <span class="n">ltext</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;license_text&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+        <span class="n">llogo</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;license_logo&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+        <span class="n">ltext</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;license_text&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">imtype</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
-            <span class="n">component</span><span class="p">,</span> <span class="n">imtype</span> <span class="o">=</span> <span class="n">imtype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="n">component</span><span class="p">,</span> <span class="n">imtype</span> <span class="o">=</span> <span class="n">imtype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
             <span class="n">comp</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imtype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;imtype&#39;</span><span class="p">:</span> <span class="n">imtype</span><span class="p">,</span>
-                 <span class="s1">&#39;topogrid&#39;</span><span class="p">:</span> <span class="n">topogrid</span><span class="p">,</span>
-                 <span class="s1">&#39;allcities&#39;</span><span class="p">:</span> <span class="n">allcities</span><span class="p">,</span>
-                 <span class="s1">&#39;states_provinces&#39;</span><span class="p">:</span> <span class="n">states_provs</span><span class="p">,</span>
-                 <span class="s1">&#39;countries&#39;</span><span class="p">:</span> <span class="n">countries</span><span class="p">,</span>
-                 <span class="s1">&#39;oceans&#39;</span><span class="p">:</span> <span class="n">oceans</span><span class="p">,</span>
-                 <span class="s1">&#39;lakes&#39;</span><span class="p">:</span> <span class="n">lakes</span><span class="p">,</span>
-                 <span class="s1">&#39;roads&#39;</span><span class="p">:</span> <span class="n">roads</span><span class="p">,</span>
-                 <span class="s1">&#39;roadcolor&#39;</span><span class="p">:</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;roadcolor&#39;</span><span class="p">],</span>
-                 <span class="s1">&#39;roadwidth&#39;</span><span class="p">:</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;roadwidth&#39;</span><span class="p">],</span>
-                 <span class="s1">&#39;faults&#39;</span><span class="p">:</span> <span class="n">faults</span><span class="p">,</span>
-                 <span class="s1">&#39;faultcolor&#39;</span><span class="p">:</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;faultcolor&#39;</span><span class="p">],</span>
-                 <span class="s1">&#39;faultwidth&#39;</span><span class="p">:</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;faultwidth&#39;</span><span class="p">],</span>
-                 <span class="s1">&#39;datadir&#39;</span><span class="p">:</span> <span class="n">datadir</span><span class="p">,</span>
-                 <span class="s1">&#39;operator&#39;</span><span class="p">:</span> <span class="n">operator</span><span class="p">,</span>
-                 <span class="s1">&#39;filter_size&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                 <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">,</span>
-                 <span class="s1">&#39;component&#39;</span><span class="p">:</span> <span class="n">comp</span><span class="p">,</span>
-                 <span class="s1">&#39;imtdict&#39;</span><span class="p">:</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">comp</span><span class="p">),</span>
-                 <span class="s1">&#39;ruptdict&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()),</span>
-                 <span class="s1">&#39;stationdict&#39;</span><span class="p">:</span> <span class="n">container</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">(),</span>
-                 <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="n">model_config</span><span class="p">,</span>
-                 <span class="s1">&#39;tdict&#39;</span><span class="p">:</span> <span class="n">text_dict</span><span class="p">,</span>
-                 <span class="s1">&#39;display_magnitude&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_magnitude</span><span class="p">,</span>
-                 <span class="s1">&#39;pdf_dpi&#39;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;pdf_dpi&#39;</span><span class="p">],</span>
-                 <span class="s1">&#39;img_dpi&#39;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;img_dpi&#39;</span><span class="p">],</span>
-                 <span class="s1">&#39;license_logo&#39;</span><span class="p">:</span> <span class="n">llogo</span><span class="p">,</span>
-                 <span class="s1">&#39;license_text&#39;</span><span class="p">:</span> <span class="n">ltext</span><span class="p">,</span>
-                 <span class="p">}</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;imtype&quot;</span><span class="p">:</span> <span class="n">imtype</span><span class="p">,</span>
+                <span class="s2">&quot;topogrid&quot;</span><span class="p">:</span> <span class="n">topogrid</span><span class="p">,</span>
+                <span class="s2">&quot;allcities&quot;</span><span class="p">:</span> <span class="n">allcities</span><span class="p">,</span>
+                <span class="s2">&quot;states_provinces&quot;</span><span class="p">:</span> <span class="n">states_provs</span><span class="p">,</span>
+                <span class="s2">&quot;countries&quot;</span><span class="p">:</span> <span class="n">countries</span><span class="p">,</span>
+                <span class="s2">&quot;oceans&quot;</span><span class="p">:</span> <span class="n">oceans</span><span class="p">,</span>
+                <span class="s2">&quot;lakes&quot;</span><span class="p">:</span> <span class="n">lakes</span><span class="p">,</span>
+                <span class="s2">&quot;roads&quot;</span><span class="p">:</span> <span class="n">roads</span><span class="p">,</span>
+                <span class="s2">&quot;roadcolor&quot;</span><span class="p">:</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;roadcolor&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;roadwidth&quot;</span><span class="p">:</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;roadwidth&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;faults&quot;</span><span class="p">:</span> <span class="n">faults</span><span class="p">,</span>
+                <span class="s2">&quot;faultcolor&quot;</span><span class="p">:</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;faultcolor&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;faultwidth&quot;</span><span class="p">:</span> <span class="n">layers</span><span class="p">[</span><span class="s2">&quot;faultwidth&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;datadir&quot;</span><span class="p">:</span> <span class="n">datadir</span><span class="p">,</span>
+                <span class="s2">&quot;operator&quot;</span><span class="p">:</span> <span class="n">operator</span><span class="p">,</span>
+                <span class="s2">&quot;filter_size&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">,</span>
+                <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="n">comp</span><span class="p">,</span>
+                <span class="s2">&quot;imtdict&quot;</span><span class="p">:</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">comp</span><span class="p">),</span>
+                <span class="s2">&quot;ruptdict&quot;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()),</span>
+                <span class="s2">&quot;stationdict&quot;</span><span class="p">:</span> <span class="n">container</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">(),</span>
+                <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">model_config</span><span class="p">,</span>
+                <span class="s2">&quot;tdict&quot;</span><span class="p">:</span> <span class="n">text_dict</span><span class="p">,</span>
+                <span class="s2">&quot;display_magnitude&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_magnitude</span><span class="p">,</span>
+                <span class="s2">&quot;pdf_dpi&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="s2">&quot;pdf_dpi&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;img_dpi&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;products&quot;</span><span class="p">][</span><span class="s2">&quot;mapping&quot;</span><span class="p">][</span><span class="s2">&quot;img_dpi&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;license_logo&quot;</span><span class="p">:</span> <span class="n">llogo</span><span class="p">,</span>
+                <span class="s2">&quot;license_text&quot;</span><span class="p">:</span> <span class="n">ltext</span><span class="p">,</span>
+            <span class="p">}</span>
             <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-            <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_uncertainty&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;UncertaintyMap&#39;</span><span class="p">,</span>
-                                  <span class="n">fileimt</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; Uncertainty Map&#39;</span><span class="p">,</span>
-                                  <span class="s1">&#39;Map of &#39;</span> <span class="o">+</span> <span class="n">imtype</span> <span class="o">+</span> <span class="s1">&#39; uncertainty.&#39;</span><span class="p">,</span>
-                                  <span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;UncertaintyMap&#39;</span><span class="p">,</span>
-                                  <span class="n">fileimt</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; Uncertainty Map&#39;</span><span class="p">,</span>
-                                  <span class="s1">&#39;Map of &#39;</span> <span class="o">+</span> <span class="n">imtype</span> <span class="o">+</span> <span class="s1">&#39; uncertainty.&#39;</span><span class="p">,</span>
-                                  <span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
+
+            <span class="c1">#</span>
+            <span class="c1"># Populate the contents.xml</span>
+            <span class="c1">#</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;imtdict&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;imtdict&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;std&quot;</span><span class="p">:</span>
+                    <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;_sigma&quot;</span>
+                    <span class="n">utype</span> <span class="o">=</span> <span class="s2">&quot; Total&quot;</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;phi&quot;</span><span class="p">:</span>
+                    <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;_phi&quot;</span>
+                    <span class="n">utype</span> <span class="o">=</span> <span class="s2">&quot; Within-event&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;_tau&quot;</span>
+                    <span class="n">utype</span> <span class="o">=</span> <span class="s2">&quot; Between-event&quot;</span>
+
+                <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+                    <span class="n">fileimt</span> <span class="o">=</span> <span class="s2">&quot;intensity&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span>
+                    <span class="n">fileimt</span> <span class="o">+</span> <span class="n">ext</span> <span class="o">+</span> <span class="s2">&quot;UncertaintyMap&quot;</span><span class="p">,</span>
+                    <span class="n">fileimt</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">utype</span> <span class="o">+</span> <span class="s2">&quot; Uncertainty Map&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Map of &quot;</span> <span class="o">+</span> <span class="n">imtype</span> <span class="o">+</span> <span class="n">utype</span> <span class="o">+</span> <span class="s2">&quot; uncertainty.&quot;</span><span class="p">,</span>
+                    <span class="n">fileimt</span> <span class="o">+</span> <span class="n">ext</span> <span class="o">+</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;image/jpeg&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span>
+                    <span class="n">fileimt</span> <span class="o">+</span> <span class="n">ext</span> <span class="o">+</span> <span class="s2">&quot;UncertaintyMap&quot;</span><span class="p">,</span>
+                    <span class="n">fileimt</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">utype</span> <span class="o">+</span> <span class="s2">&quot; Uncertainty Map&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Map of &quot;</span> <span class="o">+</span> <span class="n">imtype</span> <span class="o">+</span> <span class="n">utype</span> <span class="o">+</span> <span class="s2">&quot; uncertainty.&quot;</span><span class="p">,</span>
+                    <span class="n">fileimt</span> <span class="o">+</span> <span class="n">ext</span> <span class="o">+</span> <span class="s2">&quot;.pdf&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;application/pdf&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">max_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">cf</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
@@ -339,24 +383,33 @@
 
 <div class="viewcode-block" id="make_map"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.uncertaintymaps.html#shakemap.coremods.uncertaintymaps.make_map">[docs]</a><span class="k">def</span> <span class="nf">make_map</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>
 
-    <span class="n">imtype</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s1">&#39;imtype&#39;</span><span class="p">]</span>
+    <span class="n">imtype</span> <span class="o">=</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;imtype&quot;</span><span class="p">]</span>
 
-    <span class="n">fig1</span> <span class="o">=</span> <span class="n">draw_uncertainty_map</span><span class="p">(</span><span class="n">adict</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;imtdict&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">adict</span><span class="p">[</span><span class="s2">&quot;imtdict&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
 
-    <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+        <span class="n">fig1</span> <span class="o">=</span> <span class="n">draw_uncertainty_map</span><span class="p">(</span><span class="n">adict</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;std&quot;</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;_sigma&quot;</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;phi&quot;</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;_phi&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;_tau&quot;</span>
+
+        <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+            <span class="n">fileimt</span> <span class="o">=</span> <span class="s2">&quot;intensity&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
+
         <span class="c1"># save to pdf/jpeg</span>
-        <span class="n">pdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="s1">&#39;intensity_uncertainty.pdf&#39;</span><span class="p">)</span>
-        <span class="n">jpg_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span> <span class="s1">&#39;intensity_uncertainty.jpg&#39;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
-        <span class="n">pdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span>
-                                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_uncertainty.pdf&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">))</span>
-        <span class="n">jpg_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;datadir&#39;</span><span class="p">],</span>
-                                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_uncertainty.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">))</span>
+        <span class="n">pdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s2">&quot;datadir&quot;</span><span class="p">],</span> <span class="n">fileimt</span> <span class="o">+</span> <span class="n">ext</span> <span class="o">+</span> <span class="s2">&quot;.pdf&quot;</span><span class="p">)</span>
+        <span class="n">jpg_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">adict</span><span class="p">[</span><span class="s2">&quot;datadir&quot;</span><span class="p">],</span> <span class="n">fileimt</span> <span class="o">+</span> <span class="n">ext</span> <span class="o">+</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">)</span>
 
-    <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">pdf_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;pdf_dpi&#39;</span><span class="p">])</span>
-    <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">jpg_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">adict</span><span class="p">[</span><span class="s1">&#39;img_dpi&#39;</span><span class="p">])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig1</span><span class="p">)</span></div>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">pdf_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">adict</span><span class="p">[</span><span class="s2">&quot;pdf_dpi&quot;</span><span class="p">])</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">jpg_file</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">adict</span><span class="p">[</span><span class="s2">&quot;img_dpi&quot;</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig1</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_text_strings"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.uncertaintymaps.html#shakemap.coremods.uncertaintymaps.get_text_strings">[docs]</a><span class="k">def</span> <span class="nf">get_text_strings</span><span class="p">(</span><span class="n">stringfile</span><span class="p">):</span>
@@ -371,11 +424,11 @@
 <span class="sd">        dict: A dictionary of strings for use in writing text to the maps.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">stringfile</span><span class="p">):</span>
-        <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> not found&quot;</span> <span class="o">%</span> <span class="n">stringfile</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">stringfile</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8-sig&#39;</span><span class="p">)</span>
-    <span class="n">jline</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">stringfile</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">stringfile</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8-sig&quot;</span><span class="p">)</span>
+    <span class="n">jline</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;//&quot;</span><span class="p">):</span>
             <span class="k">continue</span>
         <span class="n">jline</span> <span class="o">+=</span> <span class="n">line</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -416,7 +469,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
