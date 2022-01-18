@@ -1109,7 +1109,10 @@ class ModelModule(CoreModule):
             df1["MMI_sd"] = np.full_like(df1["lon"], df1["MMI_sd"])
         for imtstr in self.df1.imts:
             oqimt = imt.from_string(imtstr)
-            if oqimt.string not in gmice_imts:
+            if not (
+                oqimt.string in gmice_imts
+                or (oqimt.string.startswith("SA") and "SA" in gmice_imts)
+            ):
                 continue
             if "SA" in oqimt.string and oqimt.period not in gmice_pers:
                 continue
@@ -1123,7 +1126,7 @@ class ModelModule(CoreModule):
                 df1[imtstr], self.gmice.getGM2MIsd()[oqimt]
             )
 
-        preferred_imts = ["PGV", "PGA", "SA(1.0)", "SA(0.3)", "SA(3.0"]
+        preferred_imts = ["PGV", "PGA", "SA(1.0)", "SA(0.3)", "SA(3.0)"]
         if df1["MMI"] is None:
             df1["MMI"] = np.full_like(df1["lon"], np.nan)
             df1["MMI_sd"] = np.full_like(df1["lon"], np.nan)
