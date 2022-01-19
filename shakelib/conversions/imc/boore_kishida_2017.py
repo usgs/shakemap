@@ -6,7 +6,11 @@ horizontal intensity measure components.
 import glob
 import logging
 import os.path
-import importlib.resources as importlib_resources
+
+# This is what we want for the future (Python 2.9 an beyond):
+# import importlib.resources as importlib_resources
+# but right now we have to support Py 3.8, so we have this:
+import pkg_resources
 
 # Third party imports
 import numpy as np
@@ -275,7 +279,10 @@ class BooreKishida2017(ComponentConverter):
             string 'Null', then imc_in and imc_out evaluated to be the
             same.
         """
-        datadir = importlib_resources.files("shakelib.conversions.imc") / "data"
+        # This is what we want for the future (Python 2.9 an beyond):
+        # datadir = importlib_resources.files("shakelib.conversions.imc") / "data"
+        # but right now we have to support Py 3.8, so we have this:
+        datadir = pkg_resources.resource_filename("shakelib.conversions.imc", "data")
         conv_files = glob.glob(os.path.join(datadir, "*.csv"))
         stub1 = BooreKishida2017._imcToFilestr(imc_in)
         stub2 = BooreKishida2017._imcToFilestr(imc_out)
