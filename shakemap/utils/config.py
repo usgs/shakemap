@@ -2,7 +2,10 @@
 import os
 import os.path
 import sys
-import importlib.resources as importlib_resources
+# This is what we want (for Python 2.9 and beyond):
+# import importlib.resources as importlib_resources
+# but this is what we need to support Py 2.8:
+import pkg_resources
 import logging
 import glob
 
@@ -22,7 +25,10 @@ def get_data_path():
         str: The full path to the data directory.
 
     """
-    return importlib_resources.files("shakemap") / "data"
+    # This is what we want (for Python 2.9 and beyond):
+    # return importlib_resources.files("shakemap") / "data"
+    # but this is what we need to support Py 2.8:
+    return pkg_resources.resource_filename('shakemap', 'data')
 
 
 def get_configspec(config=None):
