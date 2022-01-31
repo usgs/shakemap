@@ -166,7 +166,7 @@ package_list=(
       "gdal>=3.0.2"
       "h5py>=2.10.0"
       "impactutils>=0.8.28"
-      "ipython>=7.22.0"
+      "ipython==7.29"
       "libcomcat>=2.0.12"
       "lockfile>=0.12.2"
       "mapio>0.7.27"
