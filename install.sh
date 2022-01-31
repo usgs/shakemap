@@ -23,7 +23,7 @@ VENV=shakemap
 
 developer=0
 openquake_deps=0
-py_ver=3.10
+py_ver=3.9
 while getopts p:d:q FLAG; do
   case $FLAG in
     p)
