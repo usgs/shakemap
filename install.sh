@@ -21,9 +21,9 @@ source $prof
 # Name of virtual environment
 VENV=shakemap
 
-developer=0
+developer=1
 openquake_deps=0
-py_ver=3.10
+py_ver=3.8
 while getopts p:d:q FLAG; do
   case $FLAG in
     p)
@@ -135,7 +135,7 @@ conda clean -y --all
 
 # Extra packages to install with dev option
 dev_list=(
-    "autopep8>=1.5.7"
+    "black>=22.1.0"
     "flake8>=3.9.2"
     "pyflakes>=2.3.1"
     "rope>=0.19.0"
@@ -166,7 +166,7 @@ package_list=(
       "gdal>=3.0.2"
       "h5py>=2.10.0"
       "impactutils>=0.8.28"
-      "ipython>=7.22.0"
+      "ipython==7.29"
       "libcomcat>=2.0.12"
       "lockfile>=0.12.2"
       "mapio>0.7.27"
