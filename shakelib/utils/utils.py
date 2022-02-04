@@ -256,7 +256,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     d_min = config["extent"]["mmi"]["mindist"]
     d_max = config["extent"]["mmi"]["maxdist"]
     dx.rjb = np.logspace(np.log10(d_min), np.log10(d_max), size)
-    dx.rrup = np.sqrt(dx.rjb**2 + origin.depth**2)
+    dx.rrup = np.sqrt(dx.rjb ** 2 + origin.depth ** 2)
     dx.rhypo = dx.rrup
     dx.repi = dx.rjb
     dx.rx = np.zeros_like(dx.rjb)
@@ -277,9 +277,13 @@ def _get_extent_from_multigmpe(rupture, config=None):
     rx.mag = origin.mag
     rx.rake = 0.0
     # From WC94...
-    rx.width = 10 ** (-0.76 + 0.27 * rx.mag)
-    rx.dip = 90.0
-    rx.ztor = origin.depth
+    # rx.width = 10 ** (-0.76 + 0.27 * rx.mag)
+    # rx.dip = 90.0
+    # rx.ztor = origin.depth
+    # Using parameters from the point rupture...
+    rx.width = rupture.getWidth()
+    rx.dip = rupture.getDip()
+    rx.ztor = rupture.getDepthToTop()
     rx.hypo_depth = origin.depth
 
     gmpe_imt_mean, _ = gmpe.get_mean_and_stddevs(sx, rx, dx, default_imt, sd_types)

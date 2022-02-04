@@ -83,10 +83,10 @@ def test_get_extent_small_complex():
     faultfile = os.path.join(datadir, "Hartzell11_fault.txt")
     rupture = get_rupture(origin, faultfile)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 95.299999999999997)
-    np.testing.assert_allclose(E, 115.08333333333333)
-    np.testing.assert_allclose(S, 23.100000000000001)
-    np.testing.assert_allclose(N, 39.733333333333334)
+    np.testing.assert_allclose(W, 96.43333333333334)
+    np.testing.assert_allclose(E, 113.5)
+    np.testing.assert_allclose(S, 24.3)
+    np.testing.assert_allclose(N, 38.733333333333334)
 
 
 def test_get_extent_bad_usage():
@@ -119,10 +119,10 @@ def test_get_extent_aspect():
     )
     rupture = get_rupture(origin, rrep)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 92.666666666666671)
-    np.testing.assert_allclose(E, 119.96666666666667)
-    np.testing.assert_allclose(S, 19.833333333333332)
-    np.testing.assert_allclose(N, 38.950000000000003)
+    np.testing.assert_allclose(W, 93.78333333333333)
+    np.testing.assert_allclose(E, 118.35)
+    np.testing.assert_allclose(S, 20.883333333333332)
+    np.testing.assert_allclose(N, 38.166666666666664)
     #
     # Long vertical rupture
     #
@@ -137,10 +137,10 @@ def test_get_extent_aspect():
     )
     rupture = get_rupture(origin, rrep)
     W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 88.5)
-    np.testing.assert_allclose(E, 115.06666666666666)
-    np.testing.assert_allclose(S, 16.1)
-    np.testing.assert_allclose(N, 42.583333333333336)
+    np.testing.assert_allclose(W, 89.4)
+    np.testing.assert_allclose(E, 113.55)
+    np.testing.assert_allclose(S, 17.333333333333332)
+    np.testing.assert_allclose(N, 41.583333333333336)
 
 
 def test_get_extent_stable_small():

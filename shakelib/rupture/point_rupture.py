@@ -115,7 +115,7 @@ class PointRupture(Rupture):
         with the width coming from W&C 1994 as above.
         The default dip is 90, so we're reduced to:
         """
-        ztor = max(self._origin.depth - 0.6 * self.faultWidth, 0)
+        ztor = min(30.0, max(self._origin.depth - 0.6 * self.faultWidth, 0))
         return ztor
 
     def getQuadrilaterals(self):
