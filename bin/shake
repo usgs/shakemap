@@ -301,7 +301,8 @@ def main(args):
             if args.eventid.lower() == "help":
                 arglist = ["-h"]
 
-            # If this command is assemble, and the user has specified a comment, apply it
+            # If this command is assemble, and the user has specified a comment,
+            # apply it
             if "assemble" in cmd and args.comment:
                 # Pop the old comment and insert the new one
                 if "-c" in arglist[0]:
