@@ -56,7 +56,7 @@ class PDLTransfer(TransferBaseModule):
             cmdline_args = {}
             if "cmdline_args" in params:
                 cmdline_args = params["cmdline_args"].copy()
-            del params["cmdline_args"]
+                del params["cmdline_args"]
 
             params.update(properties)
             if self.usedevconfig is True:
