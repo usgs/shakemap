@@ -91,7 +91,7 @@ def main(args):
     if not args.property_event_type:
         args.property_event_type = ""
     args.property_event_type = " ".join(args.property_event_type)
-    if args.property_event_type != "earthquake":
+    if args.type == 'origin' and args.property_event_type != 'earthquake':
         logger.info(f"No action on event types of {args.property_event_type}")
         sys.exit(0)
 
