@@ -3,26 +3,18 @@ import logging
 
 from openquake.hazardlib import imt
 from openquake.hazardlib import const
-from openquake.hazardlib.valid import gsim
 from openquake.hazardlib.geo.utils import OrthographicProjection
 from openquake.hazardlib.gsim.base import SitesContext
 from openquake.hazardlib.gsim.base import DistancesContext
 from openquake.hazardlib.gsim.base import RuptureContext
 
-from shakemap.utils.utils import get_object_from_config
 from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.base import Rupture
-from shakelib.multigmpe import MultiGMPE, set_sites_depth_parameters
+from shakelib.multigmpe import set_sites_depth_parameters
 from shakelib.station import StationList
 
 from strec.gmreg import Regionalizer
-
-# ACR GMPE/GMICE
-from shakelib.gmice.wgrw12 import WGRW12
-
-# SCR GMPE/GMICE
-from shakelib.gmice.ak07 import AK07
 
 
 DEFAULT_ACTIVE_COEFFS = [27.24, 250.4, 579.1]
@@ -65,7 +57,7 @@ def replace_dyfi(stationfile, dyfi_xml):
     return stations
 
 
-def get_extent(rupture=None, config=None):
+def get_extent(rupture=None, config=None, ipe=None):
     """
     Method to compute map extent from rupture. There are numerous methods for
     getting the extent:
@@ -82,6 +74,7 @@ def get_extent(rupture=None, config=None):
     Args:
         rupture (Rupture): A ShakeMap Rupture instance.
         config (ConfigObj): ShakeMap config object.
+        ipe (VirtualIPE): An VirtualIPE instance.
 
     Returns:
         tuple: lonmin, lonmax, latmin, latmax rounded outward to the nearest
@@ -138,7 +131,7 @@ def get_extent(rupture=None, config=None):
     # Otherwise, use MultiGMPE to get spans
     # -------------------------------------------------------------------------
     if extent is None:
-        extent = _get_extent_from_multigmpe(rupture, config)
+        extent = _get_extent_from_multigmpe(rupture, config, ipe)
 
     if offsets is None:
         xmin, xmax, ymin, ymax = extent
@@ -193,57 +186,17 @@ def _get_extent_from_spans(rupture, spans=[]):
     return None
 
 
-def _get_extent_from_multigmpe(rupture, config=None):
+def _get_extent_from_multigmpe(rupture, config=None, ipe=None):
     """
     Use MultiGMPE to determine extent
+
+    Args:
+        rupture (Rupture): A ShakeMap Rupture instance.
+        config (ConfigObj): ShakeMap config object.
+        ipe (VirtualIPE): An VirtualIPE instance.
     """
     (clon, clat) = _rupture_center(rupture)
     origin = rupture.getOrigin()
-    if config is not None:
-        gmpe = MultiGMPE.__from_config__(config)
-        gmice = get_object_from_config("gmice", "modeling", config)
-        if imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
-            default_imt = imt.SA(1.0)
-        elif imt.PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
-            default_imt = imt.PGV()
-        else:
-            default_imt = imt.PGA()
-    else:
-        # Put in some default values for conf
-        config = {
-            "extent": {"mmi": {"threshold": 4.5, "mindist": 100, "maxdist": 1000}}
-        }
-
-        # Generic GMPEs choices based only on active vs stable
-        # as defaults...
-        stable = is_stable(origin.lon, origin.lat)
-        if not stable:
-            ASK14 = gsim("AbrahamsonEtAl2014")
-            CB14 = gsim("CampbellBozorgnia2014")
-            CY14 = gsim("ChiouYoungs2014")
-            gmpes = [ASK14, CB14, CY14]
-            site_gmpes = None
-            weights = [1 / 3.0, 1 / 3.0, 1 / 3.0]
-            gmice = WGRW12()
-        else:
-            Fea96 = gsim("FrankelEtAl1996MwNSHMP2008")
-            Tea97 = gsim("ToroEtAl1997MwNSHMP2008")
-            Sea02 = gsim("SilvaEtAl2002MwNSHMP2008")
-            C03 = gsim("Campbell2003MwNSHMP2008")
-            TP05 = gsim("TavakoliPezeshk2005MwNSHMP2008")
-            AB06p = gsim("AtkinsonBoore2006Modified2011")
-            Pea11 = gsim("PezeshkEtAl2011")
-            Atk08p = gsim("Atkinson2008prime")
-            Sea01 = gsim("SomervilleEtAl2001NSHMP2008")
-            gmpes = [Fea96, Tea97, Sea02, C03, TP05, AB06p, Pea11, Atk08p, Sea01]
-            site_gmpes = [AB06p]
-            weights = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
-            gmice = AK07()
-
-        gmpe = MultiGMPE.__from_list__(
-            gmpes, weights, default_gmpes_for_site=site_gmpes
-        )
-        default_imt = imt.SA(1.0)
 
     min_mmi = config["extent"]["mmi"]["threshold"]
     sd_types = [const.StdDev.TOTAL]
@@ -256,7 +209,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     d_min = config["extent"]["mmi"]["mindist"]
     d_max = config["extent"]["mmi"]["maxdist"]
     dx.rjb = np.logspace(np.log10(d_min), np.log10(d_max), size)
-    dx.rrup = np.sqrt(dx.rjb ** 2 + origin.depth ** 2)
+    dx.rrup = np.sqrt(dx.rjb**2 + origin.depth**2)
     dx.rhypo = dx.rrup
     dx.repi = dx.rjb
     dx.rx = np.zeros_like(dx.rjb)
@@ -268,7 +221,7 @@ def _get_extent_from_multigmpe(rupture, config=None):
     # Set to soft soil conditions
     sx.sids = np.array(range(size))
     sx.vs30 = np.full(size, 180.0)
-    set_sites_depth_parameters(sx, gmpe)
+    set_sites_depth_parameters(sx, ipe)
     sx.vs30measured = np.full(size, False, dtype=bool)
     sx.backarc = np.full(size, False, dtype=bool)
 
@@ -286,13 +239,11 @@ def _get_extent_from_multigmpe(rupture, config=None):
     rx.ztor = rupture.getDepthToTop()
     rx.hypo_depth = origin.depth
 
-    gmpe_imt_mean, _ = gmpe.get_mean_and_stddevs(sx, rx, dx, default_imt, sd_types)
-
-    # Convert to MMI
-    gmpe_to_mmi, _ = gmice.getMIfromGM(gmpe_imt_mean, default_imt)
+    mmi = imt.from_string("MMI")
+    imt_mean, _ = ipe.get_mean_and_stddevs(sx, rx, dx, mmi, sd_types)
 
     # Minimum distance that exceeds threshold MMI?
-    dists_exceed_mmi = dx.rjb[gmpe_to_mmi > min_mmi]
+    dists_exceed_mmi = dx.rjb[imt_mean > min_mmi]
     if len(dists_exceed_mmi):
         mindist_km = np.max(dists_exceed_mmi)
     else:

@@ -7,6 +7,7 @@ import os.path
 # third party imports
 import numpy as np
 import pytest
+from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 
 # local imports
 from shakelib.utils.exception import ShakeLibException
@@ -14,10 +15,18 @@ from shakelib.utils.utils import get_extent, is_stable, replace_dyfi
 from shakelib.rupture.factory import get_rupture
 from shakelib.rupture.origin import Origin
 from shakelib.station import StationList
-
+from shakelib.virtualipe import VirtualIPE
+from shakelib.gmice.wgrw12 import WGRW12
+from shakelib.multigmpe import MultiGMPE
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 datadir = os.path.join(homedir, "utils_data")
+
+
+gmpe_cy14 = ChiouYoungs2014()
+gmpe = MultiGMPE.__from_list__([gmpe_cy14], [1.0])
+gmice = WGRW12()
+ipe = VirtualIPE.__fromFuncs__(gmpe, gmice)
 
 
 def test_replace_dyfi():
@@ -64,29 +73,31 @@ def test_get_extent_small_point():
     # Do a point rupture
     # Small magnitude
     #
+    config = {"extent": {"mmi": {"threshold": 4.0, "mindist": 100, "maxdist": 1000}}}
     eventfile = os.path.join(datadir, "event_wenchuan_small.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
-    W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 102.33333333333333)
-    np.testing.assert_allclose(E, 104.41666666666667)
-    np.testing.assert_allclose(S, 30.083333333333332)
-    np.testing.assert_allclose(N, 31.883333333333333)
+    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    np.testing.assert_allclose(W, 102.21666666666667)
+    np.testing.assert_allclose(E, 104.53333333333333)
+    np.testing.assert_allclose(S, 29.983333333333334)
+    np.testing.assert_allclose(N, 31.983333333333334)
 
 
 def test_get_extent_small_complex():
     #
     # Do a complex rupture
     #
+    config = {"extent": {"mmi": {"threshold": 4.0, "mindist": 100, "maxdist": 1000}}}
     eventfile = os.path.join(datadir, "event_wenchuan.xml")
     origin = Origin.fromFile(eventfile)
     faultfile = os.path.join(datadir, "Hartzell11_fault.txt")
     rupture = get_rupture(origin, faultfile)
-    W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 96.43333333333334)
-    np.testing.assert_allclose(E, 113.5)
-    np.testing.assert_allclose(S, 24.3)
-    np.testing.assert_allclose(N, 38.733333333333334)
+    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    np.testing.assert_allclose(W, 96.349999999999994)
+    np.testing.assert_allclose(E, 113.61666666666666)
+    np.testing.assert_allclose(S, 24.216666666666665)
+    np.testing.assert_allclose(N, 38.799999999999997)
 
 
 def test_get_extent_bad_usage():
@@ -103,6 +114,7 @@ def test_get_extent_aspect():
     #
     # Test ruptures with weird aspect ratios
     #
+    config = {"extent": {"mmi": {"threshold": 4.0, "mindist": 100, "maxdist": 1000}}}
     eventfile = os.path.join(datadir, "event_wenchuan.xml")
     origin = Origin.fromFile(eventfile)
     #
@@ -118,11 +130,11 @@ def test_get_extent_aspect():
             """
     )
     rupture = get_rupture(origin, rrep)
-    W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 93.78333333333333)
-    np.testing.assert_allclose(E, 118.35)
-    np.testing.assert_allclose(S, 20.883333333333332)
-    np.testing.assert_allclose(N, 38.166666666666664)
+    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    np.testing.assert_allclose(W, 93.700000000000003)
+    np.testing.assert_allclose(E, 118.48333333333333)
+    np.testing.assert_allclose(S, 20.800000000000001)
+    np.testing.assert_allclose(N, 38.233333333333334)
     #
     # Long vertical rupture
     #
@@ -136,11 +148,11 @@ def test_get_extent_aspect():
             """
     )
     rupture = get_rupture(origin, rrep)
-    W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, 89.4)
-    np.testing.assert_allclose(E, 113.55)
-    np.testing.assert_allclose(S, 17.333333333333332)
-    np.testing.assert_allclose(N, 41.583333333333336)
+    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    np.testing.assert_allclose(W, 89.333333333333329)
+    np.testing.assert_allclose(E, 113.68333333333334)
+    np.testing.assert_allclose(S, 17.233333333333334)
+    np.testing.assert_allclose(N, 41.666666666666664)
 
 
 def test_get_extent_stable_small():
@@ -148,10 +160,11 @@ def test_get_extent_stable_small():
     # Do an event in a stable region
     # Small magnitude
     #
+    config = {"extent": {"mmi": {"threshold": 4.0, "mindist": 100, "maxdist": 1000}}}
     eventfile = os.path.join(datadir, "event_oklahoma.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
-    W, E, S, N = get_extent(rupture)
+    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
     np.testing.assert_allclose(W, -98.5)
     np.testing.assert_allclose(E, -96.28333333333333)
     np.testing.assert_allclose(S, 34.766666666666666)
@@ -163,14 +176,15 @@ def test_get_extent_stable_large():
     # Do an event in a stable region
     # Large magnitude
     #
+    config = {"extent": {"mmi": {"threshold": 4.0, "mindist": 100, "maxdist": 1000}}}
     eventfile = os.path.join(datadir, "event_oklahoma_large.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
-    W, E, S, N = get_extent(rupture)
-    np.testing.assert_allclose(W, -107.45)
-    np.testing.assert_allclose(E, -84.8)
-    np.testing.assert_allclose(S, 26.166666666666668)
-    np.testing.assert_allclose(N, 44.15)
+    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    np.testing.assert_allclose(W, -104.5)
+    np.testing.assert_allclose(E, -89.11666666666666)
+    np.testing.assert_allclose(S, 29.25)
+    np.testing.assert_allclose(N, 41.633333333333333)
 
 
 def test_is_stable():
@@ -191,7 +205,7 @@ def test_extent_config():
     config = {
         "extent": {"magnitude_spans": {"span1": [0, 6, 4, 3], "span2": [6, 10, 6, 4]}}
     }
-    extent = get_extent(rupture, config)
+    extent = get_extent(rupture, config=config, ipe=ipe)
     cmp_extent = (-99.4166667, -95.4083333, 32.675, 38.6833333)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
@@ -202,12 +216,12 @@ def test_extent_config():
             "relative_offset": [0.25, 0.5],
         }
     }
-    extent = get_extent(rupture, config)
+    extent = get_extent(rupture, config=config, ipe=ipe)
     cmp_extent = (-98.4166667, -94.4083333, 35.675, 41.6833333)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
     config = {"extent": {"bounds": {"extent": [-100, 32, -95, 37]}}}
-    extent = get_extent(rupture, config)
+    extent = get_extent(rupture, config=config, ipe=ipe)
     cmp_extent = [-100, -95, 32, 37]
     np.testing.assert_almost_equal(extent, cmp_extent)
 
