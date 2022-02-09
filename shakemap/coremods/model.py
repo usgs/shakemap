@@ -706,7 +706,7 @@ class ModelModule(CoreModule):
                 ]["extent"]
             else:
                 self.W, self.E, self.S, self.N = get_extent(
-                    self.rupture_obj, config=self.config
+                    config=self.config, ipe=self.ipe, rupture=self.rupture_obj
                 )
 
             # Adjust resolution to be under nmax
