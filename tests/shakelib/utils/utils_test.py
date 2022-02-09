@@ -77,7 +77,7 @@ def test_get_extent_small_point():
     eventfile = os.path.join(datadir, "event_wenchuan_small.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
-    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    W, E, S, N = get_extent(config=config, ipe=ipe, rupture=rupture)
     np.testing.assert_allclose(W, 102.21666666666667)
     np.testing.assert_allclose(E, 104.53333333333333)
     np.testing.assert_allclose(S, 29.983333333333334)
@@ -93,7 +93,7 @@ def test_get_extent_small_complex():
     origin = Origin.fromFile(eventfile)
     faultfile = os.path.join(datadir, "Hartzell11_fault.txt")
     rupture = get_rupture(origin, faultfile)
-    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    W, E, S, N = get_extent(config=config, ipe=ipe, rupture=rupture)
     np.testing.assert_allclose(W, 96.349999999999994)
     np.testing.assert_allclose(E, 113.61666666666666)
     np.testing.assert_allclose(S, 24.216666666666665)
@@ -130,7 +130,7 @@ def test_get_extent_aspect():
             """
     )
     rupture = get_rupture(origin, rrep)
-    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    W, E, S, N = get_extent(config=config, ipe=ipe, rupture=rupture)
     np.testing.assert_allclose(W, 93.700000000000003)
     np.testing.assert_allclose(E, 118.48333333333333)
     np.testing.assert_allclose(S, 20.800000000000001)
@@ -148,7 +148,7 @@ def test_get_extent_aspect():
             """
     )
     rupture = get_rupture(origin, rrep)
-    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    W, E, S, N = get_extent(config=config, ipe=ipe, rupture=rupture)
     np.testing.assert_allclose(W, 89.333333333333329)
     np.testing.assert_allclose(E, 113.68333333333334)
     np.testing.assert_allclose(S, 17.233333333333334)
@@ -164,7 +164,7 @@ def test_get_extent_stable_small():
     eventfile = os.path.join(datadir, "event_oklahoma.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
-    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    W, E, S, N = get_extent(config=config, ipe=ipe, rupture=rupture)
     np.testing.assert_allclose(W, -98.5)
     np.testing.assert_allclose(E, -96.28333333333333)
     np.testing.assert_allclose(S, 34.766666666666666)
@@ -180,7 +180,7 @@ def test_get_extent_stable_large():
     eventfile = os.path.join(datadir, "event_oklahoma_large.xml")
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
-    W, E, S, N = get_extent(rupture, config=config, ipe=ipe)
+    W, E, S, N = get_extent(config=config, ipe=ipe, rupture=rupture)
     np.testing.assert_allclose(W, -104.5)
     np.testing.assert_allclose(E, -89.11666666666666)
     np.testing.assert_allclose(S, 29.25)
@@ -205,7 +205,7 @@ def test_extent_config():
     config = {
         "extent": {"magnitude_spans": {"span1": [0, 6, 4, 3], "span2": [6, 10, 6, 4]}}
     }
-    extent = get_extent(rupture, config=config, ipe=ipe)
+    extent = get_extent(config=config, ipe=ipe, rupture=rupture)
     cmp_extent = (-99.4166667, -95.4083333, 32.675, 38.6833333)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
@@ -216,12 +216,12 @@ def test_extent_config():
             "relative_offset": [0.25, 0.5],
         }
     }
-    extent = get_extent(rupture, config=config, ipe=ipe)
+    extent = get_extent(config=config, ipe=ipe, rupture=rupture)
     cmp_extent = (-98.4166667, -94.4083333, 35.675, 41.6833333)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
     config = {"extent": {"bounds": {"extent": [-100, 32, -95, 37]}}}
-    extent = get_extent(rupture, config=config, ipe=ipe)
+    extent = get_extent(config=config, ipe=ipe, rupture=rupture)
     cmp_extent = [-100, -95, 32, 37]
     np.testing.assert_almost_equal(extent, cmp_extent)
 

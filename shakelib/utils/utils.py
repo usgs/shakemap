@@ -57,7 +57,7 @@ def replace_dyfi(stationfile, dyfi_xml):
     return stations
 
 
-def get_extent(rupture=None, config=None, ipe=None):
+def get_extent(config, ipe, rupture=None):
     """
     Method to compute map extent from rupture. There are numerous methods for
     getting the extent:
@@ -72,9 +72,12 @@ def get_extent(rupture=None, config=None, ipe=None):
     on a generic set of active/stable.
 
     Args:
-        rupture (Rupture): A ShakeMap Rupture instance.
-        config (ConfigObj): ShakeMap config object.
-        ipe (VirtualIPE): An VirtualIPE instance.
+        config (ConfigObj):
+            ShakeMap config object.
+        ipe (VirtualIPE):
+            An VirtualIPE instance.
+        rupture (Rupture):
+            A ShakeMap Rupture instance.
 
     Returns:
         tuple: lonmin, lonmax, latmin, latmax rounded outward to the nearest
@@ -88,19 +91,18 @@ def get_extent(rupture=None, config=None, ipe=None):
     spans = {}
     bounds = []
     offsets = None
-    if config is not None:
-        if "extent" in config:
-            if "magnitude_spans" in config["extent"]:
-                if len(config["extent"]["magnitude_spans"]):
-                    if isinstance(config["extent"]["magnitude_spans"], dict):
-                        spans = config["extent"]["magnitude_spans"]
-            if "bounds" in config["extent"]:
-                if "extent" in config["extent"]["bounds"]:
-                    if config["extent"]["bounds"]["extent"][0] != -999.0:
-                        bounds = config["extent"]["bounds"]["extent"]
-            if "relative_offset" in config["extent"]:
-                if isinstance(config["extent"]["relative_offset"], list):
-                    offsets = config["extent"]["relative_offset"]
+    if "extent" in config:
+        if "magnitude_spans" in config["extent"]:
+            if len(config["extent"]["magnitude_spans"]):
+                if isinstance(config["extent"]["magnitude_spans"], dict):
+                    spans = config["extent"]["magnitude_spans"]
+        if "bounds" in config["extent"]:
+            if "extent" in config["extent"]["bounds"]:
+                if config["extent"]["bounds"]["extent"][0] != -999.0:
+                    bounds = config["extent"]["bounds"]["extent"]
+        if "relative_offset" in config["extent"]:
+            if isinstance(config["extent"]["relative_offset"], list):
+                offsets = config["extent"]["relative_offset"]
 
     # -------------------------------------------------------------------------
     # Simplest option: extent was specified in the config, use that and exit.
@@ -186,14 +188,17 @@ def _get_extent_from_spans(rupture, spans=[]):
     return None
 
 
-def _get_extent_from_multigmpe(rupture, config=None, ipe=None):
+def _get_extent_from_multigmpe(rupture, config, ipe):
     """
     Use MultiGMPE to determine extent
 
     Args:
-        rupture (Rupture): A ShakeMap Rupture instance.
-        config (ConfigObj): ShakeMap config object.
-        ipe (VirtualIPE): An VirtualIPE instance.
+        rupture (Rupture):
+            A ShakeMap Rupture instance.
+        config (ConfigObj):
+            ShakeMap config object.
+        ipe (VirtualIPE):
+            An VirtualIPE instance.
     """
     (clon, clat) = _rupture_center(rupture)
     origin = rupture.getOrigin()
