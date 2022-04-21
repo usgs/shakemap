@@ -82,7 +82,7 @@ jobs:
       bash install.sh -p $(python.version)
     displayName: Create environment
 
-  - bash: ~/miniconda/bin/conda init bash                            
+  - bash: /usr/local/miniconda/bin/conda init bash
     displayName: Init conda for bash                                         
 
   - bash: |

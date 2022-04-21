@@ -176,6 +176,7 @@ package_list=(
       "obspy>=1.2.2"
       "openmp>=8.0.1"
       "pandas>=1.2.5"
+      "pluggy==0.8.0"
       "ps2ff>=1.5.2"
       "psutil>=5.6.7"
       "pyproj>=2.6.1"
