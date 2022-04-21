@@ -82,7 +82,9 @@ jobs:
       bash install.sh -p $(python.version)
     displayName: Create environment
 
-  - bash: conda init bash
+  - bash: |
+      echo "##vso[task.prependpath]$CONDA/bin"
+      conda init bash
     displayName: Init conda for bash                                         
 
   - bash: |
