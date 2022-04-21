@@ -1345,7 +1345,7 @@ class ModelModule(CoreModule):
             self.ccf.getCorrelation(t1_22, t2_22, matrix22)
             sta_phi_flat = sta_phi.flatten()
             make_sigma_matrix(matrix22, sta_phi_flat, sta_phi_flat)
-            np.fill_diagonal(matrix22, np.diag(matrix22) + sta_sig_extra**2)
+            np.fill_diagonal(matrix22, np.diag(matrix22) + sta_sig_extra ** 2)
             cov_WD_WD_inv = np.linalg.pinv(matrix22)
             #
             # Hold on to some things we'll need later
@@ -1508,6 +1508,13 @@ class ModelModule(CoreModule):
             self.outsd[imtstr] = pout_sd[0]
             self.outphi[imtstr] = self.psd[imtstr]
             self.outtau[imtstr] = self.tsd[imtstr]
+            # Special stuff for the MMI priors. When we make this apply to other
+            # IMTs we'll need to mess around with this block
+            if imtstr == "MMI":
+                self.MMI_add_uncertainty = np.array([])
+                self.MMI_Sigma_HH_YD = np.array([])
+                self.MMI_C = np.array([])
+                self.MMI_sta_per_ix = np.array([])
             return
 
         pout_sd2_phi = np.power(self.psd[imtstr], 2.0)
@@ -1554,6 +1561,14 @@ class ModelModule(CoreModule):
         sdsta_phi = sta_phi.flatten()
         matrix12_phi = np.empty(t2_12.shape, dtype=np.double)
         rcmatrix_phi = np.empty(t2_12.shape, dtype=np.double)
+        # Allocate the full C matrix only for the desired IMT (MMI). This
+        # is for generating realizations. Someday we will want to make this
+        # apply to other IMTs and become an optional flag for this module
+        # where we save the priors optionally
+        # Note: We would have to set up C_complete = {} at the top of the
+        # module, and then here, it would be C_complete[imtstr] = ...
+        if imtstr == "MMI":
+            C_complete = np.empty_like(T_Y0)
         for iy in range(self.smny):
             ss = iy * self.smnx
             se = (iy + 1) * self.smnx
@@ -1631,6 +1646,11 @@ class ModelModule(CoreModule):
             sdgrid_tau[iy, :] = np.sum(
                 np.multiply(C_tmp1, C, out=C_tmp2), out=s_tmp3, axis=1
             )
+            # This is where we would have a flag if we were saving the priors
+            # as an option
+            if imtstr == "MMI":
+                # Save C to complete full size C
+                C_complete[ss:se, :] = C
 
             mtime += time.time() - time4
         #
@@ -1654,6 +1674,14 @@ class ModelModule(CoreModule):
         # self.outphi[imtstr] = np.sqrt(cov_WY_WY_WD)
         self.outphi[imtstr] = self.psd[imtstr]
         self.outtau[imtstr] = np.sqrt(sdgrid_tau, out=sdgrid_tau)
+
+        # Special stuff for the MMI priors. When we make this apply to other
+        # IMTs we'll need to mess around with this block
+        if imtstr == "MMI":
+            self.MMI_add_uncertainty = self.sta_sig_extra[imtstr]
+            self.MMI_Sigma_HH_YD = self.cov_HH_yD[imtstr]
+            self.MMI_C = C_complete
+            self.MMI_sta_per_ix = sta_per_ix
 
         self.logger.debug(f"\ttime for {imtstr} distance={ddtime:f}")
         self.logger.debug(f"\ttime for {imtstr} correlation={ctime:f}")
@@ -2108,7 +2136,7 @@ class ModelModule(CoreModule):
                 else:
                     mytau = sdf[key + "_tau"][six]
                 myphi = sdf[key + "_phi"][six]
-                mysigma = np.sqrt(mytau**2 + myphi**2)
+                mysigma = np.sqrt(mytau ** 2 + myphi ** 2)
                 mysigma_rock = sdf[key + "_sigma_rock"][six]
                 mysigma_soil = sdf[key + "_sigma_soil"][six]
                 imt_name = key.lower().replace("_pred", "")
@@ -2305,6 +2333,15 @@ class ModelModule(CoreModule):
                 self.outphi[key],
                 self.outtau[key],
             )
+            if key == "MMI":
+                sub_groups = ["imts", component, key]
+                oc.setArray(sub_groups, "add_uncertainty", self.MMI_add_uncertainty)
+                oc.setArray(sub_groups, "Sigma_HH_YD", self.MMI_Sigma_HH_YD)
+                oc.setArray(sub_groups, "C", self.MMI_C)
+                oc.setArray(sub_groups, "sta_per_ix", self.MMI_sta_per_ix)
+                oc.setArray(sub_groups, "sta_phi", self.sta_phi["MMI"])
+                oc.setArray(sub_groups, "sta_lons_rad", self.sta_lons_rad["MMI"])
+                oc.setArray(sub_groups, "sta_lats_rad", self.sta_lats_rad["MMI"])
         #
         # Directivity
         #
@@ -2561,7 +2598,7 @@ class ModelModule(CoreModule):
             target_res = (
                 -(latspan + lonspan)
                 - np.sqrt(
-                    latspan**2 + lonspan**2 + 2 * latspan * lonspan * (2 * nmax - 1)
+                    latspan ** 2 + lonspan ** 2 + 2 * latspan * lonspan * (2 * nmax - 1)
                 )
             ) / (2 * (1 - nmax))
 
