@@ -79,12 +79,13 @@ jobs:
       fi
       echo $(Agent.NAME)
       echo $(python.version)
+      echo "Conda is " $CONDA " user is " $USER
       bash install.sh -p $(python.version)
     displayName: Create environment
 
   - bash: |
       echo "##vso[task.prependpath]$CONDA/bin"
-      conda init bash
+      $CONDA init bash
     displayName: Init conda for bash                                         
 
   - bash: |
