@@ -41,6 +41,23 @@ def get_result_dict(filename):
         'ymax': the maximum latitude of the grid
         'ymin': the minimum latitude of the grid
     The grids themselves will be of dimension (ny x nx) (rows x cols).
+    In addition to the above grids, the following arrays will be returned:
+        'Sigma_HH_YD': A numpy array, see below for possible values.
+        'Sigma_HH_YD_metadata': This will always be 'None'.
+        'C': A numpy array, see below for possible values.
+        'C_metadata': This will always be 'None'.
+        'add_uncertainty': A numpy array, see below for possible values.
+        'add_uncertainty_metadata': This will always be 'None'.
+        'sta_per_ix': A numpy array, see below for possible values.
+        'sta_per_ix_metadata': This will always be 'None'.
+    These arrays will have the following contents:
+        'None': If this function is run on an older version of shake_results.hdf
+                that was produced by model.py before it generated the output
+                needed to produce these arrays.
+        '[]': I.e., empty arrays. When the shakemap contained no input station data
+              sufficient to generate the arrays.
+        ...: Arrays of shapes appropriate to the input and output data dimensions.
+             It is incumbent upon the user to make proper use of these arrays.
     """
     ddict = {}
     hdfobj = h5py.File(filename, "r+")
@@ -52,6 +69,21 @@ def get_result_dict(filename):
         for key, value in dset.attrs.items():
             metadata[key] = value
         ddict[name + "_metadata"] = metadata
+    for name in (
+        "add_uncertainty",
+        "Sigma_HH_YD",
+        "C",
+        "sta_per_ix",
+        "sta_phi",
+        "sta_lons_rad",
+        "sta_lats_rad",
+    ):
+        ddict[name + "_metadata"] = None
+        try:
+            dset = group[name]
+            ddict[name] = dset[()].astype(np.float64)
+        except Exception:
+            ddict[name] = None
 
     hdfobj.close()
     return ddict
@@ -63,6 +95,24 @@ if __name__ == "__main__":
 
     print("ddict keys: ", ddict.keys())
     print()
+    for key in ddict.keys():
+        if ddict[key] is None:
+            print(f"ddict {key} is None")
+    for name in ("mean", "std", "phi", "tau"):
+        print(f"{name} shape is {(ddict[name].shape)}")
+    for key in (
+        "add_uncertainty",
+        "Sigma_HH_YD",
+        "C",
+        "sta_per_ix",
+        "sta_phi",
+        "sta_lons_rad",
+        "sta_lats_rad",
+    ):
+        if ddict[key] is None:
+            print(f"{key} shape is None")
+        else:
+            print(f"{key} shape is {(ddict[key].shape)}")
     print("Metadata:")
     print(ddict["mean_metadata"].items())
     print()

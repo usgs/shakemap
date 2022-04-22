@@ -28,6 +28,12 @@ jobs:
           #MacOS_11_Python38:
           #imageName: 'macos-11'
           #python.version: '3.8'
+      MacOS_12_Python39:
+        imageName: 'macos-latest'
+        python.version: '3.9'
+      MacOS_12_Python310:
+        imageName: 'macos-latest'
+        python.version: '3.10'
       MacOS_11_Python39:
         imageName: 'macos-11'
         python.version: '3.9'
@@ -68,15 +74,18 @@ jobs:
           echo "MacOS 10.14"
         else
           export CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
-          echo "MacOS 10.15 or MacOS 11"
+          echo "MacOS 10.15 or MacOS 11 or MacOS 12"
         fi
       fi
       echo $(Agent.NAME)
       echo $(python.version)
+      echo "Conda is " $CONDA " user is " $USER
       bash install.sh -p $(python.version)
     displayName: Create environment
 
-  - bash: conda init bash                            
+  - bash: |
+      echo "##vso[task.prependpath]$CONDA/bin"
+      conda init bash
     displayName: Init conda for bash                                         
 
   - bash: |
