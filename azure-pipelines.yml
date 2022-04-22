@@ -85,7 +85,7 @@ jobs:
 
   - bash: |
       echo "##vso[task.prependpath]$CONDA/bin"
-      $CONDA init bash
+      conda init bash
     displayName: Init conda for bash                                         
 
   - bash: |
