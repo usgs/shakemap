@@ -45,6 +45,49 @@
         "date": {
           "metadataLastUpdated": "2018-08-23"
         }
+      },
+      {
+        "name": "shakemap",
+        "organization": "U.S. Geological Survey",
+        "description": "Near-real-time maps of ground motion and shaking intensity",
+        "version": "4.1.0",
+        "status": "Production",
+
+        "permissions": {
+          "usageType": "openSource",
+          "licenses": [
+            {
+              "name": "Public Domain, CC0-1.0",
+              "URL": "https://github.com/usgs/shakemap/blob/master/LICENSE.md"
+            }
+          ]
+        },
+
+        "homepageURL": "https://usgs.github.io/shakemap/sm4_index.html",
+        "downloadURL": "https://github.com/usgs/shakemap/archive/master.zip",
+        "disclaimerURL": "https://github.com/usgs/shakemap/blob/master/LICENSE.md",
+        "repositoryURL": "https://github.com/usgs/shakemap.git",
+        "vcs": "git",
+
+        "laborHours": null,
+
+        "tags": [
+          "earthquake",
+          "shakemap"
+        ],
+
+        "languages": [
+          "python"
+        ],
+
+        "contact": {
+          "name": "C. Bruce Worden",
+          "email": "cbworden@contractor.usgs.gov "
+        },
+
+        "date": {
+          "metadataLastUpdated": "2022-04-28"
+        }
       }
     ]
 }
