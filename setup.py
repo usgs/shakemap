@@ -11,10 +11,14 @@ import shutil
 
 # This should be handled by conda when we install a platform-specific
 # compiler, but apparently isn't on macs (yet?)
-if shutil.which("clang") is None:
+clang_path = shutil.which("clang")
+if clang_path is None:
+    cc = shutil.which("gcc")
+    if cc is None:
+        raise Exception("No C Compiler found for gcc")
     os.environ["CC"] = "gcc"
 else:
-    os.environ["CC"] = "/usr/bin/clang"
+    os.environ["CC"] = clang_path
 
 sourcefiles = ["shakemap/c/pcontour.pyx", "shakemap/c/contour.c"]
 
