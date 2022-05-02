@@ -1418,7 +1418,7 @@ def draw_map(adict, override_scenario=False):
             props = contour_object["properties"]
             multi_lines = sShape(contour_object["geometry"])
             pmulti_lines = proj.project_geometry(multi_lines, src_crs=geoproj)
-            for multi_line in pmulti_lines:
+            for multi_line in pmulti_lines.geoms:
                 pmulti_line = mapping(multi_line)["coordinates"]
                 x, y = zip(*pmulti_line)
                 contour_lens[props["value"]].append(arclen(pmulti_line))
@@ -1444,7 +1444,7 @@ def draw_map(adict, override_scenario=False):
             # isovalue)
             min_len = np.array(contour_lens[props["value"]]).mean()
 
-            for multi_line in pmulti_lines:
+            for multi_line in pmulti_lines.geoms:
                 pmulti_line = mapping(multi_line)["coordinates"]
                 x, y = zip(*pmulti_line)
                 # color = imt_cmap.getDataColor(props['value'])
