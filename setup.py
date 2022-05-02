@@ -13,6 +13,9 @@ import shutil
 # compiler, but apparently isn't on macs (yet?)
 clang_path = shutil.which("clang")
 if clang_path is None:
+    cc = shutil.which("gcc")
+    if cc is None:
+        raise Exception("No C Compiler found for gcc")
     os.environ["CC"] = "gcc"
 else:
     os.environ["CC"] = clang_path
