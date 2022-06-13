@@ -23,12 +23,12 @@ from shapely.geometry import Point
 from configobj import ConfigObj
 from validate import Validator
 from shapely.geometry import Polygon
+from impactutils.rupture.origin import write_event_file
+from impactutils.rupture import constants
 
 # Local imports
 from shakemap.utils.config import get_config_paths, get_configspec, config_error
-from shakelib.rupture.origin import write_event_file
 from shakemap.utils.amps import AmplitudeHandler
-from shakelib.rupture import constants
 
 MAX_SIZE = 4096
 

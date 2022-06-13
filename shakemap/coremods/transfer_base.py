@@ -10,14 +10,14 @@ import shutil
 import re
 
 # third party imports
-from impactutils.io.smcontainers import ShakeMapOutputContainer
 from configobj import ConfigObj
 from validate import Validator
+from impactutils.io.smcontainers import ShakeMapOutputContainer
+from impactutils.rupture import constants
 
 # local imports
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths, get_data_path, config_error
-from shakelib.rupture import constants
 
 NO_TRANSFER = "NO_TRANSFER"
 SAVE_FILE = ".saved"

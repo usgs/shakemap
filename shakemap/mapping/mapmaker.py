@@ -31,14 +31,14 @@ from impactutils.mapping.mercatormap import MercatorMap
 from impactutils.colors.cpalette import ColorPalette
 from impactutils.mapping.scalebar import draw_scale
 from impactutils.textformat.text import set_num_precision
+from impactutils.rupture.point_rupture import PointRupture
+from impactutils.rupture import constants
+from impactutils.rupture.factory import rupture_from_dict
 from mapio.grid2d import Grid2D
 from mapio.geodict import GeoDict
 
 
 # local imports
-from shakelib.rupture.point_rupture import PointRupture
-from shakelib.rupture import constants
-from shakelib.rupture.factory import rupture_from_dict
 from shakelib.plotting.contour import contour, getContourLevels
 from shakelib.gmice.wgrw12 import WGRW12
 from shakemap.utils.utils import get_object_from_config

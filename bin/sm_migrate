@@ -25,8 +25,10 @@ from shakemap.utils.config import (
 from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
 
 # from shakemap.utils.amps import AmplitudeHandler
-from shakelib.rupture.origin import read_event_file, write_event_file, Origin
-from shakelib.rupture.factory import (
+from impactutils.time.ancient_time import HistoricTime
+from impactutils.rupture import constants
+from impactutils.rupture.origin import read_event_file, write_event_file, Origin
+from impactutils.rupture.factory import (
     text_to_json,
     rupture_from_dict_and_origin,
     get_rupture,
@@ -34,8 +36,6 @@ from shakelib.rupture.factory import (
 from shakelib.utils.utils import get_extent
 from shakemap.utils.probs import get_weights
 from shakemap.utils.layers import validate_config, update_config_regions
-from impactutils.time.ancient_time import HistoricTime
-from shakelib.rupture import constants
 
 KM2SEC = 3600.0 / 111  # seconds per kilometer
 

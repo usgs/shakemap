@@ -8,6 +8,7 @@ from collections import OrderedDict
 # third party imports
 import numpy as np
 from impactutils.io.smcontainers import ShakeMapOutputContainer
+from impactutils.rupture import constants
 from mapio.shake import ShakeGrid
 from mapio.geodict import GeoDict
 
@@ -15,7 +16,6 @@ from mapio.geodict import GeoDict
 from .base import CoreModule, Contents
 from shakemap.utils.config import get_config_paths
 import shakemap
-from shakelib.rupture import constants
 
 
 def _oq_to_gridxml(oqimt):

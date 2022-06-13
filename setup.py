@@ -64,7 +64,6 @@ setup(
         "shakelib.correlation",
         "shakelib.directivity",
         "shakelib.gmice",
-        "shakelib.rupture",
         "shakelib.plotting",
         "shakelib.utils",
     ],

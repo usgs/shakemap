@@ -22,7 +22,7 @@ from shakemap.utils.config import get_config_paths, get_configspec, config_error
 from shakemap.utils.logging import get_logger
 from shakemap.utils.dependencies import CommandDatabase
 from shakemap.utils.exception import TerminateShakeMap
-from shakelib.rupture.origin import read_event_file
+from impactutils.rupture.origin import read_event_file
 
 CANCEL_FILE = "CANCELED"
 

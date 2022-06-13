@@ -52,8 +52,8 @@ import copy
 import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo.utils import OrthographicProjection
 
-from shakelib.rupture import utils
-from shakelib.distance import get_distance
+from impactutils.rupture import utils
+from impactutils.rupture.distance import get_distance
 from impactutils.vectorutils.ecef import latlon2ecef
 from impactutils.vectorutils.ecef import ecef2latlon
 from impactutils.vectorutils.vector import Vector

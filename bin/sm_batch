@@ -28,12 +28,18 @@ def call_shakemap(cmd, events, modules, logfile):
     """Loop over a list of event IDs, calling ShakeMap on each one.
 
     Args:
-        cmd (str): Path to shake command.
-        events (list): List of event IDs which correspond to event directories under current profile.
-        modules (list): List of ShakeMap modules to run.
-        logfile (file): Open file object where child process can write output.
+        cmd (str):
+            Path to shake command.
+        events (list):
+            List of event IDs which correspond to event directories under current
+            profile.
+        modules (list):
+            List of ShakeMap modules to run.
+        logfile (file):
+            Open file object where child process can write output.
     Returns:
-        tuple: (Boolean indicating success/failure, stdout from shake call, stderr from shake call)
+        tuple: (Boolean indicating success/failure, stdout from shake call, stderr from
+        shake call)
     """
     modstr = " ".join(modules)
     for event in events:

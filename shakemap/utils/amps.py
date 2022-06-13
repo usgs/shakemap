@@ -14,9 +14,9 @@ from itertools import zip_longest
 # third party libraries
 import numpy as np
 from openquake.hazardlib.geo.geodetic import geodetic_distance
+from impactutils.rupture import constants
 
 # local libraries
-from shakelib.rupture import constants
 
 # define all of the tables as dictionaries
 EVENT = OrderedDict(

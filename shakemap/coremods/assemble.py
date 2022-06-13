@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 from mapio.grid2d import Grid2D
 from mapio.geodict import GeoDict
+from impactutils.rupture import constants
 
 # local imports
 from .base import CoreModule
@@ -33,7 +34,6 @@ from shakemap.utils.config import (
     path_macro_sub,
 )
 from shakemap.utils.amps import AmplitudeHandler
-from shakelib.rupture import constants
 
 LATLON_COLS = set(["LAT", "LON"])
 XY_COLS = set(["X", "Y"])

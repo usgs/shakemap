@@ -11,9 +11,9 @@ import numpy as np
 import copy
 
 
-from shakelib.rupture.factory import get_rupture
-from shakelib.rupture.origin import Origin
-from shakelib.rupture.quad_rupture import QuadRupture
+from impactutils.rupture.factory import get_rupture
+from impactutils.rupture.origin import Origin
+from impactutils.rupture.quad_rupture import QuadRupture
 
 
 # Lame method to detect integer using try block because

@@ -13,13 +13,13 @@ import shutil
 
 import pytest
 from shapely.geometry import Polygon
+from impactutils.rupture import constants
 
 import shakemap.utils.queue as queue
 from shakemap.utils.queue import Queue
 from shakemap.utils.queue import EventQueue
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.amps import AmplitudeHandler
-from shakelib.rupture import constants
 
 
 def get_dummy_logger(name):

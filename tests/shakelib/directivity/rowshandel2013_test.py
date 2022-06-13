@@ -10,13 +10,14 @@ import time
 from openquake.hazardlib.geo.utils import OrthographicProjection
 from openquake.hazardlib.geo import point
 
-from shakelib.sites import Sites
-from shakelib.rupture.quad_rupture import QuadRupture
-from shakelib.rupture.origin import Origin
-from shakelib.directivity.rowshandel2013 import Rowshandel2013
 from impactutils.vectorutils.vector import Vector
 from impactutils.vectorutils.ecef import ecef2latlon
 from impactutils.time.ancient_time import HistoricTime
+from impactutils.rupture.quad_rupture import QuadRupture
+from impactutils.rupture.origin import Origin
+
+from shakelib.sites import Sites
+from shakelib.directivity.rowshandel2013 import Rowshandel2013
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, "..", "..", ".."))

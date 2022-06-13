@@ -10,13 +10,13 @@ import json
 
 # third party imports
 from configobj import ConfigObj
+from impactutils.rupture.origin import Origin
 
 # local imports
 from .base import CoreModule
 import shakemap.utils.config as cfg
 from shakemap.utils.probs import get_weights
 from shakemap.utils.layers import validate_config, update_config_regions
-from shakelib.rupture.origin import Origin
 
 
 class SelectModule(CoreModule):

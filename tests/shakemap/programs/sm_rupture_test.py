@@ -4,8 +4,8 @@ import tempfile
 
 import numpy as np
 
-from shakelib.rupture.factory import get_rupture
-from shakelib.rupture.origin import Origin
+from impactutils.rupture.factory import get_rupture
+from impactutils.rupture.origin import Origin
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))
