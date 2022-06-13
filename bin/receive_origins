@@ -20,13 +20,13 @@ import time
 from libcomcat.search import get_event_by_id
 from impactutils.comcat.query import GeoServe
 from impactutils.mapping.compass import get_compass_dir_azimuth
+from impactutils.rupture import constants
 
 # local imports
 from shakemap.utils.config import get_config_paths
 import shakemap.utils.queue as queue
 from shakemap.utils.logging import get_generic_logger
 from shakemap.utils.utils import get_network_name
-from shakelib.rupture import constants
 
 LOGFILE = "origins.log"
 

@@ -22,22 +22,21 @@ import cartopy.io.shapereader as shpreader
 from shapely.geometry import shape
 
 import concurrent.futures as cf
+from impactutils.rupture.point_rupture import PointRupture
+from impactutils.rupture.distance import Distance, get_distance, get_distance_measures
+from impactutils.io.smcontainers import ShakeMapOutputContainer
+from impactutils.rupture import constants
 
 # local imports
 from mapio.geodict import GeoDict
 from mapio.grid2d import Grid2D
 from .base import CoreModule, Contents
-from shakelib.rupture.point_rupture import PointRupture
 from shakelib.sites import Sites
-from shakelib.distance import Distance, get_distance, get_distance_measures
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent, thirty_sec_min, thirty_sec_max
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.utils.containers import ShakeMapInputContainer
-from impactutils.io.smcontainers import ShakeMapOutputContainer
-from shakelib.rupture import constants
-
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions

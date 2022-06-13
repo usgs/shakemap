@@ -12,11 +12,11 @@ import os.path
 
 # third party imports
 import pytest
+from impactutils.io.smcontainers import ShakeMapOutputContainer
+from impactutils.rupture.point_rupture import PointRupture
 
 # local imports
 from shakelib.utils.containers import ShakeMapInputContainer
-from impactutils.io.smcontainers import ShakeMapOutputContainer
-from shakelib.rupture.point_rupture import PointRupture
 
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?

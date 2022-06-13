@@ -7,14 +7,13 @@ from openquake.hazardlib.geo.utils import OrthographicProjection
 from openquake.hazardlib.gsim.base import SitesContext
 from openquake.hazardlib.gsim.base import DistancesContext
 from openquake.hazardlib.gsim.base import RuptureContext
+from strec.gmreg import Regionalizer
+from impactutils.rupture.edge_rupture import EdgeRupture
+from impactutils.rupture.quad_rupture import QuadRupture
+from impactutils.rupture.base import Rupture
 
-from shakelib.rupture.edge_rupture import EdgeRupture
-from shakelib.rupture.quad_rupture import QuadRupture
-from shakelib.rupture.base import Rupture
 from shakelib.multigmpe import set_sites_depth_parameters
 from shakelib.station import StationList
-
-from strec.gmreg import Regionalizer
 
 
 DEFAULT_ACTIVE_COEFFS = [27.24, 250.4, 579.1]

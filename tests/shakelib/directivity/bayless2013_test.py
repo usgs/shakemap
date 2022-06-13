@@ -14,8 +14,9 @@ from openquake.hazardlib.geo import point
 from impactutils.time.ancient_time import HistoricTime
 from impactutils.vectorutils.vector import Vector
 from impactutils.vectorutils.ecef import ecef2latlon
-from shakelib.rupture.origin import Origin
-from shakelib.rupture.quad_rupture import QuadRupture
+from impactutils.rupture.origin import Origin
+from impactutils.rupture.quad_rupture import QuadRupture
+
 from shakelib.directivity.bayless2013 import Bayless2013
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?

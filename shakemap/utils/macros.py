@@ -4,7 +4,7 @@
 # stdlib imports
 from datetime import datetime
 
-from shakelib.rupture import constants
+from impactutils.rupture import constants
 
 DATE_STR_FMT = "%b %d, %Y"
 TIME_OF_DAY_FMT = "%H:%M:%S"

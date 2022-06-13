@@ -7,9 +7,10 @@ import time
 
 import numpy as np
 
+from impactutils.rupture import constants
+
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.amps import AmplitudeHandler, timestr_to_timestamp
-from shakelib.rupture import constants
 
 
 def test_amps():

@@ -4,14 +4,14 @@
 
 # third party imports
 from impactutils.io.smcontainers import ShakeMapContainerBase
-
-# local imports
-from shakelib.rupture.factory import (
+from impactutils.rupture.factory import (
     rupture_from_dict,
     get_rupture,
     rupture_from_dict_and_origin,
 )
-from shakelib.rupture.origin import Origin
+from impactutils.rupture.origin import Origin
+
+# local imports
 from shakelib.station import StationList
 
 

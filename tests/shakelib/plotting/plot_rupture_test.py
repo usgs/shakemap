@@ -9,10 +9,11 @@ from openquake.hazardlib.geo.geodetic import azimuth
 import numpy as np
 import matplotlib.pyplot as plt
 
-from shakelib.rupture.quad_rupture import QuadRupture
-from shakelib.rupture.origin import Origin
-from shakelib.plotting.plotrupture import plot_rupture_wire3d, map_rupture
+from impactutils.rupture.quad_rupture import QuadRupture
+from impactutils.rupture.origin import Origin
 from impactutils.time.ancient_time import HistoricTime
+
+from shakelib.plotting.plotrupture import plot_rupture_wire3d, map_rupture
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, "..", ".."))

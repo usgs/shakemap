@@ -16,8 +16,11 @@ from xml.sax import make_parser
 # third party imports
 from libcomcat.search import get_event_by_id
 from configobj import ConfigObj
-from impactutils.time.ancient_time import HistoricTime
 import numpy as np
+from impactutils.time.ancient_time import HistoricTime
+from shakelib.impactutils.origin import write_event_file, Origin
+from shakelib.impactutils.factory import get_rupture
+from shakelib.impactutils import constants
 
 # local imports
 from shakemap.utils.config import (
@@ -26,14 +29,11 @@ from shakemap.utils.config import (
     get_custom_validator,
     config_error,
 )
-from shakelib.rupture.origin import write_event_file, Origin
-from shakelib.rupture.factory import get_rupture
 from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
 from shakemap.utils.probs import get_weights
 from shakemap.utils.layers import validate_config, update_config_regions
 from shakemap.utils.dataframe import dataframe_to_xml
 from shakemap.coremods.dyfi import _get_dyfi_dataframe
-from shakelib.rupture import constants
 from shakelib.station import StationList
 
 TIMEFMT2 = "%Y-%m-%dT%H:%M:%S"

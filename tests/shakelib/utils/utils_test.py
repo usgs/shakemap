@@ -8,12 +8,12 @@ import os.path
 import numpy as np
 import pytest
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
+from impactutils.rupture.factory import get_rupture
+from impactutils.rupture.origin import Origin
 
 # local imports
 from shakelib.utils.exception import ShakeLibException
 from shakelib.utils.utils import get_extent, is_stable, replace_dyfi
-from shakelib.rupture.factory import get_rupture
-from shakelib.rupture.origin import Origin
 from shakelib.station import StationList
 from shakelib.virtualipe import VirtualIPE
 from shakelib.gmice.wgrw12 import WGRW12

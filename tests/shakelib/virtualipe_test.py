@@ -11,13 +11,13 @@ from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 import openquake.hazardlib.const as oqconst
 from openquake.hazardlib.imt import MMI, PGA, PGV, SA
 import pytest
+from impactutils.rupture.distance import Distance
+from impactutils.rupture.origin import Origin
+from impactutils.rupture.factory import get_rupture
 
 # local imports
-from shakelib.distance import Distance
 from shakelib.gmice.wgrw12 import WGRW12
 from shakelib.multigmpe import MultiGMPE
-from shakelib.rupture.origin import Origin
-from shakelib.rupture.factory import get_rupture
 from shakelib.sites import Sites
 from shakelib.utils.exception import ShakeLibException
 from shakelib.virtualipe import VirtualIPE

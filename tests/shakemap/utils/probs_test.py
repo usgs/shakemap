@@ -4,11 +4,12 @@ import numpy as np
 import os.path
 from configobj import ConfigObj
 
+from impactutils.rupture.origin import Origin
+
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.probs import get_weights
 from shakemap.coremods.select import validate_config
 
-from shakelib.rupture.origin import Origin
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 

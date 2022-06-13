@@ -25,15 +25,15 @@ from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011NEHRPBC
 from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006Asc
 import pytest
+from impactutils.rupture.origin import Origin
+from impactutils.rupture.quad_rupture import QuadRupture
+from impactutils.rupture.point_rupture import PointRupture
+from impactutils.rupture.distance import Distance
 
 # local imports
 from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
-from shakelib.distance import Distance
 from shakelib.multigmpe import filter_gmpe_list
 from shakelib.multigmpe import MultiGMPE, stuff_context, set_sites_depth_parameters
-from shakelib.rupture.origin import Origin
-from shakelib.rupture.quad_rupture import QuadRupture
-from shakelib.rupture.point_rupture import PointRupture
 import shakelib.sites as sites
 from shakelib.sites import Sites
 
@@ -1511,7 +1511,7 @@ def test_nga_w2_m6():
     rctx.hypo_depth = 8.0  # given
 
     dctx.rjb = np.logspace(0, np.log10(300), size)
-    dctx.rrup = np.sqrt(dctx.rjb ** 2 + rctx.ztor ** 2)  # ztor = 3.0
+    dctx.rrup = np.sqrt(dctx.rjb**2 + rctx.ztor**2)  # ztor = 3.0
     dctx.rjb_var = None
     dctx.rrup_var = None
     dctx.rx = dctx.rjb  # doesn't matter b/c vertical
