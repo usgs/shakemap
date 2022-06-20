@@ -18,9 +18,9 @@ from libcomcat.search import get_event_by_id
 from configobj import ConfigObj
 import numpy as np
 from impactutils.time.ancient_time import HistoricTime
-from shakelib.impactutils.origin import write_event_file, Origin
-from shakelib.impactutils.factory import get_rupture
-from shakelib.impactutils import constants
+from impactutils.rupture.origin import write_event_file, Origin
+from impactutils.rupture.factory import get_rupture
+from impactutils.rupture import constants
 
 # local imports
 from shakemap.utils.config import (
