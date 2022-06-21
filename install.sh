@@ -112,7 +112,7 @@ fi
 
 echo "Installing mamba from conda-forge"
 
-conda install mamba -y -n base -c conda-forge
+conda install mamba<=0.23.3 -y -n base -c conda-forge
 
 echo "Installing packages from conda-forge"
 
@@ -210,7 +210,7 @@ conda config --add channels 'defaults'
 conda config --set channel_priority flexible
 
 echo "Creating the $VENV virtual environment:"
-mamba create -y -n $VENV ${package_list[*]}
+mamba create -y -n $VENV ${package_list[*]} -c conda-forge --strict-channel-priority
 
 # Bail out at this point if the conda create command fails.
 # Clean up zip files we've downloaded
