@@ -112,7 +112,7 @@ fi
 
 echo "Installing mamba from conda-forge"
 
-conda install mamba<=0.23.3 -y -n base -c conda-forge
+conda install "mamba<=0.23.3" -y -n base -c conda-forge
 
 echo "Installing packages from conda-forge"
 
