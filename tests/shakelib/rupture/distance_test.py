@@ -106,7 +106,6 @@ def test_exceptions():
 
 
 def test_distance_no_rupture():
-    global do_tests
     event = {
         "lat": 34.1,
         "lon": -118.2,
@@ -134,8 +133,10 @@ def test_distance_no_rupture():
         cx, cy, xspan, yspan, dx, dy, vs30File=vs30file, padding=True, resample=False
     )
 
+    datadir = os.path.join(homedir, "data")
+
     if do_tests is False:
-        os.makedirs("data", exist_ok=True)
+        os.makedirs(datadir, exist_ok=True)
 
     # TEST #1
     # Make souce instance
@@ -147,14 +148,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test1_rjb.npy")
+    rrupfile = os.path.join(datadir, "test1_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test1_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test1_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test1_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test1_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
     # TEST #2
     # Souce instance
@@ -164,11 +165,11 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test2_rjb.npy")
     if do_tests is True:
-        rjb = np.load("data/test2_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
     else:
-        np.save("data/test2_rjb", dctx.rjb, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
 
     # TEST #3
     # Souce instance
@@ -180,14 +181,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test3_rjb.npy")
+    rrupfile = os.path.join(datadir, "test3_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test3_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test3_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test3_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test3_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
     # TEST #4
     # Souce instance
@@ -199,14 +200,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test4_rjb.npy")
+    rrupfile = os.path.join(datadir, "test4_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test4_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test4_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test4_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test4_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
     # TEST #5
     # Souce instance
@@ -218,14 +219,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test5_rjb.npy")
+    rrupfile = os.path.join(datadir, "test5_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test5_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test5_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test5_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test5_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
     # TEST #6
     # Souce instance
@@ -237,14 +238,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test6_rjb.npy")
+    rrupfile = os.path.join(datadir, "test6_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test6_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test6_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test6_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test6_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
     # TEST #7
     # Souce instance
@@ -256,14 +257,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test7_rjb.npy")
+    rrupfile = os.path.join(datadir, "test7_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test7_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test7_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test7_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test7_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
     # TEST #8
     # Souce instance
@@ -275,14 +276,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test8_rjb.npy")
+    rrupfile = os.path.join(datadir, "test8_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test8_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test8_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test8_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test8_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
     # TEST #9
     # Souce instance
@@ -294,14 +295,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test9_rjb.npy")
+    rrupfile = os.path.join(datadir, "test9_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test9_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test9_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test9_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test9_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
     # TEST #10
     # Souce instance
@@ -313,14 +314,14 @@ def test_distance_no_rupture():
     dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
+    rjbfile = os.path.join(datadir, "test10_rjb.npy")
+    rrupfile = os.path.join(datadir, "test10_rrup.npy")
     if do_tests is True:
-        rjb = np.load("data/test10_rjb.npy")
-        np.testing.assert_allclose(rjb, dctx.rjb, rtol=0, atol=0.01)
-        rrup = np.load("data/test10_rrup.npy")
-        np.testing.assert_allclose(rrup, dctx.rrup, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rjbfile), dctx.rjb, rtol=0, atol=0.01)
+        np.testing.assert_allclose(np.load(rrupfile), dctx.rrup, rtol=0, atol=0.01)
     else:
-        np.save("data/test10_rjb", dctx.rjb, allow_pickle=False)
-        np.save("data/test10_rrup", dctx.rrup, allow_pickle=False)
+        np.save(rjbfile, dctx.rjb, allow_pickle=False)
+        np.save(rrupfile, dctx.rrup, allow_pickle=False)
 
 
 def test_distance_from_sites_origin():
