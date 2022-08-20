@@ -175,7 +175,7 @@ package_list=(
       "obspy>=1.2.2"
       "openmp>=8.0.1"
       "pandas>=1.2.5"
-      "ps2ff>=1.5.2"
+      "pip<=21.2.1"
       "psutil>=5.6.7"
       "pyproj>=2.6.1"
       "pytest==6.2.4"
@@ -187,7 +187,7 @@ package_list=(
       "rasterio>=1.2.5"
       "scikit-image>=0.16.2"
       "scipy>=1.4.1"
-      "shapely>=1.7.1"
+      "shapely>=1.8.4"
       "simplekml>=1.3.5"
       "strec>=2.1.7"
       "versioneer>=0.20"
@@ -231,7 +231,7 @@ if [ $? -ne 0 ];then
 fi
 
 # upgrade pip, mostly so pip doesn't complain about not being new...
-pip install --upgrade pip
+# pip install --upgrade pip
 
 # if pip upgrade fails, complain but try to keep going
 if [ $? -ne 0 ];then
@@ -257,6 +257,10 @@ if [ $? -ne 0 ];then
     exit 1
 fi
 
+# 
+# Install ps2ff from the repo rather than via conda
+#
+pip install git+https://code.usgs.gov/ghsc/esi/ps2ff
 
 # This package
 echo "Installing ${VENV}..."
