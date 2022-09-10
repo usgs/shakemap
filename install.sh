@@ -258,9 +258,9 @@ if [ $? -ne 0 ];then
 fi
 
 # 
-# Install ps2ff from the repo rather than via conda
+# Install ps2ff from PYPI
 #
-pip install git+https://code.usgs.gov/ghsc/esi/ps2ff
+pip install ps2ff
 
 # This package
 echo "Installing ${VENV}..."
