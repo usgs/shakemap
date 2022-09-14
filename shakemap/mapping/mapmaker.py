@@ -1479,10 +1479,10 @@ def draw_map(adict, override_scenario=False):
 
     # make the border thicker
     lw = 2.0
-    ax.outline_patch.set_zorder(BORDER_ZORDER)
-    ax.outline_patch.set_linewidth(lw)
-    ax.outline_patch.set_joinstyle("round")
-    ax.outline_patch.set_capstyle("round")
+    ax.spines["geo"].set_zorder(BORDER_ZORDER)
+    ax.spines["geo"].set_linewidth(lw)
+    ax.spines["geo"].set_joinstyle("round")
+    ax.spines["geo"].set_capstyle("round")
 
     # Coastlines will get drawn when we draw the ocean edges
     # ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
@@ -1732,10 +1732,10 @@ def draw_uncertainty_map(adict, key, override_scenario=False):
 
     # make the border thicker
     lw = 2.0
-    ax.outline_patch.set_zorder(BORDER_ZORDER)
-    ax.outline_patch.set_linewidth(lw)
-    ax.outline_patch.set_joinstyle("round")
-    ax.outline_patch.set_capstyle("round")
+    ax.spines["geo"].set_zorder(BORDER_ZORDER)
+    ax.spines["geo"].set_linewidth(lw)
+    ax.spines["geo"].set_joinstyle("round")
+    ax.spines["geo"].set_capstyle("round")
 
     # Coastlines will get drawn when we draw the ocean edges
     # ax.coastlines(resolution="10m", zorder=COAST_ZORDER, linewidth=3)
