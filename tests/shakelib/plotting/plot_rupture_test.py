@@ -8,6 +8,7 @@ import pytest
 from openquake.hazardlib.geo.geodetic import azimuth
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d
 
 from impactutils.rupture.quad_rupture import QuadRupture
 from impactutils.rupture.origin import Origin
@@ -58,7 +59,8 @@ def test_plot_rupture(interactive=False):
 
     # Need to get tests to check exception for if an axis is handed off
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
+    # ax = fig.add_subplot(111, projection="3d")
+    ax = axes3d.Axes3D(fig)
     plot_rupture_wire3d(rupture, ax)
 
     # And raise the exception if it is not a 3d axis

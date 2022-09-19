@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
-from mpl_toolkits.mplot3d import Axes3D  # noqa
+from mpl_toolkits.mplot3d import axes3d
 
 
 MAP_WIDTH = 10.0  # map width in degrees
@@ -25,9 +25,10 @@ def plot_rupture_wire3d(rupture, ax=None):
 
     if ax is None:
         fig = plt.figure()
-        ax = fig.add_subplot(111, projection="3d")
+        ax = axes3d.Axes3D(fig)
+        # ax = fig.add_subplot(111, projection="3d")
     else:
-        if "xlim3d" not in list(ax.properties().keys()):
+        if "zaxis" not in list(ax.properties().keys()):
             raise TypeError("Non-3d axes object passed to plot() method.")
     for quad in rupture.getQuadrilaterals():
         x = [p.longitude for p in quad]
