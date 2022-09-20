@@ -102,6 +102,7 @@ def stuff_context(sites, rup, dists):
     for name in [name for name in vars(dists) if not name.startswith("__")]:
         setattr(ctx, name, getattr(dists, name))
 
+    ctx.occurrence_rate = 1e-5
     return ctx
 
 
