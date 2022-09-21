@@ -69,10 +69,41 @@ echo "Using python version ${PYVER}"
 
 # Name of virtual environment, pull from yml file
 VENV=`grep "name:" source_environment.yml  | cut -f2 -d ":" | sed 's/\s+//g'`
+echo "#####Environment to create: '${VENV}'"
 
 # Where is conda installed?
 CONDA_LOC=`which conda`
 echo "######Location of conda install: ${CONDA_LOC}"
+
+# Are we in an environment
+CURRENT_ENV=`conda info --envs | grep "*"`
+echo "Current conda environment: ${CURRENT_ENV}"
+
+# create a matplotlibrc file with the non-interactive backend "Agg" in it.
+if [ ! -d "$matplotlibdir" ]; then
+    mkdir -p $matplotlibdir
+    # if mkdir fails, bow out gracefully
+    if [ $? -ne 0 ];then
+        echo "Failed to create matplotlib configuration file. Exiting."
+        exit 1
+    fi
+fi
+
+matplotlibrc=$matplotlibdir/matplotlibrc
+if [ ! -e "$matplotlibrc" ]; then
+    echo "backend : Agg" > "$matplotlibrc"
+    echo "NOTE: A non-interactive matplotlib backend (Agg) has been set for this user."
+elif grep -Fxq "backend : Agg" $matplotlibrc ; then
+    :
+elif [ ! grep -Fxq "backend" $matplotlibrc ]; then
+    echo "backend : Agg" >> $matplotlibrc
+    echo "NOTE: A non-interactive matplotlib backend (Agg) has been set for this user."
+else
+    sed -i '' 's/backend.*/backend : Agg/' $matplotlibrc
+    echo "###############"
+    echo "NOTE: $matplotlibrc has been changed to set 'backend : Agg'"
+    echo "###############"
+fi
 
 # Is conda installed?
 conda --version
@@ -106,6 +137,8 @@ if [ $? -ne 0 ]; then
 else
     echo "conda detected, installing $VENV environment..."
 fi
+
+
 
 # Update the conda tool
 echo "##################Updating conda tool..."
