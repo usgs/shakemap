@@ -16,25 +16,25 @@ jobs:
   timeoutInMinutes: 120
   strategy:
     matrix:
-      Linux_Python39:
+      Linux_Python38:
         imageName: 'ubuntu-latest'
-        python.version: '3.9'
+        python.version: '3.8'
         install.flags: ''
       Linux_Python310:
         imageName: 'ubuntu-latest'
         python.version: '3.10'
         install.flags: '-u -p 3.10'
-      MacOS_12_Python39:
+      MacOS_12_Python38:
         imageName: 'macos-latest'
-        python.version: '3.9'
+        python.version: '3.8'
         install.flags: ''
       MacOS_12_Python310:
         imageName: 'macos-latest'
         python.version: '3.10'
         install.flags: '-u -p 3.10'
-      MacOS_11_Python39:
+      MacOS_11_Python38:
         imageName: 'macos-11'
-        python.version: '3.9'
+        python.version: '3.8'
         install.flags: ''
       MacOS_11_Python310:
         imageName: 'macos-11'
