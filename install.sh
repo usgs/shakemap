@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # constants
-DEFAULT_PYVER=3.8
+DEFAULT_PYVER=3.9
 
 usage()
 {
@@ -68,7 +68,7 @@ echo "Variable to indicate deployment: ${create_deploy_yaml}"
 echo "Using python version ${PYVER}"
 
 # Name of virtual environment, pull from yml file
-VENV=`grep "name:" source_environment.yml  | cut -f2 -d ":" | sed 's/\s+//g'`
+VENV=`grep "name:" source_environment.yml  | cut -f2 -d ":" | sed 's/ //g'`
 echo "#####Environment to create: '${VENV}'"
 
 # Where is conda installed?
@@ -149,29 +149,13 @@ CVERSION=`conda -V`
 echo "New conda version: ${CVERSION}"
 echo "##################Done updating conda tool..."
 
-# Choose an environment file based on platform
-# only add this line if it does not already exist
-# grep "/etc/profile.d/conda.sh" $prof
-# if [ $? -ne 0 ]; then
-#     echo ". $_CONDA_ROOT/etc/profile.d/conda.sh" >> $prof
-# fi
-
-# # try initializing with bash
-# echo "##############Running conda init bash..."
-# conda init bash
-# echo "##############Done running conda init bash..."
-
-# # print out the contents of profile file
-# # echo "Contents of ${prof}:"
-# # cat $prof
-
-# # make sure that the changes to profile are reflected.
-# echo "##############Sourcing ${prof}..."
-# source $prof
-# echo "##############Done sourcing ${prof}..."
-
 # Start in conda base environment
 echo "Activate base virtual environment"
+# The documentation for this command says:
+# "writes the shell code to register the initialization code for the conda shell code."
+# The ShakeMap developers will buy an ice cream for anyone who can explain the previous sentence.
+# whatever it does, it is crucially important for being able to activate a conda environment
+# inside a shell script.
 eval "$(conda shell.bash hook)"                                                
 conda activate base
 if [ $? -ne 0 ]; then
@@ -200,8 +184,7 @@ if [ -z "${input_yaml_file}" ]; then
 else
     echo "Creating new environment from environment file: ${input_yaml_file} with python version ${PYVER}"
     # change python version in yaml file to match PYVER
-
-    sed 's/python=3.9/python='"${PYVER}"'/' "${input_yaml_file}" > tmp.yml
+    sed 's/python='"${DEFAULT_PYVER}"'/python='"${PYVER}"'/' "${input_yaml_file}" > tmp.yml
     mamba env create -f tmp.yml
     rm tmp.yml 
 fi
@@ -213,8 +196,6 @@ if [ $? -ne 0 ]; then
     echo "Failed to create conda environment.  Resolve any conflicts, then try again."
     exit 1
 fi
-
-
 
 # Activate the new environment
 echo "Activating the $VENV virtual environment"
