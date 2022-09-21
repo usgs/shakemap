@@ -65,6 +65,7 @@ fi
 
 echo "YAML file to use as input: ${input_yaml_file}"
 echo "Variable to indicate deployment: ${create_deploy_yaml}"
+echo "Using python version ${PYVER}"
 
 # Name of virtual environment, pull from yml file
 VENV=`grep "name:" source_environment.yml  | cut -f2 -d ":" | sed 's/\s+//g'`
