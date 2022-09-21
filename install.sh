@@ -70,6 +70,10 @@ echo "Using python version ${PYVER}"
 # Name of virtual environment, pull from yml file
 VENV=`grep "name:" source_environment.yml  | cut -f2 -d ":" | sed 's/\s+//g'`
 
+# Where is conda installed?
+CONDA_LOC=`which conda`
+echo "######Location of conda install: ${CONDA_LOC}"
+
 # Is conda installed?
 conda --version
 if [ $? -ne 0 ]; then
