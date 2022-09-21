@@ -103,6 +103,9 @@ else
     echo "conda detected, installing $VENV environment..."
 fi
 
+# Update the conda tool
+conda update -n base -c defaults conda -y
+
 # Choose an environment file based on platform
 # only add this line if it does not already exist
 grep "/etc/profile.d/conda.sh" $prof
