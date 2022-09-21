@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # constants
-DEFAULT_PYVER=3.9
+DEFAULT_PYVER=3.8
 
 usage()
 {
