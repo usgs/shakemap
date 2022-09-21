@@ -111,14 +111,18 @@ if [ $? -ne 0 ]; then
 fi
 
 # try initializing with bash
+echo "##############Running conda init bash..."
 conda init bash
+echo "##############Done running conda init bash..."
 
 # print out the contents of profile file
 echo "Contents of ${prof}:"
 cat $prof
 
 # make sure that the changes to profile are reflected.
+echo "##############Sourcing ${prof}..."
 source $prof
+echo "##############Done sourcing ${prof}..."
 
 # Start in conda base environment
 echo "Activate base virtual environment"
