@@ -19,21 +19,27 @@ jobs:
       Linux_Python39:
         imageName: 'ubuntu-latest'
         python.version: '3.9'
+        install.flags: ''
       Linux_Python310:
         imageName: 'ubuntu-latest'
         python.version: '3.10'
+        install.flags: '-u -p 3.10'
       MacOS_12_Python39:
         imageName: 'macos-latest'
         python.version: '3.9'
+        install.flags: ''
       MacOS_12_Python310:
         imageName: 'macos-latest'
         python.version: '3.10'
+        install.flags: '-u -p 3.10'
       MacOS_11_Python39:
         imageName: 'macos-11'
         python.version: '3.9'
+        install.flags: ''
       MacOS_11_Python310:
         imageName: 'macos-11'
         python.version: '3.10'
+        install.flags: '-u -p 3.10'
   pool:
     vmImage: $(imageName)
 
@@ -64,7 +70,7 @@ jobs:
       echo $(Agent.NAME)
       echo $(python.version)
       echo "Conda is " $CONDA " user is " $USER
-      bash install.sh -p $(python.version)
+      bash install.sh $(install.flags)
     displayName: Create environment
 
   - bash: |
