@@ -172,7 +172,7 @@ echo "##################Done updating conda tool..."
 
 # Start in conda base environment
 echo "Activate base virtual environment"
-# eval "$(conda shell.bash hook)"                                                
+eval "$(conda shell.bash hook)"                                                
 conda activate base
 if [ $? -ne 0 ]; then
     "Failed to activate conda base environment. Exiting."
