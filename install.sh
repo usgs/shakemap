@@ -104,7 +104,13 @@ else
 fi
 
 # Update the conda tool
+echo "##################Updating conda tool..."
+CVERSION=`conda -V`
+echo "Current conda version: ${CVERSION}"
 conda update -n base -c defaults conda -y
+CVERSION=`conda -V`
+echo "New conda version: ${CVERSION}"
+echo "##################Done updating conda tool..."
 
 # Choose an environment file based on platform
 # only add this line if it does not already exist
@@ -119,8 +125,8 @@ conda init bash
 echo "##############Done running conda init bash..."
 
 # print out the contents of profile file
-echo "Contents of ${prof}:"
-cat $prof
+# echo "Contents of ${prof}:"
+# cat $prof
 
 # make sure that the changes to profile are reflected.
 echo "##############Sourcing ${prof}..."
