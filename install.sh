@@ -151,11 +151,11 @@ if [ $? -ne 0 ]; then
     echo ". $_CONDA_ROOT/etc/profile.d/conda.sh" >> $prof
 fi
 
-# try initializing with bash
-# conda init bash
-
 # make sure that the changes to profile are reflected.
 source $prof
+
+# try initializing with bash
+conda init bash
 
 # Activate the new environment
 echo "Activating the $VENV virtual environment"
