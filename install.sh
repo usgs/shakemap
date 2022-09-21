@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# constants
+DEFAULT_PYVER=3.9
+
 usage()
 {
   echo "Usage: install.sh [ -u  Update]
@@ -25,8 +28,11 @@ else
     exit
 fi
 
+# execute the user's profile
 source $prof
-DEFAULT_PYVER=3.9
+
+
+# Parse the command line arguments passed in by the user
 PYVER=$DEFAULT_PYVER
 create_deploy_yaml=false
 run_tests=false
@@ -51,7 +57,7 @@ while getopts ":utp:" options; do
     esac
 done
 
-# make sure -p is only checked if -u is also
+# -p can only be selected with -u
 if [[ "${PYVER}" != "${DEFAULT_PYVER}" && $create_deploy_yaml != "true" ]]; then
     echo "Error: -p option can only be used with -u option. Exiting."
     exit 1
@@ -60,13 +66,41 @@ fi
 echo "YAML file to use as input: ${input_yaml_file}"
 echo "Variable to indicate deployment: ${create_deploy_yaml}"
 
+# Name of virtual environment, pull from yml file
+VENV=`grep "name:" source_environment.yml  | cut -f2 -d ":" | sed 's/\s+//g'`
 
-# name of conda forge C compiler
-CC_PKG=c-compiler
+# Is conda installed?
+conda --version
+if [ $? -ne 0 ]; then
+    echo "No conda detected, installing miniconda..."
 
-# Name of virtual environment
-VENV=shakemap
+    command -v curl >/dev/null 2>&1 || { echo >&2 "Script requires curl but it's not installed. Aborting."; exit 1; }
 
+    curl -L $mini_conda_url -o miniconda.sh;
+
+    # if curl fails, bow out gracefully
+    if [ $? -ne 0 ];then
+        echo "Failed to download miniconda installer shell script. Exiting."
+        exit 1
+    fi
+    
+    echo "Install directory: $HOME/miniconda"
+
+    bash miniconda.sh -f -b -p $HOME/miniconda
+
+    # if miniconda.sh fails, bow out gracefully
+    if [ $? -ne 0 ];then
+        echo "Failed to run miniconda installer shell script. Exiting."
+        exit 1
+    fi
+    
+    . $HOME/miniconda/etc/profile.d/conda.sh
+
+    # remove the shell script
+    rm miniconda.sh
+else
+    echo "conda detected, installing $VENV environment..."
+fi
 
 
 # Start in conda base environment
@@ -78,10 +112,10 @@ conda activate base
 conda remove -y -n $VENV --all
 conda clean -y --all
 
-# install mamba as it makes solving MUCH faster
+# install mamba in *base* environment as it makes solving MUCH faster
 which mamba
 if [ $? -eq 0 ]; then
-   echo OK
+   echo "Mamba already installed, skipping."
 else
     echo "Installing mamba in base environment..."
     conda install mamba -n base -c conda-forge --strict-channel-priority -y
@@ -139,7 +173,7 @@ echo "#############Installing shakemap code##############"
 pip install --no-deps -e .
 
 # now if the user has explicitly asked to run tests OR they're doing an update
-if  $run_test; then
+if  $run_tests; then
     echo "Running tests..."
     py.test --cov=.
     if [ $? -eq 0 ]; then
