@@ -143,6 +143,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Choose an environment file based on platform
+# only add this line if it does not already exist
+grep "/etc/profile.d/conda.sh" $prof
+if [ $? -ne 0 ]; then
+    echo ". $_CONDA_ROOT/etc/profile.d/conda.sh" >> $prof
+fi
+
 # Activate the new environment
 echo "Activating the $VENV virtual environment"
 conda activate $VENV
