@@ -118,29 +118,33 @@ echo "##################Done updating conda tool..."
 
 # Choose an environment file based on platform
 # only add this line if it does not already exist
-grep "/etc/profile.d/conda.sh" $prof
-if [ $? -ne 0 ]; then
-    echo ". $_CONDA_ROOT/etc/profile.d/conda.sh" >> $prof
-fi
+# grep "/etc/profile.d/conda.sh" $prof
+# if [ $? -ne 0 ]; then
+#     echo ". $_CONDA_ROOT/etc/profile.d/conda.sh" >> $prof
+# fi
 
-# try initializing with bash
-echo "##############Running conda init bash..."
-conda init bash
-echo "##############Done running conda init bash..."
+# # try initializing with bash
+# echo "##############Running conda init bash..."
+# conda init bash
+# echo "##############Done running conda init bash..."
 
-# print out the contents of profile file
-# echo "Contents of ${prof}:"
-# cat $prof
+# # print out the contents of profile file
+# # echo "Contents of ${prof}:"
+# # cat $prof
 
-# make sure that the changes to profile are reflected.
-echo "##############Sourcing ${prof}..."
-source $prof
-echo "##############Done sourcing ${prof}..."
+# # make sure that the changes to profile are reflected.
+# echo "##############Sourcing ${prof}..."
+# source $prof
+# echo "##############Done sourcing ${prof}..."
 
 # Start in conda base environment
 echo "Activate base virtual environment"
 # eval "$(conda shell.bash hook)"                                                
 conda activate base
+if [ $? -ne 0 ]; then
+    "Failed to activate conda base environment. Exiting."
+    exit 1
+fi
 
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
