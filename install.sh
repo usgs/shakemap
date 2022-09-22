@@ -8,6 +8,7 @@ usage()
   echo "Usage: install.sh [ -u  Update]
                   [ -t  Run tests ]
                   [ -p  Set Python version]
+                  [ -n  Don't run tests]
             "
   exit 2
 }
@@ -38,7 +39,7 @@ create_deploy_yaml=false
 run_tests=false
 input_txt_file=$output_txt_file
 input_yaml_file=""
-while getopts ":utp:" options; do
+while getopts ":utp:n" options; do
     case "${options}" in                    # 
     u)                                    # If the option is u,
         input_yaml_file=source_environment.yml
@@ -51,7 +52,10 @@ while getopts ":utp:" options; do
     p)
         PYVER=${OPTARG}
         ;;
-    *)                                    # If unknown (any other) option:
+    n)
+        run_tests=false
+        ;;
+    *)                            # If unknown (any other) option:
       usage                       # Exit abnormally.
       ;;
     esac
@@ -239,3 +243,5 @@ if  $run_tests; then
         echo "Tests failed. Please resolve these issues then trying re-installing."
     fi
 fi
+
+echo "Reminder: Run 'conda activate' to enable the ShakeMap environment."
