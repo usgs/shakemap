@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakemap.utils.queue &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,13 +35,13 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.utils.queue">
-<span id="shakemap-utils-queue"></span><h1>shakemap.utils.queue<a class="headerlink" href="#module-shakemap.utils.queue" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-utils-queue"></span><h1>shakemap.utils.queue<a class="headerlink" href="#module-shakemap.utils.queue" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="shakemap.utils.queue.send_queue">
 <span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">send_queue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9755</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#send_queue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.send_queue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a command and its data to the queue process.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>command</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A valid command for the queue (e.g., ‘origin’).</p></li>
 <li><p><strong>data</strong> (<em>JSON serializable</em>) – The data associated with the command.
@@ -49,13 +50,13 @@ JSON serializable. Must be less than MAX_SIZE bytes when
 serialized.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><strong>RuntimeError</strong></a> – If the serialized data is larger than MAX_SIZE.</p></li>
 <li><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#OSError" title="(in Python v3.6)"><strong>OSError</strong></a> – If there is a problem with the socket or connection.</p></li>
@@ -78,7 +79,7 @@ form:</p>
 &lt;int&gt;y  (years)</p>
 </div></blockquote>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>tstring</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – An integer followed by an (optional)
 ‘m’, ‘h’, ‘d’, ‘y’.</p>
 </dd>
@@ -90,7 +91,7 @@ is returned.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If the value cannot be converted to seconds.</p>
 </dd>
 </dl>
@@ -101,14 +102,14 @@ is returned.</p>
 <span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">parse_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#parse_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.parse_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the config object to get usable data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config</strong> (<em>ConfigObj object</em>) – The result of parsing the file’s
 configuration file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A cleaned up version of the input.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
 </dd>
 </dl>
@@ -119,13 +120,13 @@ configuration file.</p>
 <span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">install_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#get_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.get_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the config and get it into a usable state.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>install_path</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The install path of the current profile.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A dictionary of configuration data.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
 </dd>
 </dl>
@@ -133,7 +134,7 @@ configuration file.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="shakemap.utils.queue.Queue">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">Queue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.Queue" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">Queue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.Queue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="shakemap.utils.queue.Queue.queueMainLoop">
@@ -145,10 +146,10 @@ configuration file.</p>
 <span class="sig-name descname"><span class="pre">doPeriodicTasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.doPeriodicTasks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.doPeriodicTasks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check for finished children and start any needed timed repeats.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Nothing.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>nothing</p>
 </dd>
 </dl>
@@ -159,10 +160,10 @@ configuration file.</p>
 <span class="sig-name descname"><span class="pre">getLogger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.getLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.getLogger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set up a logger for this process.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>An instance of a logger.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>logging.logger</p>
 </dd>
 </dl>
@@ -174,10 +175,10 @@ configuration file.</p>
 <dd><p>Do the associateAll method of the the AmplitudeHandler and
 then process all of the events with updated data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Nothing.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>nothing</p>
 </dd>
 </dl>
@@ -189,13 +190,13 @@ then process all of the events with updated data.</p>
 <dd><p>Create the event directory if it doesn’t exist and write/re-write
 the event.xml file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The event data structure.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
 </dl>
@@ -213,17 +214,17 @@ the event.xml file</p>
 <dd><p>Determine if an event should be processed (or reprocessed) and
 dispatch it for processing.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>event</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The event data structure.</p></li>
 <li><p><strong>action</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The “type” of the trigger that caused this function
 to be called.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
 </dl>
@@ -236,17 +237,17 @@ to be called.</p></li>
 an origin update. If the event in question is not in our
 database, ignore the message.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The event information dictionary.</p></li>
 <li><p><strong>action</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The “type” of the trigger that caused this function
 to be called.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
 </dl>
@@ -257,14 +258,14 @@ to be called.</p></li>
 <span class="sig-name descname"><span class="pre">processCancel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.processCancel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.processCancel" title="Permalink to this definition">¶</a></dt>
 <dd><p>We’ve received a cancellation of an event: run ‘shake cancel’.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The dictionary must have an event ID
 under the ‘id’ key.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
 </dl>
@@ -278,14 +279,14 @@ magnitude of the first metro box within which it falls, or
 the global minmag if it does not fall within a box; return
 true otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The event dictionary; must contain at least “mag”,
 “lon”, and “lat” keys.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if the event is too small to process; False otherwise.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
 </dd>
 </dl>
@@ -297,14 +298,14 @@ true otherwise.</p>
 <dd><p>Return True if the event is too old or too far in the future to
 process; return False otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>event</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The event data structure.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if the event is older than old_event_age or is
 more than future_event_age in the future; returns False otherwise.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
 </dd>
 </dl>
@@ -315,7 +316,7 @@ more than future_event_age in the future; returns False otherwise.</p>
 <span class="sig-name descname"><span class="pre">dispatchEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Queue.dispatchEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.Queue.dispatchEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Queue a run for the specified event.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>event</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The data structure of the event to process.</p></li>
 <li><p><strong>action</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – ‘cancel’, ‘test’, or some other string. ‘cancel’
@@ -326,10 +327,10 @@ See the configuration file ‘queue.conf’ for the
 exact commands that will be run.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
 </dl>
@@ -347,11 +348,11 @@ exact commands that will be run.</p></li>
 <dd><p>Look through the list of child processes, reap the ones that have
 finished, and kill any that are taking too long.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Nothing. Completed or killed child processes are removed
 from the list of children.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>nothing</p>
 </dd>
 </dl>
@@ -365,10 +366,10 @@ If attached is True, then the function returns an instance of the
 Dummycontext; if it is False the function returns the ‘context’
 argument.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>context</strong> (<em>Context manager</em>) – A valid context manager.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
 <dt>If attached is True, the function returns an</dt><dd><p>instance of the Dummycontext; if False, returns
 the ‘context’ argument.</p>
@@ -376,7 +377,7 @@ the ‘context’ argument.</p>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Context manager</p>
 </dd>
 </dl>
@@ -386,7 +387,7 @@ the ‘context’ argument.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="shakemap.utils.queue.Dummycontext">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">Dummycontext</span></span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Dummycontext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.Dummycontext" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">Dummycontext</span></span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#Dummycontext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.Dummycontext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This is a dummy context that can be used as a context manager
 with ‘with’. It doesn’t do anything.</p>
@@ -394,7 +395,7 @@ with ‘with’. It doesn’t do anything.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="shakemap.utils.queue.EventQueue">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">EventQueue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ipath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.queue.</span></span><span class="sig-name descname"><span class="pre">EventQueue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ipath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/queue.html#EventQueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.queue.EventQueue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to maintain some persistence in the event of a program
 crash or shutdown. The db file can be removed if the operator wants
@@ -463,9 +464,9 @@ a fresh start.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.1 API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
@@ -497,7 +498,7 @@ a fresh start.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

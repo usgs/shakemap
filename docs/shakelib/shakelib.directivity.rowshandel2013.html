@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.directivity.rowshandel2013 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,7 +33,7 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.directivity.rowshandel2013">
-<span id="shakelib-directivity-rowshandel2013"></span><h1>shakelib.directivity.rowshandel2013<a class="headerlink" href="#module-shakelib.directivity.rowshandel2013" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-directivity-rowshandel2013"></span><h1>shakelib.directivity.rowshandel2013<a class="headerlink" href="#module-shakelib.directivity.rowshandel2013" title="Permalink to this heading">¶</a></h1>
 <p>Implements the Rowshandel (2013) directivity model. Note that the report
 provides many options for computing the directivity factor and we have
 also used some coefficients that are unpublished updates by Rowshandel.
@@ -76,11 +77,11 @@ Earthquake Engineering Research Center, Berkeley, CA.
 <a class="reference external" href="http://peer.berkeley.edu/publications/peer_reports/reports_2013/webPEER-2013-09-Spudich.pdf">[link]</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.directivity.rowshandel2013.Rowshandel2013">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.directivity.rowshandel2013.</span></span><span class="sig-name descname"><span class="pre">Rowshandel2013</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpleDT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.directivity.rowshandel2013.</span></span><span class="sig-name descname"><span class="pre">Rowshandel2013</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpleDT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Constructor for rowshandel2013.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>origin</strong> – Origin instance.</p></li>
 <li><p><strong>rup</strong> – Rupture instance.</p></li>
@@ -106,12 +107,12 @@ False.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="shakelib.directivity.rowshandel2013.Rowshandel2013.fromSites">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fromSites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpleDT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.fromSites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.fromSites" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromSites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simpleDT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.fromSites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.fromSites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a rowshandel2013 instance from a sites instance.</p>
 <p>Class method for constructing a rowshandel2013 instance from
 a sites instance.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>origin</strong> – Origin instance.</p></li>
 <li><p><strong>rup</strong> – Rupture instance.</p></li>
@@ -134,7 +135,7 @@ False.</p></li>
 used</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Rowshandel2013 directivity class.</p>
 </dd>
 </dl>
@@ -144,7 +145,7 @@ used</p></li>
 <dt class="sig sig-object py" id="shakelib.directivity.rowshandel2013.Rowshandel2013.getFd">
 <span class="sig-name descname"><span class="pre">getFd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getFd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getFd" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Numpy array of Fd; this is the directivity amplification factor
 (log units).</p>
 </dd>
@@ -155,7 +156,7 @@ used</p></li>
 <dt class="sig sig-object py" id="shakelib.directivity.rowshandel2013.Rowshandel2013.getXiPrime">
 <span class="sig-name descname"><span class="pre">getXiPrime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getXiPrime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getXiPrime" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Numpy array of Xi’; this is the variable that accounts for
 geometric factors in Fd.</p>
 </dd>
@@ -166,7 +167,7 @@ geometric factors in Fd.</p>
 <dt class="sig sig-object py" id="shakelib.directivity.rowshandel2013.Rowshandel2013.getDT">
 <span class="sig-name descname"><span class="pre">getDT</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getDT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getDT" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List of numpy arrays of the distance taper factor. Length is the
 number of periods.</p>
 </dd>
@@ -177,7 +178,7 @@ number of periods.</p>
 <dt class="sig sig-object py" id="shakelib.directivity.rowshandel2013.Rowshandel2013.getWP">
 <span class="sig-name descname"><span class="pre">getWP</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getWP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getWP" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List of numpy array of the narrow-band multiplier. Length is the
 number of periods.</p>
 </dd>
@@ -188,7 +189,7 @@ number of periods.</p>
 <dt class="sig sig-object py" id="shakelib.directivity.rowshandel2013.Rowshandel2013.getLD">
 <span class="sig-name descname"><span class="pre">getLD</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getLD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getLD" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Numpy array of the rupture length de-normalization factor.</p>
 </dd>
 </dl>
@@ -196,7 +197,7 @@ number of periods.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">getPeriods</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getPeriods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getPeriods</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/rowshandel2013.html#Rowshandel2013.getPeriods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.directivity.rowshandel2013.Rowshandel2013.getPeriods" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of the periods for which the model is defined.</p>
 </dd></dl>
 
@@ -228,9 +229,9 @@ number of periods.</p>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -244,7 +245,7 @@ number of periods.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

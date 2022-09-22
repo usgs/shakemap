@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.utils.imt_string &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,7 +33,7 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.utils.imt_string">
-<span id="shakelib-utils-imt-string"></span><h1>shakelib.utils.imt_string<a class="headerlink" href="#module-shakelib.utils.imt_string" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-utils-imt-string"></span><h1>shakelib.utils.imt_string<a class="headerlink" href="#module-shakelib.utils.imt_string" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="shakelib.utils.imt_string.oq_to_file">
 <span class="sig-prename descclassname"><span class="pre">shakelib.utils.imt_string.</span></span><span class="sig-name descname"><span class="pre">oq_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oqimt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/imt_string.html#oq_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.utils.imt_string.oq_to_file" title="Permalink to this definition">¶</a></dt>
@@ -44,16 +45,16 @@ SA(15.0) (Spectral Acceleration at 15 seconds) -&gt; psa15p0
 SA(3) (Spectral Acceleration at 3 seconds) -&gt; psa3p0
 SA(.5) (Spectral Acceleration at 0.5 seconds) -&gt; psa0p5</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>oqimt</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Openquake IMT nomenclature string.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Filename friendly IMT string.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – when there is no corresponding filename-friendly
     IMT representation.</p>
 </dd>
@@ -69,13 +70,13 @@ psa1p0 (Spectral Acceleration at 1 second) -&gt; SA(1.0)
 psa0p3 (Spectral Acceleration at 0.3 second) -&gt; SA(0.3)
 psa15p0 (Spectral Acceleration at 15 seconds) -&gt; SA(15.0)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fileimt</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Filename friendly IMT string.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Openquake IMT nomenclature string.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
@@ -107,9 +108,9 @@ psa15p0 (Spectral Acceleration at 15 seconds) -&gt; SA(15.0)</p>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -123,7 +124,7 @@ psa15p0 (Spectral Acceleration at 15 seconds) -&gt; SA(15.0)</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

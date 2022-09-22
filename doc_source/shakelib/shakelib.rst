@@ -11,7 +11,6 @@ shakelib
    shakelib.gmice
    shakelib.gmpe
    shakelib.plotting
-   shakelib.rupture
    shakelib.utils
 
 Submodules
@@ -19,7 +18,6 @@ Submodules
 .. toctree::
    :maxdepth: 12
 
-   shakelib.distance
    shakelib.multigmpe
    shakelib.sites
    shakelib.station

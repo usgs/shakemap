@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>3.2. Products and Formats &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -39,7 +40,7 @@
 Manual</a>.</p>
 </div>
 <section id="products-and-formats">
-<span id="sec-products"></span><h1><span class="section-number">3.2. </span>Products and Formats<a class="headerlink" href="#products-and-formats" title="Permalink to this headline">¶</a></h1>
+<span id="sec-products"></span><h1><span class="section-number">3.2. </span>Products and Formats<a class="headerlink" href="#products-and-formats" title="Permalink to this heading">¶</a></h1>
 <p>ShakeMap is fundamentally a geographic product, providing a spatial representation of
 the potentially very complex shaking field associated with an earthquake. Because of
 its complicated nature, we are required to generate numerous maps that portray
@@ -51,7 +52,7 @@ these ShakeMap component products and the variety of maps and formats.</p>
 <p>For each earthquake, all maps and associated products for that event are available
 via the “Downloads” link on each earthquake-specific ShakeMap webpage.</p>
 <section id="input-files">
-<span id="sec-input-files"></span><h2><span class="section-number">3.2.1. </span>Input Files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h2>
+<span id="sec-input-files"></span><h2><span class="section-number">3.2.1. </span>Input Files<a class="headerlink" href="#input-files" title="Permalink to this heading">¶</a></h2>
 <p>The downloadable products include sufficient information to reproduce the
 ShakeMap. In particular, <em>stationlist.xml</em> and the <em>*_fault.txt</em> file(s) provide the
 input files, <em>grid.xml</em> provides the Vs30 grid (see above), and <em>info.xml</em>
@@ -75,7 +76,7 @@ earthquake, it is sufficient to copy the specified file(s) into the event’s
 input directory.</p>
 </section>
 <section id="output-files-and-products">
-<h2><span class="section-number">3.2.2. </span>Output Files and Products<a class="headerlink" href="#output-files-and-products" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">3.2.2. </span>Output Files and Products<a class="headerlink" href="#output-files-and-products" title="Permalink to this heading">¶</a></h2>
 <p>The available ShakeMap products include (and each is described in more detail in the sections
 that follow):</p>
 <ul class="simple">
@@ -122,7 +123,7 @@ that follow):</p>
 </li>
 </ul>
 <section id="metadata-and-runtime-information">
-<h3><span class="section-number">3.2.2.1. </span>Metadata and Runtime Information<a class="headerlink" href="#metadata-and-runtime-information" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.2.1. </span>Metadata and Runtime Information<a class="headerlink" href="#metadata-and-runtime-information" title="Permalink to this heading">¶</a></h3>
 <p><strong>Metadata</strong>. FGDC-compliant geospatial metadata files are distributed via the
 earthquake-specific ShakeMap webpage for each earthquake under the “Downloads”
 page. The metadata are provided in text, HTML, and XML formats in the files
@@ -149,7 +150,7 @@ understanding or replicating any particular ShakeMap.</p>
 </div>
 </section>
 <section id="static-maps-and-plots-images">
-<h3><span class="section-number">3.2.2.2. </span>Static Maps and Plots (Images)<a class="headerlink" href="#static-maps-and-plots-images" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.2.2. </span>Static Maps and Plots (Images)<a class="headerlink" href="#static-maps-and-plots-images" title="Permalink to this heading">¶</a></h3>
 <p>ShakeMap generates a number of static ground-motion maps and plots for various
 parameters (intensity measures, or IMs). Most of these maps are available in
 JPEG format, as well as zipped PostScript files that—as vector-based
@@ -217,7 +218,7 @@ corresponding color scale bar is provided at the bottom of the map (see example
 in <a class="pageref" href="#napa-pga">Figure  3</a>).</p>
 </section>
 <section id="interactive-maps">
-<h3><span class="section-number">3.2.2.3. </span>Interactive Maps<a class="headerlink" href="#interactive-maps" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.2.3. </span>Interactive Maps<a class="headerlink" href="#interactive-maps" title="Permalink to this heading">¶</a></h3>
 <p>Although the static ShakeMaps are useful, many of these products are more suitably
 served as interactive maps which can be dynamically scaled (zoomed) and layered upon
 with user-selected background and other overlays. The layers are provided via
@@ -325,7 +326,7 @@ DYFI observations are blue circles) plotted with the unbiased (red line) and bia
 </figure>
 </section>
 <section id="interpolated-ground-motion-grids">
-<span id="sec-interpolated-grid-file"></span><h3><span class="section-number">3.2.2.4. </span>Interpolated Ground Motion Grids<a class="headerlink" href="#interpolated-ground-motion-grids" title="Permalink to this headline">¶</a></h3>
+<span id="sec-interpolated-grid-file"></span><h3><span class="section-number">3.2.2.4. </span>Interpolated Ground Motion Grids<a class="headerlink" href="#interpolated-ground-motion-grids" title="Permalink to this heading">¶</a></h3>
 <p>As described in the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>, the fundamental output product of the
 ShakeMap processing system is a finely-sampled grid (nominally 1km
 spacing) of latitude and longitude
@@ -511,7 +512,7 @@ ground motion data or Vs30 values are available in
 </div>
 </section>
 <section id="station-lists">
-<h3><span class="section-number">3.2.2.5. </span>Station Lists<a class="headerlink" href="#station-lists" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.2.5. </span>Station Lists<a class="headerlink" href="#station-lists" title="Permalink to this heading">¶</a></h3>
 <p>As discussed in the section <a class="reference internal" href="#sec-input-files"><span class="std std-ref">Input Files</span></a>, ShakeMap produces station lists of input data
 in XML and text format. We also produce a version in GeoJSON format, which is available for
 download, and is used by the website to plot the stations on the interactive maps. The station
@@ -525,7 +526,7 @@ page. See <a class="pageref" href="#napa-station-table">Figure  11</a> for an ex
 </figure>
 </section>
 <section id="gis-products">
-<h3><span class="section-number">3.2.2.6. </span>GIS Products<a class="headerlink" href="#gis-products" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.2.6. </span>GIS Products<a class="headerlink" href="#gis-products" title="Permalink to this heading">¶</a></h3>
 <p>ShakeMap GIS Files (zipped) are a collection of shapefiles of polygons of the
 ShakeMap model outputs for each shaking metric: MMI, PGA, PGV, and PSA at three
 periods (0.3, 1.0, and 3.0 sec).  These file should be easily importable into a GIS
@@ -538,10 +539,6 @@ overlaying with other data for visualization purposes.</p>
 type of ground-motion parameter:</p>
 <blockquote>
 <div><table class="docutils align-default">
-<colgroup>
-<col style="width: 11%" />
-<col style="width: 89%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><em>mi</em></p></td>
 <td><p>macroseismic intensity (usually, but not necessarily, mmi)</p></td>
@@ -566,14 +563,10 @@ type of ground-motion parameter:</p>
 </div></blockquote>
 <p>The sub-sections that follow describe available file and product types.</p>
 <section id="shapefiles">
-<h4><span class="section-number">3.2.2.6.1. </span>Shapefiles<a class="headerlink" href="#shapefiles" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">3.2.2.6.1. </span>Shapefiles<a class="headerlink" href="#shapefiles" title="Permalink to this heading">¶</a></h4>
 <p>GIS shapefiles are comprised of four or five standard associated GIS files:</p>
 <blockquote>
 <div><table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 91%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><em>.dbf</em></p></td>
 <td><p>database file with layer attributes</p></td>
@@ -612,7 +605,7 @@ the same units as the online ShakeMaps. The archive of files is
 compressed in zip format and called <em>shape.zip</em>.  The <em>shape.zip</em> file is
 available for all events, but the spectral values are generally only included
 for earthquakes of magnitude 4.0 and larger.</p>
-<p><strong>HAZUS’99 Shapefiles and HAZUS-MH Geodatabases</strong>. We generate shapefiles that
+<p id="hazus"><strong>HAZUS’99 Shapefiles and HAZUS-MH Geodatabases</strong>. We generate shapefiles that
 are designed with contour polygons intervals that are appropriate for use with
 the Federal Emergency Management Agency’s (FEMA) <a class="reference external" href="http://www.fema.gov/hazus/">HAZUS-MH®</a> software, though they may be imported into any
 GIS package that can read ArcView shapefiles. Because HAZUS software requires
@@ -647,7 +640,7 @@ zip format (<em>hazus.zip</em>) to facilitate file transfer.</p>
 </div>
 </section>
 <section id="esri-raster-files-flt-files">
-<h4><span class="section-number">3.2.2.6.2. </span>ESRI Raster Files (<em>.flt</em> files)<a class="headerlink" href="#esri-raster-files-flt-files" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">3.2.2.6.2. </span>ESRI Raster Files (<em>.flt</em> files)<a class="headerlink" href="#esri-raster-files-flt-files" title="Permalink to this heading">¶</a></h4>
 <p>ESRI raster grids of the ground-motion
 parameters and their uncertainties are also available. The files are found in a
 zipped archive called <em>raster.zip</em>. Each archive contains four files per
@@ -669,7 +662,7 @@ M4.5 and larger.</p>
 </aside>
 </section>
 <section id="google-earth-overlay">
-<h4><span class="section-number">3.2.2.6.3. </span>Google Earth Overlay<a class="headerlink" href="#google-earth-overlay" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">3.2.2.6.3. </span>Google Earth Overlay<a class="headerlink" href="#google-earth-overlay" title="Permalink to this heading">¶</a></h4>
 <p>The file <em>&lt;event_id&gt;.kmz</em> enables the user to view the
 ShakeMap in Google Earth (or other KML-compliant applications). A
 color-scaled intensity overlay is provided along with a complete station list,
@@ -698,7 +691,7 @@ source, as it will have the most-up-to-date links, though it does not have all o
 the layers available in the ShakeMap KMZ file.</p>
 </section>
 <section id="contour-files">
-<h4><span class="section-number">3.2.2.6.4. </span>Contour Files<a class="headerlink" href="#contour-files" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">3.2.2.6.4. </span>Contour Files<a class="headerlink" href="#contour-files" title="Permalink to this heading">¶</a></h4>
 <p>As mentioned above in the ShakeMap Output GIS format section,
 contour files are available for general GIS, HAZUS, and KML formats. We also
 provide GeoJSON format contours, all under the ShakeMap event-specific
@@ -707,7 +700,7 @@ provide GeoJSON format contours, all under the ShakeMap event-specific
 </section>
 </section>
 <section id="real-time-product-distribution-automatic-access-and-feeds">
-<h2><span class="section-number">3.2.3. </span>Real-Time Product Distribution, Automatic Access, and Feeds<a class="headerlink" href="#real-time-product-distribution-automatic-access-and-feeds" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">3.2.3. </span>Real-Time Product Distribution, Automatic Access, and Feeds<a class="headerlink" href="#real-time-product-distribution-automatic-access-and-feeds" title="Permalink to this heading">¶</a></h2>
 <p>ShakeMap products are distributed by a number of means immediately after they
 are produced. The intent of these products is to help responders and
 other responsible parties effectively manage their post-earthquake
@@ -717,7 +710,7 @@ distribution methods are
 interactive Web downloads, RSS feeds, GeoJSON feeds, ShakeCast, the Product
 Distribution Layer (PDL) client, and GIS web mapping services.</p>
 <section id="interactive-web-downloads">
-<h3><span class="section-number">3.2.3.1. </span>Interactive Web Downloads<a class="headerlink" href="#interactive-web-downloads" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.3.1. </span>Interactive Web Downloads<a class="headerlink" href="#interactive-web-downloads" title="Permalink to this heading">¶</a></h3>
 <p>The easiest way to obtain ShakeMap products immediately following an earthquake
 is from the <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/shakemap/">ShakeMap</a> or
 <a class="reference external" href="http://earthquake.usgs.gov/">USGS Earthquake Program</a> webpages. The event
@@ -727,13 +720,13 @@ that lists just the ShakeMap products. The variety
 of formats for ShakeMap are described in the previous section.</p>
 </section>
 <section id="rss-feeds">
-<h3><span class="section-number">3.2.3.2. </span>RSS Feeds<a class="headerlink" href="#rss-feeds" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.3.2. </span>RSS Feeds<a class="headerlink" href="#rss-feeds" title="Permalink to this heading">¶</a></h3>
 <p>USGS Earthquake Program earthquake information <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/feed/v1.0/">Feeds</a> currently include Really
 Simple Syndication (RSS) feeds. However, the RSS feeds are deprecated; they will be
 decommissioned in 2016.</p>
 </section>
 <section id="geojson-feeds">
-<h3><span class="section-number">3.2.3.3. </span>GeoJSON Feeds<a class="headerlink" href="#geojson-feeds" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.3.3. </span>GeoJSON Feeds<a class="headerlink" href="#geojson-feeds" title="Permalink to this heading">¶</a></h3>
 <p><strong>Automatically Retrieving Earthquake Data and ShakeMap Files</strong>. The USGS
 Earthquake Program GeoJSON feed provides USGS ShakeMap, along with most other USGS
 real-time earthquake products. <a class="reference external" href="http://geojson.org/">GeoJSON</a> is an extension
@@ -788,12 +781,12 @@ and for the <em>shape.zip</em> files, respectively:</p>
 </div></blockquote>
 </section>
 <section id="additional-feeds">
-<h3><span class="section-number">3.2.3.4. </span>Additional Feeds<a class="headerlink" href="#additional-feeds" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.3.4. </span>Additional Feeds<a class="headerlink" href="#additional-feeds" title="Permalink to this heading">¶</a></h3>
 <p>More information about USGS earthquake data feeds is available at our <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/feed/v1.0/index.php">Feeds &amp;
 Notifications page</a>.</p>
 </section>
 <section id="shakecast-system">
-<h3><span class="section-number">3.2.3.5. </span>ShakeCast System<a class="headerlink" href="#shakecast-system" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.3.5. </span>ShakeCast System<a class="headerlink" href="#shakecast-system" title="Permalink to this heading">¶</a></h3>
 <p>ShakeCast delivers user-specified ShakeMap products to the user’s
 local or virtual system(s), and runs fragility-based damage (or
 inspection priority) calculations for specific portfolios. More advanced
@@ -804,13 +797,13 @@ responsible parties within an organization on a per-facility basis. See
 can be found on the ShakeCast <a class="reference external" href="http://earthquake.usgs.gov/research/software/shakecast/">homepage</a> and <a class="reference external" href="https://my.usgs.gov/confluence/display/ShakeCast/Home">Wiki</a> and the documentation provided therein.</p>
 </section>
 <section id="product-delivery-layer-pdl-client">
-<h3><span class="section-number">3.2.3.6. </span>Product Delivery Layer (PDL) Client<a class="headerlink" href="#product-delivery-layer-pdl-client" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.3.6. </span>Product Delivery Layer (PDL) Client<a class="headerlink" href="#product-delivery-layer-pdl-client" title="Permalink to this heading">¶</a></h3>
 <p>Finally, for academic and government users, ShakeMap products (and other
 earthquake products) are communicated through the USGS’s <a class="reference external" href="http://earthquake.usgs.gov/research/software/#PDL">Product Distribution
 Layer (PDL)</a>.</p>
 </section>
 <section id="web-mapping-gis-services">
-<span id="gis-services"></span><h3><span class="section-number">3.2.3.7. </span>Web Mapping (GIS) Services<a class="headerlink" href="#web-mapping-gis-services" title="Permalink to this headline">¶</a></h3>
+<span id="gis-services"></span><h3><span class="section-number">3.2.3.7. </span>Web Mapping (GIS) Services<a class="headerlink" href="#web-mapping-gis-services" title="Permalink to this heading">¶</a></h3>
 <p>In addition to the downloadable GIS-formatted ShakeMaps (including shapefiles) that are
 readily available for each ShakeMap event, USGS also hosts a real-time <a class="reference external" href="http://earthquake.usgs.gov/arcgis/rest/services/eq/sm_ShakeMap30DaySignificant/MapServer">30-day
 Signficant `Earthquake GIS ShakeMap Feed</a>.
@@ -871,9 +864,9 @@ be completed.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual (Deprecated)</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a></li>
@@ -934,7 +927,7 @@ be completed.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

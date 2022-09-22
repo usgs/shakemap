@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>4.2. Installation and Configuration &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,13 +35,13 @@
           <div class="body" role="main">
             
   <section id="installation-and-configuration">
-<span id="sec-installation-4"></span><h1><span class="section-number">4.2. </span>Installation and Configuration<a class="headerlink" href="#installation-and-configuration" title="Permalink to this headline">¶</a></h1>
+<span id="sec-installation-4"></span><h1><span class="section-number">4.2. </span>Installation and Configuration<a class="headerlink" href="#installation-and-configuration" title="Permalink to this heading">¶</a></h1>
 <p>The <a class="reference external" href="https://github.com/usgs/shakemap/wiki">ShakeMap Wiki</a> provides
 a basic quick-start guide to installing and running ShakeMap v4. The
 present section is intended to provide supplementary material and
 additional detail for installing, configuring, and running v4.</p>
 <section id="installation">
-<h2><span class="section-number">4.2.1. </span>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.2.1. </span>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
 <p>The Wiki does a pretty good job of explaining the installation process,
 which is fairly automated. Here we will just reiterate that things will
 go most smoothly if you use the bash shell and conda virtual environment.
@@ -49,7 +50,7 @@ software (ShakeMap runs on Python 3.7 or 3.8, while many systems still
 use 2.7 as a default) and dependency headaches.</p>
 </section>
 <section id="configuration">
-<h2><span class="section-number">4.2.2. </span>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.2.2. </span>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h2>
 <p>After running <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> the newly-created profile will have its
 <em>config</em> directory populated with a default set of configuration files.
 These files should be reviewed by the operator prior to running
@@ -64,7 +65,7 @@ changes to parameters.</p>
 the <code class="docutils literal notranslate"><span class="pre">mapping</span></code> module. See the <em>products.conf</em> section below.</p>
 <p>The configuration files are discussed in the sections below.</p>
 <section id="model-conf">
-<h3><span class="section-number">4.2.2.1. </span>model.conf<a class="headerlink" href="#model-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.1. </span>model.conf<a class="headerlink" href="#model-conf" title="Permalink to this heading">¶</a></h3>
 <p><em>model.conf</em> contains configuration options for the way modeling works, such
 as the GMPE or GMPEs to use, the location of the Vs30, the IMTs to compute,
 and options on where the predictions should be computed (i.e., grid
@@ -96,7 +97,7 @@ and set the system to use it. For instance:</p>
 </div>
 </section>
 <section id="select-conf">
-<h3><span class="section-number">4.2.2.2. </span>select.conf<a class="headerlink" href="#select-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.2. </span>select.conf<a class="headerlink" href="#select-conf" title="Permalink to this heading">¶</a></h3>
 <p><em>select.conf</em> has options for GMPE selection, which are used by
 the <code class="docutils literal notranslate"><span class="pre">select</span></code> module. Note that if/when the <code class="docutils literal notranslate"><span class="pre">select</span></code> module runs, it
 creates the file <em>model_select.conf</em> in the event’s <em>current</em> directory,
@@ -111,7 +112,7 @@ and then add any other config options to it.</p>
 additional details on how this configuration works.</p>
 </section>
 <section id="products-conf">
-<h3><span class="section-number">4.2.2.3. </span>products.conf<a class="headerlink" href="#products-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.3. </span>products.conf<a class="headerlink" href="#products-conf" title="Permalink to this heading">¶</a></h3>
 <p><em>products.conf</em> holds options for the various ShakeMap products, such as
 contours, rasters, and maps. Additional explanation is
 available as comments in the <em>products.conf</em> file.</p>
@@ -136,7 +137,7 @@ be there the next time you update or install the ShakeMap software.</p>
 module.</p>
 </section>
 <section id="gmpe-sets-conf">
-<h3><span class="section-number">4.2.2.4. </span>gmpe_sets.conf<a class="headerlink" href="#gmpe-sets-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.4. </span>gmpe_sets.conf<a class="headerlink" href="#gmpe-sets-conf" title="Permalink to this heading">¶</a></h3>
 <p>This file defines the GMPE sets that are available to be set in
 <em>model.conf</em>. These sets can be as simple as a single GMPE with a
 weight of 1.0. The GMPE sets can be selected directly from <em>model.conf</em>,
@@ -144,7 +145,7 @@ or a the custom GMPE set created by the <code class="docutils literal notranslat
 selected.</p>
 </section>
 <section id="modules-conf">
-<h3><span class="section-number">4.2.2.5. </span>modules.conf<a class="headerlink" href="#modules-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.5. </span>modules.conf<a class="headerlink" href="#modules-conf" title="Permalink to this heading">¶</a></h3>
 <p><em>modules.conf</em> ontrols what GMPEs are available for constructing GMPE sets.
 Generally, this only needs to be edited if you wish to use a GMPE that is not
 currently imported. The GMPEs are imported
@@ -153,7 +154,7 @@ from the <a class="reference external" href="https://github.com/gem/oq-engine">O
 library.</p>
 </section>
 <section id="shake-conf">
-<h3><span class="section-number">4.2.2.6. </span>shake.conf<a class="headerlink" href="#shake-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.6. </span>shake.conf<a class="headerlink" href="#shake-conf" title="Permalink to this heading">¶</a></h3>
 <p>This configuration file is only for very general configuration options
 relating
 to the operation of <code class="docutils literal notranslate"><span class="pre">shake</span></code>. It allows the operator to configure additional
@@ -173,29 +174,29 @@ on the command line, i.e., like this:</p>
 </div>
 </section>
 <section id="logging-conf">
-<h3><span class="section-number">4.2.2.7. </span>logging.conf<a class="headerlink" href="#logging-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.7. </span>logging.conf<a class="headerlink" href="#logging-conf" title="Permalink to this heading">¶</a></h3>
 <p><em>logging.conf</em> contains options for logging. Most users will likely not
 need to modify this file unless they wish to change the format of the
 messages, date/time stamps, or other logging behavior.</p>
 </section>
 <section id="transfer-conf">
-<h3><span class="section-number">4.2.2.8. </span>transfer.conf<a class="headerlink" href="#transfer-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.8. </span>transfer.conf<a class="headerlink" href="#transfer-conf" title="Permalink to this heading">¶</a></h3>
 <p><em>transfer.conf</em> controls the transfer of ShakeMap products to remote
 systems via the
 <code class="docutils literal notranslate"><span class="pre">transfer</span></code> module. See the documentation within the file itself for
 explanation of the available options.</p>
 </section>
 <section id="migrate-conf">
-<h3><span class="section-number">4.2.2.9. </span>migrate.conf<a class="headerlink" href="#migrate-conf" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.2.2.9. </span>migrate.conf<a class="headerlink" href="#migrate-conf" title="Permalink to this heading">¶</a></h3>
 <p>This file holds parameters that determine how ShakeMap 3.5 data directories
-are migrated to ShakeMap 4.0-compatible directories via the program
+are migrated to ShakeMap v4-compatible directories via the program
 <code class="docutils literal notranslate"><span class="pre">sm_migrate</span></code>. This file allows the user to choose which OpenQuake
 GMPE should be used in place of the ShakeMap GMPE previously used
 for each event.</p>
 </section>
 </section>
 <section id="downloading-and-configuring-vs30-and-topography">
-<h2><span class="section-number">4.2.3. </span>Downloading and Configuring Vs30 and Topography<a class="headerlink" href="#downloading-and-configuring-vs30-and-topography" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.2.3. </span>Downloading and Configuring Vs30 and Topography<a class="headerlink" href="#downloading-and-configuring-vs30-and-topography" title="Permalink to this heading">¶</a></h2>
 <p>We provide three files available by FTP at
 <a class="reference external" href="ftp://hazards.cr.usgs.gov/shakemap">ftp://hazards.cr.usgs.gov/shakemap</a>:</p>
 <ul class="simple">
@@ -271,7 +272,7 @@ the paths to any absolute path on your system.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.0 Manual</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.1 Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="sm4_introduction.html">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm4_technical_guide.html">2. Technical Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm4_users_guide.html">3. Users Guide</a></li>
@@ -308,8 +309,8 @@ the paths to any absolute path on your system.</p>
 <li class="toctree-l2"><a class="reference internal" href="sm4_glossary.html">7. Glossary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -323,7 +324,7 @@ the paths to any absolute path on your system.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

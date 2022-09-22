@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>2.3. Data Processing &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,7 +35,7 @@
           <div class="body" role="main">
             
   <section id="data-processing">
-<span id="sec-processing-4"></span><h1><span class="section-number">2.3. </span>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">¶</a></h1>
+<span id="sec-processing-4"></span><h1><span class="section-number">2.3. </span>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this heading">¶</a></h1>
 <p>The <strong>model</strong> module is ShakeMap’s primary data processing module. It
 gathers data, performs quality control, and interpolates ground motions
 to a grid or pre-selected set of points.</p>
@@ -47,9 +48,9 @@ specifics of ShakeMap’s implementation of this method are described below.</p>
 <p>Note, this document applies to ShakeMap v4.1 and later. For v4.0.x, see
 <a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al., 2018</span></a>.</p>
 <section id="ground-motion-prediction">
-<span id="subsec-ground-motion-prediction-4"></span><h2><span class="section-number">2.3.1. </span>Ground-Motion Prediction<a class="headerlink" href="#ground-motion-prediction" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-ground-motion-prediction-4"></span><h2><span class="section-number">2.3.1. </span>Ground-Motion Prediction<a class="headerlink" href="#ground-motion-prediction" title="Permalink to this heading">¶</a></h2>
 <section id="ground-motion-models">
-<h3><span class="section-number">2.3.1.1. </span>Ground Motion Models<a class="headerlink" href="#ground-motion-models" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.1. </span>Ground Motion Models<a class="headerlink" href="#ground-motion-models" title="Permalink to this heading">¶</a></h3>
 <p>ShakeMap uses ground-motion prediction equations (GMPEs) to provide the
 initial estimates of ground motions. The GMPEs are drawn from the set
 of GMPEs implemented by the GEM OpenQuake project. The full list of
@@ -67,7 +68,7 @@ environments, as well as consistency with the methodology of other
 projects, such as the <a class="reference external" href="https://www.usgs.gov/natural-hazards/earthquake-hazards/hazards/">USGS National Seismic Hazard Model</a>.</p>
 </section>
 <section id="ground-motion-model-sets">
-<h3><span class="section-number">2.3.1.2. </span>Ground Motion Model Sets<a class="headerlink" href="#ground-motion-model-sets" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.2. </span>Ground Motion Model Sets<a class="headerlink" href="#ground-motion-model-sets" title="Permalink to this heading">¶</a></h3>
 <p>By default, ShakeMap comes with a few GMPE sets pre-configured, and we review a
 few of the important ones here. One example is the “active_crustal_nshmp2014,”
 which combines four NGA West2 GMPEs using equal weights. This is used by the
@@ -98,7 +99,7 @@ earthquake in question. This treatment is consistent with the approach
 used by NSHM.</p>
 </section>
 <section id="uncertainty-from-multiple-models">
-<h3><span class="section-number">2.3.1.3. </span>Uncertainty from Multiple Models<a class="headerlink" href="#uncertainty-from-multiple-models" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.3. </span>Uncertainty from Multiple Models<a class="headerlink" href="#uncertainty-from-multiple-models" title="Permalink to this heading">¶</a></h3>
 <p>The MultiGMPE module uses a list of GMPEs and their weights to
 produce a weighted mean at each location. If we treat the outputs of the
 GMPEs as random variables, then we can define a variable <img class="math" src="../_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/> as a
@@ -168,7 +169,7 @@ a spectral acceleration period appropriate to the earthquake magnitude.</p>
 to use beyond a specified distance.</p>
 </section>
 <section id="site-corrections">
-<span id="subsec-site-amplification-4"></span><h3><span class="section-number">2.3.1.4. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this headline">¶</a></h3>
+<span id="subsec-site-amplification-4"></span><h3><span class="section-number">2.3.1.4. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this heading">¶</a></h3>
 <p>Near-surface conditions can have a substantial effect on ground motions.
 Ground motions at soft-soil sites, for instance, will typically be amplified
 relative to sites on bedrock.  Because we wish to interpolate sparse data
@@ -184,7 +185,7 @@ site amplification proxy parameter in current-genereation GMPEs, the latter
 approach usually applies.</p>
 </section>
 <section id="site-characterization-map">
-<h3><span class="section-number">2.3.1.5. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.5. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this heading">¶</a></h3>
 <p>In general, site amplifications are computed using a Vs30 grid supplied
 by the operator (see the Vs30 parameters <code class="docutils literal notranslate"><span class="pre">vs30file</span></code> and <code class="docutils literal notranslate"><span class="pre">vs30default</span></code>
 in the <code class="docutils literal notranslate"><span class="pre">data</span></code> section of <em>model.conf</em> for configuration information.)
@@ -228,7 +229,7 @@ consistently scaled mosaic of <a class="reference external" href="https://github
 with smooth transitions from tile to tile.</p>
 </section>
 <section id="generic-amplification-factors">
-<h3><span class="section-number">2.3.1.6. </span>Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.6. </span>Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this heading">¶</a></h3>
 <p>Shakemap does not currently support operator-supplied basin
 depths. Some modern GMPEs use basin depths (typically “Z1.0” or “Z2.5”)
 as an additional site amplification term. These GMPEs typically also
@@ -248,7 +249,7 @@ factors.</p>
 </section>
 </section>
 <section id="ground-motion-to-intensity-conversions">
-<span id="subsec-gmice"></span><h2><span class="section-number">2.3.2. </span>Ground Motion to Intensity Conversions<a class="headerlink" href="#ground-motion-to-intensity-conversions" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-gmice"></span><h2><span class="section-number">2.3.2. </span>Ground Motion to Intensity Conversions<a class="headerlink" href="#ground-motion-to-intensity-conversions" title="Permalink to this heading">¶</a></h2>
 <p>While ideally we would have cross-correlation functions available
 between macroseismic intenstiy and other IMTs (see
 <a class="reference internal" href="#subsec-cross-correlation"><span class="std std-ref">Cross-correlation Functions</span></a>), no such functions
@@ -276,7 +277,7 @@ and configured with the <code class="docutils literal notranslate"><span class="
 of <em>model.conf</em>.</p>
 </section>
 <section id="intensity-prediction-equations">
-<h2><span class="section-number">2.3.3. </span>Intensity Prediction Equations<a class="headerlink" href="#intensity-prediction-equations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.3. </span>Intensity Prediction Equations<a class="headerlink" href="#intensity-prediction-equations" title="Permalink to this heading">¶</a></h2>
 <p>A small number of intensity prediction equations (IPEs) are currently
 available. The available IPEs are for active tectonic and stable
 tectonic regions. If a suitable IPE is not available, the operator may
@@ -352,7 +353,7 @@ the <a class="reference internal" href="sm4_references.html#worden2012"><span cl
 </div>
 </section>
 <section id="cross-correlation-functions">
-<span id="subsec-cross-correlation"></span><h2><span class="section-number">2.3.4. </span>Cross-correlation Functions<a class="headerlink" href="#cross-correlation-functions" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-cross-correlation"></span><h2><span class="section-number">2.3.4. </span>Cross-correlation Functions<a class="headerlink" href="#cross-correlation-functions" title="Permalink to this heading">¶</a></h2>
 <p>There is, as yet, a very limited number of cross-correlation functions
 in the literature.
 Currently, ShakeMap depends primarily on the cross-correlation functions
@@ -381,7 +382,7 @@ correlated with PGV.</p>
 for additional IMTs, we will incorporate them into ShakeMap.</p>
 </section>
 <section id="data-handling-and-outliers">
-<h2><span class="section-number">2.3.5. </span>Data Handling and Outliers<a class="headerlink" href="#data-handling-and-outliers" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.5. </span>Data Handling and Outliers<a class="headerlink" href="#data-handling-and-outliers" title="Permalink to this heading">¶</a></h2>
 <p>As a general rule, ShakeMap assumes that by the time data reach
 <strong>model</strong> they have undergone fairly rigorous quality control.
 It is assumed that the seismic networks that produce the data
@@ -421,14 +422,14 @@ parameter is flagged (e.g., if PGV is flagged, then the MMI derived
 from it is also flagged).</p>
 </section>
 <section id="interpolation">
-<h2><span class="section-number">2.3.6. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.6. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> discusses the application of
 the MVN to the interpolation of ground motions.
 <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a> updates and improves upon this
 approach. Here, we
 discuss some specific details of their implementation within ShakeMap.</p>
 <section id="computation">
-<span id="subsubsec-mvn-computation"></span><h3><span class="section-number">2.3.6.1. </span>Computation<a class="headerlink" href="#computation" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-mvn-computation"></span><h3><span class="section-number">2.3.6.1. </span>Computation<a class="headerlink" href="#computation" title="Permalink to this heading">¶</a></h3>
 <p>The conditional MVN can be summarized as a case in which we have a
 random variable of interest <img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/> where we wish to compute
 predictions
@@ -562,7 +563,7 @@ purposes, it is both convenient and computationally efficient to process
 each row of the output grid for each IMT separately.</p>
 </section>
 <section id="imt-selection">
-<span id="subsubsec-imt-selection"></span><h3><span class="section-number">2.3.6.2. </span>IMT Selection<a class="headerlink" href="#imt-selection" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-imt-selection"></span><h3><span class="section-number">2.3.6.2. </span>IMT Selection<a class="headerlink" href="#imt-selection" title="Permalink to this heading">¶</a></h3>
 <p>In a typical ShakeMap operational environment, it is common for each
 seismic station to produce a number of IMT observations, some of
 which may be flagged as outliers. In addition, in ShakeMap V4, the
@@ -631,7 +632,7 @@ and amplitudes of the conditioning observations.</span><a class="headerlink" hre
 </figure>
 </section>
 <section id="notation">
-<h3><span class="section-number">2.3.6.3. </span>Notation<a class="headerlink" href="#notation" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.6.3. </span>Notation<a class="headerlink" href="#notation" title="Permalink to this heading">¶</a></h3>
 <p>In this section we introduce some additional notation that will be
 used in the following sections. As discussed above, our vector
 <img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/> is broken into two parts, with part 1 being the elements we
@@ -642,7 +643,7 @@ the notation found therein. Thus, the subscript <img class="math" src="../_image
 we wish to predict, while <img class="math" src="../_images/math/e2bb3efda8323fb5e02e3d31234224eeedc7a270.png" alt="D"/> denotes those with data.</p>
 </section>
 <section id="weighting-of-residuals">
-<span id="subsubsec-weighting-residuals"></span><h3><span class="section-number">2.3.6.4. </span>Weighting of Residuals<a class="headerlink" href="#weighting-of-residuals" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-weighting-residuals"></span><h3><span class="section-number">2.3.6.4. </span>Weighting of Residuals<a class="headerlink" href="#weighting-of-residuals" title="Permalink to this heading">¶</a></h3>
 <p>In some situations (such as with seismic station data), our observations
 are treated as having no uncertainty. In other cases, however, the data
 are uncertain, that is, they may each be viewed as an element of a
@@ -677,7 +678,7 @@ the covariance of the residuals is modified:</p>
 calculations below.</p>
 </section>
 <section id="event-bias">
-<h3><span class="section-number">2.3.6.5. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.6.5. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this heading">¶</a></h3>
 <p>Once the native data have been prepared for a particular output IMT,
 ShakeMap computes an event term (the “bias”).
 <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>, Appendix B, discusses the
@@ -747,7 +748,7 @@ the residuals, and the standard deviation decreases.</span><a class="headerlink"
 </figure>
 </section>
 <section id="computing-the-mvn">
-<span id="subsubsec-engler-mvn-computation-4"></span><h3><span class="section-number">2.3.6.6. </span>Computing the MVN<a class="headerlink" href="#computing-the-mvn" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-engler-mvn-computation-4"></span><h3><span class="section-number">2.3.6.6. </span>Computing the MVN<a class="headerlink" href="#computing-the-mvn" title="Permalink to this heading">¶</a></h3>
 <p>While <a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a> describes the basic MVN process,
 we follow the more advanced techniques described in
 <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>, Appendix B, in order to produce
@@ -797,7 +798,7 @@ of computational practicality only the diagonal terms of the covariance
 matrices are computed.</p>
 </section>
 <section id="summary">
-<h3><span class="section-number">2.3.6.7. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.6.7. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">¶</a></h3>
 <p>The interpolation process begins with the collectior or calculation of the
 native data for the output IMT in question. Next, the bias is calculated,
 where the covariance matrix, <img class="math" src="../_images/math/0b1ee5a8c58d05e6f1f400f0b5c28ed8b6c8f81b.png" alt="\mathbf{\Sigma_{{W_2}{W_2}}}"/> is
@@ -809,7 +810,7 @@ calculated. We can then iterate piecemeal through the rows of
 </section>
 </section>
 <section id="finite-rupture-approximations">
-<span id="sec-point-source"></span><h2><span class="section-number">2.3.7. </span>Finite-rupture Approximations<a class="headerlink" href="#finite-rupture-approximations" title="Permalink to this headline">¶</a></h2>
+<span id="sec-point-source"></span><h2><span class="section-number">2.3.7. </span>Finite-rupture Approximations<a class="headerlink" href="#finite-rupture-approximations" title="Permalink to this heading">¶</a></h2>
 <p>In situations where no finite rupture model has been specified,
 ShakeMap will approximate distances (and adjust the uncertainties
 of predicted ground motions)
@@ -817,7 +818,7 @@ using the point-source to finite-rupture equations developed
 by <a class="reference internal" href="sm4_references.html#thompson2018"><span class="std std-ref">Thompson and Worden (2018)</span></a></p>
 </section>
 <section id="output-points-vs-grids">
-<h2><span class="section-number">2.3.8. </span>Output: Points vs. Grids<a class="headerlink" href="#output-points-vs-grids" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.8. </span>Output: Points vs. Grids<a class="headerlink" href="#output-points-vs-grids" title="Permalink to this heading">¶</a></h2>
 <p>The typical application of ShakeMap is to compute ground motions
 over a gridded region. The grid is centered on the epicenter of
 the earthquake, and its extent is set automatically. The default
@@ -838,9 +839,9 @@ the <code class="docutils literal notranslate"><span class="pre">prediction_loca
 of <em>model.conf</em>.</p>
 </section>
 <section id="performance-considerations">
-<h2><span class="section-number">2.3.9. </span>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.9. </span>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this heading">¶</a></h2>
 <section id="multithreading">
-<h3><span class="section-number">2.3.9.1. </span>Multithreading<a class="headerlink" href="#multithreading" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.9.1. </span>Multithreading<a class="headerlink" href="#multithreading" title="Permalink to this heading">¶</a></h3>
 <p>The run time of ShakeMap is most strongly controlled by the number
 of input seismic stations (and macroseismic observations), the size
 of the output grid, and the number of output IMTs. While the Numpy
@@ -864,7 +865,7 @@ compile BLAS libraries that are reentrant-safe – a topic which is
 far beyond the scope of this manual.)</p>
 </section>
 <section id="grid-size">
-<h3><span class="section-number">2.3.9.2. </span>Grid Size<a class="headerlink" href="#grid-size" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.9.2. </span>Grid Size<a class="headerlink" href="#grid-size" title="Permalink to this heading">¶</a></h3>
 <p>At a given grid resolution (as specified in <em>model.conf</em>), the number
 of points in the grid can grow very large for maps that cover several
 degrees of latitude and longitude. ShakeMap’s automatic scaling
@@ -907,7 +908,7 @@ their needs.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.0 Manual</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.1 Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="sm4_introduction.html">1. Introduction</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="sm4_technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="tg_philosophy.html">2.1. Philosophy of Estimating and Interpolating Ground Motions</a></li>
@@ -956,8 +957,8 @@ their needs.</p>
 <li class="toctree-l2"><a class="reference internal" href="sm4_glossary.html">7. Glossary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -971,7 +972,7 @@ their needs.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

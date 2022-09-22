@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.gmice.ak07 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,11 +33,11 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.gmice.ak07">
-<span id="shakelib-gmice-ak07"></span><h1>shakelib.gmice.ak07<a class="headerlink" href="#module-shakelib.gmice.ak07" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-gmice-ak07"></span><h1>shakelib.gmice.ak07<a class="headerlink" href="#module-shakelib.gmice.ak07" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.gmice.ak07.AK07">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.gmice.ak07.</span></span><span class="sig-name descname"><span class="pre">AK07</span></span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE" title="shakelib.gmice.gmice.GMICE"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.gmice.gmice.GMICE</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.gmice.ak07.</span></span><span class="sig-name descname"><span class="pre">AK07</span></span><a class="reference internal" href="../_modules/shakelib/gmice/ak07.html#AK07"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmice.ak07.AK07" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE" title="shakelib.gmice.gmice.GMICE"><code class="xref py py-class docutils literal notranslate"><span class="pre">GMICE</span></code></a></p>
 <p>Implements the ground motion intensity conversion equations (GMICE) of
 Atkinson and Kaka (2007). This module implements a simplified version.</p>
 <p class="rubric">References</p>
@@ -52,7 +53,7 @@ Society of America - BULL SEISMOL SOC AMER.
 intensity. Supported ground-motion IMTs are PGA, PGV and PSA
 at 0.3, 1.0, and 2.0 sec periods.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>amps</strong> (<em>ndarray</em>) – Ground motion amplitude; natural log units; g for PGA and
 PSA, cm/s for PGV.</p></li>
@@ -63,7 +64,7 @@ Supported SA periods are 0.3, 1.0, and 3.0 sec.
 <li><p><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Earthquake magnitude.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>ndarray of Modified Mercalli Intensity and ndarray of
 dMMI / dln(amp) (i.e., the slope of the relationship at the
 point in question).</p>
@@ -78,7 +79,7 @@ point in question).</p>
 intensity. Supported IMTs are PGA, PGV and PSA for 0.3, 1.0, and
 3.0 sec periods.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mmi</strong> (<em>ndarray</em>) – Macroseismic intensity.</p></li>
 <li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – IMT of the requested ground-motions intensities (must be
@@ -88,7 +89,7 @@ one of PGA, PGV, or SA).
 <li><p><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Earthquake magnitude.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Ndarray of ground motion intensity in natural log of g for PGA
 and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI
 (i.e., the slope of the relationship at the point in question).</p>
@@ -102,7 +103,7 @@ and PSA, and natural log cm/s for PGV; ndarray of dln(amp) / dMMI
 <dd><p>Return a dictionary of standard deviations for the ground-motion
 to MMI conversion. The keys are the ground motion types.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dictionary of GM to MI sigmas (in MMI units).</p>
 </dd>
 </dl>
@@ -115,7 +116,7 @@ to MMI conversion. The keys are the ground motion types.</p>
 to ground-motion conversion. The keys are the ground motion
 types.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dictionary of MI to GM sigmas (ln(PGM) units).</p>
 </dd>
 </dl>
@@ -149,9 +150,9 @@ types.</p>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -165,7 +166,7 @@ types.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,7 +12,9 @@
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
    
@@ -38,7 +40,11 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">importlib.resources</span> <span class="k">as</span> <span class="nn">importlib_resources</span>
+
+<span class="c1"># This is what we want for the future (Python 2.9 an beyond):</span>
+<span class="c1"># import importlib.resources as importlib_resources</span>
+<span class="c1"># but right now we have to support Py 3.8, so we have this:</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
 
 <span class="c1"># Third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -307,7 +313,10 @@
 <span class="sd">            string &#39;Null&#39;, then imc_in and imc_out evaluated to be the</span>
 <span class="sd">            same.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">datadir</span> <span class="o">=</span> <span class="n">importlib_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;shakelib.conversions.imc&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+        <span class="c1"># This is what we want for the future (Python 2.9 an beyond):</span>
+        <span class="c1"># datadir = importlib_resources.files(&quot;shakelib.conversions.imc&quot;) / &quot;data&quot;</span>
+        <span class="c1"># but right now we have to support Py 3.8, so we have this:</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s2">&quot;shakelib.conversions.imc&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
         <span class="n">conv_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">&quot;*.csv&quot;</span><span class="p">))</span>
         <span class="n">stub1</span> <span class="o">=</span> <span class="n">BooreKishida2017</span><span class="o">.</span><span class="n">_imcToFilestr</span><span class="p">(</span><span class="n">imc_in</span><span class="p">)</span>
         <span class="n">stub2</span> <span class="o">=</span> <span class="n">BooreKishida2017</span><span class="o">.</span><span class="n">_imcToFilestr</span><span class="p">(</span><span class="n">imc_out</span><span class="p">)</span>
@@ -410,9 +419,9 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -426,7 +435,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

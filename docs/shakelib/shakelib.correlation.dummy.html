@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.correlation.dummy &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,21 +33,21 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.correlation.dummy">
-<span id="shakelib-correlation-dummy"></span><h1>shakelib.correlation.dummy<a class="headerlink" href="#module-shakelib.correlation.dummy" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-correlation-dummy"></span><h1>shakelib.correlation.dummy<a class="headerlink" href="#module-shakelib.correlation.dummy" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.correlation.dummy.DummyCorrelation">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.correlation.dummy.</span></span><span class="sig-name descname"><span class="pre">DummyCorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/dummy.html#DummyCorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.dummy.DummyCorrelation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakelib.correlation.ccf_base.html#shakelib.correlation.ccf_base.CrossCorrelationBase" title="shakelib.correlation.ccf_base.CrossCorrelationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.correlation.ccf_base.CrossCorrelationBase</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.correlation.dummy.</span></span><span class="sig-name descname"><span class="pre">DummyCorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/dummy.html#DummyCorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.dummy.DummyCorrelation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakelib.correlation.ccf_base.html#shakelib.correlation.ccf_base.CrossCorrelationBase" title="shakelib.correlation.ccf_base.CrossCorrelationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">CrossCorrelationBase</span></code></a></p>
 <p>Simplified correlation module for testing purposes. Should not be used
 in productions runs as it does not produce valid correlations.</p>
 <p>Initialize the cross-correlation object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>periods</strong> (<em>ndarray</em>) – An array of periods that will be requested
 from the function. Values must be in the range [0.01, 10.0],
 and must me sorted from smallest to largest.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An instance of <a class="reference internal" href="#shakelib.correlation.dummy.DummyCorrelation" title="shakelib.correlation.dummy.DummyCorrelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">DummyCorrelation</span></code></a>.</p>
 </dd>
 </dl>
@@ -66,7 +67,7 @@ indices may be equal, and there is no restriction on which one is
 larger. The indices refer to periods in the ‘period’ argument to the
 class constructor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ix1</strong> (<em>ndarray</em>) – The indices of the first period of interest.</p></li>
 <li><p><strong>ix2</strong> (<em>ndarrays</em>) – The indices of the second period of interest.</p></li>
@@ -74,11 +75,11 @@ class constructor.</p>
 The result is placed in h.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The predicted correlation coefficient. The output
 array will have the same shape as the inputs.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>h (ndarray)</p>
 </dd>
 </dl>
@@ -112,9 +113,9 @@ array will have the same shape as the inputs.</p>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -128,7 +129,7 @@ array will have the same shape as the inputs.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
