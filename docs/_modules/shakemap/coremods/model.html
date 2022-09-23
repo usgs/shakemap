@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,7 +12,9 @@
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -54,22 +56,21 @@
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">shape</span>
 
 <span class="kn">import</span> <span class="nn">concurrent.futures</span> <span class="k">as</span> <span class="nn">cf</span>
+<span class="kn">from</span> <span class="nn">impactutils.rupture.point_rupture</span> <span class="kn">import</span> <span class="n">PointRupture</span>
+<span class="kn">from</span> <span class="nn">impactutils.rupture.distance</span> <span class="kn">import</span> <span class="n">Distance</span><span class="p">,</span> <span class="n">get_distance</span><span class="p">,</span> <span class="n">get_distance_measures</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="kn">import</span> <span class="n">ShakeMapOutputContainer</span>
+<span class="kn">from</span> <span class="nn">impactutils.rupture</span> <span class="kn">import</span> <span class="n">constants</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="kn">import</span> <span class="n">GeoDict</span>
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="kn">import</span> <span class="n">Grid2D</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">CoreModule</span><span class="p">,</span> <span class="n">Contents</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.point_rupture</span> <span class="kn">import</span> <span class="n">PointRupture</span>
 <span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="kn">import</span> <span class="n">Sites</span>
-<span class="kn">from</span> <span class="nn">shakelib.distance</span> <span class="kn">import</span> <span class="n">Distance</span><span class="p">,</span> <span class="n">get_distance</span><span class="p">,</span> <span class="n">get_distance_measures</span>
 <span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="kn">import</span> <span class="n">MultiGMPE</span>
 <span class="kn">from</span> <span class="nn">shakelib.virtualipe</span> <span class="kn">import</span> <span class="n">VirtualIPE</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.utils</span> <span class="kn">import</span> <span class="n">get_extent</span><span class="p">,</span> <span class="n">thirty_sec_min</span><span class="p">,</span> <span class="n">thirty_sec_max</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="kn">import</span> <span class="n">oq_to_file</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="kn">import</span> <span class="n">ShakeMapInputContainer</span>
-<span class="kn">from</span> <span class="nn">impactutils.io.smcontainers</span> <span class="kn">import</span> <span class="n">ShakeMapOutputContainer</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="kn">import</span> <span class="n">constants</span>
-
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="kn">import</span> <span class="n">get_config_paths</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="kn">import</span> <span class="n">get_object_from_config</span>
 <span class="kn">from</span> <span class="nn">shakemap._version</span> <span class="kn">import</span> <span class="n">get_versions</span>
@@ -738,7 +739,7 @@
                 <span class="p">][</span><span class="s2">&quot;extent&quot;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">get_extent</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+                    <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">ipe</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ipe</span><span class="p">,</span> <span class="n">rupture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span>
                 <span class="p">)</span>
 
             <span class="c1"># Adjust resolution to be under nmax</span>
@@ -1141,7 +1142,10 @@
             <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;MMI_sd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">],</span> <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;MMI_sd&quot;</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">imts</span><span class="p">:</span>
             <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">imtstr</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">oqimt</span><span class="o">.</span><span class="n">string</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmice_imts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+                <span class="n">oqimt</span><span class="o">.</span><span class="n">string</span> <span class="ow">in</span> <span class="n">gmice_imts</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">oqimt</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;SA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;SA&quot;</span> <span class="ow">in</span> <span class="n">gmice_imts</span><span class="p">)</span>
+            <span class="p">):</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="s2">&quot;SA&quot;</span> <span class="ow">in</span> <span class="n">oqimt</span><span class="o">.</span><span class="n">string</span> <span class="ow">and</span> <span class="n">oqimt</span><span class="o">.</span><span class="n">period</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmice_pers</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -1155,7 +1159,7 @@
                 <span class="n">df1</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">gmice</span><span class="o">.</span><span class="n">getGM2MIsd</span><span class="p">()[</span><span class="n">oqimt</span><span class="p">]</span>
             <span class="p">)</span>
 
-        <span class="n">preferred_imts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PGV&quot;</span><span class="p">,</span> <span class="s2">&quot;PGA&quot;</span><span class="p">,</span> <span class="s2">&quot;SA(1.0)&quot;</span><span class="p">,</span> <span class="s2">&quot;SA(0.3)&quot;</span><span class="p">,</span> <span class="s2">&quot;SA(3.0&quot;</span><span class="p">]</span>
+        <span class="n">preferred_imts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PGV&quot;</span><span class="p">,</span> <span class="s2">&quot;PGA&quot;</span><span class="p">,</span> <span class="s2">&quot;SA(1.0)&quot;</span><span class="p">,</span> <span class="s2">&quot;SA(0.3)&quot;</span><span class="p">,</span> <span class="s2">&quot;SA(3.0)&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;MMI&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;MMI&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;MMI_sd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
@@ -1537,6 +1541,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">outsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pout_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">outphi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">outtau</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
+            <span class="c1"># Special stuff for the MMI priors. When we make this apply to other</span>
+            <span class="c1"># IMTs we&#39;ll need to mess around with this block</span>
+            <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">MMI_add_uncertainty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">MMI_Sigma_HH_YD</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">MMI_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">MMI_sta_per_ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
             <span class="k">return</span>
 
         <span class="n">pout_sd2_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="mf">2.0</span><span class="p">)</span>
@@ -1583,6 +1594,14 @@
         <span class="n">sdsta_phi</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">matrix12_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">t2_12</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
         <span class="n">rcmatrix_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">t2_12</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+        <span class="c1"># Allocate the full C matrix only for the desired IMT (MMI). This</span>
+        <span class="c1"># is for generating realizations. Someday we will want to make this</span>
+        <span class="c1"># apply to other IMTs and become an optional flag for this module</span>
+        <span class="c1"># where we save the priors optionally</span>
+        <span class="c1"># Note: We would have to set up C_complete = {} at the top of the</span>
+        <span class="c1"># module, and then here, it would be C_complete[imtstr] = ...</span>
+        <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+            <span class="n">C_complete</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">T_Y0</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">iy</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">smny</span><span class="p">):</span>
             <span class="n">ss</span> <span class="o">=</span> <span class="n">iy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span>
             <span class="n">se</span> <span class="o">=</span> <span class="p">(</span><span class="n">iy</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">smnx</span>
@@ -1660,6 +1679,11 @@
             <span class="n">sdgrid_tau</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">C_tmp1</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">C_tmp2</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">s_tmp3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
             <span class="p">)</span>
+            <span class="c1"># This is where we would have a flag if we were saving the priors</span>
+            <span class="c1"># as an option</span>
+            <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+                <span class="c1"># Save C to complete full size C</span>
+                <span class="n">C_complete</span><span class="p">[</span><span class="n">ss</span><span class="p">:</span><span class="n">se</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">C</span>
 
             <span class="n">mtime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
         <span class="c1">#</span>
@@ -1683,6 +1707,14 @@
         <span class="c1"># self.outphi[imtstr] = np.sqrt(cov_WY_WY_WD)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outphi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outtau</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sdgrid_tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">sdgrid_tau</span><span class="p">)</span>
+
+        <span class="c1"># Special stuff for the MMI priors. When we make this apply to other</span>
+        <span class="c1"># IMTs we&#39;ll need to mess around with this block</span>
+        <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MMI_add_uncertainty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MMI_Sigma_HH_YD</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov_HH_yD</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MMI_C</span> <span class="o">=</span> <span class="n">C_complete</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MMI_sta_per_ix</span> <span class="o">=</span> <span class="n">sta_per_ix</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">time for </span><span class="si">{</span><span class="n">imtstr</span><span class="si">}</span><span class="s2"> distance=</span><span class="si">{</span><span class="n">ddtime</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">time for </span><span class="si">{</span><span class="n">imtstr</span><span class="si">}</span><span class="s2"> correlation=</span><span class="si">{</span><span class="n">ctime</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -2334,6 +2366,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">outphi</span><span class="p">[</span><span class="n">key</span><span class="p">],</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">outtau</span><span class="p">[</span><span class="n">key</span><span class="p">],</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;MMI&quot;</span><span class="p">:</span>
+                <span class="n">sub_groups</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;imts&quot;</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">key</span><span class="p">]</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="n">sub_groups</span><span class="p">,</span> <span class="s2">&quot;add_uncertainty&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MMI_add_uncertainty</span><span class="p">)</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="n">sub_groups</span><span class="p">,</span> <span class="s2">&quot;Sigma_HH_YD&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MMI_Sigma_HH_YD</span><span class="p">)</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="n">sub_groups</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MMI_C</span><span class="p">)</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="n">sub_groups</span><span class="p">,</span> <span class="s2">&quot;sta_per_ix&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MMI_sta_per_ix</span><span class="p">)</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="n">sub_groups</span><span class="p">,</span> <span class="s2">&quot;sta_phi&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_phi</span><span class="p">[</span><span class="s2">&quot;MMI&quot;</span><span class="p">])</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="n">sub_groups</span><span class="p">,</span> <span class="s2">&quot;sta_lons_rad&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="s2">&quot;MMI&quot;</span><span class="p">])</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="n">sub_groups</span><span class="p">,</span> <span class="s2">&quot;sta_lats_rad&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sta_lats_rad</span><span class="p">[</span><span class="s2">&quot;MMI&quot;</span><span class="p">])</span>
         <span class="c1">#</span>
         <span class="c1"># Directivity</span>
         <span class="c1">#</span>
@@ -2898,9 +2939,9 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -2914,7 +2955,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

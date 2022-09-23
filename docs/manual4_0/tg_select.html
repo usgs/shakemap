@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>2.4. Ground Motion Model Selection &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,9 +35,9 @@
           <div class="body" role="main">
             
   <section id="ground-motion-model-selection">
-<span id="sec-select-4"></span><h1><span class="section-number">2.4. </span>Ground Motion Model Selection<a class="headerlink" href="#ground-motion-model-selection" title="Permalink to this headline">¶</a></h1>
+<span id="sec-select-4"></span><h1><span class="section-number">2.4. </span>Ground Motion Model Selection<a class="headerlink" href="#ground-motion-model-selection" title="Permalink to this heading">¶</a></h1>
 <section id="overview">
-<h2><span class="section-number">2.4.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.4.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
 <p>Tectonic classification of earthquakes is a key component of the USGS
 Global ShakeMap system because it serves as the basis for the selection
 of ground motion prediction equations (GMPEs). GMPE selection has a
@@ -72,7 +73,7 @@ layers will use.</p>
 documentation.</p>
 </section>
 <section id="tectonic-regions">
-<h2><span class="section-number">2.4.2. </span>Tectonic Regions<a class="headerlink" href="#tectonic-regions" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.4.2. </span>Tectonic Regions<a class="headerlink" href="#tectonic-regions" title="Permalink to this heading">¶</a></h2>
 <p><a class="pageref" href="#select-regions">Figure  1</a> shows a global map of the first layer of
 information, which is a set of four mutually exclusive and globally
 exhaustive classes, which we refer to as <strong>tectonic regions</strong>: active
@@ -88,11 +89,6 @@ volcanic (VOL).</p>
 <a class="reference internal" href="sm4_references.html#garcia2012b"><span class="std std-ref">Garcia and others (2012)</span></a>. The approximate mapping between
 the new tectonic regions and the seismotectonic domains is:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 22%" />
-<col style="width: 52%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Tectonic Region</p></th>
 <th class="head"><p>Subtypes</p></th>
@@ -226,7 +222,7 @@ the GMPE sets for each of these regimes, weighted by their probabilities,
 into a subduction GMPE set that is specific to the earthquake’s location.</p>
 </section>
 <section id="subduction-subtypes">
-<h2><span class="section-number">2.4.3. </span>Subduction Subtypes<a class="headerlink" href="#subduction-subtypes" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.4.3. </span>Subduction Subtypes<a class="headerlink" href="#subduction-subtypes" title="Permalink to this heading">¶</a></h2>
 <p>Within subduction zones, we distribute the probability given to the
 subduction zone tectonic region between its three subtypes. By default,
 this primarily relies on the
@@ -314,7 +310,7 @@ other tectonic regions (e.g., configurable with the <code class="docutils litera
 and <code class="docutils literal notranslate"><span class="pre">max_depth</span></code> keys).</p>
 </section>
 <section id="geographic-regionalization">
-<h2><span class="section-number">2.4.4. </span>Geographic Regionalization<a class="headerlink" href="#geographic-regionalization" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.4.4. </span>Geographic Regionalization<a class="headerlink" href="#geographic-regionalization" title="Permalink to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">select</span></code> module also considers the earthquake’s presence within, or
 distance from, any number of user-defined geographic layers. If the
 earthquake is within a layer, that layer’s parameters (as configured in
@@ -382,7 +378,7 @@ called <code class="docutils literal notranslate"><span class="pre">california.w
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.0 Manual</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.1 Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="sm4_introduction.html">1. Introduction</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="sm4_technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="tg_philosophy.html">2.1. Philosophy of Estimating and Interpolating Ground Motions</a></li>
@@ -405,8 +401,8 @@ called <code class="docutils literal notranslate"><span class="pre">california.w
 <li class="toctree-l2"><a class="reference internal" href="sm4_glossary.html">7. Glossary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -420,7 +416,7 @@ called <code class="docutils literal notranslate"><span class="pre">california.w
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

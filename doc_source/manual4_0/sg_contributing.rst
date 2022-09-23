@@ -439,14 +439,22 @@ The install script depends on the following files:
     the running of tests following the install users can run `bash install.sh -t`, otherwise they
     can manually run `py.test --cov=.` after the install is complete.
     
-  - "Development" Users who are contributing to ShakeMap development and need to update the ShakeMap 
-    code and the Python dependencies. `bash install.sh -u` will update dependencies, run tests, and 
-    generate a new deployment_<platform>.txt file if the tests are successful. If a developer wants to 
-    update the environment but NOT run tests and NOT generate a new deployment_<platform>.txt file, they
-    can run `bash install.sh -un`. Developers who want to update the Python version from the current
+  - "Development" Users who are making routine contributions to the ShakeMap software
+    and who do not anticipate adding new dependencies or otherwise changing existing
+    dependencies. These users may install much as the "Deployment users, above, with
+    the simple `bash install.sh`. The development workflow may then proceed as described
+    elsewhere in this document.
+
+  - "Configuration" Users who are contributing to ShakeMap development and need to update
+    the ShakeMap code and the Python dependencies. `bash install.sh -u` will update
+    dependencies, run tests, and generate a new deployment_<platform>.txt file if the
+    tests are successful. If a developer wants to update the environment but NOT run
+    tests and NOT generate a new deployment_<platform>.txt file, they can run
+    `bash install.sh -un`. Developers who want to update the Python version from the current
     default and the dependencies (many Python packages have version-specific builds) can run
     `bash install.sh -u -p 3.X`. Unless the "-n" option is added, tests will be run and a new 
-    deployment_<platform>.txt file will be created.
+    deployment_<platform>.txt file will be created. Note that this is a fairly major 
+    step and should be taken only in consultation with the ShakeMap development team.
 
 Core Modules
 =============

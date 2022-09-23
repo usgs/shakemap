@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,7 +12,9 @@
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -35,26 +37,17 @@
 
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">imt</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="kn">import</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.valid</span> <span class="kn">import</span> <span class="n">gsim</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="kn">import</span> <span class="n">OrthographicProjection</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">SitesContext</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">DistancesContext</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="kn">import</span> <span class="n">RuptureContext</span>
-
-<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="kn">import</span> <span class="n">get_object_from_config</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="kn">import</span> <span class="n">EdgeRupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="kn">import</span> <span class="n">QuadRupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="kn">import</span> <span class="n">Rupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="kn">import</span> <span class="n">MultiGMPE</span><span class="p">,</span> <span class="n">set_sites_depth_parameters</span>
-<span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="kn">import</span> <span class="n">StationList</span>
-
 <span class="kn">from</span> <span class="nn">strec.gmreg</span> <span class="kn">import</span> <span class="n">Regionalizer</span>
+<span class="kn">from</span> <span class="nn">impactutils.rupture.edge_rupture</span> <span class="kn">import</span> <span class="n">EdgeRupture</span>
+<span class="kn">from</span> <span class="nn">impactutils.rupture.quad_rupture</span> <span class="kn">import</span> <span class="n">QuadRupture</span>
+<span class="kn">from</span> <span class="nn">impactutils.rupture.base</span> <span class="kn">import</span> <span class="n">Rupture</span>
 
-<span class="c1"># ACR GMPE/GMICE</span>
-<span class="kn">from</span> <span class="nn">shakelib.gmice.wgrw12</span> <span class="kn">import</span> <span class="n">WGRW12</span>
-
-<span class="c1"># SCR GMPE/GMICE</span>
-<span class="kn">from</span> <span class="nn">shakelib.gmice.ak07</span> <span class="kn">import</span> <span class="n">AK07</span>
+<span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="kn">import</span> <span class="n">set_sites_depth_parameters</span>
+<span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="kn">import</span> <span class="n">StationList</span>
 
 
 <span class="n">DEFAULT_ACTIVE_COEFFS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">27.24</span><span class="p">,</span> <span class="mf">250.4</span><span class="p">,</span> <span class="mf">579.1</span><span class="p">]</span>
@@ -97,7 +90,7 @@
     <span class="k">return</span> <span class="n">stations</span></div>
 
 
-<div class="viewcode-block" id="get_extent"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.get_extent">[docs]</a><span class="k">def</span> <span class="nf">get_extent</span><span class="p">(</span><span class="n">rupture</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_extent"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.get_extent">[docs]</a><span class="k">def</span> <span class="nf">get_extent</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ipe</span><span class="p">,</span> <span class="n">rupture</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Method to compute map extent from rupture. There are numerous methods for</span>
 <span class="sd">    getting the extent:</span>
@@ -112,8 +105,12 @@
 <span class="sd">    on a generic set of active/stable.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        rupture (Rupture): A ShakeMap Rupture instance.</span>
-<span class="sd">        config (ConfigObj): ShakeMap config object.</span>
+<span class="sd">        config (ConfigObj):</span>
+<span class="sd">            ShakeMap config object.</span>
+<span class="sd">        ipe (VirtualIPE):</span>
+<span class="sd">            An VirtualIPE instance.</span>
+<span class="sd">        rupture (Rupture):</span>
+<span class="sd">            A ShakeMap Rupture instance.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        tuple: lonmin, lonmax, latmin, latmax rounded outward to the nearest</span>
@@ -127,19 +124,18 @@
     <span class="n">spans</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">offsets</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s2">&quot;extent&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;magnitude_spans&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-                        <span class="n">spans</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;bounds&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="s2">&quot;extent&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">]:</span>
-                    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">][</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">999.0</span><span class="p">:</span>
-                        <span class="n">bounds</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">][</span><span class="s2">&quot;extent&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;relative_offset&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;relative_offset&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                    <span class="n">offsets</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;relative_offset&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;extent&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;magnitude_spans&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">spans</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;magnitude_spans&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;bounds&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s2">&quot;extent&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">][</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">999.0</span><span class="p">:</span>
+                    <span class="n">bounds</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">][</span><span class="s2">&quot;extent&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;relative_offset&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;relative_offset&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">offsets</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;relative_offset&quot;</span><span class="p">]</span>
 
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># Simplest option: extent was specified in the config, use that and exit.</span>
@@ -170,7 +166,7 @@
     <span class="c1"># Otherwise, use MultiGMPE to get spans</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="k">if</span> <span class="n">extent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">extent</span> <span class="o">=</span> <span class="n">_get_extent_from_multigmpe</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="n">extent</span> <span class="o">=</span> <span class="n">_get_extent_from_multigmpe</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">ipe</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">offsets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">extent</span>
@@ -225,57 +221,20 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_get_extent_from_multigmpe</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_extent_from_multigmpe</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">ipe</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Use MultiGMPE to determine extent</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rupture (Rupture):</span>
+<span class="sd">            A ShakeMap Rupture instance.</span>
+<span class="sd">        config (ConfigObj):</span>
+<span class="sd">            ShakeMap config object.</span>
+<span class="sd">        ipe (VirtualIPE):</span>
+<span class="sd">            An VirtualIPE instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">)</span> <span class="o">=</span> <span class="n">_rupture_center</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
     <span class="n">origin</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">__from_config__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="n">gmice</span> <span class="o">=</span> <span class="n">get_object_from_config</span><span class="p">(</span><span class="s2">&quot;gmice&quot;</span><span class="p">,</span> <span class="s2">&quot;modeling&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span> <span class="ow">in</span> <span class="n">gmice</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
-            <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">imt</span><span class="o">.</span><span class="n">PGV</span> <span class="ow">in</span> <span class="n">gmice</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
-            <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">PGV</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">PGA</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># Put in some default values for conf</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;extent&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mmi&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span> <span class="s2">&quot;mindist&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;maxdist&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}}</span>
-        <span class="p">}</span>
-
-        <span class="c1"># Generic GMPEs choices based only on active vs stable</span>
-        <span class="c1"># as defaults...</span>
-        <span class="n">stable</span> <span class="o">=</span> <span class="n">is_stable</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">stable</span><span class="p">:</span>
-            <span class="n">ASK14</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;AbrahamsonEtAl2014&quot;</span><span class="p">)</span>
-            <span class="n">CB14</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;CampbellBozorgnia2014&quot;</span><span class="p">)</span>
-            <span class="n">CY14</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;ChiouYoungs2014&quot;</span><span class="p">)</span>
-            <span class="n">gmpes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ASK14</span><span class="p">,</span> <span class="n">CB14</span><span class="p">,</span> <span class="n">CY14</span><span class="p">]</span>
-            <span class="n">site_gmpes</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">]</span>
-            <span class="n">gmice</span> <span class="o">=</span> <span class="n">WGRW12</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">Fea96</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;FrankelEtAl1996MwNSHMP2008&quot;</span><span class="p">)</span>
-            <span class="n">Tea97</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;ToroEtAl1997MwNSHMP2008&quot;</span><span class="p">)</span>
-            <span class="n">Sea02</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;SilvaEtAl2002MwNSHMP2008&quot;</span><span class="p">)</span>
-            <span class="n">C03</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;Campbell2003MwNSHMP2008&quot;</span><span class="p">)</span>
-            <span class="n">TP05</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;TavakoliPezeshk2005MwNSHMP2008&quot;</span><span class="p">)</span>
-            <span class="n">AB06p</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;AtkinsonBoore2006Modified2011&quot;</span><span class="p">)</span>
-            <span class="n">Pea11</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;PezeshkEtAl2011&quot;</span><span class="p">)</span>
-            <span class="n">Atk08p</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;Atkinson2008prime&quot;</span><span class="p">)</span>
-            <span class="n">Sea01</span> <span class="o">=</span> <span class="n">gsim</span><span class="p">(</span><span class="s2">&quot;SomervilleEtAl2001NSHMP2008&quot;</span><span class="p">)</span>
-            <span class="n">gmpes</span> <span class="o">=</span> <span class="p">[</span><span class="n">Fea96</span><span class="p">,</span> <span class="n">Tea97</span><span class="p">,</span> <span class="n">Sea02</span><span class="p">,</span> <span class="n">C03</span><span class="p">,</span> <span class="n">TP05</span><span class="p">,</span> <span class="n">AB06p</span><span class="p">,</span> <span class="n">Pea11</span><span class="p">,</span> <span class="n">Atk08p</span><span class="p">,</span> <span class="n">Sea01</span><span class="p">]</span>
-            <span class="n">site_gmpes</span> <span class="o">=</span> <span class="p">[</span><span class="n">AB06p</span><span class="p">]</span>
-            <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.16</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
-            <span class="n">gmice</span> <span class="o">=</span> <span class="n">AK07</span><span class="p">()</span>
-
-        <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">__from_list__</span><span class="p">(</span>
-            <span class="n">gmpes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">default_gmpes_for_site</span><span class="o">=</span><span class="n">site_gmpes</span>
-        <span class="p">)</span>
-        <span class="n">default_imt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 
     <span class="n">min_mmi</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;mmi&quot;</span><span class="p">][</span><span class="s2">&quot;threshold&quot;</span><span class="p">]</span>
     <span class="n">sd_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">]</span>
@@ -288,10 +247,8 @@
     <span class="n">d_min</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;mmi&quot;</span><span class="p">][</span><span class="s2">&quot;mindist&quot;</span><span class="p">]</span>
     <span class="n">d_max</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;extent&quot;</span><span class="p">][</span><span class="s2">&quot;mmi&quot;</span><span class="p">][</span><span class="s2">&quot;maxdist&quot;</span><span class="p">]</span>
     <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">d_min</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">d_max</span><span class="p">),</span> <span class="n">size</span><span class="p">)</span>
-    <span class="c1"># Details don&#39;t matter for this; assuming vertical surface rupturing fault</span>
-    <span class="c1"># with epicenter at the surface.</span>
-    <span class="n">dx</span><span class="o">.</span><span class="n">rrup</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span>
-    <span class="n">dx</span><span class="o">.</span><span class="n">rhypo</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span>
+    <span class="n">dx</span><span class="o">.</span><span class="n">rrup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">.</span><span class="n">rjb</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">dx</span><span class="o">.</span><span class="n">rhypo</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">rrup</span>
     <span class="n">dx</span><span class="o">.</span><span class="n">repi</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span>
     <span class="n">dx</span><span class="o">.</span><span class="n">rx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dx</span><span class="o">.</span><span class="n">rjb</span><span class="p">)</span>
     <span class="n">dx</span><span class="o">.</span><span class="n">ry0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dx</span><span class="o">.</span><span class="n">rjb</span><span class="p">)</span>
@@ -302,7 +259,7 @@
     <span class="c1"># Set to soft soil conditions</span>
     <span class="n">sx</span><span class="o">.</span><span class="n">sids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
     <span class="n">sx</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
-    <span class="n">set_sites_depth_parameters</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">)</span>
+    <span class="n">set_sites_depth_parameters</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">ipe</span><span class="p">)</span>
     <span class="n">sx</span><span class="o">.</span><span class="n">vs30measured</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
     <span class="n">sx</span><span class="o">.</span><span class="n">backarc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
@@ -311,18 +268,20 @@
     <span class="n">rx</span><span class="o">.</span><span class="n">mag</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
     <span class="n">rx</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="c1"># From WC94...</span>
-    <span class="n">rx</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.76</span> <span class="o">+</span> <span class="mf">0.27</span> <span class="o">*</span> <span class="n">rx</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
-    <span class="n">rx</span><span class="o">.</span><span class="n">dip</span> <span class="o">=</span> <span class="mf">90.0</span>
-    <span class="n">rx</span><span class="o">.</span><span class="n">ztor</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span>
+    <span class="c1"># rx.width = 10 ** (-0.76 + 0.27 * rx.mag)</span>
+    <span class="c1"># rx.dip = 90.0</span>
+    <span class="c1"># rx.ztor = origin.depth</span>
+    <span class="c1"># Using parameters from the point rupture...</span>
+    <span class="n">rx</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getWidth</span><span class="p">()</span>
+    <span class="n">rx</span><span class="o">.</span><span class="n">dip</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getDip</span><span class="p">()</span>
+    <span class="n">rx</span><span class="o">.</span><span class="n">ztor</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getDepthToTop</span><span class="p">()</span>
     <span class="n">rx</span><span class="o">.</span><span class="n">hypo_depth</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span>
 
-    <span class="n">gmpe_imt_mean</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">default_imt</span><span class="p">,</span> <span class="n">sd_types</span><span class="p">)</span>
-
-    <span class="c1"># Convert to MMI</span>
-    <span class="n">gmpe_to_mmi</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gmice</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">gmpe_imt_mean</span><span class="p">,</span> <span class="n">default_imt</span><span class="p">)</span>
+    <span class="n">mmi</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;MMI&quot;</span><span class="p">)</span>
+    <span class="n">imt_mean</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ipe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">mmi</span><span class="p">,</span> <span class="n">sd_types</span><span class="p">)</span>
 
     <span class="c1"># Minimum distance that exceeds threshold MMI?</span>
-    <span class="n">dists_exceed_mmi</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span><span class="p">[</span><span class="n">gmpe_to_mmi</span> <span class="o">&gt;</span> <span class="n">min_mmi</span><span class="p">]</span>
+    <span class="n">dists_exceed_mmi</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">rjb</span><span class="p">[</span><span class="n">imt_mean</span> <span class="o">&gt;</span> <span class="n">min_mmi</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dists_exceed_mmi</span><span class="p">):</span>
         <span class="n">mindist_km</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dists_exceed_mmi</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -464,9 +423,9 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -480,7 +439,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

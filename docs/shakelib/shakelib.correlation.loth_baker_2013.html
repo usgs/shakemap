@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.correlation.loth_baker_2013 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,11 +33,11 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.correlation.loth_baker_2013">
-<span id="shakelib-correlation-loth-baker-2013"></span><h1>shakelib.correlation.loth_baker_2013<a class="headerlink" href="#module-shakelib.correlation.loth_baker_2013" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-correlation-loth-baker-2013"></span><h1>shakelib.correlation.loth_baker_2013<a class="headerlink" href="#module-shakelib.correlation.loth_baker_2013" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.correlation.loth_baker_2013.LothBaker2013">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.correlation.loth_baker_2013.</span></span><span class="sig-name descname"><span class="pre">LothBaker2013</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/loth_baker_2013.html#LothBaker2013"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.loth_baker_2013.LothBaker2013" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakelib.correlation.ccf_base.html#shakelib.correlation.ccf_base.CrossCorrelationBase" title="shakelib.correlation.ccf_base.CrossCorrelationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.correlation.ccf_base.CrossCorrelationBase</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.correlation.loth_baker_2013.</span></span><span class="sig-name descname"><span class="pre">LothBaker2013</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/loth_baker_2013.html#LothBaker2013"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.loth_baker_2013.LothBaker2013" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakelib.correlation.ccf_base.html#shakelib.correlation.ccf_base.CrossCorrelationBase" title="shakelib.correlation.ccf_base.CrossCorrelationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">CrossCorrelationBase</span></code></a></p>
 <p>Created by Christophe Loth, 12/18/2012
 Pythonized and vectorized by C. Bruce Worden, 3/15/2017
 Updated with the erratum tables by C. Bruce Worden, 1/13/2021
@@ -55,12 +56,12 @@ Earthquake Engineering &amp; Structural Dynamics, 49(3), 315-316.
 <a class="reference external" href="https://doi.org/10.1002/eqe.3233">https://doi.org/10.1002/eqe.3233</a></p>
 <p>Create an instance of LB13.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>periods</strong> (<em>numpy.array</em>) – An array of periods that will be requested
 from the function. Values must be [0.01 -&gt; 10.0], and must be
 sorted from smallest to largest.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An instance of <a class="reference internal" href="#shakelib.correlation.loth_baker_2013.LothBaker2013" title="shakelib.correlation.loth_baker_2013.LothBaker2013"><code class="xref py py-class docutils literal notranslate"><span class="pre">LothBaker2013</span></code></a>.</p>
 </dd>
 </dl>
@@ -74,7 +75,7 @@ indices may be equal, and there is no restriction on which one is
 larger. The indices refer to periods in the ‘period’ argument to the
 class constructor. The result is stored in h.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ix1</strong> (<em>2D</em><em>, </em><em>C-contiguous numpy array</em><em>)</em>) – The indices of the first period of interest.</p></li>
 <li><p><strong>ix2</strong> (<em>2D</em><em>, </em><em>C-contiguous numpy array</em><em>)</em>) – The indices of the second period of interest.</p></li>
@@ -83,11 +84,11 @@ h will be returned with the result, so it must be
 copied if the values in h are to be preserved.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The predicted correlation coefficient. The output array
 will have the same shape as the inputs.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>h (numpy array)</p>
 </dd>
 </dl>
@@ -121,9 +122,9 @@ will have the same shape as the inputs.</p>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -137,7 +138,7 @@ will have the same shape as the inputs.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

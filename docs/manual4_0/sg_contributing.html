@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>4.9. Guidelines for Contributors &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,7 +35,7 @@
           <div class="body" role="main">
             
   <section id="guidelines-for-contributors">
-<span id="sec-contributing-4"></span><h1><span class="section-number">4.9. </span>Guidelines for Contributors<a class="headerlink" href="#guidelines-for-contributors" title="Permalink to this headline">¶</a></h1>
+<span id="sec-contributing-4"></span><h1><span class="section-number">4.9. </span>Guidelines for Contributors<a class="headerlink" href="#guidelines-for-contributors" title="Permalink to this heading">¶</a></h1>
 <p>We encourage contributions to the ShakeMap project. Before
 you begin, however, we recommend you contact us (either
 directly or, preferrably, through the <em>issues</em> feature on
@@ -68,7 +69,7 @@ request.</p>
 <li><p>Coremods</p></li>
 </ul>
 <section id="coding-style">
-<h2><span class="section-number">4.9.1. </span>Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.9.1. </span>Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this heading">¶</a></h2>
 <p>We now use the <a class="reference external" href="https://github.com/psf/black">Black Code Formatter</a> for
 all code formatting. You will be expected to run your code through Black
 before submitting it to us. There are Black extensions for emacs, vim,
@@ -293,7 +294,7 @@ directory on Github.</p>
 </div>
 </section>
 <section id="workflow">
-<h2><span class="section-number">4.9.2. </span>Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.9.2. </span>Workflow<a class="headerlink" href="#workflow" title="Permalink to this heading">¶</a></h2>
 <p>Below is a description of our Git workflow. This workflow
 is an adaption of a fairly common set of procedures for working with
 GitHub. <a class="pageref" href="#workflow-figure">Figure  1</a> illustrates the process described
@@ -384,8 +385,89 @@ development should take place within feature branches, and the
 local master branch is updated only by pulling from the upstream
 repository.</p>
 </section>
+<section id="dependency-management">
+<h2><span class="section-number">4.9.3. </span>Dependency Management<a class="headerlink" href="#dependency-management" title="Permalink to this heading">¶</a></h2>
+<p>A developer may wish to update ShakeMap Python dependencies. For this
+use case, the install script, included in the repository, has arguments
+to assist with this process.</p>
+<p>The help for the install.sh script (found at the root level of the ShakeMap
+directory) has the following usage help:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">install</span><span class="o">.</span><span class="n">sh</span> <span class="p">[</span> <span class="o">-</span><span class="n">u</span>  <span class="n">Update</span><span class="p">]</span>
+                  <span class="p">[</span> <span class="o">-</span><span class="n">t</span>  <span class="n">Run</span> <span class="n">tests</span> <span class="p">]</span>
+                  <span class="p">[</span> <span class="o">-</span><span class="n">p</span>  <span class="n">Set</span> <span class="n">Python</span> <span class="n">version</span><span class="p">]</span>
+                  <span class="p">[</span> <span class="o">-</span><span class="n">n</span>  <span class="n">Don</span><span class="s1">&#39;t run tests]</span>
+</pre></div>
+</div>
+<p>To upgrade to the latest versions of the Python dependencies:</p>
+<blockquote>
+<div><p>$ bash install.sh -u</p>
+</div></blockquote>
+<p>The “-u” option will ignore the platform-specific “spec” file that is
+included in the repository (“deployment_linux.txt” or “deployment_macos.txt”)
+and create an environment using the “source_environment.yml” file as input.
+This file may contain some pinning of conda versions in order to avoid conflicts
+between dependencies.</p>
+<p>Running the install script with the update option will force tests to run.
+If all of these tests succeed, then a new “spec” file will be created as
+appropriate to your environment (Linux or MacOS). If ANY of these tests fail,
+this file will not be re-created, and the developer should review the code
+being tested to determine if the errors can be resolved by either 1) updating
+the code to match changes in dependencies or 2) by pinning the dependencies to
+versions that work with the current state of ShakeMap code. Updating the code
+is generally the preferred solution, unless the pinning is to recent versions
+and <em>higher</em>. Keeping the ShakeMap code compliant with the most recent versions
+of dependencies will prevent further errors in the future.</p>
+<p>If the developer is working on a Linux platform, they must then have access to a
+MacOS platform, or conversely, a MacOS developer must have access to a Linux platform.
+The developer should run the install script with the “-u” option on <em>both</em> platforms,
+and resolve all issues found on both.</p>
+<p>If the developer wants to test the installation with a version of Python higher
+than the default version found in the install script (“grep DEFAULT_PYVER install.sh”)
+they should use the -p option <em>together</em> with the -u option. Given how quickly things
+change in the Python ecosystem, this is likely to cause errors with tests. Resolve in
+the same way as described above.</p>
+<dl>
+<dt>The install script depends on the following files:</dt><dd><ul class="simple">
+<li><p>source_environment.yml A yaml file with minimal pinning of python dependencies.
+This file is only ever an input.</p></li>
+<li><p>deployment_linux.txt A text file containing urls of Linux conda packages to download.
+This file is generated by the install script and also used as an input when run with
+the update option.</p></li>
+<li><p>deployment_macos.txt A text file containing urls of MacOS conda packages to download.
+This file is generated by the install script and also used as an input when run with
+the update option.</p></li>
+<li><p>requirements.txt A text file with the packages that must be installed by pip instead of conda.</p></li>
+</ul>
+<dl class="simple">
+<dt>Use cases:</dt><dd><ul class="simple">
+<li><p>“Deployment” Users who simply wish to install ShakeMap in order to run it and have no
+interest in development. These users should run <cite>bash install.sh</cite> to create an environment
+using either the deployment_linux.txt or deployment_macos.txt files as input. To automate
+the running of tests following the install users can run <cite>bash install.sh -t</cite>, otherwise they
+can manually run <cite>py.test –cov=.</cite> after the install is complete.</p></li>
+<li><p>“Development” Users who are making routine contributions to the ShakeMap software
+and who do not anticipate adding new dependencies or otherwise changing existing
+dependencies. These users may install much as the “Deployment users, above, with
+the simple <cite>bash install.sh</cite>. The development workflow may then proceed as described
+elsewhere in this document.</p></li>
+<li><p>“Configuration” Users who are contributing to ShakeMap development and need to update
+the ShakeMap code and the Python dependencies. <cite>bash install.sh -u</cite> will update
+dependencies, run tests, and generate a new deployment_&lt;platform&gt;.txt file if the
+tests are successful. If a developer wants to update the environment but NOT run
+tests and NOT generate a new deployment_&lt;platform&gt;.txt file, they can run
+<cite>bash install.sh -un</cite>. Developers who want to update the Python version from the current
+default and the dependencies (many Python packages have version-specific builds) can run
+<cite>bash install.sh -u -p 3.X</cite>. Unless the “-n” option is added, tests will be run and a new
+deployment_&lt;platform&gt;.txt file will be created. Note that this is a fairly major
+step and should be taken only in consultation with the ShakeMap development team.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
 <section id="core-modules">
-<h2><span class="section-number">4.9.3. </span>Core Modules<a class="headerlink" href="#core-modules" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.9.4. </span>Core Modules<a class="headerlink" href="#core-modules" title="Permalink to this heading">¶</a></h2>
 <p>Most developers will be primarily interested in developing modules
 for the <code class="docutils literal notranslate"><span class="pre">shake</span></code> program.
 The source for these modules may be found in the directory
@@ -405,7 +487,7 @@ or <em>info.py</em> for examples of the way core modules are implemented.</p>
 it automatically and include it in the list of available modules.</p>
 </section>
 <section id="logging">
-<h2><span class="section-number">4.9.4. </span>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.9.5. </span>Logging<a class="headerlink" href="#logging" title="Permalink to this heading">¶</a></h2>
 <p>Modules should log to <code class="docutils literal notranslate"><span class="pre">self.logger</span></code>. We encourage logging generally
 useful information as <code class="docutils literal notranslate"><span class="pre">self.logger.info</span></code>, particularly anything that
 might normally be put in as a <code class="docutils literal notranslate"><span class="pre">print</span></code> statement. We also encourage
@@ -447,7 +529,7 @@ include:</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.0 Manual</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 4.1 Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="sm4_introduction.html">1. Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm4_technical_guide.html">2. Technical Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm4_users_guide.html">3. Users Guide</a></li>
@@ -463,8 +545,9 @@ include:</p>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">4.9. Guidelines for Contributors</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#coding-style">4.9.1. Coding Style</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#workflow">4.9.2. Workflow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core-modules">4.9.3. Core Modules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#logging">4.9.4. Logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dependency-management">4.9.3. Dependency Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core-modules">4.9.4. Core Modules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logging">4.9.5. Logging</a></li>
 </ul>
 </li>
 </ul>
@@ -474,8 +557,8 @@ include:</p>
 <li class="toctree-l2"><a class="reference internal" href="sm4_glossary.html">7. Glossary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -489,7 +572,7 @@ include:</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

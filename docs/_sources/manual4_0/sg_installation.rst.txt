@@ -182,7 +182,7 @@ migrate.conf
 ------------
 
 This file holds parameters that determine how ShakeMap 3.5 data directories
-are migrated to ShakeMap 4.0-compatible directories via the program
+are migrated to ShakeMap v4-compatible directories via the program
 ``sm_migrate``. This file allows the user to choose which OpenQuake
 GMPE should be used in place of the ShakeMap GMPE previously used
 for each event.

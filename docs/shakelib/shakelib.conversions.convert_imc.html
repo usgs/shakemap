@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.conversions.convert_imc &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,11 +33,11 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.conversions.convert_imc">
-<span id="shakelib-conversions-convert-imc"></span><h1>shakelib.conversions.convert_imc<a class="headerlink" href="#module-shakelib.conversions.convert_imc" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-conversions-convert-imc"></span><h1>shakelib.conversions.convert_imc<a class="headerlink" href="#module-shakelib.conversions.convert_imc" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.conversions.convert_imc.ComponentConverter">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.convert_imc.</span></span><span class="sig-name descname"><span class="pre">ComponentConverter</span></span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.convert_imc.</span></span><span class="sig-name descname"><span class="pre">ComponentConverter</span></span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
 <p>Base class for implementing conversions between components.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="shakelib.conversions.convert_imc.ComponentConverter.checkUnknown">
@@ -52,7 +53,7 @@ to AVERAGE_HORIZONTAL.</p>
 <dd><p>Return an array of amps converted from one IMC to another.</p>
 <p>Note: This can be used to perform chained conversions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
@@ -64,10 +65,10 @@ Default is None.</p></li>
 <li><p><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The earthquake magnitude. Default is None.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A numpy array of converted ground motions.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
@@ -75,11 +76,11 @@ Default is None.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="shakelib.conversions.convert_imc.ComponentConverter.convertAmpsOnce">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">convertAmpsOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertAmpsOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convertAmpsOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertAmpsOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of amps converted from one IMC to another.</p>
 <p>Note: This does not implement chained conversions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
@@ -90,10 +91,10 @@ containing the rupture distances of the ground motions.</p></li>
 <li><p><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The earthquake magnitude.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A numpy array of converted ground motions.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
@@ -106,7 +107,7 @@ containing the rupture distances of the ground motions.</p></li>
 to another.</p>
 <p>Note:  This can be used to perform chained conversions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
@@ -114,10 +115,10 @@ ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
 the logged ground motions.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A numpy array of converted standard deviations.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
@@ -125,12 +126,12 @@ the logged ground motions.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="shakelib.conversions.convert_imc.ComponentConverter.convertSigmasOnce">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">convertSigmasOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigmas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertSigmasOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convertSigmasOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigmas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.convertSigmasOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of standard deviations converted from one IMC
 to another.</p>
 <p>Note: This does not implement chained conversions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
@@ -138,10 +139,10 @@ ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
 the logged ground motions.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A numpy array of converted standard deviations.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
@@ -149,11 +150,11 @@ the logged ground motions.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="shakelib.conversions.convert_imc.ComponentConverter.pathSearch">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">pathSearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imc_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imc_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.pathSearch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.pathSearch" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pathSearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imc_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imc_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imc.html#ComponentConverter.pathSearch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imc.ComponentConverter.pathSearch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method to create a “path” to convert one IMC to another.</p>
 <p>This can be used for chain conversions</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>graph</strong> (<em>Dictionary</em>) – Dictionary of sets describing possible
 conversions between IMCs.</p></li>
@@ -161,10 +162,10 @@ conversions between IMCs.</p></li>
 <li><p><strong>imc_out</strong> (<em>IMC</em>) – Desired OpenQuake IMC type of the output amps.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>IMCs as a path for to convert one IMC to another.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
 </dl>
@@ -176,7 +177,7 @@ conversions between IMCs.</p></li>
 <dd><p>Create a “path” to convert one IMC to another.</p>
 <p>This can be used for chain conversions</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>graph</strong> (<em>Dictionary</em>) – Dictionary of sets describing possible
 conversions between IMCs.</p></li>
@@ -184,13 +185,13 @@ conversions between IMCs.</p></li>
 <li><p><strong>imc_out</strong> (<em>IMC</em>) – Desired OpenQuake IMC type of the output amps.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>IMCs as a path for to convert one IMC to another.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError if no path is found.</strong> – </p>
 </dd>
 </dl>
@@ -202,13 +203,13 @@ conversions between IMCs.</p></li>
 <dd><p>Convert a string to one of the OQ IMC types. Return None if the string
 does not match any of the strings in the Enum.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>imcstring</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string corresponding to one of the OQ IMC types.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>One of the OQ IMC types. Returns None if nothing matches.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>IMC</p>
 </dd>
 </dl>
@@ -242,9 +243,9 @@ does not match any of the strings in the Enum.</p>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -258,7 +259,7 @@ does not match any of the strings in the Enum.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

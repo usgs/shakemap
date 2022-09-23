@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.conversions.imt.bommer_alarcon_2006 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,11 +33,11 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.conversions.imt.bommer_alarcon_2006">
-<span id="shakelib-conversions-imt-bommer-alarcon-2006"></span><h1>shakelib.conversions.imt.bommer_alarcon_2006<a class="headerlink" href="#module-shakelib.conversions.imt.bommer_alarcon_2006" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-conversions-imt-bommer-alarcon-2006"></span><h1>shakelib.conversions.imt.bommer_alarcon_2006<a class="headerlink" href="#module-shakelib.conversions.imt.bommer_alarcon_2006" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.imt.bommer_alarcon_2006.</span></span><span class="sig-name descname"><span class="pre">BommerAlarcon2006</span></span><a class="reference internal" href="../_modules/shakelib/conversions/imt/bommer_alarcon_2006.html#BommerAlarcon2006"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.IMTConverter" title="shakelib.conversions.convert_imt.IMTConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.convert_imt.IMTConverter</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.imt.bommer_alarcon_2006.</span></span><span class="sig-name descname"><span class="pre">BommerAlarcon2006</span></span><a class="reference internal" href="../_modules/shakelib/conversions/imt/bommer_alarcon_2006.html#BommerAlarcon2006"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.IMTConverter" title="shakelib.conversions.convert_imt.IMTConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">IMTConverter</span></code></a></p>
 <p>Class for conversion between PGV (units of cm/s) and PSA05 (units of g)
 by Bommer and Alarcon (2006).</p>
 <ul class="simple">
@@ -52,7 +53,7 @@ ground velocity. Journal of Earthquake Engineering, 10(01), 1-31.
 <span class="sig-name descname"><span class="pre">convertAmps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/bommer_alarcon_2006.html#BommerAlarcon2006.convertAmps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.convertAmps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of converted IMT amplitude values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imt_in</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – OQ intensity measure type. Same as type as the input
 values defined by the imt variable.</p></li>
@@ -62,13 +63,13 @@ be converted to.</p></li>
 ground motions. Valid IMTs are PGV, and SA.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Numpy array of amps converted from imt_in to imt_out.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If not a valid conversion.</p>
 </dd>
 </dl>
@@ -102,9 +103,9 @@ ground motions. Valid IMTs are PGV, and SA.</p></li>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -118,7 +119,7 @@ ground motions. Valid IMTs are PGV, and SA.</p></li>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

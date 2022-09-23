@@ -7,7 +7,7 @@ Software Architecture
 Overview
 ========
 
-ShakeMap 4.0 is designed to allow flexibility in the organization of
+ShakeMap v4 is designed to allow flexibility in the organization of
 computing resources. :num:`Figure #architecture-overview` illustrates an
 idealized implementation where data preparation, processing, and rendering
 all take place within separate computational units. The processing sequence
@@ -619,7 +619,7 @@ list of options.
 sm_migrate
 -----------
 
-Migrates a directory of ShakeMap 3.5 data files into ShakeMap 4.0 inputs.
+Migrates a directory of ShakeMap 3.5 data files into ShakeMap v4 inputs.
 The migration of GMPEs is configurable via the *migrate.conf* configuration
 file.
 

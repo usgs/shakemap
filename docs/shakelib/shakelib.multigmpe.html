@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.multigmpe &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,7 +33,7 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.multigmpe">
-<span id="shakelib-multigmpe"></span><h1>shakelib.multigmpe<a class="headerlink" href="#module-shakelib.multigmpe" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-multigmpe"></span><h1>shakelib.multigmpe<a class="headerlink" href="#module-shakelib.multigmpe" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="shakelib.multigmpe.set_sites_depth_parameters">
 <span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">set_sites_depth_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#set_sites_depth_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.set_sites_depth_parameters" title="Permalink to this definition">¶</a></dt>
@@ -43,13 +44,13 @@ I have submitted an issue to OQ requesting subclasses of these
 methods that do not require the depth parameters in the
 SitesContext to make this easier.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sites</strong> – 1 An OQ sites context.</p></li>
 <li><p><strong>gmpe</strong> – An OQ GMPE instance.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An OQ sites context with the depth parameters set for the
 requested GMPE.</p>
 </dd>
@@ -62,18 +63,18 @@ requested GMPE.</p>
 <dd><p>Function to fill a rupture context with the contents of all of the
 other contexts.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sites</strong> (<em>SiteCollection</em>) – A SiteCollection object.</p></li>
 <li><p><strong>rup</strong> (<em>RuptureContext</em>) – A RuptureContext object.</p></li>
 <li><p><strong>dists</strong> (<em>DistanceContext</em>) – A DistanceContext object.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A new RuptureContext whose attributes are all of
 the elements of the three inputs.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>RuptureContext</p>
 </dd>
 </dl>
@@ -86,12 +87,12 @@ the elements of the three inputs.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">MultiGMPE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openquake.hazardlib.gsim.base.GMPE</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">MultiGMPE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GMPE</span></code></p>
 <p>Implements a GMPE that is the combination of multiple GMPEs.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_TECTONIC_REGION_TYPE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_TECTONIC_REGION_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reference to a
 <code class="xref py py-class docutils literal notranslate"><span class="pre">tectonic</span> <span class="pre">region</span> <span class="pre">type</span></code> this GSIM
 is defined for. One GSIM can implement only one tectonic region type.</p>
@@ -99,7 +100,7 @@ is defined for. One GSIM can implement only one tectonic region type.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of <code class="xref py py-mod docutils literal notranslate"><span class="pre">intensity</span> <span class="pre">measure</span> <span class="pre">types</span></code>
 this GSIM can
 calculate. A set should contain classes from module
@@ -108,16 +109,16 @@ calculate. A set should contain classes from module
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
 <dd><p><cite>intensity measure component type
 &lt;openquake.hazardlib.const.IMC&gt;</cite> this GSIM can calculate mean
 and standard
 deviation for.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Reference to a</p>
 </dd>
-<dt class="field-even">Type</dt>
+<dt class="field-even">Type<span class="colon">:</span></dt>
 <dd class="field-even"><p>class</p>
 </dd>
 </dl>
@@ -125,7 +126,7 @@ deviation for.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({'Total'})</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'Total'})</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of
 <code class="xref py py-class docutils literal notranslate"><span class="pre">standard</span> <span class="pre">deviation</span> <span class="pre">types</span></code>
 this GSIM can calculate.</p>
@@ -133,7 +134,7 @@ this GSIM can calculate.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS">
-<span class="sig-name descname"><span class="pre">REQUIRES_SITES_PARAMETERS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">REQUIRES_SITES_PARAMETERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of site parameters names this GSIM needs. The set should include
 strings that match names of the attributes of a <code class="xref py py-class docutils literal notranslate"><span class="pre">site</span></code> object.
 Those attributes are then available in the
@@ -142,7 +143,7 @@ Those attributes are then available in the
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS">
-<span class="sig-name descname"><span class="pre">REQUIRES_RUPTURE_PARAMETERS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">REQUIRES_RUPTURE_PARAMETERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of rupture parameters (excluding distance information) required
 by GSIM. Supported parameters are:</p>
 <dl class="simple">
@@ -164,7 +165,7 @@ attributes with same names.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES">
-<span class="sig-name descname"><span class="pre">REQUIRES_DISTANCES</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">REQUIRES_DISTANCES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
 <dd><p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dppvalue()</span></code>.
 <code class="docutils literal notranslate"><span class="pre">rvolc</span></code></p>
 <blockquote>
@@ -203,17 +204,17 @@ not.</p>
 <dd><p>Method to remove GMPEs from the GMPE list that are not applicable
 to a specific IMT. Rescales the weights to sum to one.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>gmpes</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of GMPE instances.</p></li>
 <li><p><strong>wts</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of floats indicating the weight of the GMPEs.</p></li>
 <li><p><strong>imt</strong> (<em>IMT</em>) – OQ IMT to filter GMPE list for.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of GMPE instances and list of weights.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
 </dd>
 </dl>
@@ -224,7 +225,7 @@ to a specific IMT. Rescales the weights to sum to one.</p>
 <span class="sig-prename descclassname"><span class="pre">shakelib.multigmpe.</span></span><span class="sig-name descname"><span class="pre">get_gmpe_sa_periods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#get_gmpe_sa_periods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.multigmpe.get_gmpe_sa_periods" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to extract the SA periods defined by a GMPE.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>gmpe</strong> (<em>GMPE</em>) – A GMPE instance.</p>
 </dd>
 </dl>
@@ -248,10 +249,10 @@ table, the range of periods will be the same across all of the
 tables.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>gmpe</strong> (<em>GMPE</em>) – An OQ GMPE instance.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The associated coefficient table.</p>
 </dd>
 </dl>
@@ -283,9 +284,9 @@ tables.</p></li>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -299,7 +300,7 @@ tables.</p></li>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

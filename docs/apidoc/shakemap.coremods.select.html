@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakemap.coremods.select &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,32 +35,32 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.coremods.select">
-<span id="shakemap-coremods-select"></span><h1>shakemap.coremods.select<a class="headerlink" href="#module-shakemap.coremods.select" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-coremods-select"></span><h1>shakemap.coremods.select<a class="headerlink" href="#module-shakemap.coremods.select" title="Permalink to this heading">¶</a></h1>
 <p>Parse STREC output and create/select a GMPE set for an event.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakemap.coremods.select.SelectModule">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.select.</span></span><span class="sig-name descname"><span class="pre">SelectModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/select.html#SelectModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.select.SelectModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.select.</span></span><span class="sig-name descname"><span class="pre">SelectModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/select.html#SelectModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.select.SelectModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreModule</span></code></a></p>
 <p>select - Parse STREC output, make a GMPE set, create model_select.conf.</p>
 <p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakemap.coremods.select.SelectModule.command_name">
-<span class="sig-name descname"><span class="pre">command_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'select'</span></em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.command_name" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">command_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'select'</span></em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakemap.coremods.select.SelectModule.targets">
-<span class="sig-name descname"><span class="pre">targets</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['model_select\\.conf']</span></em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.targets" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">targets</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['model_select\\.conf']</span></em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.targets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakemap.coremods.select.SelectModule.dependencies">
-<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[('event.xml',</span> <span class="pre">True),</span> <span class="pre">('source.text',</span> <span class="pre">False)]</span></em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.dependencies" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('event.xml',</span> <span class="pre">True),</span> <span class="pre">('source.text',</span> <span class="pre">False)]</span></em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakemap.coremods.select.SelectModule.configs">
-<span class="sig-name descname"><span class="pre">configs</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['select.conf']</span></em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.configs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['select.conf']</span></em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.configs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -70,7 +71,7 @@ configuration file, creates a new GMPE set specific to the event,
 and writes model_select.conf in the event’s ‘current’ directory.</p>
 <p>Configuration file: select.conf</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>NotADirectoryError -- the event's current directory doesn't exist</strong> – </p></li>
 <li><p><strong>FileNotFoundError -- the event.xml file doesn't exist</strong> – </p></li>
@@ -109,9 +110,9 @@ and writes model_select.conf in the event’s ‘current’ directory.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.1 API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.assemble.html">shakemap.coremods.assemble</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
@@ -163,7 +164,7 @@ and writes model_select.conf in the event’s ‘current’ directory.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

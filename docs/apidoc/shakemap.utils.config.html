@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakemap.utils.config &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,7 +35,7 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.utils.config">
-<span id="shakemap-utils-config"></span><h1>shakemap.utils.config<a class="headerlink" href="#module-shakemap.utils.config" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-utils-config"></span><h1>shakemap.utils.config<a class="headerlink" href="#module-shakemap.utils.config" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="shakemap.utils.config.get_data_path">
 <span class="sig-prename descclassname"><span class="pre">shakemap.utils.config.</span></span><span class="sig-name descname"><span class="pre">get_data_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_data_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.config.get_data_path" title="Permalink to this definition">¶</a></dt>
@@ -42,10 +43,10 @@
 modelspec.conf, the template config files, and the example config
 files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The full path to the data directory.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
@@ -56,13 +57,13 @@ files.</p>
 <span class="sig-prename descclassname"><span class="pre">shakemap.utils.config.</span></span><span class="sig-name descname"><span class="pre">get_configspec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_configspec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.config.get_configspec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the full path to a ShakeMap config spec file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of config spec to find, or None.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The path to a config spec, or</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
@@ -78,14 +79,14 @@ installation directory; 2) the path to the data directory.</p>
 return the paths to the repository’s test install and data
 directories.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The paths to the ShakeMap install directory
 and the data directory.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>FileNotFoundError -- if the profile file can't be found.</strong> – </p></li>
 <li><p><strong>ValueError -- If the correct profile can't be foun in profiles.conf.</strong> – </p></li>
@@ -113,7 +114,7 @@ and the data directory.</p>
 would return “hello/world”. It is not an error if the original string
 does not contain one or any of the substitution strings.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>s</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string into which the replacements are made.</p></li>
 <li><p><strong>ip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;INSTALL_DIR&gt;.</p></li>
@@ -122,10 +123,10 @@ does not contain one or any of the substitution strings.</p>
 <li><p><strong>ei</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;EVENT_ID&gt;.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A new string with the sub-string replacements.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
@@ -137,10 +138,10 @@ does not contain one or any of the substitution strings.</p>
 <dd><p>Returns a validator suitable for validating the ShakeMap config
 files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A Validator object.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Validator</span></code></p>
 </dd>
 </dl>
@@ -153,7 +154,7 @@ files.</p>
 Throws a RuntimeError exception  upon completion if any errors or
 missing sections are encountered.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>config</strong> (<em>ConfigObj</em>) – The ConfigObj instance representing the
 parsed config.</p></li>
@@ -161,13 +162,13 @@ parsed config.</p></li>
 the ‘config’ arguments.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Nothing</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><strong>RuntimeError</strong></a> – Should always raise this exception.</p>
 </dd>
 </dl>
@@ -180,16 +181,16 @@ the ‘config’ arguments.</p></li>
 in their config file. This function is based on suggested usage in the
 ConfigObj manual.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>config</strong> (<em>ConfigObj</em>) – A ConfigObj instance.</p></li>
 <li><p><strong>logger</strong> (<em>logger</em>) – The logger to which to write complaints.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Nothing</p>
 </dd>
 </dl>
@@ -202,16 +203,16 @@ ConfigObj manual.</p>
 in config are defined in their respective sections. Raises a
 ValidateError exception if an error is encountered.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>config</strong> (<em>ConfigObj</em>) – A ConfigObj instance.</p></li>
 <li><p><strong>logger</strong> (<em>logger</em>) – The logger to which to write complaints.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Nothing</p>
 </dd>
 </dl>
@@ -228,13 +229,13 @@ ValidateError exception if an error is encountered.</p>
 <dd><p>Checks to see if value is a float, or NaN, nan, Inf, -Inf, etc.
 Raises a ValidateError exception on failure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing a float NaN or Inf.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input value converted to its float equivalent.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
 </dd>
 </dl>
@@ -249,14 +250,14 @@ float or a float plus ‘d’ is interpreted as decimal degrees, ‘m’ is
 interpreted as arc-minutes, and ‘c’ is interpreted as arc-seconds.
 Raises a ValidateError exception on failure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing a float or a float appended
 with ‘d’, ‘m’, or ‘c’ (for degrees, minutes, seconds).</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input value converted to decimal degrees.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
 </dd>
 </dl>
@@ -269,13 +270,13 @@ with ‘d’, ‘m’, or ‘c’ (for degrees, minutes, seconds).</p>
 and whose values add up to 1.0.  Raises a ValidateError exception on
 failure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing a list of floats.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input string converted to a list of floats.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
 </dl>
@@ -287,13 +288,13 @@ failure.</p>
 <dd><p>Checks to see if value is a list of floats, including NaN and Inf.
 Raises a ValidateError exception on failure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing a list of floats.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input string converted to a list of floats.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
 </dl>
@@ -306,13 +307,13 @@ Raises a ValidateError exception on failure.</p>
 The entries are not checked for their validity as GMPEs. Raises a
 ValidateError exception on failure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing a list of GMPEs.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input string converted to a list of GMPEs.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
 </dl>
@@ -326,14 +327,14 @@ whose values are valid coordinates in (longitude, longitude,
 latitude, latitude) order. Returns a list upon success; raises a
 ValidateError exception on failure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing a list of geographic
 coordinates.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input string converted to a list of floats.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
 </dl>
@@ -346,13 +347,13 @@ coordinates.</p>
 Raises a ValidateError exception on failure. Does macro substitution
 of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing the path to a file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input string.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
@@ -365,13 +366,13 @@ of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
 Raises a ValidateError exception on failure. Does macro substitution
 of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing the path to a directory.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input string.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
@@ -384,13 +385,13 @@ of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
 ‘automatic’, ‘released’, or ‘reviewed.  Raises a ValidateError
 exception on failure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A status string.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input string. ‘automatic’ is returned if value is empty.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </dd>
 </dl>
@@ -403,17 +404,17 @@ exception on failure.</p>
 of floats. Raises ValidateError if the input can’t be
 converted to a list of floats.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A string or list of strings to be
 converted to a list of floats.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input converted to a list of floats.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValidateError</strong> – </p>
 </dd>
 </dl>
@@ -425,16 +426,16 @@ converted to a list of floats.</p>
 <dd><p>Converts (if possible) the input string to a float. Raises
 ValidateError if the input can’t be converted to a float.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string to be converted to a float.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input converted to a float.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValidateError</strong> – </p>
 </dd>
 </dl>
@@ -446,16 +447,16 @@ ValidateError if the input can’t be converted to a float.</p>
 <dd><p>Converts (if possible) the input string to a bool. Raises
 ValidateError if the input can’t be converted to a bool.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string to be converted to a bool.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The input converted to a bool.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValidateError</strong> – </p>
 </dd>
 </dl>
@@ -468,7 +469,7 @@ ValidateError if the input can’t be converted to a bool.</p>
 (otherwise exit) and the paths for each profile should exist, otherwise the
 profile entry is removed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config</strong> (<em>ConfigObj</em>) – The ConfigObj instance.</p>
 </dd>
 </dl>
@@ -500,9 +501,9 @@ profile entry is removed.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.1 API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
@@ -534,7 +535,7 @@ profile entry is removed.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

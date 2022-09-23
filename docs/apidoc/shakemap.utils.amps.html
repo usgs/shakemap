@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakemap.utils.amps &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,10 +35,10 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.utils.amps">
-<span id="shakemap-utils-amps"></span><h1>shakemap.utils.amps<a class="headerlink" href="#module-shakemap.utils.amps" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-utils-amps"></span><h1>shakemap.utils.amps<a class="headerlink" href="#module-shakemap.utils.amps" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></span><span class="sig-name descname"><span class="pre">AmplitudeHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">install_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></span><span class="sig-name descname"><span class="pre">AmplitudeHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">install_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Store and associate strong motion peak amplitudes with
 earthquake events.</p>
@@ -54,7 +55,7 @@ earthquake events.</p>
 <dd><p>Insert an event into the database.</p>
 <p>A directory with name of event[‘id’] should exist in data_path.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>event</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – <p>Dictionary containing fields:
 - id: Event ID (i.e., us2008abcd).
@@ -76,10 +77,10 @@ earthquake events.</p>
 insert a new event (False)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
 </dl>
@@ -90,15 +91,15 @@ insert a new event (False)</p></li>
 <span class="sig-name descname"><span class="pre">getEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.getEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.getEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the event parameters for the specified event.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>eventid</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The id of the event to query</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A dictionary of the columns of the table and
 their values for the the event; a None is
 returned if the event is not in the database.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dictionary</p>
 </dd>
 </dl>
@@ -109,13 +110,13 @@ returned if the event is not in the database.</p>
 <span class="sig-name descname"><span class="pre">deleteEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.deleteEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.deleteEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete the event from the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>eventid</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The id of the event to delete</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
 </dl>
@@ -127,13 +128,13 @@ returned if the event is not in the database.</p>
 <dd><p>Return all the rows from the event table where the ‘repeats’ column
 is not NULL.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>none</strong> – </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of tuples of (eventid, origin_time, [repeats]).</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a>)</p>
 </dd>
 </dl>
@@ -147,16 +148,16 @@ write station XML to file system.</p>
 <p>Ground motion records associated with events will be deleted
 from the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>pretty_print</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Writes more human-readable XML, but is
 slower and writes larger files. False
 by default.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The event IDs of the events for which associated data
 were found.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
 </dl>
@@ -170,7 +171,7 @@ write station XML to file system.</p>
 <p>Ground motion records associated with events will be deleted
 from the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>eventid</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The event ID of the event to associate</p></li>
 <li><p><strong>pretty_print</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Writes more human-readable XML, but is
@@ -178,11 +179,11 @@ slower and writes larger files. False
 by default.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of amps associated with the specified event.
 -1 is returned if the event is not found in the database.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)">int</a></p>
 </dd>
 </dl>
@@ -197,14 +198,14 @@ database. Note that in the case of duplicate stations, the amps from
 only one will
 be used, any others will be deleted from the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>eqtime</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Unix timestamp of earthquake origin.</p></li>
 <li><p><strong>eqlat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Latitude of earthquake origin.</p></li>
 <li><p><strong>eqlon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Longitude of earthquake origin.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>A list of amps associated with the event. Each row in the
 list has the following columns:</p>
 <blockquote>
@@ -224,7 +225,7 @@ list has the following columns:</p>
 </div></blockquote>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
 </dd>
 </dl>
@@ -236,7 +237,7 @@ list has the following columns:</p>
 <dd><p>Write the list of tuples as an XML file in the event’s
 current directory.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data_list</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – <p>A list of tuples with the following
 elements:</p>
@@ -261,10 +262,10 @@ be somewhat larger and writing will be
 somewhat slower.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Nothing.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>nothing</p>
 </dd>
 </dl>
@@ -275,7 +276,7 @@ somewhat slower.</p></li>
 <span class="sig-name descname"><span class="pre">insertAmps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xmlfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.insertAmps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.insertAmps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert data from amps file into database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>xmlfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – XML file containing peak ground motion data.</p>
 </dd>
 </dl>
@@ -287,14 +288,14 @@ somewhat slower.</p></li>
 <dd><p>Clean out amplitude data that is older than the threshold
 number of days.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>threshold</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum age in days of amplitude data in
 the database.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of stations deleted.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)">int</a></p>
 </dd>
 </dl>
@@ -306,13 +307,13 @@ the database.</p>
 <dd><p>Clean out event data that is older than the threshold number
 of days.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>threshold</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum age in days of events in the database.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of events deleted.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)">int</a></p>
 </dd>
 </dl>
@@ -323,7 +324,7 @@ of days.</p>
 <span class="sig-name descname"><span class="pre">getStats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.getStats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.getStats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get summary statistics about the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>Fields:</p>
 <blockquote>
 <div><ul class="simple">
@@ -347,7 +348,7 @@ of days.</p>
 </div></blockquote>
 </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
 </dd>
 </dl>
@@ -397,9 +398,9 @@ of days.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.1 API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.amps</a></li>
@@ -431,7 +432,7 @@ of days.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakemap.utils.layers &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,13 +35,13 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.utils.layers">
-<span id="shakemap-utils-layers"></span><h1>shakemap.utils.layers<a class="headerlink" href="#module-shakemap.utils.layers" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-utils-layers"></span><h1>shakemap.utils.layers<a class="headerlink" href="#module-shakemap.utils.layers" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="shakemap.utils.layers.validate_config">
 <span class="sig-prename descclassname"><span class="pre">shakemap.utils.layers.</span></span><span class="sig-name descname"><span class="pre">validate_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mydict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_data_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/layers.html#validate_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.layers.validate_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively validate select.conf.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mydict</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Full or partial config dictionary.</p></li>
 <li><p><strong>install_path</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – </p></li>
@@ -55,18 +56,18 @@
 <dd><p>Return the distance from a point to the nearest edge of a
 polygon.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</p></li>
 <li><p><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</p></li>
 <li><p><strong>poly</strong> (<em>Polygon</em>) – An instance of a shapely Polygon.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The distance (in km) from the reference point to the
 nearest edge (or vertex) of the polygon.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
 </dd>
 </dl>
@@ -81,7 +82,7 @@ greater than 5000 km from the point, the point cannot be inside the
 polygon and the distance reported will be the distance to the nearest
 edge. So don’t make polygons too big.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</p></li>
 <li><p><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</p></li>
@@ -89,12 +90,12 @@ edge. So don’t make polygons too big.</p>
 or MultiPolygon.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The distance (in km) from the reference point to the
 nearest polygon in the layer. The distance will be zero if the
 point lies inside the polygon.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></p>
 </dd>
 </dl>
@@ -113,7 +114,7 @@ nearest edge. So don’t make polygons too big.</p>
 extensions), and should contain either a single POLYGON or
 MULTIPOLYGON object. The layer name will be the file’s basename.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>elon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The longitude of the reference point.</p></li>
 <li><p><strong>elat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The latitude of the reference point.</p></li>
@@ -121,13 +122,13 @@ MULTIPOLYGON object. The layer name will be the file’s basename.</p>
 files.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A dictionary where the keys are the layer names, and the
 values are the distance (in km) from the reference point to the
 nearest polygon in the layer. The distance will be zero if the
 point lies inside the polygon.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
 </dd>
 </dl>
@@ -164,9 +165,9 @@ point lies inside the polygon.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.1 API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
@@ -198,7 +199,7 @@ point lies inside the polygon.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

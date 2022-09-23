@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakemap.coremods.contour &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -34,11 +35,11 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.coremods.contour">
-<span id="shakemap-coremods-contour"></span><h1>shakemap.coremods.contour<a class="headerlink" href="#module-shakemap.coremods.contour" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-coremods-contour"></span><h1>shakemap.coremods.contour<a class="headerlink" href="#module-shakemap.coremods.contour" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakemap.coremods.contour.ContourModule">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.contour.</span></span><span class="sig-name descname"><span class="pre">ContourModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#ContourModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.contour.ContourModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.contour.</span></span><span class="sig-name descname"><span class="pre">ContourModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#ContourModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.contour.ContourModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreModule</span></code></a></p>
 <dl class="simple">
 <dt>contour – Generate contours of all IMT values from the</dt><dd><p>shake_result.hdf output file.</p>
 </dd>
@@ -46,17 +47,17 @@
 <p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakemap.coremods.contour.ContourModule.command_name">
-<span class="sig-name descname"><span class="pre">command_name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'contour'</span></em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.command_name" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">command_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'contour'</span></em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakemap.coremods.contour.ContourModule.targets">
-<span class="sig-name descname"><span class="pre">targets</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['products/cont_.*\\.json']</span></em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.targets" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">targets</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['products/cont_.*\\.json']</span></em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.targets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakemap.coremods.contour.ContourModule.dependencies">
-<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[('products/shake_result.hdf',</span> <span class="pre">True)]</span></em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.dependencies" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('products/shake_result.hdf',</span> <span class="pre">True)]</span></em><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -64,7 +65,7 @@
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#ContourModule.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.contour.ContourModule.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create contour files for all configured IMT values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#NotADirectoryError" title="(in Python v3.6)"><strong>NotADirectoryError</strong></a> – When the event data directory does not exist.</p></li>
 <li><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#FileNotFoundError" title="(in Python v3.6)"><strong>FileNotFoundError</strong></a> – When the the shake_result HDF file does not
@@ -81,7 +82,7 @@
 <span class="sig-prename descclassname"><span class="pre">shakemap.coremods.contour.</span></span><span class="sig-name descname"><span class="pre">contour_to_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#contour_to_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.contour.contour_to_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate contours of all IMT values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – ShakeMapOutputContainer with
 ShakeMap output data.</p></li>
@@ -89,7 +90,7 @@ ShakeMap output data.</p></li>
 <li><p><strong>logger</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/logging.html#logging.Logger" title="(in Python v3.6)"><em>logging.Logger</em></a>) – Python logging Logger instance.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#LookupError" title="(in Python v3.6)"><strong>LookupError</strong></a> – When configured file format is not supported</p>
 </dd>
 </dl>
@@ -121,9 +122,9 @@ ShakeMap output data.</p></li>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0 API</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.1 API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.assemble.html">shakemap.coremods.assemble</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
@@ -175,7 +176,7 @@ ShakeMap output data.</p></li>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

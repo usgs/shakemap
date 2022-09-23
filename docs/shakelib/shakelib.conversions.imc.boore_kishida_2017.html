@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.conversions.imc.boore_kishida_2017 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,13 +33,13 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.conversions.imc.boore_kishida_2017">
-<span id="shakelib-conversions-imc-boore-kishida-2017"></span><h1>shakelib.conversions.imc.boore_kishida_2017<a class="headerlink" href="#module-shakelib.conversions.imc.boore_kishida_2017" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-conversions-imc-boore-kishida-2017"></span><h1>shakelib.conversions.imc.boore_kishida_2017<a class="headerlink" href="#module-shakelib.conversions.imc.boore_kishida_2017" title="Permalink to this heading">¶</a></h1>
 <p>Module implements BooreKishida2017 class to convert between various
 horizontal intensity measure components.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.imc.boore_kishida_2017.</span></span><span class="sig-name descname"><span class="pre">BooreKishida2017</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imc_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imc_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter" title="shakelib.conversions.convert_imc.ComponentConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.convert_imc.ComponentConverter</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.imc.boore_kishida_2017.</span></span><span class="sig-name descname"><span class="pre">BooreKishida2017</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imc_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imc_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter" title="shakelib.conversions.convert_imc.ComponentConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentConverter</span></code></a></p>
 <p>This class implements the Boore and Kishida (2017) conversions for
 horizontal intensity measure components.</p>
 <p>This class explicitly supports the following subset of the conversions
@@ -80,7 +81,7 @@ of America, 96(4A), 1512-1522.</p>
 <span class="sig-name descname"><span class="pre">convertAmpsOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertAmpsOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of amps converted from one IMC to another.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
@@ -91,13 +92,13 @@ containing the rupture distances of the ground motions.</p></li>
 <li><p><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The earthquake magnitude.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A numpy array of converted ground motions (logged).</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If mag and rrup are none or the IMT</p></li>
 <li><p><strong>is not an allowed type.</strong> – </p></li>
@@ -117,7 +118,7 @@ to another and then back again will yield the original ground
 motions via convertAmps(), the standard deviations will be
 inflated by both conversions via this method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
@@ -125,13 +126,13 @@ ground motions. Valid IMTs are PGA, PGV, and SA.</p></li>
 the logged ground motions.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A numpy array of converted standard deviations.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If mag and rrup are none or the IMT</p></li>
 <li><p><strong>is not an allowed type.</strong> – </p></li>
@@ -168,9 +169,9 @@ the logged ground motions.</p></li>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -184,7 +185,7 @@ the logged ground motions.</p></li>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

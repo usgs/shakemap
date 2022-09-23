@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>shakelib.correlation.ccf_base &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -32,18 +33,18 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.correlation.ccf_base">
-<span id="shakelib-correlation-ccf-base"></span><h1>shakelib.correlation.ccf_base<a class="headerlink" href="#module-shakelib.correlation.ccf_base" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-correlation-ccf-base"></span><h1>shakelib.correlation.ccf_base<a class="headerlink" href="#module-shakelib.correlation.ccf_base" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="shakelib.correlation.ccf_base.CrossCorrelationBase">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">shakelib.correlation.ccf_base.</span></span><span class="sig-name descname"><span class="pre">CrossCorrelationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/ccf_base.html#CrossCorrelationBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.ccf_base.CrossCorrelationBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.correlation.ccf_base.</span></span><span class="sig-name descname"><span class="pre">CrossCorrelationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/ccf_base.html#CrossCorrelationBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.ccf_base.CrossCorrelationBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
 <p>The abstract base class of cross-correlation functions.</p>
 <p>The derived class should take an array of periods as its single
 argument. These are the periods to which the index arrays of the
 getCorrelation() method will refer.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="shakelib.correlation.ccf_base.CrossCorrelationBase.getCorrelation">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">getCorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ix1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/ccf_base.html#CrossCorrelationBase.getCorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.ccf_base.CrossCorrelationBase.getCorrelation" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getCorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ix1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/ccf_base.html#CrossCorrelationBase.getCorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.ccf_base.CrossCorrelationBase.getCorrelation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the correlation between two periods and a separation distance
 of h km. ix1 and ix2 give the indices into the array of periods that
 is provided to the class constructor. The code is implemented in this
@@ -55,7 +56,7 @@ indices may be equal, and there is no restriction on which one is
 larger. The indices refer to periods in the ‘period’ argument to the
 class constructor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ix1</strong> (<em>ndarray</em>) – The indices of the first period of interest.</p></li>
 <li><p><strong>ix2</strong> (<em>ndarrays</em>) – The indices of the second period of interest.</p></li>
@@ -64,11 +65,11 @@ The result is placed in h, so h must be copied if it is
 to be preserved.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The predicted correlation coefficient. The output
 array will have the same shape as the inputs.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>h (ndarray)</p>
 </dd>
 </dl>
@@ -102,9 +103,9 @@ array will have the same shape as the inputs.</p>
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -118,7 +119,7 @@ array will have the same shape as the inputs.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

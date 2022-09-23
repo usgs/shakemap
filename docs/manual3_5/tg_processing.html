@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>2.5. ShakeMap Processing &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -39,7 +40,7 @@
 Manual</a>.</p>
 </div>
 <section id="shakemap-processing">
-<span id="sec-shakemap-processing"></span><h1><span class="section-number">2.5. </span>ShakeMap Processing<a class="headerlink" href="#shakemap-processing" title="Permalink to this headline">¶</a></h1>
+<span id="sec-shakemap-processing"></span><h1><span class="section-number">2.5. </span>ShakeMap Processing<a class="headerlink" href="#shakemap-processing" title="Permalink to this heading">¶</a></h1>
 <p>As discussed in the <a class="reference internal" href="users_guide.html#users-guide"><span class="std std-ref">User’s Guide</span></a>, ShakeMap produces a range of output products.
 However, ShakeMap’s primary outputs are grids of interpolated ground motions, from
 which the other grids, contours, and maps are derived. Interpolated grids are produced for
@@ -91,7 +92,7 @@ a schematic of the key processing steps.</p>
 <p>The sections that follow provide a more complete description of the processing steps outlined
 above.</p>
 <section id="data-preparation">
-<h2><span class="section-number">2.5.1. </span>Data preparation<a class="headerlink" href="#data-preparation" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.1. </span>Data preparation<a class="headerlink" href="#data-preparation" title="Permalink to this heading">¶</a></h2>
 <p>The first step in processing is the preparation of the parametric data. As discussed in the
 <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>, ground motion amplitudes are provided to ShakeMap in the form of
 Extended Markup Language (XML) files. Note that we describe here the behavior of
@@ -139,7 +140,7 @@ amplitude of each ground-motion parameter is used by ShakeMap.</p>
 input data. Please see the relevant section of the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>
 for complete information.</p>
 <section id="flagged-stations">
-<h3><span class="section-number">2.5.1.1. </span>Flagged Stations<a class="headerlink" href="#flagged-stations" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.1.1. </span>Flagged Stations<a class="headerlink" href="#flagged-stations" title="Permalink to this heading">¶</a></h3>
 <p>If the “flag” attribute of any amplitude in the input XML is non-null and non-zero, then
 all components of that station are flagged as unusable. The reasoning here is that for a
 given data stream, the typical network errors (telemetry glitch, incomplete data, off-scale
@@ -168,7 +169,7 @@ Number reflects separate offline processing for this Manual.</span><a class="hea
 </figure>
 </section>
 <section id="converting-mmi-to-pgm-and-pgm-to-mmi">
-<h3><span class="section-number">2.5.1.2. </span>Converting MMI to PGM and PGM to MMI<a class="headerlink" href="#converting-mmi-to-pgm-and-pgm-to-mmi" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.1.2. </span>Converting MMI to PGM and PGM to MMI<a class="headerlink" href="#converting-mmi-to-pgm-and-pgm-to-mmi" title="Permalink to this heading">¶</a></h3>
 <p>Once the input data have been read and peak amplitudes assigned for each station (which
 may be null if the data are flagged), intensities are derived from the peak
 amplitudes and peak amplitudes are derived from the intensities using the GMICEs
@@ -179,7 +180,7 @@ these low intensities introduced a significant source of error in the interpolat
 due to the very wide range (and overlap) of ground motions that can produce MMIs lower than III or IV.</p>
 </section>
 <section id="site-corrections">
-<h3><span class="section-number">2.5.1.3. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.1.3. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this heading">¶</a></h3>
 <p>Near-surface conditions can have a substantial effect on ground motions. Ground motions
 at soft-soil sites, for instance, will typically be amplified relative to sites on bedrock.
 Because we wish to interpolate sparse data to a grid over which site characteristics may
@@ -194,7 +195,7 @@ convention and use Vs30-based amplification terms to account for site amplificat
 In <a class="reference internal" href="future_directions.html#future-directions"><span class="std std-ref">Future Directions</span></a>, we suggest alternative approaches that require additional
 site information beyond Vs30.</p>
 <section id="site-characterization-map">
-<h4><span class="section-number">2.5.1.3.1. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">2.5.1.3.1. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this heading">¶</a></h4>
 <p>Each region wishing to implement ShakeMap should have a Vs30 map that covers the
 entire area they wish to map.  Using the Jan. 17, 1994, M6.7 Northridge, California
 earthquake ShakeMap as an example (<a class="pageref" href="#figure1-4">Figure  3</a>), we present,
@@ -263,7 +264,7 @@ anticipated that aggregated Vs30 data provided by
 <a class="reference internal" href="../manual4_0/sm4_references.html#yong2015"><span class="std std-ref">Yong et al. (2015)</span></a> will facilitate further map development of other portions of the U.S.</p>
 </section>
 <section id="amplification-factors">
-<h4><span class="section-number">2.5.1.3.2. </span>Amplification Factors<a class="headerlink" href="#amplification-factors" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">2.5.1.3.2. </span>Amplification Factors<a class="headerlink" href="#amplification-factors" title="Permalink to this heading">¶</a></h4>
 <p>ShakeMap provides two operator-selectable methods for determining the factors used to
 amplify and de-amplify ground motions based on Vs30. The first is to apply the
 frequency- and amplitude-dependent factors, such as those determined by
@@ -276,7 +277,7 @@ choices and their behavior with respect to other user-configurable parameters ar
 discussed in the <a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a>.</p>
 </section>
 <section id="correct-data-to-rock">
-<h4><span class="section-number">2.5.1.3.3. </span>Correct Data to “Rock”<a class="headerlink" href="#correct-data-to-rock" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">2.5.1.3.3. </span>Correct Data to “Rock”<a class="headerlink" href="#correct-data-to-rock" title="Permalink to this heading">¶</a></h4>
 <p>If, as is usually the case, the operator has opted to apply site amplification (via the <em>-qtm</em>
 option to <em>grind</em>), the ground-motion observations are corrected (de-amplified) to “rock”.
 (The Vs30 of “rock” is specified with the parameter ‘smVs30default’ in <em>grind.conf</em>.) See
@@ -327,7 +328,7 @@ data. Currently, basin amplifications are not applied to MMI.</p>
 </section>
 </section>
 <section id="event-bias">
-<span id="sec-event-bias"></span><h2><span class="section-number">2.5.2. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this headline">¶</a></h2>
+<span id="sec-event-bias"></span><h2><span class="section-number">2.5.2. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this heading">¶</a></h2>
 <p>ShakeMap uses ground motion prediction equations (GMPEs) and, optionally, intensity prediction
 equations (IPEs) to supplement sparse data in its interpolation and estimation of ground
 motions. If sufficient data are available, we compute an event bias that effectively
@@ -415,7 +416,7 @@ shown in the data-rich, best-constrained map (D).</span><a class="headerlink" hr
 </figure>
 </section>
 <section id="interpolation">
-<span id="sec-interpolation"></span><h2><span class="section-number">2.5.3. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h2>
+<span id="sec-interpolation"></span><h2><span class="section-number">2.5.3. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this heading">¶</a></h2>
 <p>The interpolation procedure is described in detail in <a class="reference internal" href="../manual4_0/sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2010)</span></a>. Here we
 summarize it only briefly.</p>
 <p>To compute an estimate of ground motion at a given point in the latitude-longitude grid,
@@ -463,7 +464,7 @@ byproduct of the interpolation process. Again, <a class="reference internal" hre
 details.</p>
 </section>
 <section id="amplify-ground-motions">
-<span id="id1"></span><h2><span class="section-number">2.5.4. </span>Amplify Ground Motions<a class="headerlink" href="#amplify-ground-motions" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2><span class="section-number">2.5.4. </span>Amplify Ground Motions<a class="headerlink" href="#amplify-ground-motions" title="Permalink to this heading">¶</a></h2>
 <p>At this point, ShakeMap has produced interpolated grids of ground motions (and
 intensities) at a site class specified as “rock.” If the operator has specified the <em>-basement</em>
 option to <em>grind</em> (and supplied the necessary depth-to-basement file), a
@@ -471,7 +472,7 @@ basin amplification function (currently <a class="reference internal" href="../m
 specified <em>-qtm</em>, site amplifications are applied to the grids, creating the final output.</p>
 </section>
 <section id="differences-in-handling-mmi">
-<h2><span class="section-number">2.5.5. </span>Differences in Handling MMI<a class="headerlink" href="#differences-in-handling-mmi" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.5. </span>Differences in Handling MMI<a class="headerlink" href="#differences-in-handling-mmi" title="Permalink to this heading">¶</a></h2>
 <p>The processing of MMI is designed to be identical to the processing of PGM; however, a
 few differences remain:</p>
 <ol class="arabic simple">
@@ -513,7 +514,7 @@ available are also those within which station density is great
 </ol>
 </section>
 <section id="fault-considerations">
-<h2><span class="section-number">2.5.6. </span>Fault Considerations<a class="headerlink" href="#fault-considerations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.6. </span>Fault Considerations<a class="headerlink" href="#fault-considerations" title="Permalink to this heading">¶</a></h2>
 <p>Small-to-moderate earthquakes can be effectively characterized as a point source, with
 distances being calculated from the hypocenter (or epicenter, depending on the GMPE).
 But accurate prediction of ground motions from larger earthquakes requires knowledge of
@@ -527,7 +528,7 @@ distance calculation to accommodate the unknown fault geometry. We also allow th
 operator to specify a finite fault, as discussed in sections <a class="reference internal" href="#sec-fault-dimensions"><span class="std std-ref">Fault Dimensions</span></a>
 and <a class="reference internal" href="#sec-directivity"><span class="std std-ref">Directivity</span></a>.</p>
 <section id="median-distance-and-finite-faults">
-<span id="sec-median-distance"></span><h3><span class="section-number">2.5.6.1. </span>Median Distance and Finite Faults<a class="headerlink" href="#median-distance-and-finite-faults" title="Permalink to this headline">¶</a></h3>
+<span id="sec-median-distance"></span><h3><span class="section-number">2.5.6.1. </span>Median Distance and Finite Faults<a class="headerlink" href="#median-distance-and-finite-faults" title="Permalink to this heading">¶</a></h3>
 <p>As discussed in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>, the user may specify a
 finite fault to guide the
 estimates of the GMPE, but often a fault model is not available for some time following
@@ -581,7 +582,7 @@ Northridge earthquake, the dimensions of the rupture are constrained from analys
 the earthquake source (e.g., <a class="reference internal" href="../manual4_0/sm4_references.html#wald1996"><span class="std std-ref">Wald et al., 1996</span></a>).</p>
 </section>
 <section id="fault-dimensions">
-<span id="sec-fault-dimensions"></span><h3><span class="section-number">2.5.6.2. </span>Fault Dimensions<a class="headerlink" href="#fault-dimensions" title="Permalink to this headline">¶</a></h3>
+<span id="sec-fault-dimensions"></span><h3><span class="section-number">2.5.6.2. </span>Fault Dimensions<a class="headerlink" href="#fault-dimensions" title="Permalink to this heading">¶</a></h3>
 <p>The <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a> describes the format for specifying a
 fault. Essentially, ShakeMap
 faults are one or more (connected or disconnected) planar quadrilaterals. The fault
@@ -606,7 +607,7 @@ influence of the estimated ground motion at each grid point, obviating the need 
 fault geometries in such estimates.</p>
 </section>
 <section id="directivity">
-<span id="sec-directivity"></span><h3><span class="section-number">2.5.6.3. </span>Directivity<a class="headerlink" href="#directivity" title="Permalink to this headline">¶</a></h3>
+<span id="sec-directivity"></span><h3><span class="section-number">2.5.6.3. </span>Directivity<a class="headerlink" href="#directivity" title="Permalink to this heading">¶</a></h3>
 <p>Another way in which a finite fault may affect the estimated ground motions is through
 directivity. Where a finite fault has been defined in ShakeMap, one may choose to apply
 a correction for rupture directivity. We use the approach developed
@@ -638,14 +639,14 @@ PGV, No Directivity; and D) PGV, Directivity added.</span><a class="headerlink" 
 </section>
 </section>
 <section id="additional-considerations">
-<h2><span class="section-number">2.5.7. </span>Additional Considerations<a class="headerlink" href="#additional-considerations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.7. </span>Additional Considerations<a class="headerlink" href="#additional-considerations" title="Permalink to this heading">¶</a></h2>
 <p>There are a great number of details and options when running <em>grind</em>. Operators should
 familiarize themselves with <em>grind</em> ’s behavior by reading the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>,
 the configuration file (<em>grind.conf</em>), and the program’s
 self-documentation (run “<em>grind -help</em>”).
 Below are a few other characteristics of <em>grind</em> that the operator should be familiar with.</p>
 <section id="user-supplied-estimate-grids">
-<h3><span class="section-number">2.5.7.1. </span>User-supplied Estimate Grids<a class="headerlink" href="#user-supplied-estimate-grids" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.7.1. </span>User-supplied Estimate Grids<a class="headerlink" href="#user-supplied-estimate-grids" title="Permalink to this heading">¶</a></h3>
 <p>Much of the discussion above was centered on the use of GMPEs (and IPEs) and getting
 the best set of estimates from them (through bias, basin corrections, finite faults, and directivity).
 But the users may also supply their own grids of estimates for any or all of the ground motion
@@ -664,7 +665,7 @@ visualize and employ familiar ShakeMap products. For instance, see the
 ShakeCast scenario described in <a class="reference internal" href="shakemap_applications.html#sec-shakemap-applications"><span class="std std-ref">Applications of ShakeMap</span></a>.</p>
 </section>
 <section id="uncertainty">
-<h3><span class="section-number">2.5.7.2. </span>Uncertainty<a class="headerlink" href="#uncertainty" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.7.2. </span>Uncertainty<a class="headerlink" href="#uncertainty" title="Permalink to this heading">¶</a></h3>
 <p>As mentioned above, some of the products of <em>grind</em> are grids of uncertainty for each
 parameter. This uncertainty is the result of a weighted average combination of the
 uncertainties of the various inputs (observations, converted observations, and estimates)
@@ -729,9 +730,9 @@ system described in the <a class="reference internal" href="users_guide.html#use
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual (Deprecated)</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
@@ -793,7 +794,7 @@ system described in the <a class="reference internal" href="users_guide.html#use
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
