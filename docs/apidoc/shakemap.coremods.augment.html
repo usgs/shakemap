@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.coremods.augment &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,11 +35,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-shakemap.coremods.augment">
-<span id="shakemap-coremods-augment"></span><h1>shakemap.coremods.augment<a class="headerlink" href="#module-shakemap.coremods.augment" title="Permalink to this heading">¶</a></h1>
+  <section id="shakemap-coremods-augment">
+<h1>shakemap.coremods.augment<a class="headerlink" href="#shakemap-coremods-augment" title="Permalink to this heading">¶</a></h1>
 <p>Reads shake_data.hdf from the event’s current directory and adds local
 configs, data, etc., then writes a new shake_data.hdf.</p>
-<dl class="py class">
+<span class="target" id="module-shakemap.coremods.augment"></span><dl class="py class">
 <dt class="sig sig-object py" id="shakemap.coremods.augment.AugmentModule">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.augment.</span></span><span class="sig-name descname"><span class="pre">AugmentModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreModule</span></code></a></p>
@@ -113,7 +114,15 @@ differs from the originator in the previous line of the history.</p>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.assemble.html">shakemap.coremods.assemble</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.augment</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.augment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.augment.AugmentModule"><code class="docutils literal notranslate"><span class="pre">AugmentModule</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.augment.AugmentModule.command_name"><code class="docutils literal notranslate"><span class="pre">AugmentModule.command_name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.augment.AugmentModule.execute"><code class="docutils literal notranslate"><span class="pre">AugmentModule.execute()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.augment.AugmentModule.parseArgs"><code class="docutils literal notranslate"><span class="pre">AugmentModule.parseArgs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.base.html">shakemap.coremods.base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.contour.html">shakemap.coremods.contour</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.coverage.html">shakemap.coremods.coverage</a></li>

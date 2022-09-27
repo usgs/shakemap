@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.coremods.base &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -139,7 +140,25 @@ it will need to override this module.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.assemble.html">shakemap.coremods.assemble</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.augment.html">shakemap.coremods.augment</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.base</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.base</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.base.CoreModule"><code class="docutils literal notranslate"><span class="pre">CoreModule</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.CoreModule.command_name"><code class="docutils literal notranslate"><span class="pre">CoreModule.command_name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.CoreModule.targets"><code class="docutils literal notranslate"><span class="pre">CoreModule.targets</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.CoreModule.dependencies"><code class="docutils literal notranslate"><span class="pre">CoreModule.dependencies</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.CoreModule.configs"><code class="docutils literal notranslate"><span class="pre">CoreModule.configs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.CoreModule.execute"><code class="docutils literal notranslate"><span class="pre">CoreModule.execute()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.CoreModule.parseArgs"><code class="docutils literal notranslate"><span class="pre">CoreModule.parseArgs()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.CoreModule.writeContents"><code class="docutils literal notranslate"><span class="pre">CoreModule.writeContents()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.base.Contents"><code class="docutils literal notranslate"><span class="pre">Contents</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.Contents.addFile"><code class="docutils literal notranslate"><span class="pre">Contents.addFile()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.Contents.readContents"><code class="docutils literal notranslate"><span class="pre">Contents.readContents()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.base.Contents.writeContents"><code class="docutils literal notranslate"><span class="pre">Contents.writeContents()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.contour.html">shakemap.coremods.contour</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.coverage.html">shakemap.coremods.coverage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
