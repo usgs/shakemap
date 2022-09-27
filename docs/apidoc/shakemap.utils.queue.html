@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.utils.queue &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -479,7 +480,42 @@ a fresh start.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.queue</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.queue</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.queue.send_queue"><code class="docutils literal notranslate"><span class="pre">send_queue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.queue.str_to_seconds"><code class="docutils literal notranslate"><span class="pre">str_to_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.queue.parse_config"><code class="docutils literal notranslate"><span class="pre">parse_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.queue.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.queue.Queue"><code class="docutils literal notranslate"><span class="pre">Queue</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.queueMainLoop"><code class="docutils literal notranslate"><span class="pre">Queue.queueMainLoop()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.doPeriodicTasks"><code class="docutils literal notranslate"><span class="pre">Queue.doPeriodicTasks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.getLogger"><code class="docutils literal notranslate"><span class="pre">Queue.getLogger()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.associateAll"><code class="docutils literal notranslate"><span class="pre">Queue.associateAll()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.writeEventXml"><code class="docutils literal notranslate"><span class="pre">Queue.writeEventXml()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.moveEventDirectory"><code class="docutils literal notranslate"><span class="pre">Queue.moveEventDirectory()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.processOrigin"><code class="docutils literal notranslate"><span class="pre">Queue.processOrigin()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.processOther"><code class="docutils literal notranslate"><span class="pre">Queue.processOther()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.processCancel"><code class="docutils literal notranslate"><span class="pre">Queue.processCancel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.magnitudeTooSmall"><code class="docutils literal notranslate"><span class="pre">Queue.magnitudeTooSmall()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.eventTooOldOrInFuture"><code class="docutils literal notranslate"><span class="pre">Queue.eventTooOldOrInFuture()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.dispatchEvent"><code class="docutils literal notranslate"><span class="pre">Queue.dispatchEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.runQueuedEvents"><code class="docutils literal notranslate"><span class="pre">Queue.runQueuedEvents()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.reapChildren"><code class="docutils literal notranslate"><span class="pre">Queue.reapChildren()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.Queue.getContext"><code class="docutils literal notranslate"><span class="pre">Queue.getContext()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.queue.Dummycontext"><code class="docutils literal notranslate"><span class="pre">Dummycontext</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.queue.EventQueue"><code class="docutils literal notranslate"><span class="pre">EventQueue</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.EventQueue.commit"><code class="docutils literal notranslate"><span class="pre">EventQueue.commit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.EventQueue.getQueuedEvents"><code class="docutils literal notranslate"><span class="pre">EventQueue.getQueuedEvents()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.EventQueue.queueEvent"><code class="docutils literal notranslate"><span class="pre">EventQueue.queueEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.EventQueue.dequeueEvent"><code class="docutils literal notranslate"><span class="pre">EventQueue.dequeueEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.EventQueue.getRunningEvents"><code class="docutils literal notranslate"><span class="pre">EventQueue.getRunningEvents()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.EventQueue.insertRunningEvent"><code class="docutils literal notranslate"><span class="pre">EventQueue.insertRunningEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.queue.EventQueue.deleteRunningEvent"><code class="docutils literal notranslate"><span class="pre">EventQueue.deleteRunningEvent()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>
 </ul>
 </li>

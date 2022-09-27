@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.coremods.kml &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -409,7 +410,36 @@ the viewer’s map.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.kml</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.kml</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.KMLModule"><code class="docutils literal notranslate"><span class="pre">KMLModule</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.kml.KMLModule.command_name"><code class="docutils literal notranslate"><span class="pre">KMLModule.command_name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.kml.KMLModule.targets"><code class="docutils literal notranslate"><span class="pre">KMLModule.targets</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.kml.KMLModule.dependencies"><code class="docutils literal notranslate"><span class="pre">KMLModule.dependencies</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.kml.KMLModule.execute"><code class="docutils literal notranslate"><span class="pre">KMLModule.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_kmz"><code class="docutils literal notranslate"><span class="pre">create_kmz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.place_legend"><code class="docutils literal notranslate"><span class="pre">place_legend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_epicenter"><code class="docutils literal notranslate"><span class="pre">create_epicenter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_polygons"><code class="docutils literal notranslate"><span class="pre">create_polygons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_contours"><code class="docutils literal notranslate"><span class="pre">create_contours()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.set_look"><code class="docutils literal notranslate"><span class="pre">set_look()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_line_styles"><code class="docutils literal notranslate"><span class="pre">create_line_styles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_overlay"><code class="docutils literal notranslate"><span class="pre">create_overlay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_overlay_image"><code class="docutils literal notranslate"><span class="pre">create_overlay_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_stations"><code class="docutils literal notranslate"><span class="pre">create_stations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.make_placemark"><code class="docutils literal notranslate"><span class="pre">make_placemark()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.get_intensity"><code class="docutils literal notranslate"><span class="pre">get_intensity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.get_description_table"><code class="docutils literal notranslate"><span class="pre">get_description_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.imt_to_string"><code class="docutils literal notranslate"><span class="pre">imt_to_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.make_row"><code class="docutils literal notranslate"><span class="pre">make_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.get_description"><code class="docutils literal notranslate"><span class="pre">get_description()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.get_imt_text"><code class="docutils literal notranslate"><span class="pre">get_imt_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.create_styles"><code class="docutils literal notranslate"><span class="pre">create_styles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.add_icon_style"><code class="docutils literal notranslate"><span class="pre">add_icon_style()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.kml.flip_rgb"><code class="docutils literal notranslate"><span class="pre">flip_rgb()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>

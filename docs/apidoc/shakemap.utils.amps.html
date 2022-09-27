@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.utils.amps &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -403,7 +404,28 @@ of days.</p>
 <li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.1 API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.amps</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.amps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.commit"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.commit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.insertEvent"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.insertEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.getEvent"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.getEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.deleteEvent"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.deleteEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.getRepeats"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.getRepeats()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.associateAll"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.associateAll()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.associateOne"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.associateOne()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.associate"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.associate()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.writeXML"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.writeXML()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.insertAmps"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.insertAmps()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.cleanAmps"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.cleanAmps()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.cleanEvents"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.cleanEvents()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.getStats"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.getStats()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.amps.dt_to_timestamp"><code class="docutils literal notranslate"><span class="pre">dt_to_timestamp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.amps.timestr_to_timestamp"><code class="docutils literal notranslate"><span class="pre">timestr_to_timestamp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.amps.prettify"><code class="docutils literal notranslate"><span class="pre">prettify()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dataframe.html">shakemap.utils.dataframe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>

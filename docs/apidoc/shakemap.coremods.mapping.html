@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.coremods.mapping &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -178,7 +179,23 @@ config. The file is assumend to be UTF-8.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.history.html">shakemap.coremods.history</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.kml.html">shakemap.coremods.kml</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.mapping</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.mapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.mapping.MappingModule"><code class="docutils literal notranslate"><span class="pre">MappingModule</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.mapping.MappingModule.command_name"><code class="docutils literal notranslate"><span class="pre">MappingModule.command_name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.mapping.MappingModule.targets"><code class="docutils literal notranslate"><span class="pre">MappingModule.targets</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.mapping.MappingModule.dependencies"><code class="docutils literal notranslate"><span class="pre">MappingModule.dependencies</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.mapping.MappingModule.configs"><code class="docutils literal notranslate"><span class="pre">MappingModule.configs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.mapping.MappingModule.display_magnitude"><code class="docutils literal notranslate"><span class="pre">MappingModule.display_magnitude</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.mapping.MappingModule.parseArgs"><code class="docutils literal notranslate"><span class="pre">MappingModule.parseArgs()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.mapping.MappingModule.execute"><code class="docutils literal notranslate"><span class="pre">MappingModule.execute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.mapping.make_map"><code class="docutils literal notranslate"><span class="pre">make_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.mapping.make_pin_thumbnail"><code class="docutils literal notranslate"><span class="pre">make_pin_thumbnail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.mapping.get_text_strings"><code class="docutils literal notranslate"><span class="pre">get_text_strings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.mapping.make_overlay"><code class="docutils literal notranslate"><span class="pre">make_overlay()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.pointcsv.html">shakemap.coremods.pointcsv</a></li>

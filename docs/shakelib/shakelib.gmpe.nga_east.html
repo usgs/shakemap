@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakelib.gmpe.nga_east &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,11 +33,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-shakelib.gmpe.nga_east">
-<span id="shakelib-gmpe-nga-east"></span><h1>shakelib.gmpe.nga_east<a class="headerlink" href="#module-shakelib.gmpe.nga_east" title="Permalink to this heading">¶</a></h1>
+  <section id="shakelib-gmpe-nga-east">
+<h1>shakelib.gmpe.nga_east<a class="headerlink" href="#shakelib-gmpe-nga-east" title="Permalink to this heading">¶</a></h1>
 <p>Module to simplify importing the OQ implementation of the
 NGA-East GMPE suite.</p>
-<dl class="py class">
+<span class="target" id="module-shakelib.gmpe.nga_east"></span><dl class="py class">
 <dt class="sig sig-object py" id="shakelib.gmpe.nga_east.NGAEast">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.gmpe.nga_east.</span></span><span class="sig-name descname"><span class="pre">NGAEast</span></span><a class="reference internal" href="../_modules/shakelib/gmpe/nga_east.html#NGAEast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GMPE</span></code></p>
@@ -69,7 +70,7 @@ deviation for.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.gmpe.nga_east.NGAEast.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({&lt;function</span> <span class="pre">PGV&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">SA&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">PGA&gt;})</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({&lt;function</span> <span class="pre">SA&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">PGA&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">PGV&gt;})</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of <code class="xref py py-mod docutils literal notranslate"><span class="pre">intensity</span> <span class="pre">measure</span> <span class="pre">types</span></code>
 this GSIM can
 calculate. A set should contain classes from module
@@ -129,17 +130,17 @@ object attributes with same names. Values are in kilometers.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.gmpe.nga_east.NGAEast.TABLE_PATHS">
-<span class="sig-name descname"><span class="pre">TABLE_PATHS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['nga_east_SP15.hdf5',</span> <span class="pre">'nga_east_PEER_GP.hdf5',</span> <span class="pre">'nga_east_1CCSP.hdf5',</span> <span class="pre">'nga_east_Graizer.hdf5',</span> <span class="pre">'nga_east_usgs_11.hdf5',</span> <span class="pre">'nga_east_usgs_10.hdf5',</span> <span class="pre">'nga_east_usgs_1.hdf5',</span> <span class="pre">'nga_east_2CVSP.hdf5',</span> <span class="pre">'nga_east_usgs_6.hdf5',</span> <span class="pre">'nga_east_usgs_17.hdf5',</span> <span class="pre">'nga_east_B_ab95.hdf5',</span> <span class="pre">'nga_east_usgs_16.hdf5',</span> <span class="pre">'nga_east_usgs_7.hdf5',</span> <span class="pre">'nga_east_B_sgd02.hdf5',</span> <span class="pre">'nga_east_HA15.hdf5',</span> <span class="pre">'nga_east_usgs_15.hdf5',</span> <span class="pre">'nga_east_usgs_4.hdf5',</span> <span class="pre">'nga_east_PEER_EX.hdf5',</span> <span class="pre">'nga_east_1CVSP.hdf5',</span> <span class="pre">'nga_east_usgs_8.hdf5',</span> <span class="pre">'nga_east_Graizer16.hdf5',</span> <span class="pre">'nga_east_B_a04.hdf5',</span> <span class="pre">'nga_east_B_bs11.hdf5',</span> <span class="pre">'nga_east_2CCSP.hdf5',</span> <span class="pre">'nga_east_Frankel.hdf5',</span> <span class="pre">'nga_east_Graizer17.hdf5',</span> <span class="pre">'nga_east_B_ab14.hdf5',</span> <span class="pre">'nga_east_usgs_9.hdf5',</span> <span class="pre">'nga_east_YA15.hdf5',</span> <span class="pre">'nga_east_usgs_5.hdf5',</span> <span class="pre">'nga_east_usgs_14.hdf5',</span> <span class="pre">'nga_east_usgs_13.hdf5',</span> <span class="pre">'nga_east_usgs_2.hdf5',</span> <span class="pre">'nga_east_B_bca10d.hdf5',</span> <span class="pre">'nga_east_usgs_3.hdf5',</span> <span class="pre">'nga_east_usgs_12.hdf5',</span> <span class="pre">'nga_east_PZCT15_M1SS.hdf5',</span> <span class="pre">'nga_east_PZCT15_M2ES.hdf5']</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.TABLE_PATHS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">TABLE_PATHS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['nga_east_Frankel.hdf5',</span> <span class="pre">'nga_east_Graizer17.hdf5',</span> <span class="pre">'nga_east_usgs_11.hdf5',</span> <span class="pre">'nga_east_Graizer16.hdf5',</span> <span class="pre">'nga_east_B_ab14.hdf5',</span> <span class="pre">'nga_east_B_bca10d.hdf5',</span> <span class="pre">'nga_east_usgs_1.hdf5',</span> <span class="pre">'nga_east_usgs_5.hdf5',</span> <span class="pre">'nga_east_PZCT15_M2ES.hdf5',</span> <span class="pre">'nga_east_usgs_13.hdf5',</span> <span class="pre">'nga_east_PEER_EX.hdf5',</span> <span class="pre">'nga_east_PZCT15_M1SS.hdf5',</span> <span class="pre">'nga_east_usgs_4.hdf5',</span> <span class="pre">'nga_east_SP15.hdf5',</span> <span class="pre">'nga_east_B_bs11.hdf5',</span> <span class="pre">'nga_east_2CCSP.hdf5',</span> <span class="pre">'nga_east_usgs_7.hdf5',</span> <span class="pre">'nga_east_1CVSP.hdf5',</span> <span class="pre">'nga_east_usgs_16.hdf5',</span> <span class="pre">'nga_east_B_ab95.hdf5',</span> <span class="pre">'nga_east_usgs_8.hdf5',</span> <span class="pre">'nga_east_1CCSP.hdf5',</span> <span class="pre">'nga_east_usgs_3.hdf5',</span> <span class="pre">'nga_east_usgs_9.hdf5',</span> <span class="pre">'nga_east_PEER_GP.hdf5',</span> <span class="pre">'nga_east_usgs_10.hdf5',</span> <span class="pre">'nga_east_HA15.hdf5',</span> <span class="pre">'nga_east_usgs_12.hdf5',</span> <span class="pre">'nga_east_usgs_17.hdf5',</span> <span class="pre">'nga_east_B_a04.hdf5',</span> <span class="pre">'nga_east_B_sgd02.hdf5',</span> <span class="pre">'nga_east_usgs_14.hdf5',</span> <span class="pre">'nga_east_usgs_6.hdf5',</span> <span class="pre">'nga_east_2CVSP.hdf5',</span> <span class="pre">'nga_east_YA15.hdf5',</span> <span class="pre">'nga_east_usgs_15.hdf5',</span> <span class="pre">'nga_east_usgs_2.hdf5',</span> <span class="pre">'nga_east_Graizer.hdf5']</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.TABLE_PATHS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.gmpe.nga_east.NGAEast.this_module">
-<span class="sig-name descname"><span class="pre">this_module</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/Users/cbworden/Unix/python/shakemap/shakelib/gmpe'</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.this_module" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">this_module</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/home/mhearne/src/python/shakemap/shakelib/gmpe'</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.this_module" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.gmpe.nga_east.NGAEast.NGA_BASE_PATH">
-<span class="sig-name descname"><span class="pre">NGA_BASE_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/Users/cbworden/Unix/python/shakemap/shakelib/gmpe/../../shakemap/data/nga_east_tables'</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.NGA_BASE_PATH" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">NGA_BASE_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/home/mhearne/src/python/shakemap/shakelib/gmpe/../../shakemap/data/nga_east_tables'</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.NGA_BASE_PATH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -174,7 +175,7 @@ object attributes with same names. Values are in kilometers.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="shakelib.gmpe.nga_east.NGAEast.PATH">
-<span class="sig-name descname"><span class="pre">PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/Users/cbworden/Unix/python/shakemap/shakelib/gmpe/nga_east_small_mag'</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.PATH" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/home/mhearne/src/python/shakemap/shakelib/gmpe/nga_east_small_mag'</span></em><a class="headerlink" href="#shakelib.gmpe.nga_east.NGAEast.PATH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

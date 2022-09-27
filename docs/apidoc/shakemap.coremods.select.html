@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.coremods.select &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,10 +35,10 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-shakemap.coremods.select">
-<span id="shakemap-coremods-select"></span><h1>shakemap.coremods.select<a class="headerlink" href="#module-shakemap.coremods.select" title="Permalink to this heading">¶</a></h1>
+  <section id="shakemap-coremods-select">
+<h1>shakemap.coremods.select<a class="headerlink" href="#shakemap-coremods-select" title="Permalink to this heading">¶</a></h1>
 <p>Parse STREC output and create/select a GMPE set for an event.</p>
-<dl class="py class">
+<span class="target" id="module-shakemap.coremods.select"></span><dl class="py class">
 <dt class="sig sig-object py" id="shakemap.coremods.select.SelectModule">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.select.</span></span><span class="sig-name descname"><span class="pre">SelectModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/select.html#SelectModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.select.SelectModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreModule</span></code></a></p>
@@ -133,7 +134,17 @@ and writes model_select.conf in the event’s ‘current’ directory.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.save.html">shakemap.coremods.save</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.select</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.select</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.select.SelectModule"><code class="docutils literal notranslate"><span class="pre">SelectModule</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.select.SelectModule.command_name"><code class="docutils literal notranslate"><span class="pre">SelectModule.command_name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.select.SelectModule.targets"><code class="docutils literal notranslate"><span class="pre">SelectModule.targets</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.select.SelectModule.dependencies"><code class="docutils literal notranslate"><span class="pre">SelectModule.dependencies</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.select.SelectModule.configs"><code class="docutils literal notranslate"><span class="pre">SelectModule.configs</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.select.SelectModule.execute"><code class="docutils literal notranslate"><span class="pre">SelectModule.execute()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.shape.html">shakemap.coremods.shape</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.sleep.html">shakemap.coremods.sleep</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.stations.html">shakemap.coremods.stations</a></li>

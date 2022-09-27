@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.utils.layers &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -176,7 +177,14 @@ point lies inside the polygon.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.exception.html">shakemap.utils.exception</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.generic_amp.html">shakemap.utils.generic_amp</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.layers</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.layers.validate_config"><code class="docutils literal notranslate"><span class="pre">validate_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.layers.nearest_edge"><code class="docutils literal notranslate"><span class="pre">nearest_edge()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.layers.dist_to_layer"><code class="docutils literal notranslate"><span class="pre">dist_to_layer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.layers.get_layer_distances"><code class="docutils literal notranslate"><span class="pre">get_layer_distances()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.layers.update_config_regions"><code class="docutils literal notranslate"><span class="pre">update_config_regions()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
