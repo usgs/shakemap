@@ -321,8 +321,8 @@ def create(config, profile, accept, ppath, nogrids):
     #
     # FTP info
     #
-    ftp_machine = "hazards.cr.usgs.gov"
-    ftp_dir = "/shakemap"
+    ftp_machine = "ftpext.usgs.gov"
+    ftp_dir = "/pub/cr/co/golden/emthompson"
     ftp_topo = "topo_30sec.grd"
     ftp_vs30 = "global_vs30.grd"
 
