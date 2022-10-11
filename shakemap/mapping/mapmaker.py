@@ -1418,6 +1418,8 @@ def draw_map(adict, override_scenario=False):
             props = contour_object["properties"]
             multi_lines = sShape(contour_object["geometry"])
             pmulti_lines = proj.project_geometry(multi_lines, src_crs=geoproj)
+            if isinstance(pmulti_lines, list):
+                continue
             for multi_line in pmulti_lines.geoms:
                 pmulti_line = mapping(multi_line)["coordinates"]
                 x, y = zip(*pmulti_line)
@@ -1439,7 +1441,8 @@ def draw_map(adict, override_scenario=False):
             props = contour_object["properties"]
             multi_lines = sShape(contour_object["geometry"])
             pmulti_lines = proj.project_geometry(multi_lines, src_crs=geoproj)
-
+            if isinstance(pmulti_lines, list):
+                continue
             # only label long contours (relative to others with the same
             # isovalue)
             min_len = np.array(contour_lens[props["value"]]).mean()
