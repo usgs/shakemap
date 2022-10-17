@@ -19,7 +19,7 @@ import shutil
 import pathlib
 import glob
 import textwrap
-import ftplib
+import urllib.request
 from tempfile import mkstemp
 import re
 
@@ -319,24 +319,23 @@ def create(config, profile, accept, ppath, nogrids):
     if not os.path.isdir(vs30_path):
         os.mkdir(vs30_path)
     #
-    # FTP info
+    # url info
     #
-    ftp_machine = "ftpext.usgs.gov"
-    ftp_dir = "/pub/cr/co/golden/emthompson"
-    ftp_topo = "topo_30sec.grd"
-    ftp_vs30 = "global_vs30.grd"
+    url_machine = "https://apps.usgs.gov/"
+    url_topo_dir = "shakemap_geodata/topo/"
+    url_vs30_dir = "shakemap_geodata/vs30/"
+    topo_file = "topo_30sec.grd"
+    vs30_file = "global_vs30.grd"
 
     print("Retrieving global topo and Vs30 files. This may take a minute...")
-    ftp = ftplib.FTP(ftp_machine)
-    ftp.login("anonymous", "shakemap")
-    ftp.cwd(ftp_dir)
-    fd = open(os.path.join(topo_path, ftp_topo), "wb")
-    ftp.retrbinary("RETR " + ftp_topo, fd.write)
-    fd.close()
-    fd = open(os.path.join(vs30_path, ftp_vs30), "wb")
-    ftp.retrbinary("RETR " + ftp_vs30, fd.write)
-    fd.close()
-    ftp.close()
+    url = url_machine + url_topo_dir + topo_file
+    file_name = os.path.join(topo_path, topo_file)
+    with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+        shutil.copyfileobj(response, out_file)
+    url = url_machine + url_vs30_dir + vs30_file
+    file_name = os.path.join(vs30_path, vs30_file)
+    with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+        shutil.copyfileobj(response, out_file)
     print("Done.")
 
     do_config = True
