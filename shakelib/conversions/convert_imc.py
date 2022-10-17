@@ -12,14 +12,12 @@ class ComponentConverter(ABC):
         Checks if imc_in or imc_out is an unknown type.
 
         If of an unknown type, it is automatically set
-        to AVERAGE_HORIZONTAL.
+        to GEOMETRIC_MEAN.
         """
         if self.imc_in not in self.conversion_graph:
-            # self.imc_in = 'Average horizontal'
-            self.imc_in = IMC.AVERAGE_HORIZONTAL
+            self.imc_in = IMC.GEOMETRIC_MEAN
         if self.imc_out not in self.conversion_graph:
-            # self.imc_out = 'Average horizontal'
-            self.imc_out = IMC.AVERAGE_HORIZONTAL
+            self.imc_out = IMC.GEOMETRIC_MEAN
 
     def convertAmps(self, imt, amps, rrups=None, mag=None):
         """
