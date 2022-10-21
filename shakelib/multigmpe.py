@@ -17,6 +17,7 @@ from openquake.hazardlib.contexts import RuptureContext
 from shakelib.conversions.imt.abrahamson_bhasin_2020 import AbrahamsonBhasin2020
 from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
 from shakelib.sites import Sites
+from shakelib.multiutils import gmpe_gmas
 
 # Special case GMPEs:
 from shakelib.gmpe.nga_east import NGAEast
@@ -291,9 +292,7 @@ class MultiGMPE(GMPE):
             # -----------------------------------------------------------------
             if not isinstance(gmpe, MultiGMPE):
                 ctx = stuff_context(sites, rup, dists)
-                lmean, lsd = gmpe.get_mean_and_stddevs(
-                    ctx, ctx, ctx, timt, stddev_types
-                )
+                lmean, lsd = gmpe_gmas(gmpe, ctx, timt, stddev_types)
             else:
                 lmean, lsd = gmpe.get_mean_and_stddevs(
                     sites, rup, dists, timt, stddev_types
@@ -985,7 +984,7 @@ class MultiGMPE(GMPE):
             rup_dist = getattr(dists, dtype)
             rup_dist += delta_distance
             ctx = stuff_context(sites, rup, dists)
-            tmean, tsd = gmpe.get_mean_and_stddevs(ctx, ctx, ctx, imt, stddev_types)
+            tmean, tsd = gmpe_gmas(gmpe, ctx, imt, stddev_types)
             # Find the derivative w.r.t. the rupture distance
             dm_dr = (lmean - tmean) / delta_distance
             # The additional variance is (dm/dr)^2 * dvar
