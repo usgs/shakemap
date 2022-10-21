@@ -31,12 +31,12 @@ class BooreKishida2017(ComponentConverter):
     provided by B&K (specified as OpenQuake IMCs):
 
         - RotD50 <=> GMRotI50
-        - RotD50 <=> AVERAGE_HORIZONTAL (i.e., Geometric Mean "as recorded")
+        - RotD50 <=> GEOMETRIC_MEAN (i.e., Geometric Mean "as recorded")
         - RotD100 <=> RotD50
         - RotD50 <=> GREATER_OF_TWO_HORIZONTAL
         - RotD100 <=> GREATER_OF_TWO_HORIZONTAL
         - GMRotI50 <=> GREATER_OF_TWO_HORIZONTAL
-        - AVERAGE_HORIZONTAL <=> GREATER_OF_TWO_HORIZONTAL
+        - GEOMETRIC_MEAN <=> GREATER_OF_TWO_HORIZONTAL
 
     Chain conversions are supported when using `convertAmps`. Otherwise
     conversions must be done in two+ steps using `convertAmpsOnce`. For IMCs
@@ -44,7 +44,7 @@ class BooreKishida2017(ComponentConverter):
     to the geometric mean (which B&K call GM_AR).
 
     Notes
-        - Assumes ALL unknown IMC types are AVERAGE_HORIZONTAL.
+        - Assumes ALL unknown IMC types are GEOMETRIC_MEAN.
 
     References
 
@@ -67,43 +67,43 @@ class BooreKishida2017(ComponentConverter):
             imc_from_str = self.imc_from_str(imc_in)
             if imc_from_str is None:
                 logging.warning(
-                    "Unknown IMC string '%s' in input, using " "Average horizontal",
+                    "Unknown IMC string '%s' in input, using Geometric Mean",
                     imc_in,
                 )
-                self.imc_in = IMC.AVERAGE_HORIZONTAL
+                self.imc_in = IMC.GEOMETRIC_MEAN
             else:
                 self.imc_in = imc_from_str
         else:
             logging.warning(
-                "Unknown object passed as input %s, using Average " "horizontal",
+                "Unknown object passed as input %s, using Geometric Mean",
                 type(imc_in),
             )
-            self.imc_in = IMC.AVERAGE_HORIZONTAL
+            self.imc_in = IMC.GEOMETRIC_MEAN
         if type(imc_out) == IMC:
             self.imc_out = imc_out
         elif type(imc_out) == str:
             imc_from_str = self.imc_from_str(imc_out)
             if imc_from_str is None:
                 logging.warning(
-                    "Unknown IMC string '%s' in output, using " "Average horizontal",
+                    "Unknown IMC string '%s' in output, using Geometric Mean",
                     imc_out,
                 )
-                self.imc_out = IMC.AVERAGE_HORIZONTAL
+                self.imc_out = IMC.GEOMETRIC_MEAN
             else:
                 self.imc_out = imc_from_str
         else:
             logging.warning(
-                "Unknown object passed as opuput %s, using Average " "horizontal",
+                "Unknown object passed as opuput %s, using Geometric Mean",
                 type(imc_out),
             )
-            self.imc_out = IMC.AVERAGE_HORIZONTAL
+            self.imc_out = IMC.GEOMETRIC_MEAN
 
         # Possible conversions
         self.conversion_graph = {
             IMC.RotD50: set(
                 [
                     IMC.GMRotI50,
-                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.GEOMETRIC_MEAN,
                     IMC.RotD100,
                     IMC.GREATER_OF_TWO_HORIZONTAL,
                     IMC.RANDOM_HORIZONTAL,
@@ -112,13 +112,13 @@ class BooreKishida2017(ComponentConverter):
                 ]
             ),
             IMC.GMRotI50: set([IMC.RotD50, IMC.GREATER_OF_TWO_HORIZONTAL]),
-            IMC.AVERAGE_HORIZONTAL: set([IMC.RotD50, IMC.GREATER_OF_TWO_HORIZONTAL]),
+            IMC.GEOMETRIC_MEAN: set([IMC.RotD50, IMC.GREATER_OF_TWO_HORIZONTAL]),
             IMC.RotD100: set([IMC.RotD50, IMC.GREATER_OF_TWO_HORIZONTAL]),
             IMC.GREATER_OF_TWO_HORIZONTAL: set(
                 [
                     IMC.RotD50,
                     IMC.GMRotI50,
-                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.GEOMETRIC_MEAN,
                     IMC.RotD100,
                     IMC.RANDOM_HORIZONTAL,
                     IMC.HORIZONTAL,
@@ -130,7 +130,7 @@ class BooreKishida2017(ComponentConverter):
             IMC.RANDOM_HORIZONTAL: set([IMC.GREATER_OF_TWO_HORIZONTAL, IMC.RotD50]),
         }
         # Check if any imc values are unknown. If they are, convert
-        # to AVERAGE_HORIZONTAL
+        # to GEOMETRIC_MEAN
         self.checkUnknown()
         # Get shortest conversion "path" between imc_in and imc_out
         self.path = self.getShortestPath(
@@ -322,7 +322,7 @@ class BooreKishida2017(ComponentConverter):
         elif oq_imc == IMC.GMRotI50:
             return "GM50"
         elif (
-            oq_imc == IMC.AVERAGE_HORIZONTAL
+            oq_imc == IMC.GEOMETRIC_MEAN
             or oq_imc == IMC.HORIZONTAL
             or oq_imc == IMC.RANDOM_HORIZONTAL
             or oq_imc == IMC.MEDIAN_HORIZONTAL

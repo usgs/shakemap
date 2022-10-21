@@ -23,7 +23,7 @@ class BeyerBommer2006(ComponentConverter):
     +---------------------------+------------------------+
     | OpenQuake                 | Beyer & Bommer         |
     +===========================+========================+
-    | AVERAGE_HORIZONTAL        | GMxy (Geometric mean)  |
+    | GEOMETRIC_MEAN            | GMxy (Geometric mean)  |
     +---------------------------+------------------------+
     | HORIZONTAL                | Random?                |
     +---------------------------+------------------------+
@@ -42,11 +42,11 @@ class BeyerBommer2006(ComponentConverter):
 
     Notes
 
-        - AVERAGE_HORIZONTAL is the "reference" type.
+        - GEOMETRIC_MEAN is the "reference" type.
         - The OQ IMC "HORIZONAL" indicates that the horizontal IMC category
           may be ambiguous. In these cases, we are assuming that it is a
           random horizontal component as a default.
-        - Assumes ALL unknown IMC types are AVERAGE_HORIZONTAL
+        - Assumes ALL unknown IMC types are GEOMETRIC_MEAN
 
     References
 
@@ -66,36 +66,36 @@ class BeyerBommer2006(ComponentConverter):
             imc_from_str = self.imc_from_str(imc_in)
             if imc_from_str is None:
                 logging.warning(
-                    "Unknown IMC string '%s' in input, using " "Average horizontal",
+                    "Unknown IMC string '%s' in input, using Geometric Mean",
                     imc_in,
                 )
-                self.imc_in = IMC.AVERAGE_HORIZONTAL
+                self.imc_in = IMC.GEOMETRIC_MEAN
             else:
                 self.imc_in = imc_from_str
         else:
             logging.warning(
-                "Unknown object passed as input %s, using Average " "horizontal",
+                "Unknown object passed as input %s, using Geometric Mean",
                 type(imc_in),
             )
-            self.imc_in = IMC.AVERAGE_HORIZONTAL
+            self.imc_in = IMC.GEOMETRIC_MEAN
         if type(imc_out) == IMC:
             self.imc_out = imc_out
         elif type(imc_out) == str:
             imc_from_str = self.imc_from_str(imc_out)
             if imc_from_str is None:
                 logging.warning(
-                    "Unknown IMC string '%s' in output, using " "Average horizontal",
+                    "Unknown IMC string '%s' in output, using Geometric Mean",
                     imc_out,
                 )
-                self.imc_out = IMC.AVERAGE_HORIZONTAL
+                self.imc_out = IMC.GEOMETRIC_MEAN
             else:
                 self.imc_out = imc_from_str
         else:
             logging.warning(
-                "Unknown object passed as opuput %s, using Average " "horizontal",
+                "Unknown object passed as opuput %s, using Geometric Mean",
                 type(imc_out),
             )
-            self.imc_out = IMC.AVERAGE_HORIZONTAL
+            self.imc_out = IMC.GEOMETRIC_MEAN
         # c12 = median ratio
         # c34 = std. of log ratio
         # R = ratio of sigma_pga values
@@ -110,7 +110,7 @@ class BeyerBommer2006(ComponentConverter):
                     IMC.RotD50,
                     IMC.RANDOM_HORIZONTAL,
                     IMC.HORIZONTAL,
-                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.GEOMETRIC_MEAN,
                 ]
             ),
             IMC.MEDIAN_HORIZONTAL: set(
@@ -120,7 +120,7 @@ class BeyerBommer2006(ComponentConverter):
                     IMC.RotD50,
                     IMC.RANDOM_HORIZONTAL,
                     IMC.HORIZONTAL,
-                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.GEOMETRIC_MEAN,
                 ]
             ),
             IMC.GMRotI50: set(
@@ -130,7 +130,7 @@ class BeyerBommer2006(ComponentConverter):
                     IMC.RotD50,
                     IMC.RANDOM_HORIZONTAL,
                     IMC.HORIZONTAL,
-                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.GEOMETRIC_MEAN,
                 ]
             ),
             IMC.RotD50: set(
@@ -140,7 +140,7 @@ class BeyerBommer2006(ComponentConverter):
                     IMC.GMRotI50,
                     IMC.RANDOM_HORIZONTAL,
                     IMC.HORIZONTAL,
-                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.GEOMETRIC_MEAN,
                 ]
             ),
             IMC.RANDOM_HORIZONTAL: set(
@@ -150,7 +150,7 @@ class BeyerBommer2006(ComponentConverter):
                     IMC.GMRotI50,
                     IMC.RotD50,
                     IMC.HORIZONTAL,
-                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.GEOMETRIC_MEAN,
                 ]
             ),
             IMC.HORIZONTAL: set(
@@ -160,10 +160,10 @@ class BeyerBommer2006(ComponentConverter):
                     IMC.GMRotI50,
                     IMC.RotD50,
                     IMC.RANDOM_HORIZONTAL,
-                    IMC.AVERAGE_HORIZONTAL,
+                    IMC.GEOMETRIC_MEAN,
                 ]
             ),
-            IMC.AVERAGE_HORIZONTAL: set(
+            IMC.GEOMETRIC_MEAN: set(
                 [
                     IMC.GREATER_OF_TWO_HORIZONTAL,
                     IMC.MEDIAN_HORIZONTAL,
@@ -175,7 +175,7 @@ class BeyerBommer2006(ComponentConverter):
             ),
         }
         # Check if any imc values are unknown. If they are, convert
-        # to AVERAGE_HORIZONTAL
+        # to GEOMETRIC_MEAN
         self.checkUnknown()
         # Get shortest conversion "path" between imc_in and imc_out
         self.path = self.getShortestPath(
@@ -326,7 +326,7 @@ class BeyerBommer2006(ComponentConverter):
         Raises:
             ValueError if unknown IMT specified.
         """
-        if imc == const.IMC.AVERAGE_HORIZONTAL:
+        if imc == const.IMC.GEOMETRIC_MEAN:
             # The amps are already in the B&B "reference" type ("GM", i.e.,
             # geometric mean)
             return 1.0
@@ -371,7 +371,7 @@ class BeyerBommer2006(ComponentConverter):
             ValueError if unknown IMT specified.
         """
 
-        if imc == const.IMC.AVERAGE_HORIZONTAL:
+        if imc == const.IMC.GEOMETRIC_MEAN:
             # The amps are already in the B&B "reference" type ("GM", i.e.,
             # geometric mean)
             return 1.0, 0.0

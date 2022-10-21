@@ -213,7 +213,7 @@ def _get_extent_from_multigmpe(rupture, config, ipe):
     d_min = config["extent"]["mmi"]["mindist"]
     d_max = config["extent"]["mmi"]["maxdist"]
     dx.rjb = np.logspace(np.log10(d_min), np.log10(d_max), size)
-    dx.rrup = np.sqrt(dx.rjb**2 + origin.depth**2)
+    dx.rrup = np.sqrt(dx.rjb ** 2 + origin.depth ** 2)
     dx.rhypo = dx.rrup
     dx.repi = dx.rjb
     dx.rx = np.zeros_like(dx.rjb)

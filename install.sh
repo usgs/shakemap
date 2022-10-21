@@ -219,6 +219,7 @@ fi
 
 echo "#############Installing pip dependencies##############"
 pip install --no-dependencies -r requirements.txt 
+pip install --upgrade --no-dependencies git+https://github.com/gem/oq-engine
 # pip install --upgrade --no-dependencies https://github.com/gem/oq-engine/archive/engine-3.12.zip
 
 # Touch the C code to make sure it gets re-compiled

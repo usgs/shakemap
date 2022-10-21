@@ -123,16 +123,16 @@ def test_bb06():
     np.testing.assert_allclose(amps_out, amps_target, atol=1e-5)
     np.testing.assert_allclose(sigs_out, sigs_target, atol=1e-5)
 
-    # Test that an invalid/unknown parameter is changed to AVERAGE_HORIZONTAL
+    # Test that an invalid/unknown parameter is changed to GEOMETRIC_MEAN
     bb06 = BeyerBommer2006("wrong", imc_out[0])
-    assert bb06.imc_in.value == "Average horizontal"
+    assert bb06.imc_in.value == "Average Horizontal"
     assert bb06.imc_out == imc_out[0]
     bb06 = BeyerBommer2006(imc_out[0], "wrong")
     assert bb06.imc_in == imc_out[0]
-    assert bb06.imc_out.value == "Average horizontal"
+    assert bb06.imc_out.value == "Average Horizontal"
     bb06 = BeyerBommer2006("wrong", "wrong")
-    assert bb06.imc_in.value == "Average horizontal"
-    assert bb06.imc_out.value == "Average horizontal"
+    assert bb06.imc_in.value == "Average Horizontal"
+    assert bb06.imc_out.value == "Average Horizontal"
 
     # Test that the correct input/output imc returns the right path
     bb06 = BeyerBommer2006("Median horizontal", "Random horizontal")
@@ -156,8 +156,8 @@ def test_bb06():
     with pytest.raises(ValueError) as e:
         bb06.convertAmpsOnce(PGA(), [10.0], None, None)
 
-    # Test that AVERAGE_HORIZONTAL returns 1 regardless of imt
-    bb06 = BeyerBommer2006("Average horizontal", "Average Horizontal (RotD50)")
+    # Test that GEOMETRIC_MEAN returns 1 regardless of imt
+    bb06 = BeyerBommer2006("Average Horizontal", "Average Horizontal (RotD50)")
     denom = 1
     numer = 1
     result = np.asarray([10.0]) + np.log(numer / denom)

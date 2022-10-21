@@ -19,6 +19,7 @@ from openquake.hazardlib import imt as IMT
 from openquake.hazardlib.gsim.usgs_ceus_2019 import NGAEastUSGSGMPE
 from openquake.hazardlib.gsim.gmpe_table import _return_tables
 
+from shakelib.multiutils import gmpe_gmas
 from shakelib.conversions.imt.abrahamson_bhasin_2020 import AbrahamsonBhasin2020
 
 # Max distance for evaluating NGAEast. This *should* be 1500, but due to what
@@ -135,7 +136,7 @@ class NGAEast(GMPE):
         # below, we need to do it all in rup, then pass rup as all three
         # contexts when we call the gmpe.get_mean_and_stddevs()
         rup = copy.deepcopy(rx)
-        if rup.mag < 4.0:
+        if np.any(rup.mag < 4.0):
             is_small_mag = True
             delta_mag = rup.mag - 4.0
             rup.mag = 4.0
@@ -202,9 +203,7 @@ class NGAEast(GMPE):
                     #
                     # No table for PGV, compute vimt, then convert to PGV
                     #
-                    vmean, vstddevs = gm.get_mean_and_stddevs(
-                        rup, rup, rup, vimt, stddev_types
-                    )
+                    vmean, vstddevs = gmpe_gmas(gm, rup, vimt, stddev_types)
                     tmean, tstddevs = ab2020.getPGVandSTDDEVS(
                         vmean, vstddevs, stddev_types, rup.rrup, rup.vs30
                     )
@@ -214,13 +213,9 @@ class NGAEast(GMPE):
                     #
                     # Table exists for PGV, proceed normally
                     #
-                    tmean, tstddevs = gm.get_mean_and_stddevs(
-                        rup, rup, rup, imt, stddev_types
-                    )
+                    tmean, tstddevs = gmpe_gmas(gm, rup, imt, stddev_types)
             else:
-                tmean, tstddevs = gm.get_mean_and_stddevs(
-                    rup, rup, rup, imt, stddev_types
-                )
+                tmean, tstddevs = gmpe_gmas(gm, rup, imt, stddev_types)
 
             mean += tmean * total_gmpe_weights[i]
             for j, sd in enumerate(tstddevs):

@@ -27,7 +27,7 @@ class AbrahamsonBhasin2020(object):
         ]
         self.Tref = 0
         for mm, tt in mag_T:
-            if mag <= mm:
+            if np.any(mag <= mm):
                 self.Tref = tt
                 break
         if self.Tref == 0:
@@ -82,7 +82,7 @@ class AbrahamsonBhasin2020(object):
         """
         c = self.coeff
         m = self.mag
-        if m < 5:
+        if np.any(m < 5):
             f1 = c["a2"]
         elif m <= 7.5:
             f1 = c["a2"] + (c["a3"] - c["a2"]) * (m - 5.0) / 2.5
