@@ -1366,10 +1366,9 @@ class ModelModule(CoreModule):
                 or self.rx.mag <= self.bias_max_mag
             ):
                 self.mu_H_yD[imtstr] = mu_H_yD
-                self.cov_HH_yD[imtstr] = cov_HH_yD
             else:
                 self.mu_H_yD[imtstr] = np.zeros_like(mu_H_yD)
-                self.cov_HH_yD[imtstr] = np.zeros_like(cov_HH_yD)
+            self.cov_HH_yD[imtstr] = cov_HH_yD
             #
             # Get the nominal bias and variance
             #
