@@ -84,7 +84,7 @@ class AbrahamsonBhasin2020(object):
         m = self.mag
         if np.any(m < 5):
             f1 = c["a2"]
-        elif m <= 7.5:
+        elif np.any(m <= 7.5):
             f1 = c["a2"] + (c["a3"] - c["a2"]) * (m - 5.0) / 2.5
         else:
             f1 = c["a3"]
