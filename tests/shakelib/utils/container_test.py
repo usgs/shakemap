@@ -50,6 +50,7 @@ mech="" netid="us" network="" />"""
             "armor": 5,
             "class": "Warrior",
             "intelligence": 10,
+            "data": {"min_nresp": 3},
         }
         rupturefile = os.path.join(homedir, "container_data", "Barkaetal02_fault.txt")
         eventfile = io.StringIO(event_text)

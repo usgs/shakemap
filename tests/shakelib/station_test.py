@@ -41,7 +41,7 @@ def test_station():
     dyfifile = os.path.join(datadir, "ciim3_dat.xml")
     xmlfiles = [inputfile, dyfifile]
 
-    stations = StationList.loadFromFiles(xmlfiles, ":memory:")
+    stations = StationList.loadFromFiles(xmlfiles)
 
     df1, _ = stations.getStationDictionary(instrumented=True)
     df2, _ = stations.getStationDictionary(instrumented=False)
@@ -80,7 +80,7 @@ def test_station():
     dyfifile = os.path.join(datadir, "dyfi_dat.xml")
     len_stat1 = len(stations.getStationDictionary(instrumented=True)[0]["id"])
     xmlfiles = [inputfile, dyfifile]
-    stations = stations.addData(xmlfiles)
+    stations = stations.addData(xmlfiles, 3)
     len_stat2 = len(stations.getStationDictionary(instrumented=True)[0]["id"])
 
     # Check that more stations were added
@@ -120,7 +120,7 @@ def test_station2():
     inputfile = os.path.join(datadir, "stationlist.xml")
     xmlfiles = [inputfile]
 
-    stations = StationList.loadFromFiles(xmlfiles, ":memory:")
+    stations = StationList.loadFromFiles(xmlfiles)
 
     df1, _ = stations.getStationDictionary(instrumented=True)
     # Check Keys pressent
@@ -183,7 +183,7 @@ def test_station3():
     inputfile = os.path.join(datadir, "stationlist.xml")
     xmlfiles = [inputfile]
 
-    stations = StationList.loadFromFiles(xmlfiles, ":memory:")
+    stations = StationList.loadFromFiles(xmlfiles)
 
     myjson = stations.getGeoJson()
 
@@ -216,7 +216,7 @@ def test_station4():
     dyfifile = os.path.join(datadir, "dyfi_dat.xml")
     xmlfiles = [dyfifile]
 
-    stations = StationList.loadFromFiles(xmlfiles, ":memory:")
+    stations = StationList.loadFromFiles(xmlfiles)
 
     df1, _ = stations.getStationDictionary(instrumented=True)  # noqa
     df2, _ = stations.getStationDictionary(instrumented=False)  # noqa
@@ -236,13 +236,13 @@ def test_station5():
     dyfifile = os.path.join(datadir, "ciim3_dat.xml")
 
     xmlfiles = [inputfile, dyfifile]
-    stations1 = StationList.loadFromFiles(xmlfiles, ":memory:")
+    stations1 = StationList.loadFromFiles(xmlfiles)
     #
     # Load the data more than once to exercise the code that handles
     # repeated entries.
     #
     xmlfiles = [inputfile, inputfile, dyfifile, dyfifile]
-    stations2 = StationList.loadFromFiles(xmlfiles, ":memory:")
+    stations2 = StationList.loadFromFiles(xmlfiles)
 
     df1, _ = stations1.getStationDictionary(instrumented=True)
     df2, _ = stations2.getStationDictionary(instrumented=True)

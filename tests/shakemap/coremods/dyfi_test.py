@@ -25,7 +25,7 @@ def test_geocoded():
 
     with vcr.use_cassette(tape_file1):
         detail = get_event_by_id(eventid)
-        df, msg = _get_dyfi_dataframe(detail)
+        df, msg = _get_dyfi_dataframe(detail, min_nresp=3)
 
     np.testing.assert_almost_equal(df["INTENSITY"].sum(), 3610.4)
     np.testing.assert_almost_equal(df["STDDEV"].sum(), 254.265)
@@ -36,7 +36,7 @@ def test_geocoded():
 
     with vcr.use_cassette(tape_file2):
         detail = get_event_by_id(eventid)
-        df, msg = _get_dyfi_dataframe(detail)
+        df, msg = _get_dyfi_dataframe(detail, min_nresp=3)
 
     np.testing.assert_almost_equal(df["INTENSITY"].sum(), 2766.5)
     np.testing.assert_almost_equal(df["STDDEV"].sum(), 217.096)
@@ -51,7 +51,7 @@ def test_dyfi():
 
         with vcr.use_cassette(tape_file3):
             detail = get_event_by_id(eventid)
-            dataframe, msg = _get_dyfi_dataframe(detail)
+            dataframe, msg = _get_dyfi_dataframe(detail, min_nresp=3)
 
     except Exception:
         assert 1 == 2
@@ -62,7 +62,7 @@ def test_dyfi():
     # Test reading a file
     eventdir = "eventdata/nc72282711/current/data"
     testfile = os.path.join(datadir, eventdir, "dyfi_geo_10km.geojson")
-    dataframe, msg = _get_dyfi_dataframe(None, testfile)
+    dataframe, msg = _get_dyfi_dataframe(None, inputfile=testfile, min_nresp=3)
     assert len(dataframe) == 203
 
 

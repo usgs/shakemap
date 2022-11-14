@@ -20,7 +20,7 @@ DEFAULT_ACTIVE_COEFFS = [27.24, 250.4, 579.1]
 DEFAULT_STABLE_COEFFS = [63.4, 465.4, 581.3]
 
 
-def replace_dyfi(stationfile, dyfi_xml):
+def replace_dyfi(stationfile, dyfi_xml, min_nresp=3):
     """Remove any non-instrumented data from station file, add DYFI.
 
     Args:
@@ -28,11 +28,13 @@ def replace_dyfi(stationfile, dyfi_xml):
                            contain old DYFI data.
         dyfi_xml (str): DYFI XML data file, which will be added to
                         instrumented station data.
+        min_nresp (int): The minimum number of DYFI responses required for an
+                         observation to be added to the stationlist. Default = 3.
     Returns:
         StationList: Object containing merged data.
 
     """
-    stations = StationList.loadFromFiles([stationfile])
+    stations = StationList.loadFromFiles([stationfile], min_nresp=1)
     # reach into the internal database and find the instrumented stations
     conn = stations.db
     cursor = stations.cursor
@@ -52,7 +54,7 @@ def replace_dyfi(stationfile, dyfi_xml):
         conn.commit()
 
     # now insert the dyfi data
-    stations.addData([dyfi_xml])
+    stations.addData([dyfi_xml], min_nresp)
     return stations
 
 
