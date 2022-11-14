@@ -785,7 +785,9 @@ class ModelModule(CoreModule):
                 continue
             if dfid == "df2" and self.no_macroseismic:
                 continue
-            sdf, imts = self.stations.getStationDictionary(instrumented=val)
+            sdf, imts = self.stations.getStationDictionary(
+                instrumented=val, min_nresp=self.config["data"]["min_nresp"]
+            )
             if sdf is not None:
                 df = DataFrame()
                 df.df = sdf

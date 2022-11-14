@@ -163,7 +163,9 @@ class ShakeMapInputContainer(ShakeMapContainerBase):
               ground motion observations, (macroseismic or instrumented).
 
         """
-        station = StationList.loadFromFiles(datafiles)
+        station = StationList.loadFromFiles(
+            datafiles, min_nresp=self.getConfig()["data"]["min_nresp"]
+        )
         self.setStationList(station)
 
     def addStationData(self, datafiles):
@@ -179,9 +181,11 @@ class ShakeMapInputContainer(ShakeMapContainerBase):
             return
         try:
             station = self.getStationList()
-            station.addData(datafiles)
+            station.addData(datafiles, self.getConfig()["data"]["min_nresp"])
         except AttributeError:
-            station = StationList.loadFromFiles(datafiles)
+            station = StationList.loadFromFiles(
+                datafiles, min_nresp=self.getConfig()["data"]["min_nresp"]
+            )
         self.setStationList(station)
 
     def updateRupture(self, eventxml=None, rupturefile=None):

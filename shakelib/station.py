@@ -151,7 +151,7 @@ class StationList(object):
         return "\n".join(list(self.db.iterdump()))
 
     @classmethod
-    def loadFromFiles(cls, filelist, dbfile=":memory:"):
+    def loadFromFiles(cls, filelist, min_nresp=3, dbfile=":memory:"):
         """
         Create a StationList object by reading one or more ShakeMap XML or
         JSON input files.
@@ -159,6 +159,9 @@ class StationList(object):
         Args:
             filelist (sequence of str):
                 Sequence of ShakeMap XML and/or JSON input files to read.
+            min_nresp (int):
+                The minimum number of DYFI observations required to form and valid
+                observation. Default is 3.
             dbfile (str):
                 Path to a file into which to write the SQLite database.
                 The default is ':memory:' for an in-memory database.
@@ -170,16 +173,19 @@ class StationList(object):
         db = sqlite3.connect(dbfile, timeout=15)
         self = cls(db)
         self._createTables()
-        self.addData(filelist)
+        self.addData(filelist, min_nresp)
         return self
 
-    def addData(self, filelist):
+    def addData(self, filelist, min_nresp):
         """
         Add data from XML or JSON files to the existing StationList.
 
         Args:
             filelist:
                 A list of ShakeMap XML or JSON input files.
+            min_nresp (int):
+                The minimum number of DYFI observations required to form and valid
+                observation.
 
         Returns:
             nothing: Nothing.
@@ -187,12 +193,12 @@ class StationList(object):
         jsonfiles = [x for x in filelist if x.endswith(".json")]
         xmlfiles = [x for x in filelist if x.endswith(".xml")]
         if len(jsonfiles):
-            self._loadFromJSON(jsonfiles)
+            self._loadFromJSON(jsonfiles, min_nresp)
         if len(xmlfiles):
-            self._loadFromXML(xmlfiles)
+            self._loadFromXML(xmlfiles, min_nresp)
         return self
 
-    def _loadFromXML(self, xmlfiles):
+    def _loadFromXML(self, xmlfiles, min_nresp):
         """
         Create a StationList object by reading one or more ShakeMap XML input
         files.
@@ -200,6 +206,9 @@ class StationList(object):
         Args:
             xmlfiles (sequence of str):
                 Sequence of ShakeMap XML input files to read.
+            min_nresp (int):
+                The minimum number of DYFI responses for an observation to be
+                included in the station output.
 
         Returns:
             nothing: Nothing.
@@ -208,14 +217,14 @@ class StationList(object):
         stationdict = {}
         imtset = set()
         for xmlfile in xmlfiles:
-            stationdict, ims = self._filter_station(xmlfile, stationdict)
+            stationdict, ims = self._filter_station(xmlfile, stationdict, min_nresp)
             imtset |= ims
         # fill the database and create the object from it
         self._loadFromDict(stationdict, imtset)
         self._fixOrientations()
         return
 
-    def _loadFromJSON(self, jsonfiles):
+    def _loadFromJSON(self, jsonfiles, min_nresp):
         """
         Create a StationList object by reading one or more ShakeMap JSON
         data files.
@@ -223,6 +232,9 @@ class StationList(object):
         Args:
             jsonfiles (sequence of str):
                 Sequence of ShakeMap JSON data files to read.
+            min_nresp (int):
+                The minimum number of DYFI responses for an observation to be
+                included in the station output.
 
         Returns:
             nothing: Nothing.
@@ -316,6 +328,8 @@ class StationList(object):
                         nresp = int(feature["properties"].get("nresp", -1))
                     except (ValueError, TypeError):
                         nresp = -1
+                    if nresp >= 0 and nresp < min_nresp:
+                        continue
                     flag = feature["properties"]["intensity_flag"]
                     if not flag or flag == "":
                         flag = "0"
@@ -741,7 +755,7 @@ class StationList(object):
         self.cursor.execute("SELECT imt_type FROM imt")
         return set([z[0] for z in self.cursor.fetchall()])
 
-    def getStationDictionary(self, instrumented=True):
+    def getStationDictionary(self, instrumented=True, min_nresp=1):
         """
         Return a dictionary of the instrumented or non-instrumented
         stations. The keys describe the parameter, the values are Numpy
@@ -770,6 +784,9 @@ class StationList(object):
                 Set to True if the dictionary is to contain the instrumented
                 stations, or to False if the dictionary is to contain the
                 non-instrumented (MMI) stations.
+            min_nresp (int):
+                The minimum number of DYFI responses required to make a valid
+                observation.
 
         Returns:
             dict, set: A dictionary of Numpy arrays, and a set specifying
@@ -822,8 +839,12 @@ class StationList(object):
             "AND s.id = a.station_id "
             "AND a.imt_id = i.id "
             'AND s.instrumented = ? AND a.orientation NOT IN ("Z", "U") '
-            "AND a.amp IS NOT NULL",
-            (instrumented,),
+            "AND a.amp IS NOT NULL "
+            "AND (a.nresp < 0 OR a.nresp >= ?)",
+            (
+                instrumented,
+                min_nresp,
+            ),
         )
         amp_rows = self.cursor.fetchall()
 
@@ -966,7 +987,7 @@ class StationList(object):
             imtset.add(key)
         return pgmdict, imtset, imt_translate
 
-    def _filter_station(self, xmlfile, stationdict):
+    def _filter_station(self, xmlfile, stationdict, min_nresp):
         """
         Filter individual xmlfile into a stationdict data structure.
 
@@ -974,9 +995,16 @@ class StationList(object):
             xmlfile (string):
                 Path to ShakeMap XML input file (or file-like object)
                 containing station data.
+            stationdict (dict):
+                the dictionary of stations that the stations in this file should
+                be added to.
+            min_nresp (int):
+                The minimum number of responses that a DYFI observation needs
+                to be included in the processing.
 
         Returns:
             stationdict data structure
+            imts: a set of IMTs that were found in the file
         """
         #
         # Strip off any namespace garbage that is prepended
@@ -1060,6 +1088,8 @@ class StationList(object):
                         nresp = int(attributes["nresp"])
                     else:
                         nresp = -1
+                    if nresp >= 0 and nresp < min_nresp:
+                        continue
                     compdict["mmi"]["amps"]["MMI"] = {
                         "value": float(attributes["intensity"]),
                         "stddev": stddev,

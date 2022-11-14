@@ -48,7 +48,7 @@ OLD_DYFI_COLUMNS_REPLACE = {
     "Epicentral distance": "distance",
 }
 
-MIN_RESPONSES = 3  # minimum number of DYFI responses per grid
+MIN_RESPONSES = 1  # minimum number of DYFI responses per grid
 
 
 class DYFIModule(CoreModule):
@@ -91,15 +91,15 @@ class DYFIModule(CoreModule):
         self.logger.info("Wrote %i DYFI records to %s" % (len(dataframe), xmlfile))
 
 
-def _get_dyfi_dataframe(detail_or_url, inputfile=None):
+def _get_dyfi_dataframe(detail_or_url, inputfile=None, min_nresp=MIN_RESPONSES):
 
     if inputfile:
         with open(inputfile, "rb") as f:
             rawdata = f.read()
         if "json" in inputfile:
-            df = _parse_geocoded_json(rawdata)
+            df = _parse_geocoded_json(rawdata, min_nresp)
         else:
-            df = _parse_geocoded_csv(rawdata)
+            df = _parse_geocoded_csv(rawdata, min_nresp)
         if df is None:
             msg = f"Could not read file {inputfile}"
 
@@ -109,7 +109,7 @@ def _get_dyfi_dataframe(detail_or_url, inputfile=None):
         else:
             detail = detail_or_url
 
-        df, msg = _parse_dyfi_detail(detail)
+        df, msg = _parse_dyfi_detail(detail, min_nresp)
 
     if df is None:
         return None, msg
@@ -121,7 +121,7 @@ def _get_dyfi_dataframe(detail_or_url, inputfile=None):
     return (df, "")
 
 
-def _parse_dyfi_detail(detail):
+def _parse_dyfi_detail(detail, min_nresp):
 
     if not detail.hasProduct("dyfi"):
         msg = f"{detail.url} has no DYFI product at this time."
@@ -140,13 +140,13 @@ def _parse_dyfi_detail(detail):
     # get 1km data set, if exists
     if len(dyfi.getContentsMatching("dyfi_geo_1km.geojson")):
         bytes_1k, _ = dyfi.getContentBytes("dyfi_geo_1km.geojson")
-        df_1k = _parse_geocoded_json(bytes_1k)
+        df_1k = _parse_geocoded_json(bytes_1k, min_nresp)
         return df_1k, ""
 
     # get 10km data set, if exists
     if len(dyfi.getContentsMatching("dyfi_geo_10km.geojson")):
         bytes_10k, _ = dyfi.getContentBytes("dyfi_geo_10km.geojson")
-        df_10k = _parse_geocoded_json(bytes_10k)
+        df_10k = _parse_geocoded_json(bytes_10k, min_nresp)
         return None, "Only 10km dataset found, ignoring."
 
     if not len(df):
@@ -155,13 +155,13 @@ def _parse_dyfi_detail(detail):
             return (None, "No geocoded datasets are available for this event.")
 
         bytes_geo, _ = dyfi.getContentBytes("cdi_geo.txt")
-        df = _parse_geocoded_csv(bytes_geo)
+        df = _parse_geocoded_csv(bytes_geo, min_nresp)
         return None, "Only cdi_geo.txt found, ignoring."
 
     return df, ""
 
 
-def _parse_geocoded_csv(bytes_data):
+def _parse_geocoded_csv(bytes_data, min_nresp):
     # the dataframe we want has columns:
     # 'intensity', 'distance', 'lat', 'lon', 'station', 'nresp'
     # the cdi geo file has:
@@ -186,12 +186,12 @@ def _parse_geocoded_csv(bytes_data):
     else:
         df = df.rename(index=str, columns=DYFI_COLUMNS_REPLACE)
     df = df.drop(["Suspect?", "City", "State"], axis=1)
-    df = df[df["nresp"] >= MIN_RESPONSES]
+    df = df[df["nresp"] >= min_nresp]
 
     return df
 
 
-def _parse_geocoded_json(bytes_data):
+def _parse_geocoded_json(bytes_data, min_nresp):
 
     text_data = bytes_data.decode("utf-8")
     try:
@@ -226,6 +226,6 @@ def _parse_geocoded_json(bytes_data):
         index=str, columns={"cdi": "intensity", "dist": "distance", "name": "station"}
     )
     if df is not None:
-        df = df[df["nresp"] >= MIN_RESPONSES]
+        df = df[df["nresp"] >= min_nresp]
 
     return df
