@@ -2,7 +2,7 @@
     {
         "name": "shakemap",
         "description": "Near-real-time maps of ground motion and shaking intensity",
-        "version": "4.1.4",
+        "version": "v4.1.4",
         "status": "Development",
         "organization": "U.S. Geological Survey",
         "vcs": "git",
