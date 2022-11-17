@@ -1,93 +1,84 @@
-{
-    "version": "2.0.0",
-    "measurermentTyep": {},
-    "agency": "U.S. Department of the Interior",
-    "releases": [
-      {
+[
+    {
         "name": "shakemap",
-        "organization": "U.S. Geological Survey",
         "description": "Near-real-time maps of ground motion and shaking intensity",
-        "version": "4.0.0",
-        "status": "Production",
-
-        "permissions": {
-          "usageType": "openSource",
-          "licenses": [
-            {
-              "name": "Public Domain, CC0-1.0",
-              "URL": "https://github.com/usgs/shakemap/blob/master/LICENSE.md"
-            }
-          ]
-        },
-
-        "homepageURL": "https://usgs.github.io/shakemap/sm4_index.html",
-        "downloadURL": "https://github.com/usgs/shakemap/archive/master.zip",
-        "disclaimerURL": "https://github.com/usgs/shakemap/blob/master/LICENSE.md",
-        "repositoryURL": "https://github.com/usgs/shakemap.git",
+        "version": "4.1.4",
+        "status": "Development",
+        "organization": "U.S. Geological Survey",
         "vcs": "git",
-
-        "laborHours": null,
-
-        "tags": [
-          "earthquake",
-          "shakemap"
-        ],
-
-        "languages": [
-          "python"
-        ],
-
-        "contact": {
-          "name": "C. Bruce Worden",
-          "email": "cbworden@usgs.gov "
+        "repositoryURL": "https://code.usgs.gov/ghsc/esi/shakemap.git",
+        "homepageURL": "https://code.usgs.gov/ghsc/esi/shakemap",
+        "downloadURL": "https://code.usgs.gov/ghsc/esi/shakemap/-/archive/v4.1.4/shakemap-v4.1.4.zip",
+        "disclaimerURL": "https://code.usgs.gov/ghsc/esi/shakemap/-/raw/v4.1.4/DISCLAIMER.md",
+        "permissions": {
+            "licenses": [
+                {
+                    "name": "Public Domain, CC0-1.0",
+                    "URL": "https://code.usgs.gov/ghsc/esi/shakemap/-/raw/v4.1.4/LICENSE.md"
+                }
+            ],
+            "usageType": "openSource",
+            "exemptionText": null
         },
-
+        "laborHours": 1,
+        "languages": [
+            "python",
+            "c"
+        ],
+        "tags": [
+            "earthquake",
+            "shakemap",
+            "impact",
+            "strong motion",
+            "ground motion"
+        ],
+        "contact": {
+            "name": "C. Bruce Worden",
+            "email": "cbworden@contractor.usgs.gov"
+        },
         "date": {
-          "metadataLastUpdated": "2018-08-23"
+            "metadataLastUpdated": "2022-11-17"
         }
-      },
-      {
+    },
+    {
         "name": "shakemap",
-        "organization": "U.S. Geological Survey",
         "description": "Near-real-time maps of ground motion and shaking intensity",
-        "version": "4.1.0",
+        "version": "4.0.3",
         "status": "Production",
-
-        "permissions": {
-          "usageType": "openSource",
-          "licenses": [
-            {
-              "name": "Public Domain, CC0-1.0",
-              "URL": "https://github.com/usgs/shakemap/blob/master/LICENSE.md"
-            }
-          ]
-        },
-
-        "homepageURL": "https://usgs.github.io/shakemap/sm4_index.html",
-        "downloadURL": "https://github.com/usgs/shakemap/archive/master.zip",
-        "disclaimerURL": "https://github.com/usgs/shakemap/blob/master/LICENSE.md",
-        "repositoryURL": "https://github.com/usgs/shakemap.git",
+        "organization": "U.S. Geological Survey",
         "vcs": "git",
-
-        "laborHours": null,
-
-        "tags": [
-          "earthquake",
-          "shakemap"
-        ],
-
-        "languages": [
-          "python"
-        ],
-
-        "contact": {
-          "name": "C. Bruce Worden",
-          "email": "cbworden@contractor.usgs.gov "
+        "repositoryURL": "https://code.usgs.gov/ghsc/esi/shakemap.git",
+        "homepageURL": "https://code.usgs.gov/ghsc/esi/shakemap",
+        "downloadURL": "https://code.usgs.gov/ghsc/esi/shakemap/-/archive/4.0.3/shakemap-4.0.3.zip",
+        "disclaimerURL": "https://code.usgs.gov/ghsc/esi/shakemap/-/raw/4.0.3/DISCLAIMER.md",
+        "permissions": {
+            "licenses": [
+                {
+                    "name": "Public Domain, CC0-1.0",
+                    "URL": "https://code.usgs.gov/ghsc/esi/shakemap/-/raw/4.0.3/LICENSE.md"
+                }
+            ],
+            "usageType": "openSource",
+            "exemptionText": null
         },
-
+        "laborHours": 1,
+        "languages": [
+            "python",
+            "c"
+        ],
+        "tags": [
+            "earthquake",
+            "shakemap",
+            "impact",
+            "strong motion",
+            "ground motion"
+        ],
+        "contact": {
+            "name": "C. Bruce Worden",
+            "email": "cbworden@contractor.usgs.gov"
+        },
         "date": {
-          "metadataLastUpdated": "2022-04-28"
+            "metadataLastUpdated": "2022-11-17"
         }
-      }
-    ]
-}
+    }
+]
