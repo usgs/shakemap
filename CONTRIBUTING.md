@@ -13,7 +13,7 @@ into the project you can [fork this repository][2] and
 Please see the Guidelines for Contributors section of the 
 ShakeMap manual for information on contribution to ShakeMap:
 
-http://usgs.github.io/shakemap/manual4_0/tg_contributing.html
+http://cbworden.github.io/shakemap/manual4_0/tg_contributing.html
 
 For additional information, please see the [USGS software development best
 practices guide][4] and the [USGS Code of Scientific Conduct][5]. 
@@ -125,11 +125,6 @@ The docs can then be previewed by opening `docs/index.html` in a browser.
 
 Notes:
  - Never edit the contents of `docs`, only edit the files in `doc_source`.
- - Remember that the notebooks run gmprocess code when you build the docs, 
-   so please be sure to check that the tutorials ran sucessfully. 
- - The result of the tutorials will depend on your config file options, 
-   so I recommend having a project with the default config file set up 
-   and use that project when building the docs. 
 
 
 [1]: https://code.usgs.gov/ghsc/esi/shakemap/issues

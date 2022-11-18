@@ -1,21 +1,19 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakelib.plotting.contour &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,10 +32,10 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.plotting.contour">
-<span id="shakelib-plotting-contour"></span><h1>shakelib.plotting.contour<a class="headerlink" href="#module-shakelib.plotting.contour" title="Permalink to this heading">¶</a></h1>
+<span id="shakelib-plotting-contour"></span><h1>shakelib.plotting.contour<a class="headerlink" href="#module-shakelib.plotting.contour" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="shakelib.plotting.contour.contour">
-<span class="sig-prename descclassname"><span class="pre">shakelib.plotting.contour.</span></span><span class="sig-name descname"><span class="pre">contour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imtdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/plotting/contour.html#contour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.plotting.contour.contour" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.plotting.contour.contour">
+<code class="sig-prename descclassname"><span class="pre">shakelib.plotting.contour.</span></code><code class="sig-name descname"><span class="pre">contour</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imtdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gmice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/plotting/contour.html#contour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.plotting.contour.contour" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate contours of a specific IMT and return as a Shapely
 MultiLineString object.</p>
 <dl class="field-list simple">
@@ -73,8 +71,8 @@ feature.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="shakelib.plotting.contour.getContourLevels">
-<span class="sig-prename descclassname"><span class="pre">shakelib.plotting.contour.</span></span><span class="sig-name descname"><span class="pre">getContourLevels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">itype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/plotting/contour.html#getContourLevels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.plotting.contour.getContourLevels" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.plotting.contour.getContourLevels">
+<code class="sig-prename descclassname"><span class="pre">shakelib.plotting.contour.</span></code><code class="sig-name descname"><span class="pre">getContourLevels</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">itype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/plotting/contour.html#getContourLevels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.plotting.contour.getContourLevels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get contour levels given min/max values and desired IMT.</p>
 <p>Use itype=’log’ for any IMT that is logarithmically distributed, such as
 PGA, PGV, and Sa. Linear for MMI.</p>
@@ -133,12 +131,12 @@ indicates linear intervals.</p></li>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

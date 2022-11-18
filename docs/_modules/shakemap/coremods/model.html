@@ -1,18 +1,17 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.coremods.model &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -819,7 +818,9 @@
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">dfid</span> <span class="o">==</span> <span class="s2">&quot;df2&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_macroseismic</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">sdf</span><span class="p">,</span> <span class="n">imts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">getStationDictionary</span><span class="p">(</span><span class="n">instrumented</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">sdf</span><span class="p">,</span> <span class="n">imts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">getStationDictionary</span><span class="p">(</span>
+                <span class="n">instrumented</span><span class="o">=</span><span class="n">val</span><span class="p">,</span> <span class="n">min_nresp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;min_nresp&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="n">sdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
                 <span class="n">df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">sdf</span>
@@ -1400,10 +1401,9 @@
                 <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_max_mag</span>
             <span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mu_H_yD</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu_H_yD</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cov_HH_yD</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_HH_yD</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mu_H_yD</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mu_H_yD</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cov_HH_yD</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">cov_HH_yD</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cov_HH_yD</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_HH_yD</span>
             <span class="c1">#</span>
             <span class="c1"># Get the nominal bias and variance</span>
             <span class="c1">#</span>
@@ -2950,12 +2950,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

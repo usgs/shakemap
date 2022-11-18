@@ -1,7 +1,7 @@
 
 .. important::
    This ShakeMap 3.5 Manual is deprecated. Please see the `ShakeMap 4
-   Manual <http://usgs.github.io/shakemap/index.html>`__.
+   Manual <http://cbworden.github.io/shakemap/index.html>`__.
 
 .. _references:
 
@@ -790,7 +790,7 @@ C.B. Worden, M. Hearne, D.J. Wald, and M. Pagani (2016). Complimentary Component
 .. _worden2016b:
 
 Worden, C.B. and D.J. Wald (2016). ShakeMap Manual Online: technical manual, user's guide, and software guide, 
-U. S. Geological Survey. usgs.github.io/shakemap. DOI: 10.5066/F7D21VPQ.
+U. S. Geological Survey. cbworden.github.io/shakemap. DOI: 10.5066/F7D21VPQ.
 \
 
 .. _yamakawa1998:
