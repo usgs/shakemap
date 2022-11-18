@@ -1,21 +1,19 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>4.1. Software Architecture &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,9 +34,9 @@
           <div class="body" role="main">
             
   <section id="software-architecture">
-<span id="sec-architecture-4"></span><h1><span class="section-number">4.1. </span>Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this heading">¶</a></h1>
+<span id="sec-architecture-4"></span><h1><span class="section-number">4.1. </span>Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this headline">¶</a></h1>
 <section id="overview">
-<h2><span class="section-number">4.1.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">4.1.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap v4 is designed to allow flexibility in the organization of
 computing resources. <a class="pageref" href="#architecture-overview">Figure  1</a> illustrates an
 idealized implementation where data preparation, processing, and rendering
@@ -51,10 +49,10 @@ event’s seismotectonic regime and related choices about GMPE selection), and
 produces a file, <em>shake_data.hdf</em>, containing all of these parameters. This
 file may be injected into a messaging system, but may also be used locally
 by subsequent processes.</p>
-<figure class="align-left" id="id1">
+<figure class="align-left" id="figure-1">
 <span id="architecture-overview"></span><a class="reference internal image-reference" href="../_images/sm4.png"><img alt="../_images/sm4.png" src="../_images/sm4.png" style="width: 700px;" /></a>
 <figcaption>
-<p><span class="caption-text">Figure 1: Overview of ShakeMap architecture.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Figure 1: Overview of ShakeMap architecture.</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>The processing continues when <em>shake_data.hdf</em> becomes available. The ShakeMap
@@ -72,10 +70,10 @@ from a messaging system, and run the program <code class="docutils literal notra
 data and configuration choices to those contained in <em>shake_data.hdf</em>
 (see <a class="pageref" href="#shake-consumer">Figure  2</a>). They may then run <code class="docutils literal notranslate"><span class="pre">shake</span> <span class="pre">model</span></code> to
 generate a <em>shake_result.hdf</em> specific to their needs.</p>
-<figure class="align-left" id="id2">
+<figure class="align-left" id="figure-2">
 <span id="shake-consumer"></span><a class="reference internal image-reference" href="../_images/consumer.png"><img alt="../_images/consumer.png" src="../_images/consumer.png" style="width: 700px;" /></a>
 <figcaption>
-<p><span class="caption-text">Figure 2: An example of a consumer of the <em>shake_data.hdf</em> product.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Figure 2: An example of a consumer of the <em>shake_data.hdf</em> product.</span><a class="headerlink" href="#figure-2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Rendering begins when <em>shake_result.hdf</em> becomes available. A set of modules
@@ -93,11 +91,11 @@ generates those products from <em>shake_result.hdf</em> (via <code class="docuti
 products are needed (e.g., from users viewing or requesting downloads) they
 are produced on the fly by the web service. Once generated, products may be
 cached by the web system to improve performance.</p>
-<figure class="align-left" id="id3">
+<figure class="align-left" id="figure-3">
 <span id="shake-web"></span><a class="reference internal image-reference" href="../_images/web.png"><img alt="../_images/web.png" src="../_images/web.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 3: An example of a website using a web service to retrieve products. The web
-service produces products from <em>shake_result.hdf</em>.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+service produces products from <em>shake_result.hdf</em>.</span><a class="headerlink" href="#figure-3" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Any combination of these approaches (i.e., producing products locally or
@@ -109,13 +107,13 @@ are delivered directly by the authoritative ShakeMap system or through a
 web service.</p>
 </section>
 <section id="programs">
-<h2><span class="section-number">4.1.2. </span>Programs<a class="headerlink" href="#programs" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">4.1.2. </span>Programs<a class="headerlink" href="#programs" title="Permalink to this headline">¶</a></h2>
 <p>The core components of ShakeMap are a set of command line programs.
 These programs allow the operator to set up a ShakeMap environment,
 collect data and configurations into inputs (i.e., <em>shake_data.hdf</em>),
 and generate ShakeMap grids and their associated products.</p>
 <section id="sm-profile">
-<h3><span class="section-number">4.1.2.1. </span>sm_profile<a class="headerlink" href="#sm-profile" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.2.1. </span>sm_profile<a class="headerlink" href="#sm-profile" title="Permalink to this headline">¶</a></h3>
 <p>The user will need to run <code class="docutils literal notranslate"><span class="pre">sm_profile</span></code> at least once to create a ShakeMap
 environment, referred to as a ‘profile.’ This environment consists of two
 directories – one for event data, and another for configuration files and
@@ -188,7 +186,7 @@ scenarios, and historic events). See the
 <a class="reference internal" href="../programs/sm_profile.html#sm-profile"><span class="std std-ref">sm_profile man page</span></a> for usage and a list of options.</p>
 </section>
 <section id="shake">
-<h3><span class="section-number">4.1.2.2. </span>shake<a class="headerlink" href="#shake" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.2.2. </span>shake<a class="headerlink" href="#shake" title="Permalink to this headline">¶</a></h3>
 <p>The primary ShakeMap program is called <code class="docutils literal notranslate"><span class="pre">shake</span></code>. It takes an event ID and an
 optional list of modules as arguments. The modules do the work of assembling
 the input data, producing interpolated grids, and deriving products from the
@@ -217,7 +215,7 @@ quit without running <code class="docutils literal notranslate"><span class="pre
 calling <code class="docutils literal notranslate"><span class="pre">shake</span></code> with the <code class="docutils literal notranslate"><span class="pre">--force</span></code> option.</p>
 </section>
 <section id="shake-modules">
-<h3><span class="section-number">4.1.2.3. </span>shake Modules<a class="headerlink" href="#shake-modules" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.2.3. </span>shake Modules<a class="headerlink" href="#shake-modules" title="Permalink to this headline">¶</a></h3>
 <p>Below is a description of many of the modules available to <code class="docutils literal notranslate"><span class="pre">shake</span></code>.
 They are ordered in more or less the order they would be called. The
 module <code class="docutils literal notranslate"><span class="pre">select</span></code> would be run first if the operator wanted to have
@@ -236,7 +234,7 @@ have produced their products.</p>
 <p>To learn the details of the specific products the various modules produce,
 see the Users Guide section <a class="reference internal" href="ug_products.html#sec-products-4"><span class="std std-ref">Products and Formats</span></a>.</p>
 <section id="select">
-<h4><span class="section-number">4.1.2.3.1. </span>select<a class="headerlink" href="#select" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.1. </span>select<a class="headerlink" href="#select" title="Permalink to this headline">¶</a></h4>
 <p>Please see the section <a class="reference internal" href="tg_select.html#sec-select-4"><span class="std std-ref">Ground Motion Model Selection</span></a> for
 details on the way <code class="docutils literal notranslate"><span class="pre">select</span></code> works. <code class="docutils literal notranslate"><span class="pre">select</span></code> will create a file
 called <em>model_select.conf</em> in the event’s <em>current</em> directory. The
@@ -244,7 +242,7 @@ configuration parameters in this file will override those set in the
 sysetm-level <em>model.conf</em> file.</p>
 </section>
 <section id="associate">
-<h4><span class="section-number">4.1.2.3.2. </span>associate<a class="headerlink" href="#associate" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.2. </span>associate<a class="headerlink" href="#associate" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">associate</span></code> module checks a database of station data and searches
 for ground motions that may associate with the event. If any associated
 data are found, they are written to a file <em>*_dat.xml</em> in the event’s
@@ -255,7 +253,7 @@ that data via a program like <code class="docutils literal notranslate"><span cl
 probably not use the <code class="docutils literal notranslate"><span class="pre">associate</span></code> module.</p>
 </section>
 <section id="dyfi">
-<h4><span class="section-number">4.1.2.3.3. </span>dyfi<a class="headerlink" href="#dyfi" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.3. </span>dyfi<a class="headerlink" href="#dyfi" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">dyfi</span></code> module queries ComCat for any “Did You Feel It?” data associated
 with an event and writes that data to a file in the event’s <em>current</em>
 directory.
@@ -265,7 +263,7 @@ unlikely to produce results.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.dyfi.html#module-shakemap.coremods.dyfi" title="shakemap.coremods.dyfi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.dyfi()</span></code></a> for the module’s API documentation.</p>
 </section>
 <section id="assemble">
-<h4><span class="section-number">4.1.2.3.4. </span>assemble<a class="headerlink" href="#assemble" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.4. </span>assemble<a class="headerlink" href="#assemble" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">assemble</span></code> module collects event and configuration data and creates the
 file <em>shake_data.hdf</em>. It first reads <em>event.xml</em> and stores it in a data
 structure. <code class="docutils literal notranslate"><span class="pre">sm_assemble</span></code> then reads the configuration files</p>
@@ -316,15 +314,15 @@ will prompt the user for a comment.
 Run <code class="docutils literal notranslate"><span class="pre">shake</span> <span class="pre">help</span> <span class="pre">assemble</span></code> for more.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.assemble.html#module-shakemap.coremods.assemble" title="shakemap.coremods.assemble"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.assemble()</span></code></a> for the module’s API
 documentation.</p>
-<figure class="align-left" id="id4">
+<figure class="align-left" id="figure-4">
 <span id="shake-assemble"></span><a class="reference internal image-reference" href="../_images/assemble.png"><img alt="../_images/assemble.png" src="../_images/assemble.png" style="width: 700px;" /></a>
 <figcaption>
-<p><span class="caption-text">Figure 4: Data flow of the <em>assemble</em> module.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Figure 4: Data flow of the <em>assemble</em> module.</span><a class="headerlink" href="#figure-4" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="augment">
-<h4><span class="section-number">4.1.2.3.5. </span>augment<a class="headerlink" href="#augment" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.5. </span>augment<a class="headerlink" href="#augment" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">augment</span></code> module behaves in a manner similar to <code class="docutils literal notranslate"><span class="pre">assemble</span></code> except
 that it will first read <em>shake_data.hdf</em> from the event’s <em>current</em>
 directory. If <em>event.xml</em> exists in the event’s <em>current</em> directory, its
@@ -353,7 +351,7 @@ Run <code class="docutils literal notranslate"><span class="pre">shake</span> <s
 documentation.</p>
 </section>
 <section id="model">
-<h4><span class="section-number">4.1.2.3.6. </span>model<a class="headerlink" href="#model" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.6. </span>model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">model</span></code> module reads the data in <em>shake_data.hdf</em> and produces an
 interpolated ShakeMap. Depending upon the settings found in <em>model.conf</em>,
 the interpolation product may be a grid or a set of points. See
@@ -380,7 +378,7 @@ format and content of <em>shake_result.hdf</em>.</p>
 documentation.</p>
 </section>
 <section id="contour">
-<h4><span class="section-number">4.1.2.3.7. </span>contour<a class="headerlink" href="#contour" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.7. </span>contour<a class="headerlink" href="#contour" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">contour</span></code> reads an event’s <em>shake_result.hdf</em> and produces iso-seismal
 contours for each of the intensity measure types found therein. The contours
 are written as GeoJSON to files called <em>cont_&lt;imt_type&gt;.json</em> in the event’s
@@ -388,7 +386,7 @@ are written as GeoJSON to files called <em>cont_&lt;imt_type&gt;.json</em> in th
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.contour()</span></code></a> for the module’s API documentation..</p>
 </section>
 <section id="coverage">
-<h4><span class="section-number">4.1.2.3.8. </span>coverage<a class="headerlink" href="#coverage" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.8. </span>coverage<a class="headerlink" href="#coverage" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">coverage</span></code> reads an event’s <em>shake_result.hdf</em> and produces low-, medium-,
 and high-resolution “coverages” for interactive maps and plots in the
 <a class="reference external" href="https://www.w3.org/TR/covjson-overview/">CoverageJSON format</a>, and places
@@ -396,7 +394,7 @@ them in the <em>current/products</em> subdirectory.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.coverage.html#module-shakemap.coremods.coverage" title="shakemap.coremods.coverage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.coverage()</span></code></a> for the module’s API documentation..</p>
 </section>
 <section id="gridxml">
-<h4><span class="section-number">4.1.2.3.9. </span>gridxml<a class="headerlink" href="#gridxml" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.9. </span>gridxml<a class="headerlink" href="#gridxml" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">gridxml</span></code> reads an event’s <em>shake_result.hdf</em> and produces the ShakeMap 3.5
 files <em>grid.xml</em> and <em>uncertainty.xml</em>. Note that these files will eventually
 become deprecated in favor of the new <em>shake_result.hdf</em> file.
@@ -410,14 +408,14 @@ format and content of <em>shake_result.hdf</em>.</p>
 documentation.</p>
 </section>
 <section id="info">
-<h4><span class="section-number">4.1.2.3.10. </span>info<a class="headerlink" href="#info" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.10. </span>info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">info</span></code> reads an event’s <em>shake_result.hdf</em> and produces <em>info.json</em>,
 which contains metadata about the ShakeMap.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.info.html#module-shakemap.coremods.info" title="shakemap.coremods.info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.info()</span></code></a> for the module’s API
 documentation.</p>
 </section>
 <section id="kml">
-<h4><span class="section-number">4.1.2.3.11. </span>kml<a class="headerlink" href="#kml" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.11. </span>kml<a class="headerlink" href="#kml" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">kml</span></code> reads <em>shake_result.hdf</em> and produces a file, <em>shakemap.kmz</em>
 which is a self-contained file of geographic layers suitable for
 reading into Google Earth. The layers include an MMI overlay and MMI
@@ -425,7 +423,7 @@ polygons, contours of MMI and the other IMTs found in <code class="docutils lite
 station locations and data, and the event’s epicenter.</p>
 </section>
 <section id="mapping">
-<h4><span class="section-number">4.1.2.3.12. </span>mapping<a class="headerlink" href="#mapping" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.12. </span>mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">mapping</span></code> reads an event’s <em>shake_result.hdf</em> and produces a set of
 maps of the IMTs in both JPEG and PDF format. Also produced is an abstract
 thumbnail image of MMI which may be used as a symbolic logo or pin for
@@ -436,7 +434,7 @@ See the configuration file <em>products.conf</em> for information on configuring
 the <code class="docutils literal notranslate"><span class="pre">mapping</span></code> module.</p>
 </section>
 <section id="plotregr">
-<h4><span class="section-number">4.1.2.3.13. </span>plotregr<a class="headerlink" href="#plotregr" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.13. </span>plotregr<a class="headerlink" href="#plotregr" title="Permalink to this headline">¶</a></h4>
 <p>When <code class="docutils literal notranslate"><span class="pre">model</span></code> runs, it produces a set of curves of the selected GMPE vs.
 distance, as well as a set of distance metrics [e.g., epi- and hypo-central
 distances, rupture distance, and Joyner-Boore distance (where the rupture
@@ -461,7 +459,7 @@ use of the much richer data found in the station file, and are a far better
 tool for studying the characteristics of the data,</p>
 </section>
 <section id="raster">
-<h4><span class="section-number">4.1.2.3.14. </span>raster<a class="headerlink" href="#raster" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.14. </span>raster<a class="headerlink" href="#raster" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">raster</span></code> reads an event’s <em>shake_result.hdf</em> and produces GIS
 raster files of the mean and standard deviation for each of the
 IMTs in <em>shake_result.hdf</em>.</p>
@@ -469,7 +467,7 @@ IMTs in <em>shake_result.hdf</em>.</p>
 documentation.</p>
 </section>
 <section id="rupture">
-<h4><span class="section-number">4.1.2.3.15. </span>rupture<a class="headerlink" href="#rupture" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.15. </span>rupture<a class="headerlink" href="#rupture" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">rupture</span></code> reads an event’s <em>shake_result.hdf</em> and produces a
 file, <em>rupture.json</em> containing the coordinates of the rupture
 plane(s) supplied via the input file <em>&lt;&gt;_fault.txt</em> or <em>&lt;&gt;_fault.json</em>.</p>
@@ -477,7 +475,7 @@ plane(s) supplied via the input file <em>&lt;&gt;_fault.txt</em> or <em>&lt;&gt;
 documentation.</p>
 </section>
 <section id="shape">
-<h4><span class="section-number">4.1.2.3.16. </span>shape<a class="headerlink" href="#shape" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.16. </span>shape<a class="headerlink" href="#shape" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">shape</span></code> reads an event’s <em>shake_result.hdf</em> and produces a set of
 ESRI-style shape files for the ground motion parameters found therein.
 The shape files are zipped together with supporting .lyr, .prj, and
@@ -486,7 +484,7 @@ use of the shape files is deprecated and it is preferable to use the
 ESRI raster file (see the <code class="docutils literal notranslate"><span class="pre">raster</span></code> section, above.)</p>
 </section>
 <section id="stations">
-<h4><span class="section-number">4.1.2.3.17. </span>stations<a class="headerlink" href="#stations" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.17. </span>stations<a class="headerlink" href="#stations" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">stations</span></code> reads an event’s <em>shake_result.hdf</em> and produces a
 JSON file, <em>stationlist.json</em>, of the input station data. The output
 JSON also contains predicted values (on “rock” and “soil”), inter- and
@@ -496,7 +494,7 @@ intra-event uncertainties for each type of prediction, converted amplitudes
 documentation.</p>
 </section>
 <section id="transfer">
-<h4><span class="section-number">4.1.2.3.18. </span>transfer<a class="headerlink" href="#transfer" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.3.18. </span>transfer<a class="headerlink" href="#transfer" title="Permalink to this headline">¶</a></h4>
 <p>There are three main <code class="docutils literal notranslate"><span class="pre">transfer</span></code> programs: <code class="docutils literal notranslate"><span class="pre">transfer_email</span></code> (which sends
 email to a list of users), <code class="docutils literal notranslate"><span class="pre">transfer_pdl</span></code> (which inserts the ShakeMap
 products into the <a class="reference external" href="pdl-client-4">PDL system</a>), and <code class="docutils literal notranslate"><span class="pre">transfer_scp</span></code> (which does a
@@ -510,47 +508,47 @@ documentation.</p>
 </section>
 </section>
 <section id="miscellaneous-shake-modules">
-<h3><span class="section-number">4.1.2.4. </span>Miscellaneous shake Modules<a class="headerlink" href="#miscellaneous-shake-modules" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.2.4. </span>Miscellaneous shake Modules<a class="headerlink" href="#miscellaneous-shake-modules" title="Permalink to this headline">¶</a></h3>
 <p>The modules below have special purposes and are generally not used in
 routine processing.</p>
 <section id="history">
-<h4><span class="section-number">4.1.2.4.1. </span>history<a class="headerlink" href="#history" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.4.1. </span>history<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">hisotry</span></code> module will attempt to read the ShakeMap history
 information stored in the event’s <em>shake_data.hdf</em> or backup files
 and print it to the screen.</p>
 </section>
 <section id="save">
-<h4><span class="section-number">4.1.2.4.2. </span>save<a class="headerlink" href="#save" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.4.2. </span>save<a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">save</span></code> module generates a new <em>backup????</em> directory with the
 contents of the event’s <em>current</em> directory. It is useful for preserving
 intermediate results.</p>
 </section>
 <section id="sleep">
-<h4><span class="section-number">4.1.2.4.3. </span>sleep<a class="headerlink" href="#sleep" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">4.1.2.4.3. </span>sleep<a class="headerlink" href="#sleep" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">sleep</span></code> module will cause the calling process to sleep for a
 specified number of seconds. It may be useful under certain circumstances.</p>
 </section>
 </section>
 </section>
 <section id="additional-programs">
-<h2><span class="section-number">4.1.3. </span>Additional Programs<a class="headerlink" href="#additional-programs" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">4.1.3. </span>Additional Programs<a class="headerlink" href="#additional-programs" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap provides a few auxiliary programs that may occasionally be
 useful.</p>
 <section id="getdyfi">
-<h3><span class="section-number">4.1.3.1. </span>getdyfi<a class="headerlink" href="#getdyfi" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.1. </span>getdyfi<a class="headerlink" href="#getdyfi" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">getdyfi</span></code> is a standalone program implementing the <code class="docutils literal notranslate"><span class="pre">dyfi</span></code> module’s
 functionality.  See the <a class="reference internal" href="../programs/getdyfi.html#getdyfi"><span class="std std-ref">getdyfi man page</span></a> for usage and a
 list of options.</p>
 </section>
 <section id="sm-compare">
-<h3><span class="section-number">4.1.3.2. </span>sm_compare<a class="headerlink" href="#sm-compare" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.2. </span>sm_compare<a class="headerlink" href="#sm-compare" title="Permalink to this headline">¶</a></h3>
 <p>Allows the user to compare two ShakeMaps by making images of their
 difference and ratio.</p>
 <p>See the <a class="reference internal" href="../programs/sm_compare.html#sm-compare"><span class="std std-ref">sm_compare man page</span></a> for usage and a
 list of options.</p>
 </section>
 <section id="sm-create">
-<h3><span class="section-number">4.1.3.3. </span>sm_create<a class="headerlink" href="#sm-create" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.3. </span>sm_create<a class="headerlink" href="#sm-create" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">sm_create</span></code> queries the NEIC ComCat database for ShakeMap data
 associated with an event and writes that data into the event’s
 local <em>current</em> directory. The event will then be available for
@@ -559,7 +557,7 @@ local processing.</p>
 list of options.</p>
 </section>
 <section id="sm-migrate">
-<h3><span class="section-number">4.1.3.4. </span>sm_migrate<a class="headerlink" href="#sm-migrate" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.4. </span>sm_migrate<a class="headerlink" href="#sm-migrate" title="Permalink to this headline">¶</a></h3>
 <p>Migrates a directory of ShakeMap 3.5 data files into ShakeMap v4 inputs.
 The migration of GMPEs is configurable via the <em>migrate.conf</em> configuration
 file.</p>
@@ -567,7 +565,7 @@ file.</p>
 list of options.</p>
 </section>
 <section id="sm-queue">
-<h3><span class="section-number">4.1.3.5. </span>sm_queue<a class="headerlink" href="#sm-queue" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.5. </span>sm_queue<a class="headerlink" href="#sm-queue" title="Permalink to this headline">¶</a></h3>
 <p>A daemon process to receive messages from external systems for the
 triggering and cancellation of ShakeMap runs. See the section
 <a class="reference internal" href="sg_queue.html#sec-queue-4"><span class="std std-ref">Queueing Events</span></a> for more detail. The behavior
@@ -579,7 +577,7 @@ may be retrieved from the source directory
 list of options.</p>
 </section>
 <section id="receive-amps-receive-origins-and-associate-amps">
-<h3><span class="section-number">4.1.3.6. </span>receive_amps, receive_origins, and associate_amps<a class="headerlink" href="#receive-amps-receive-origins-and-associate-amps" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.6. </span>receive_amps, receive_origins, and associate_amps<a class="headerlink" href="#receive-amps-receive-origins-and-associate-amps" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">receive_amps</span></code> and <code class="docutils literal notranslate"><span class="pre">receive_origins</span></code> are intended to be run
 by a configured instance of the USGS’s Product
 Distribution system (PDL) to inform <code class="docutils literal notranslate"><span class="pre">sm_queue</span></code> of new origins and
@@ -592,7 +590,7 @@ input files with those that associate. Again, this will be of
 limited utility to users not running PDL.</p>
 </section>
 <section id="run-verification">
-<h3><span class="section-number">4.1.3.7. </span>run_verification<a class="headerlink" href="#run-verification" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.7. </span>run_verification<a class="headerlink" href="#run-verification" title="Permalink to this headline">¶</a></h3>
 <p>Runs a set of simple verification tests and displays the results.
 The resulting plots may be compared to those found in the
 documentation section <a class="reference internal" href="tg_verification.html#sec-verification-4"><span class="std std-ref">Verification</span></a>.
@@ -600,16 +598,16 @@ documentation section <a class="reference internal" href="tg_verification.html#s
 usage and notes.</p>
 </section>
 <section id="sm-batch">
-<h3><span class="section-number">4.1.3.8. </span>sm_batch<a class="headerlink" href="#sm-batch" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.8. </span>sm_batch<a class="headerlink" href="#sm-batch" title="Permalink to this headline">¶</a></h3>
 <p>Will run a list of events specified in a text file containing one event
 ID per line.</p>
 </section>
 <section id="sm-check">
-<h3><span class="section-number">4.1.3.9. </span>sm_check<a class="headerlink" href="#sm-check" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.9. </span>sm_check<a class="headerlink" href="#sm-check" title="Permalink to this headline">¶</a></h3>
 <p>Will check the user’s configuration files for certain types of errors.</p>
 </section>
 <section id="sm-rupture">
-<h3><span class="section-number">4.1.3.10. </span>sm_rupture<a class="headerlink" href="#sm-rupture" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">4.1.3.10. </span>sm_rupture<a class="headerlink" href="#sm-rupture" title="Permalink to this headline">¶</a></h3>
 <p>Will create or convert a rupture file for ShakeMap v4. Run the program
 with the “–help” option for an explanation and a list of options.</p>
 </section>
@@ -719,12 +717,12 @@ with the “–help” option for an explanation and a list of options.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

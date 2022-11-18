@@ -6,13 +6,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.gmpe.nga_east &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -51,6 +52,7 @@
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.usgs_ceus_2019</span> <span class="kn">import</span> <span class="n">NGAEastUSGSGMPE</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.gmpe_table</span> <span class="kn">import</span> <span class="n">_return_tables</span>
 
+<span class="kn">from</span> <span class="nn">shakelib.multiutils</span> <span class="kn">import</span> <span class="n">gmpe_gmas</span>
 <span class="kn">from</span> <span class="nn">shakelib.conversions.imt.abrahamson_bhasin_2020</span> <span class="kn">import</span> <span class="n">AbrahamsonBhasin2020</span>
 
 <span class="c1"># Max distance for evaluating NGAEast. This *should* be 1500, but due to what</span>
@@ -167,7 +169,7 @@
         <span class="c1"># below, we need to do it all in rup, then pass rup as all three</span>
         <span class="c1"># contexts when we call the gmpe.get_mean_and_stddevs()</span>
         <span class="n">rup</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">rx</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;</span> <span class="mf">4.0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;</span> <span class="mf">4.0</span><span class="p">):</span>
             <span class="n">is_small_mag</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">delta_mag</span> <span class="o">=</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">4.0</span>
             <span class="n">rup</span><span class="o">.</span><span class="n">mag</span> <span class="o">=</span> <span class="mf">4.0</span>
@@ -234,9 +236,7 @@
                     <span class="c1">#</span>
                     <span class="c1"># No table for PGV, compute vimt, then convert to PGV</span>
                     <span class="c1">#</span>
-                    <span class="n">vmean</span><span class="p">,</span> <span class="n">vstddevs</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                        <span class="n">rup</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">vimt</span><span class="p">,</span> <span class="n">stddev_types</span>
-                    <span class="p">)</span>
+                    <span class="n">vmean</span><span class="p">,</span> <span class="n">vstddevs</span> <span class="o">=</span> <span class="n">gmpe_gmas</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">vimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
                     <span class="n">tmean</span><span class="p">,</span> <span class="n">tstddevs</span> <span class="o">=</span> <span class="n">ab2020</span><span class="o">.</span><span class="n">getPGVandSTDDEVS</span><span class="p">(</span>
                         <span class="n">vmean</span><span class="p">,</span> <span class="n">vstddevs</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">,</span> <span class="n">rup</span><span class="o">.</span><span class="n">rrup</span><span class="p">,</span> <span class="n">rup</span><span class="o">.</span><span class="n">vs30</span>
                     <span class="p">)</span>
@@ -246,13 +246,9 @@
                     <span class="c1">#</span>
                     <span class="c1"># Table exists for PGV, proceed normally</span>
                     <span class="c1">#</span>
-                    <span class="n">tmean</span><span class="p">,</span> <span class="n">tstddevs</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                        <span class="n">rup</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span>
-                    <span class="p">)</span>
+                    <span class="n">tmean</span><span class="p">,</span> <span class="n">tstddevs</span> <span class="o">=</span> <span class="n">gmpe_gmas</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">tmean</span><span class="p">,</span> <span class="n">tstddevs</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                    <span class="n">rup</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span>
-                <span class="p">)</span>
+                <span class="n">tmean</span><span class="p">,</span> <span class="n">tstddevs</span> <span class="o">=</span> <span class="n">gmpe_gmas</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
 
             <span class="n">mean</span> <span class="o">+=</span> <span class="n">tmean</span> <span class="o">*</span> <span class="n">total_gmpe_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tstddevs</span><span class="p">):</span>
@@ -309,9 +305,9 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -320,7 +316,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>

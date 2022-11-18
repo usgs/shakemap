@@ -1,21 +1,19 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakelib.gmpe.nullgmpe &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -33,14 +31,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="shakelib-gmpe-nullgmpe">
-<h1>shakelib.gmpe.nullgmpe<a class="headerlink" href="#shakelib-gmpe-nullgmpe" title="Permalink to this heading">¶</a></h1>
+  <section id="module-shakelib.gmpe.nullgmpe">
+<span id="shakelib-gmpe-nullgmpe"></span><h1>shakelib.gmpe.nullgmpe<a class="headerlink" href="#module-shakelib.gmpe.nullgmpe" title="Permalink to this headline">¶</a></h1>
 <p>A GMPE that returns a constant everywhere. Useful for testing, but
 nothing else.</p>
-<span class="target" id="module-shakelib.gmpe.nullgmpe"></span><dl class="py class">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.gmpe.nullgmpe.</span></span><span class="sig-name descname"><span class="pre">NullGMPE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmpe/nullgmpe.html#NullGMPE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GMPE</span></code></p>
+<dl class="py class">
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">shakelib.gmpe.nullgmpe.</span></code><code class="sig-name descname"><span class="pre">NullGMPE</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmpe/nullgmpe.html#NullGMPE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openquake.hazardlib.gsim.base.GMPE</span></code></p>
 <p>This is a GMPE for testing. It returns the mean and stddevs
 specified in the constructor.</p>
 <p>The default constructor takes three named arguments:</p>
@@ -60,16 +58,16 @@ GMPE (default=0.6)</p></li>
 </dl>
 <p>The total standard deviation returned will be <code class="docutils literal notranslate"><span class="pre">sqrt(phi^2</span> <span class="pre">+</span> <span class="pre">tau^2)</span></code>.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_TECTONIC_REGION_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Active</span> <span class="pre">Shallow</span> <span class="pre">Crust'</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
+<code class="sig-name descname"><span class="pre">DEFINED_FOR_TECTONIC_REGION_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Active</span> <span class="pre">Shallow</span> <span class="pre">Crust'</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reference to a
 <code class="xref py py-class docutils literal notranslate"><span class="pre">tectonic</span> <span class="pre">region</span> <span class="pre">type</span></code> this GSIM
 is defined for. One GSIM can implement only one tectonic region type.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({&lt;function</span> <span class="pre">SA&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">PGA&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">PGV&gt;})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
+<code class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({&lt;function</span> <span class="pre">PGA&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">PGV&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">SA&gt;})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of <code class="xref py py-mod docutils literal notranslate"><span class="pre">intensity</span> <span class="pre">measure</span> <span class="pre">types</span></code>
 this GSIM can
 calculate. A set should contain classes from module
@@ -77,8 +75,8 @@ calculate. A set should contain classes from module
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Greater</span> <span class="pre">of</span> <span class="pre">two</span> <span class="pre">horizontal'</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
+<code class="sig-name descname"><span class="pre">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Greater</span> <span class="pre">of</span> <span class="pre">two</span> <span class="pre">horizontal'</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
 <dd><p><cite>intensity measure component type
 &lt;openquake.hazardlib.const.IMC&gt;</cite> this GSIM can calculate mean
 and standard
@@ -94,16 +92,16 @@ deviation for.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
-<span class="sig-name descname"><span class="pre">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'Inter</span> <span class="pre">event',</span> <span class="pre">'Intra</span> <span class="pre">event',</span> <span class="pre">'Total'})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
+<code class="sig-name descname"><span class="pre">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({'Inter</span> <span class="pre">event',</span> <span class="pre">'Intra</span> <span class="pre">event',</span> <span class="pre">'Total'})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of
 <code class="xref py py-class docutils literal notranslate"><span class="pre">standard</span> <span class="pre">deviation</span> <span class="pre">types</span></code>
 this GSIM can calculate.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_SITES_PARAMETERS">
-<span class="sig-name descname"><span class="pre">REQUIRES_SITES_PARAMETERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'vs30'})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_SITES_PARAMETERS">
+<code class="sig-name descname"><span class="pre">REQUIRES_SITES_PARAMETERS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({'vs30'})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of site parameters names this GSIM needs. The set should include
 strings that match names of the attributes of a <code class="xref py py-class docutils literal notranslate"><span class="pre">site</span></code> object.
 Those attributes are then available in the
@@ -111,8 +109,8 @@ Those attributes are then available in the
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_RUPTURE_PARAMETERS">
-<span class="sig-name descname"><span class="pre">REQUIRES_RUPTURE_PARAMETERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_RUPTURE_PARAMETERS">
+<code class="sig-name descname"><span class="pre">REQUIRES_RUPTURE_PARAMETERS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set of rupture parameters (excluding distance information) required
 by GSIM. Supported parameters are:</p>
 <dl class="simple">
@@ -133,20 +131,38 @@ attributes with same names.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_DISTANCES">
-<span class="sig-name descname"><span class="pre">REQUIRES_DISTANCES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'rjb'})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
-<dd><p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dppvalue()</span></code>.
-<code class="docutils literal notranslate"><span class="pre">rvolc</span></code></p>
-<blockquote>
-<div><p>Source to site distance passing through surface projection of volcanic zone</p>
-</div></blockquote>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_DISTANCES">
+<code class="sig-name descname"><span class="pre">REQUIRES_DISTANCES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">frozenset({'rjb'})</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set of types of distance measures between rupture and sites. Possible
+values are:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">rrup</span></code></dt><dd><p>Closest distance to rupture surface.  See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_min_distance()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rjb</span></code></dt><dd><p>Distance to rupture’s surface projection. See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_joyner_boore_distance()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rx</span></code></dt><dd><p>Perpendicular distance to rupture top edge projection.
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_rx_distance()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ry0</span></code></dt><dd><p>Horizontal distance off the end of the rupture measured parallel to
+strike.
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_ry0_distance()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rcdpp</span></code></dt><dd><p>Direct point parameter for directivity effect centered on the site- and earthquake-specific
+average DPP used. See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dppvalue()</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rvolc</span></code></dt><dd><p>Source to site distance passing through surface projection of volcanic zone.</p>
+</dd>
+</dl>
 <p>All the distances are available from the <code class="xref py py-class docutils literal notranslate"><span class="pre">DistancesContext</span></code>
 object attributes with same names. Values are in kilometers.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.get_mean_and_stddevs">
-<span class="sig-name descname"><span class="pre">get_mean_and_stddevs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev_types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmpe/nullgmpe.html#NullGMPE.get_mean_and_stddevs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.get_mean_and_stddevs">
+<code class="sig-name descname"><span class="pre">get_mean_and_stddevs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev_types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/gmpe/nullgmpe.html#NullGMPE.get_mean_and_stddevs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements the OpenQuake GroundShakingIntensityModel
 get_mean_and_stddevs interface. See superclass
 <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs">method</a>.</p>
@@ -156,8 +172,8 @@ any of the other contexts. The imt is also ignored.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="shakelib.gmpe.nullgmpe.NullGMPE.COEFFS">
-<span class="sig-name descname"><span class="pre">COEFFS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;CoeffsTable</span> <span class="pre">c1&gt;</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.COEFFS" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.gmpe.nullgmpe.NullGMPE.COEFFS">
+<code class="sig-name descname"><span class="pre">COEFFS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;CoeffsTable</span> <span class="pre">c1&gt;</span></em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.COEFFS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -199,12 +215,12 @@ any of the other contexts. The imt is also ignored.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

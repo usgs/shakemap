@@ -1,21 +1,19 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>2.6. Representing Macroseismic Intensity on Maps &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -37,11 +35,11 @@
             
   <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>This ShakeMap 3.5 Manual is deprecated. Please see the <a class="reference external" href="http://usgs.github.io/shakemap/index.html">ShakeMap 4
+<p>This ShakeMap 3.5 Manual is deprecated. Please see the <a class="reference external" href="http://cbworden.github.io/shakemap/index.html">ShakeMap 4
 Manual</a>.</p>
-</div>
+</aside>
 <section id="representing-macroseismic-intensity-on-maps">
-<span id="sec-tg-intensity"></span><h1><span class="section-number">2.6. </span>Representing Macroseismic Intensity on Maps<a class="headerlink" href="#representing-macroseismic-intensity-on-maps" title="Permalink to this heading">¶</a></h1>
+<span id="sec-tg-intensity"></span><h1><span class="section-number">2.6. </span>Representing Macroseismic Intensity on Maps<a class="headerlink" href="#representing-macroseismic-intensity-on-maps" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="../manual4_0/sm4_references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> relates recorded ground motions to Modified Mercalli Intensities in
 California. While not the first work of its type, Wald et al. had the advantage of using
 several earthquakes that were both very well surveyed for MMI, and also well
@@ -69,7 +67,7 @@ perceived shaking and potential damage consistent with both human response and
 damage assessments of past earthquakes to characterize the shaking from just-occurred
 earthquakes.</p>
 <section id="color-palette-for-the-shakemap-instrumental-intensity-scale">
-<h2><span class="section-number">2.6.1. </span>Color Palette for the ShakeMap Instrumental Intensity Scale<a class="headerlink" href="#color-palette-for-the-shakemap-instrumental-intensity-scale" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.6.1. </span>Color Palette for the ShakeMap Instrumental Intensity Scale<a class="headerlink" href="#color-palette-for-the-shakemap-instrumental-intensity-scale" title="Permalink to this headline">¶</a></h2>
 <p>The color coding for the Instrumental Intensity map uses a standard rainbow palette (see Table
 1.1).  The “cool” to “hot” color scheme is familiar to most and is readily recognizable,
 as it is used as a standard in many fields (for example, see USA Today’s daily temperature
@@ -207,7 +205,7 @@ to columns 6-8.</p>
 <div class="line"><br /></div>
 </div>
 <a class="reference internal image-reference" href="../_images/Figure_1_16_top.png"><img alt="../_images/Figure_1_16_top.png" src="../_images/Figure_1_16_top.png" style="width: 650px;" /></a>
-<figure class="align-left" id="id1">
+<figure class="align-left" id="figure-1">
 <span id="figure1-16"></span><a class="reference internal image-reference" href="../_images/Figure_1_16_bottom.png"><img alt="../_images/Figure_1_16_bottom.png" src="../_images/Figure_1_16_bottom.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 1: Top: ShakeMap Instrumental Intensity Scale Legend: Color palette, two-word
@@ -216,7 +214,7 @@ motions are applicable to <a class="reference internal" href="../manual4_0/sm4_r
 Conversion Equations use the same color scale, but their ranges of peak motions will differ. Bottom:
 Legend below PGV ShakeMap. The legend for below each ShakeMap is now map
 (parameter-) and GMICE-specific as labeled. Color-coding of stations corresponds to their
-intensity the GMICE (ground motion/intensity) relationship.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+intensity the GMICE (ground motion/intensity) relationship.</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>We drape the color-coded Instrumental Intensity values over the topography to maximize
@@ -226,7 +224,7 @@ amplification, but we recognize that many users do not necessarily
 benefit intuitively from having topography as a basemap.</p>
 </section>
 <section id="shakemap-instrumental-intensity-scale-text-descriptions">
-<h2><span class="section-number">2.6.2. </span>ShakeMap Instrumental Intensity Scale Text Descriptions<a class="headerlink" href="#shakemap-instrumental-intensity-scale-text-descriptions" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.6.2. </span>ShakeMap Instrumental Intensity Scale Text Descriptions<a class="headerlink" href="#shakemap-instrumental-intensity-scale-text-descriptions" title="Permalink to this headline">¶</a></h2>
 <p>The estimated intensity map is usually wholly or partially derived from ground motions
 recorded by seismic instruments, and represents intensities that are likely to have been
 associated with the recorded ground motions. However, unlike conventional intensities,
@@ -273,7 +271,7 @@ V is  “strong.”  Higher EMS-98 intensities are given bullet descriptions in 
 damage they produce, rather than the strength of perceived shaking.</p>
 </section>
 <section id="shakemap-intensity-scale-and-peak-ground-motions">
-<h2><span class="section-number">2.6.3. </span>ShakeMap Intensity Scale and Peak Ground Motions<a class="headerlink" href="#shakemap-intensity-scale-and-peak-ground-motions" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.6.3. </span>ShakeMap Intensity Scale and Peak Ground Motions<a class="headerlink" href="#shakemap-intensity-scale-and-peak-ground-motions" title="Permalink to this headline">¶</a></h2>
 <p>The ShakeMap Instrumental Intensity Scale Legend provides the PGA and PGV
 associated with the central value in each
 intensity box (see <a class="pageref" href="#figure1-16">Figure  1</a>). For all current GMICEs, the ground motion scale is
@@ -290,7 +288,7 @@ no longer provided by (previously redundant) PGM ranges, but rather by the media
 motions associated with the intensity on the scale.</p>
 </section>
 <section id="color-coding-stations-by-intensity">
-<h2><span class="section-number">2.6.4. </span>Color Coding Stations by Intensity<a class="headerlink" href="#color-coding-stations-by-intensity" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.6.4. </span>Color Coding Stations by Intensity<a class="headerlink" href="#color-coding-stations-by-intensity" title="Permalink to this headline">¶</a></h2>
 <p>Traditionally, stations on the PGM ShakeMaps were color-coded to the seismic network
 that provided them. More recent versions of ShakeMap, however, allow the operator to
 color the stations with the intensity they produced, with each PGM parameter (e.g., PGA,
@@ -298,7 +296,7 @@ PGV, PSA03) using its own intensity correlation. <a class="pageref" href="#figur
 many of the other figures throughout this guide) illustrates the color coding of stations
 by their intensity values for several parameters. The operator can elect this option by
 calling the program <em>mapping</em> with the flag <em>-pgminten</em>.</p>
-<figure class="align-center" id="id2">
+<figure class="align-center" id="figure-2">
 <span id="figure1-11"></span><a class="reference internal image-reference" href="../_images/Figure_1_11.png"><img alt="../_images/Figure_1_11.png" src="../_images/Figure_1_11.png" style="width: 617.5px; height: 1234.05px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 2: ShakeMap for the 1994 M6.7 Northridge, CA earthquake with a finite fault (red
@@ -306,7 +304,7 @@ rectangle), strong motion data (triangles) and intensity data (circles). Station
 data are color coded according to their intensity value, either as observed (for macroseismic data)
 or as converted by <a class="reference internal" href="references.html#worden2011"><span class="std std-ref">Worden et al. (2011)</span></a> and indicated by the scales shown. Note:
 Macroseismic data do not change colors from map to map, but seismic stations do, since the
-estimated intensity conversion depends on which parameter is used.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+estimated intensity conversion depends on which parameter is used.</span><a class="headerlink" href="#figure-2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -373,12 +371,12 @@ estimated intensity conversion depends on which parameter is used.</span><a clas
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

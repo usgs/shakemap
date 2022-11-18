@@ -1,21 +1,19 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>2.4. Ground Motion Model Selection &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,9 +34,9 @@
           <div class="body" role="main">
             
   <section id="ground-motion-model-selection">
-<span id="sec-select-4"></span><h1><span class="section-number">2.4. </span>Ground Motion Model Selection<a class="headerlink" href="#ground-motion-model-selection" title="Permalink to this heading">¶</a></h1>
+<span id="sec-select-4"></span><h1><span class="section-number">2.4. </span>Ground Motion Model Selection<a class="headerlink" href="#ground-motion-model-selection" title="Permalink to this headline">¶</a></h1>
 <section id="overview">
-<h2><span class="section-number">2.4.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.4.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>Tectonic classification of earthquakes is a key component of the USGS
 Global ShakeMap system because it serves as the basis for the selection
 of ground motion prediction equations (GMPEs). GMPE selection has a
@@ -74,16 +72,16 @@ layers will use.</p>
 documentation.</p>
 </section>
 <section id="tectonic-regions">
-<h2><span class="section-number">2.4.2. </span>Tectonic Regions<a class="headerlink" href="#tectonic-regions" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.4.2. </span>Tectonic Regions<a class="headerlink" href="#tectonic-regions" title="Permalink to this headline">¶</a></h2>
 <p><a class="pageref" href="#select-regions">Figure  1</a> shows a global map of the first layer of
 information, which is a set of four mutually exclusive and globally
 exhaustive classes, which we refer to as <strong>tectonic regions</strong>: active
 crustal region (ACR), stable continental region (SCR), subduction (SUB), and
 volcanic (VOL).</p>
-<figure class="align-left" id="id1">
+<figure class="align-left" id="figure-1">
 <span id="select-regions"></span><a class="reference internal image-reference" href="../_images/select_regions.png"><img alt="../_images/select_regions.png" src="../_images/select_regions.png" style="width: 700px;" /></a>
 <figcaption>
-<p><span class="caption-text">Figure 1: Map of main tectonic regions.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Figure 1: Map of main tectonic regions.</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>These regions are a simplification of the seismotectonic domains developed by
@@ -203,14 +201,14 @@ Normalizing by the total, the final weights would be 0.625 ‘scr’ and
 <p><a class="pageref" href="#tectonic-region-example">Figure  2</a> maps the probabilities for the main
 tectonic regions in the northwest US. This illustrates how the horizontal
 buffer smoothly transitions between the regions.</p>
-<figure class="align-left" id="id2">
+<figure class="align-left" id="figure-2">
 <span id="tectonic-region-example"></span><a class="reference internal image-reference" href="../_images/select_example_tect_regions.png"><img alt="../_images/select_example_tect_regions.png" src="../_images/select_example_tect_regions.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 2: Maps of the probability of the four main tectonic regions in the
 northwest US.
 Top left: active crustal region (ACR); Top right: stable continental
 region(SCR);
-Bottom left: subduction (SUB); Bottom right: volcanic (VOL).</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+Bottom left: subduction (SUB); Bottom right: volcanic (VOL).</span><a class="headerlink" href="#figure-2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Each region’s GMPE set is in turn comprised of a weighted set of other
@@ -223,7 +221,7 @@ the GMPE sets for each of these regimes, weighted by their probabilities,
 into a subduction GMPE set that is specific to the earthquake’s location.</p>
 </section>
 <section id="subduction-subtypes">
-<h2><span class="section-number">2.4.3. </span>Subduction Subtypes<a class="headerlink" href="#subduction-subtypes" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.4.3. </span>Subduction Subtypes<a class="headerlink" href="#subduction-subtypes" title="Permalink to this headline">¶</a></h2>
 <p>Within subduction zones, we distribute the probability given to the
 subduction zone tectonic region between its three subtypes. By default,
 this primarily relies on the
@@ -256,12 +254,12 @@ of <code class="docutils literal notranslate"><span class="pre">select.conf</spa
 interface for larger magnitudes, crustal for shallow events, interface for
 intermediate depth events, and slab for deeper events, as illustrated
 in <a class="pageref" href="#sub-no-slab">Figure  3</a>.</p>
-<figure class="align-left" id="id3">
+<figure class="align-left" id="figure-3">
 <span id="sub-no-slab"></span><a class="reference internal image-reference" href="../_images/sub_no_slab.png"><img alt="../_images/sub_no_slab.png" src="../_images/sub_no_slab.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 3: Profiles showing the probability of crustal, interface, and interslab
 subuction subtypes (assuming the probability of subduction is 1.0) with
-depth for a magnitude of 7 (left), 8 (center), and 9 (right).</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+depth for a magnitude of 7 (left), 8 (center), and 9 (right).</span><a class="headerlink" href="#figure-3" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>The slab model is defined for most locations in subduction zones. When
@@ -311,7 +309,7 @@ other tectonic regions (e.g., configurable with the <code class="docutils litera
 and <code class="docutils literal notranslate"><span class="pre">max_depth</span></code> keys).</p>
 </section>
 <section id="geographic-regionalization">
-<h2><span class="section-number">2.4.4. </span>Geographic Regionalization<a class="headerlink" href="#geographic-regionalization" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.4.4. </span>Geographic Regionalization<a class="headerlink" href="#geographic-regionalization" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">select</span></code> module also considers the earthquake’s presence within, or
 distance from, any number of user-defined geographic layers. If the
 earthquake is within a layer, that layer’s parameters (as configured in
@@ -412,12 +410,12 @@ called <code class="docutils literal notranslate"><span class="pre">california.w
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

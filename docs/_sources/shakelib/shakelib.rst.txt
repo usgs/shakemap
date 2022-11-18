@@ -19,6 +19,7 @@ Submodules
    :maxdepth: 12
 
    shakelib.multigmpe
+   shakelib.multiutils
    shakelib.sites
    shakelib.station
    shakelib.virtualipe

@@ -1,21 +1,19 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>2.5. Verification &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +34,7 @@
           <div class="body" role="main">
             
   <section id="verification">
-<span id="sec-verification-4"></span><h1><span class="section-number">2.5. </span>Verification<a class="headerlink" href="#verification" title="Permalink to this heading">¶</a></h1>
+<span id="sec-verification-4"></span><h1><span class="section-number">2.5. </span>Verification<a class="headerlink" href="#verification" title="Permalink to this headline">¶</a></h1>
 <p>The results produced by the ShakeMap <strong>model</strong> module are the product of
 an interpolation scheme based on the statistics of multivariate
 normal distributions (MVN). See <a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>
@@ -80,7 +78,7 @@ not work on all systems. The plots can be found in
 <em>tests/data/eventdata/verification_test_XXXX/current/products</em> (where
 “<em>XXXX</em>” is the number of the test).</p>
 <section id="test-0001">
-<h2><span class="section-number">2.5.1. </span>Test 0001<a class="headerlink" href="#test-0001" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.1. </span>Test 0001<a class="headerlink" href="#test-0001" title="Permalink to this headline">¶</a></h2>
 <p><a class="pageref" href="#verification-test-one">Figure  1</a> shows the results of Test 0001. This
 test places two observation points along a line.
 As discussed above, the GMPE evaluates to 0 (in log units) everywhere.
@@ -95,7 +93,7 @@ of the bias is applied to the within-event uncertainty.
 These are the expected results, are consistent with our hand calculations,
 and provide some confidence that the
 MVN implementation is not introducing a bias or other anomalies.</p>
-<figure class="align-left" id="id1">
+<figure class="align-left" id="figure-1">
 <span id="verification-test-one"></span><a class="reference internal image-reference" href="../_images/verification_test_0001_PGA.png"><img alt="../_images/verification_test_0001_PGA.png" src="../_images/verification_test_0001_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 1: Verification Test 0001. Two observations along a line have
@@ -103,12 +101,12 @@ amplitudes of 0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
-standard deviation (lower plot).</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+standard deviation (lower plot).</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0002">
-<h2><span class="section-number">2.5.2. </span>Test 0002<a class="headerlink" href="#test-0002" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.2. </span>Test 0002<a class="headerlink" href="#test-0002" title="Permalink to this headline">¶</a></h2>
 <p>Test 0002 is shown in <a class="pageref" href="#verification-test-two">Figure  2</a>. In this test,
 one observation has an amplitude of +1.0, the other is –1.0. Because of
 the offsetting observations, the bias is again 0. The figure shows that
@@ -117,7 +115,7 @@ observation points, and approach 0 at distances far from the
 observations. As with Test 0001, the standard deviation is 0 at
 the observations and reaches a maximum somewhere between 0.8 and 1.0
 at great distance from the observations.</p>
-<figure class="align-left" id="id2">
+<figure class="align-left" id="figure-2">
 <span id="verification-test-two"></span><a class="reference internal image-reference" href="../_images/verification_test_0002_PGA.png"><img alt="../_images/verification_test_0002_PGA.png" src="../_images/verification_test_0002_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 2: Verification Test 0002. Two observations along a line have
@@ -125,12 +123,12 @@ amplitudes of +1.0 and –1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the
-conditional standard deviation (lower plot).</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+conditional standard deviation (lower plot).</span><a class="headerlink" href="#figure-2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0003">
-<h2><span class="section-number">2.5.3. </span>Test 0003<a class="headerlink" href="#test-0003" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.3. </span>Test 0003<a class="headerlink" href="#test-0003" title="Permalink to this headline">¶</a></h2>
 <p>Verification Test 0003 has a single observation with an amplitude of +1.0
 along a line (see <a class="pageref" href="#verification-test-three">Figure  3</a>).
 We start with equations 12 and 13 of
@@ -263,7 +261,7 @@ we have:</p>
 observation point, the mean is 0.36 (top), and the standard deviation is
 about 0.933 (bottom), verifying that our implementation of the MVN appears
 to be working as intended.</p>
-<figure class="align-left" id="id3">
+<figure class="align-left" id="figure-3">
 <span id="verification-test-three"></span><a class="reference internal image-reference" href="../_images/verification_test_0003_PGA.png"><img alt="../_images/verification_test_0003_PGA.png" src="../_images/verification_test_0003_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 3: Verification Test 0003. A single observation along a line with
@@ -271,12 +269,12 @@ an amplitude of +1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
-standard deviation (lower plot).</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+standard deviation (lower plot).</span><a class="headerlink" href="#figure-3" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0004">
-<h2><span class="section-number">2.5.4. </span>Test 0004<a class="headerlink" href="#test-0004" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.4. </span>Test 0004<a class="headerlink" href="#test-0004" title="Permalink to this headline">¶</a></h2>
 <p>Test 0004 uses an identical set up to Test 0003, except there
 are two observations (of amplitude +1.0) at the same location.
 Because the observations are co-located and of the same period,
@@ -286,7 +284,7 @@ effect of a single observation. The result, illustrated in
 <a class="pageref" href="#verification-test-four">Figure  4</a> (which has two observations)
 is identical to <a class="pageref" href="#verification-test-three">Figure  3</a> (which
 has only one observation).</p>
-<figure class="align-left" id="id4">
+<figure class="align-left" id="figure-4">
 <span id="verification-test-four"></span><a class="reference internal image-reference" href="../_images/verification_test_0004_PGA.png"><img alt="../_images/verification_test_0004_PGA.png" src="../_images/verification_test_0004_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 4: Verification Test 0004. Two observations at the same
@@ -296,12 +294,12 @@ The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
 standard deviation (lower plot). Compare with
-<a class="pageref" href="#verification-test-three">Figure  3</a>.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<a class="pageref" href="#verification-test-three">Figure  3</a>.</span><a class="headerlink" href="#figure-4" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0004b">
-<h2><span class="section-number">2.5.5. </span>Test 0004b<a class="headerlink" href="#test-0004b" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.5. </span>Test 0004b<a class="headerlink" href="#test-0004b" title="Permalink to this headline">¶</a></h2>
 <p>Test 0004b uses an identical set up to Test 0004, except that the
 two observations (of amplitude +1.0) have been separated by 1
 degree of longitude. Thus, they are no longer highly correlated
@@ -316,7 +314,7 @@ uncertainty at distance from the observations is slightly less
 in Test 0004b than in Test 0004 because the two essentially
 independent observations have reduced the uncertainty of the
 bias, which lowers the overall uncertainty.</p>
-<figure class="align-left" id="id5">
+<figure class="align-left" id="figure-5">
 <span id="verification-test-four-b"></span><a class="reference internal image-reference" href="../_images/verification_test_0004b_PGA.png"><img alt="../_images/verification_test_0004b_PGA.png" src="../_images/verification_test_0004b_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 5: Verification Test 0004b. Two observations at different
@@ -325,12 +323,12 @@ The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
 standard deviation (lower plot). Compare with
-<a class="pageref" href="#verification-test-four">Figure  4</a>.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+<a class="pageref" href="#verification-test-four">Figure  4</a>.</span><a class="headerlink" href="#figure-5" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0005">
-<h2><span class="section-number">2.5.6. </span>Test 0005<a class="headerlink" href="#test-0005" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.6. </span>Test 0005<a class="headerlink" href="#test-0005" title="Permalink to this headline">¶</a></h2>
 <p>Test 0005 also has two co-located observations (see Verification
 Test 0004, above), but here they have
 opposite amplitudes of +1.0 and –1.0. The result, shown in
@@ -338,7 +336,7 @@ opposite amplitudes of +1.0 and –1.0. The result, shown in
 and standard deviation behave as if there were only a single
 observation with the mean amplitude of the two observations (i.e.,
 0).</p>
-<figure class="align-left" id="id6">
+<figure class="align-left" id="figure-6">
 <span id="verification-test-five"></span><a class="reference internal image-reference" href="../_images/verification_test_0005_PGA.png"><img alt="../_images/verification_test_0005_PGA.png" src="../_images/verification_test_0005_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 6: Verification Test 0005. Two observations at the same
@@ -346,12 +344,12 @@ location along a line, with amplitudes of +1.0 and –1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the
-conditional standard deviation (lower plot).</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+conditional standard deviation (lower plot).</span><a class="headerlink" href="#figure-6" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0006">
-<h2><span class="section-number">2.5.7. </span>Test 0006<a class="headerlink" href="#test-0006" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.7. </span>Test 0006<a class="headerlink" href="#test-0006" title="Permalink to this headline">¶</a></h2>
 <p><a class="pageref" href="#verification-test-six">Figure  7</a> illustrates Verification Test 0006.
 Forty evenly-spaced observations, all with amplitudes of +1.0 are used.
 Most of the observations are to the left of center of the plot (and
@@ -361,7 +359,7 @@ compared with a single observation as in
 <a class="pageref" href="#verification-test-three">Figure  3</a>), and the conditional
 standard deviation at distance has decreased toward the within-event
 value of 0.8.</p>
-<figure class="align-left" id="id7">
+<figure class="align-left" id="figure-7">
 <span id="verification-test-six"></span><a class="reference internal image-reference" href="../_images/verification_test_0006_PGA.png"><img alt="../_images/verification_test_0006_PGA.png" src="../_images/verification_test_0006_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 7: Verification Test 0006. Forty evenly-space observations along
@@ -370,12 +368,12 @@ extend some distance off the left edge of the figure).
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
-standard deviation (lower plot).</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+standard deviation (lower plot).</span><a class="headerlink" href="#figure-7" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0007">
-<h2><span class="section-number">2.5.8. </span>Test 0007<a class="headerlink" href="#test-0007" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.8. </span>Test 0007<a class="headerlink" href="#test-0007" title="Permalink to this headline">¶</a></h2>
 <p>Verification Test 0007 uses a single observation with an amplitude
 of +1.0. The observation is of spectral acceleration (SA) at a
 period of 1.0 s. The conditional mean SA was
@@ -390,7 +388,7 @@ bias approaches 0 and its standard deviation approaches the
 between-event standard deviation, thus the conditional standard
 deviation approaches the combined between-event and within-event
 standard deviation (which, in our tests is 1.0).</p>
-<figure class="align-left" id="id8">
+<figure class="align-left" id="figure-8">
 <span id="verification-test-seven"></span><a class="reference internal image-reference" href="../_images/verification_test_0007_spectra_plot.png"><img alt="../_images/verification_test_0007_spectra_plot.png" src="../_images/verification_test_0007_spectra_plot.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 8: Verification Test 0007. A single observation of spectral
@@ -400,12 +398,12 @@ at periods from 0.1 s to 10.0 s.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the
-conditional standard deviation (lower plot).</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+conditional standard deviation (lower plot).</span><a class="headerlink" href="#figure-8" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0008">
-<h2><span class="section-number">2.5.9. </span>Test 0008<a class="headerlink" href="#test-0008" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.9. </span>Test 0008<a class="headerlink" href="#test-0008" title="Permalink to this headline">¶</a></h2>
 <p>Verification Test 0008 demonstrates the effect of uncertainty in the
 value at the observation point. If we consider equations
 <a class="reference internal" href="#equation-mu-given-y2">(6)</a> and <a class="reference internal" href="#equation-var-given-y2">(7)</a>, and the supporting equations
@@ -476,7 +474,7 @@ find the mean at the observation point to be about (1.0, 0.64, 0.31, 0.1,
 0.03), with standard deviations (0.0, 0.6, 0.83, 0.95, 0.99). At distance,
 the means are (0.36, 0.23, 0.11, 0.04, 0.01) with standard deviations
 (0.93, 0.96, 0.98, 0.99, 1.0).</p>
-<figure class="align-left" id="id9">
+<figure class="align-left" id="figure-9">
 <span id="verification-test-eight"></span><a class="reference internal image-reference" href="../_images/verification_test_0008_PGA.png"><img alt="../_images/verification_test_0008_PGA.png" src="../_images/verification_test_0008_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 9: Verification Test 0008. Five separates runs of ShakeMap
@@ -485,12 +483,12 @@ amplitude of +1.0, but with increasing uncertainty.
 The upper plot (solid lines) shows the conditional means,
 and the lower plot (dashed lines) shows the conditional standard
 deviations. The black lines should be identical to their
-counterparts in <a class="pageref" href="#verification-test-three">Figure  3</a>.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+counterparts in <a class="pageref" href="#verification-test-three">Figure  3</a>.</span><a class="headerlink" href="#figure-9" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0009">
-<h2><span class="section-number">2.5.10. </span>Test 0009<a class="headerlink" href="#test-0009" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.10. </span>Test 0009<a class="headerlink" href="#test-0009" title="Permalink to this headline">¶</a></h2>
 <p>Test 0009 (see
 <a class="pageref" href="#verification-test-nine">Figure  10</a>) has five observations:
 the central observation has an amplitude of 0.75, while the
@@ -502,7 +500,7 @@ location of the central observation,
 but despite that influence its conditional mean should approach
 the observational amplitude (0.75) from below, but not reach or
 exceed it.</p>
-<figure class="align-left" id="id10">
+<figure class="align-left" id="figure-10">
 <span id="verification-test-nine"></span><a class="reference internal image-reference" href="../_images/verification_test_0009_PGA.png"><img alt="../_images/verification_test_0009_PGA.png" src="../_images/verification_test_0009_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 10: Verification Test 0009. Five observations: the central
@@ -512,12 +510,12 @@ a standard deviation of 0.2.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the
-conditional standard deviation (lower plot).</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+conditional standard deviation (lower plot).</span><a class="headerlink" href="#figure-10" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0010">
-<h2><span class="section-number">2.5.11. </span>Test 0010<a class="headerlink" href="#test-0010" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.11. </span>Test 0010<a class="headerlink" href="#test-0010" title="Permalink to this headline">¶</a></h2>
 <p>Like Test 0009, Test 0010 (see
 <a class="pageref" href="#verification-test-ten">Figure  11</a>) has five observations:
 the central observation has an amplitude of 0.75, while the
@@ -529,7 +527,7 @@ the location of
 the central observation would approach the assigned amplitude
 from above. The amplitude should not (quite) reach the
 observational value (0.75), or go below it.</p>
-<figure class="align-left" id="id11">
+<figure class="align-left" id="figure-11">
 <span id="verification-test-ten"></span><a class="reference internal image-reference" href="../_images/verification_test_0010_PGA.png"><img alt="../_images/verification_test_0010_PGA.png" src="../_images/verification_test_0010_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 11: Verification Test 0010. Five observations: the central
@@ -540,12 +538,12 @@ The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
 standard deviation (lower plot). Compare with
-<a class="pageref" href="#verification-test-nine">Figure  10</a>.</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+<a class="pageref" href="#verification-test-nine">Figure  10</a>.</span><a class="headerlink" href="#figure-11" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0011">
-<h2><span class="section-number">2.5.12. </span>Test 0011<a class="headerlink" href="#test-0011" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.5.12. </span>Test 0011<a class="headerlink" href="#test-0011" title="Permalink to this headline">¶</a></h2>
 <p>The purpose of this test is to verify the orientation of the Vs30
 grid and the generic amplification factors. The origin and magnitude
 are those of the January 17, 1994, Northridge, California earthquake.
@@ -562,7 +560,7 @@ amplification factors of 1.0, and the southeast quadrant has an
 amplification of 0.0. The figure demonstrates that the combined
 amplifications are working correctly and are in the proper
 orientation.</p>
-<figure class="align-left" id="id12">
+<figure class="align-left" id="figure-12">
 <span id="verification-test-eleven"></span><a class="reference internal image-reference" href="../_images/verification_test_0011_PSA3p0.png"><img alt="../_images/verification_test_0011_PSA3p0.png" src="../_images/verification_test_0011_PSA3p0.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 12: Verification Test 0011. 3 s PSA  map using the epicenter and magnitude
@@ -570,7 +568,7 @@ of the January 17, 1994, Northridge, California earthquake. The
 coastline and other background features are the result of
 site amplification from the Vs30 file. The major north-south and
 east-west divisions are the result of generic amplification
-factors.</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+factors.</span><a class="headerlink" href="#figure-12" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -641,12 +639,12 @@ factors.</span><a class="headerlink" href="#id12" title="Permalink to this image
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

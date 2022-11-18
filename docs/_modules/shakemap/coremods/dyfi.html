@@ -6,13 +6,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakemap.coremods.dyfi &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
    
@@ -80,7 +81,7 @@
     <span class="s2">&quot;Epicentral distance&quot;</span><span class="p">:</span> <span class="s2">&quot;distance&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">MIN_RESPONSES</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># minimum number of DYFI responses per grid</span>
+<span class="n">MIN_RESPONSES</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># minimum number of DYFI responses per grid</span>
 
 
 <div class="viewcode-block" id="DYFIModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.dyfi.html#shakemap.coremods.dyfi.DYFIModule">[docs]</a><span class="k">class</span> <span class="nc">DYFIModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -123,15 +124,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Wrote </span><span class="si">%i</span><span class="s2"> DYFI records to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataframe</span><span class="p">),</span> <span class="n">xmlfile</span><span class="p">))</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">_get_dyfi_dataframe</span><span class="p">(</span><span class="n">detail_or_url</span><span class="p">,</span> <span class="n">inputfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_dyfi_dataframe</span><span class="p">(</span><span class="n">detail_or_url</span><span class="p">,</span> <span class="n">inputfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_nresp</span><span class="o">=</span><span class="n">MIN_RESPONSES</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">inputfile</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">rawdata</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">if</span> <span class="s2">&quot;json&quot;</span> <span class="ow">in</span> <span class="n">inputfile</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">_parse_geocoded_json</span><span class="p">(</span><span class="n">rawdata</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">_parse_geocoded_json</span><span class="p">(</span><span class="n">rawdata</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">_parse_geocoded_csv</span><span class="p">(</span><span class="n">rawdata</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">_parse_geocoded_csv</span><span class="p">(</span><span class="n">rawdata</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not read file </span><span class="si">{</span><span class="n">inputfile</span><span class="si">}</span><span class="s2">&quot;</span>
 
@@ -141,7 +142,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">detail</span> <span class="o">=</span> <span class="n">detail_or_url</span>
 
-        <span class="n">df</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">_parse_dyfi_detail</span><span class="p">(</span><span class="n">detail</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">_parse_dyfi_detail</span><span class="p">(</span><span class="n">detail</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">msg</span>
@@ -153,7 +154,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_parse_dyfi_detail</span><span class="p">(</span><span class="n">detail</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_parse_dyfi_detail</span><span class="p">(</span><span class="n">detail</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">detail</span><span class="o">.</span><span class="n">hasProduct</span><span class="p">(</span><span class="s2">&quot;dyfi&quot;</span><span class="p">):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">detail</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> has no DYFI product at this time.&quot;</span>
@@ -172,13 +173,13 @@
     <span class="c1"># get 1km data set, if exists</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dyfi</span><span class="o">.</span><span class="n">getContentsMatching</span><span class="p">(</span><span class="s2">&quot;dyfi_geo_1km.geojson&quot;</span><span class="p">)):</span>
         <span class="n">bytes_1k</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dyfi</span><span class="o">.</span><span class="n">getContentBytes</span><span class="p">(</span><span class="s2">&quot;dyfi_geo_1km.geojson&quot;</span><span class="p">)</span>
-        <span class="n">df_1k</span> <span class="o">=</span> <span class="n">_parse_geocoded_json</span><span class="p">(</span><span class="n">bytes_1k</span><span class="p">)</span>
+        <span class="n">df_1k</span> <span class="o">=</span> <span class="n">_parse_geocoded_json</span><span class="p">(</span><span class="n">bytes_1k</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df_1k</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
 
     <span class="c1"># get 10km data set, if exists</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dyfi</span><span class="o">.</span><span class="n">getContentsMatching</span><span class="p">(</span><span class="s2">&quot;dyfi_geo_10km.geojson&quot;</span><span class="p">)):</span>
         <span class="n">bytes_10k</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dyfi</span><span class="o">.</span><span class="n">getContentBytes</span><span class="p">(</span><span class="s2">&quot;dyfi_geo_10km.geojson&quot;</span><span class="p">)</span>
-        <span class="n">df_10k</span> <span class="o">=</span> <span class="n">_parse_geocoded_json</span><span class="p">(</span><span class="n">bytes_10k</span><span class="p">)</span>
+        <span class="n">df_10k</span> <span class="o">=</span> <span class="n">_parse_geocoded_json</span><span class="p">(</span><span class="n">bytes_10k</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Only 10km dataset found, ignoring.&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -187,13 +188,13 @@
             <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;No geocoded datasets are available for this event.&quot;</span><span class="p">)</span>
 
         <span class="n">bytes_geo</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dyfi</span><span class="o">.</span><span class="n">getContentBytes</span><span class="p">(</span><span class="s2">&quot;cdi_geo.txt&quot;</span><span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">_parse_geocoded_csv</span><span class="p">(</span><span class="n">bytes_geo</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">_parse_geocoded_csv</span><span class="p">(</span><span class="n">bytes_geo</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Only cdi_geo.txt found, ignoring.&quot;</span>
 
     <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_parse_geocoded_csv</span><span class="p">(</span><span class="n">bytes_data</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_parse_geocoded_csv</span><span class="p">(</span><span class="n">bytes_data</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">):</span>
     <span class="c1"># the dataframe we want has columns:</span>
     <span class="c1"># &#39;intensity&#39;, &#39;distance&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;station&#39;, &#39;nresp&#39;</span>
     <span class="c1"># the cdi geo file has:</span>
@@ -218,12 +219,12 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">DYFI_COLUMNS_REPLACE</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;Suspect?&quot;</span><span class="p">,</span> <span class="s2">&quot;City&quot;</span><span class="p">,</span> <span class="s2">&quot;State&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;nresp&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">MIN_RESPONSES</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;nresp&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_nresp</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">df</span>
 
 
-<span class="k">def</span> <span class="nf">_parse_geocoded_json</span><span class="p">(</span><span class="n">bytes_data</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_parse_geocoded_json</span><span class="p">(</span><span class="n">bytes_data</span><span class="p">,</span> <span class="n">min_nresp</span><span class="p">):</span>
 
     <span class="n">text_data</span> <span class="o">=</span> <span class="n">bytes_data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -258,7 +259,7 @@
         <span class="n">index</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cdi&quot;</span><span class="p">:</span> <span class="s2">&quot;intensity&quot;</span><span class="p">,</span> <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;station&quot;</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;nresp&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">MIN_RESPONSES</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;nresp&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_nresp</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">df</span>
 </pre></div>
@@ -286,9 +287,9 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.0 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0 Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -297,7 +298,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>

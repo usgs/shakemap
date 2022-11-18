@@ -1,21 +1,19 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>2.2. Recorded Ground-motion Parameters &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,9 +34,9 @@
           <div class="body" role="main">
             
   <section id="recorded-ground-motion-parameters">
-<span id="sec-tg-parameters-4"></span><h1><span class="section-number">2.2. </span>Recorded Ground-motion Parameters<a class="headerlink" href="#recorded-ground-motion-parameters" title="Permalink to this heading">¶</a></h1>
+<span id="sec-tg-parameters-4"></span><h1><span class="section-number">2.2. </span>Recorded Ground-motion Parameters<a class="headerlink" href="#recorded-ground-motion-parameters" title="Permalink to this headline">¶</a></h1>
 <section id="data-acquisition">
-<h2><span class="section-number">2.2.1. </span>Data Acquisition<a class="headerlink" href="#data-acquisition" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.2.1. </span>Data Acquisition<a class="headerlink" href="#data-acquisition" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap requires estimates of magnitude, location, and (optionally, but preferably)
 shaking intensity measures (IMs) at seismic stations. As such, ShakeMap has been interfaced with
 several types of seismic processing systems in wide use at numerous networks across the U.S. and
@@ -90,7 +88,7 @@ well as any of the available dial-sites, and they are updated automatically as m
 are acquired.</p>
 </section>
 <section id="derived-parametric-ground-motion-values">
-<h2><span class="section-number">2.2.2. </span>Derived Parametric Ground-motion Values<a class="headerlink" href="#derived-parametric-ground-motion-values" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.2.2. </span>Derived Parametric Ground-motion Values<a class="headerlink" href="#derived-parametric-ground-motion-values" title="Permalink to this headline">¶</a></h2>
 <p>Parametric data from stations serving ShakeMap should include peak ground acceleration
 (PGA), peak ground velocity (PGV), and peak response spectral acceleration amplitudes
 (at 0.3, 1.0, and 3.0 sec).  Often, parametric values are derived continuously, using
@@ -128,7 +126,7 @@ as modules to produce the proper spatial cross-correlations and MMI
 conversions.</p>
 </section>
 <section id="macroseismic-intensity">
-<h2><span class="section-number">2.2.3. </span>Macroseismic Intensity<a class="headerlink" href="#macroseismic-intensity" title="Permalink to this heading">¶</a></h2>
+<h2><span class="section-number">2.2.3. </span>Macroseismic Intensity<a class="headerlink" href="#macroseismic-intensity" title="Permalink to this headline">¶</a></h2>
 <p>ShakeMap also (optionally) accepts input data in the form of observed
 macroseismic intensity (MMI, MCS, etc.). As with peak ground motion
 parameters from seismic stations, ShakeMap expects specific file formats
@@ -177,7 +175,7 @@ stations are represented with triangles and macroseismic data are depicted
 with circles (see <a class="pageref" href="#figure1-1-4">Figure  1</a>, for example). This convention
 is forward-looking: not all seismic networks were
 currently following this convention at the time of this writing.</p>
-<figure class="align-left" id="id1">
+<figure class="align-left" id="figure-1">
 <span id="figure1-1-4"></span><a class="reference internal image-reference" href="../_images/south_napa.png"><img alt="../_images/south_napa.png" src="../_images/south_napa.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 1: Intensity ShakeMap from the 2014 M6.0 American Canyon (Napa Valley),
@@ -187,12 +185,12 @@ are color-coded according to their intensity value, either as observed
 <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> as shown in the legend.
 The north-south black line indicates the fault location, which nucleated
 near the epicenter (black star). Note: Map Version Number reflects
-separate offline processing for this Manual.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+separate offline processing for this Manual.</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p><a class="pageref" href="#figure-hawaii-interactive-4">Figure  2</a> shows a different representation of the
 intensity map  on the newer, interactive maps on the USGS web site.</p>
-<figure class="align-left" id="id2">
+<figure class="align-left" id="figure-2">
 <span id="figure-hawaii-interactive-4"></span><a class="reference internal image-reference" href="../_images/Hawaii_interactive1.png"><img alt="../_images/Hawaii_interactive1.png" src="../_images/Hawaii_interactive1.png" style="width: 585.0px; height: 1044.9px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 2: Intensity ShakeMap from the 2006 M6.7 Kahola Bay, HI earthquake.
@@ -200,7 +198,7 @@ Contours indicate intensities; strong motion data (triangles) and
 intensity data (circles) are color-coded according to their intensity
 value, either as observed (for macroseismic data) or as converted by
 <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>. Inset on lower map shows
-pop-up station information.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+pop-up station information.</span><a class="headerlink" href="#figure-2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -262,12 +260,12 @@ pop-up station information.</span><a class="headerlink" href="#id2" title="Perma
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
