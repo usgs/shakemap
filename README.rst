@@ -1,50 +1,3 @@
-+---------+------------------+-----------------+-------------+
-| Azure   | |AzureLP39|      | ubuntu          | Python 3.9  |
-+         +------------------+-----------------+-------------+
-|         | |AzureLP310|     | ubuntu          | Python 3.10 |
-+         +------------------+-----------------+-------------+
-|         | |AzureM11P39|    | OSX 11          | Python 3.9  |
-+         +------------------+-----------------+-------------+
-|         | |AzureM11P310|   | OSX 11          | Python 3.10 |
-+         +------------------+-----------------+-------------+
-|         | |AzureM1015P39|  | OSX 10.15       | Python 3.9  |
-+         +------------------+-----------------+-------------+
-|         | |AzureM1015P310| | OSX 10.15       | Python 3.10 |
-+---------+------------------+-----------------+-------------+
-| CodeCov | |CodeCov|                                        |
-+---------+--------------------------------------------------+
-
-
-.. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/usgs/shakemap
-    :alt: Code Coverage Status
-
-.. |AzureLP39| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python39
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
-.. |AzureLP310| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20Linux_Python310
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
-.. |AzureM11P39| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_11_Python39
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
-.. |AzureM11P310| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_11_Python310
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
-.. |AzureM1015P39| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_15_Python39
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
-.. |AzureM1015P310| image:: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_apis/build/status/usgs.shakemap?branchName=master&jobName=ShakeMap&configuration=ShakeMap%20MacOS_10_15_Python310
-   :target: https://dev.azure.com/GHSC-ESI/USGS-ShakeMap/_build/latest?definitionId=2&branchName=master
-   :alt: Azure DevOps Build Status                                             
-
-
-
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
@@ -59,13 +12,13 @@ Subversion (svn) from
 
 The manual for ShakeMap V3.5 can be found here
 
-- http://usgs.github.io/shakemap/manual3_5/index.html
+- http://cbworden.github.io/shakemap/manual3_5/index.html
 
 
 Documentation
 -------------
 
-The ShakeMap v4 docs can be found `here <https://usgs.github.io/shakemap/sm4_index.html>`_.
+The ShakeMap v4 docs can be found `here <https://cbworden.github.io/shakemap/sm4_index.html>`_.
 Also, see the wiki associated with this repository for an install/setup
 tutorial.
 
@@ -73,11 +26,11 @@ tutorial.
 Introduction
 ------------
 
-This repository holds the latest version of the ShakeMap code (v4.0).
+This repository holds the latest version of the ShakeMap code (v4).
 ShakeMap is a system for rapidly characterizing the extent and distribution of
 strong ground shaking following significant earthquakes. The code is 
 primarily written in the Python programming language. See the documentation 
-at http://usgs.github.io/shakemap/sm4_index.html for a more detailed discussion
+at http://cbworden.github.io/shakemap/sm4_index.html for a more detailed discussion
 of ShakeMap and a list of references.
 
 To receive updates on ShakeMap and discuss the software, please join the

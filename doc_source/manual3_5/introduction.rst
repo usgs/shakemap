@@ -1,7 +1,7 @@
 
 .. important::
    This ShakeMap 3.5 Manual is deprecated. Please see the `ShakeMap 4
-   Manual <http://usgs.github.io/shakemap/index.html>`__.
+   Manual <http://cbworden.github.io/shakemap/index.html>`__.
 
 .. _introduction:
 
@@ -27,7 +27,7 @@ Introduction
    original (:ref:`Wald et al., 2005 <wald2005>`) ShakeMap Manual.  We employ Python document 
    generator `Sphinx <http://sphinx-doc.org/>`_, with the source
    under `GitHub <http://github.com/>`_ version control.
-   The online version of the manual is available at http://usgs.github.io/shakemap.
+   The online version of the manual is available at http://cbworden.github.io/shakemap.
 
 .. only:: html
 
@@ -71,4 +71,4 @@ ShakeMaps works can navigate to the :ref:`technical-guide`. Those who want to us
 ShakeMap products and understand their varied forms can jump to the :ref:`users-guide`. 
 If your goal is to install and operate ShakeMap, see the :ref:`software-guide`. The
 :ref:`software-guide` also points users to the ShakeMap software distribution and 
-`Software Guide <http://usgs.github.io/shakemap/_static/SoftwareGuideV3_5.pdf>`_.
+`Software Guide <http://cbworden.github.io/shakemap/_static/SoftwareGuideV3_5.pdf>`_.

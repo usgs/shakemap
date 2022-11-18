@@ -1,7 +1,7 @@
 
 .. important::
    This ShakeMap 3.5 Manual is deprecated. Please see the `ShakeMap 4
-   Manual <http://usgs.github.io/shakemap/index.html>`__.
+   Manual <http://cbworden.github.io/shakemap/index.html>`__.
 
 .. _sec_shakemap_processing:
 

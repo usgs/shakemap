@@ -1,7 +1,7 @@
 
 .. important::
    This ShakeMap 3.5 Manual is deprecated. Please see the `ShakeMap 4
-   Manual <http://usgs.github.io/shakemap/index.html>`__.
+   Manual <http://cbworden.github.io/shakemap/index.html>`__.
 
 .. _software-guide:
 
@@ -380,7 +380,7 @@ https://vault.gps.caltech.edu/repos/products/shakemap/tags/release-3.5/
 
 The Software Guide included in the *doc* directory of the distribution will always be the 
 most up-to-date and should be consulted when installing and configuring ShakeMap. The 
-Software Guide may also be obtained by `download <http://usgs.github.io/shakemap/_static/SoftwareGuideV3_5.pdf>`_.
+Software Guide may also be obtained by `download <http://cbworden.github.io/shakemap/_static/SoftwareGuideV3_5.pdf>`_.
 This version of Guide is not guaranteed to be the most up-to-date, however. It should be 
 used only to familiarize oneself with the general requirements of installing and operating 
 ShakeMap. When installing the software, the Guide in the *doc* directory of the software

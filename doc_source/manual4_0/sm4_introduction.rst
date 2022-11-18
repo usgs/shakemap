@@ -41,5 +41,5 @@ To cite this manual:
 
 Worden, C.B., E. M. Thompson, M. Hearne, and D.J. Wald (2020). ShakeMap
 Manual Online: technical manual, user’s guide, and software guide,
-U. S. Geological Survey. http://usgs.github.io/shakemap/.
+U. S. Geological Survey. http://cbworden.github.io/shakemap/.
 DOI: https://doi.org/10.5066/F7D21VPQ.
