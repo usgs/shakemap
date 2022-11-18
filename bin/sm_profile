@@ -3,10 +3,8 @@
 Manage ShakeMap profiles. Profiles allow the user to maintain multiple
 ShakeMap configurations and data directories. sm_profile allows the
 user to create, delete, and switch between profiles.
-
 Files:
     ~/.shakemap/profiles.conf
-
 """
 
 # stdlib imports
@@ -45,7 +43,6 @@ def replace(file_path, pattern, subst):
 
 def get_parser():
     desc = """ Manage ShakeMap profiles.
-
 These ShakeMap profiles allow one user to have multiple ShakeMap profiles
 (installations) on the same machine.  These profiles can all be configured
 differently, if desired. By default the profiles reside in the file
@@ -329,12 +326,12 @@ def create(config, profile, accept, ppath, nogrids):
 
     print("Retrieving global topo and Vs30 files. This may take a minute...")
     url = url_machine + url_topo_dir + topo_file
-    file_name = os.path.join(topo_path, topo_file)
-    with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+    topo_file_path = os.path.join(topo_path, topo_file)
+    with urllib.request.urlopen(url) as response, open(topo_file_path, 'wb') as out_file:
         shutil.copyfileobj(response, out_file)
     url = url_machine + url_vs30_dir + vs30_file
-    file_name = os.path.join(vs30_path, vs30_file)
-    with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+    vs30_file_path = os.path.join(vs30_path, vs30_file)
+    with urllib.request.urlopen(url) as response, open(vs30_file_path, 'wb') as out_file:
         shutil.copyfileobj(response, out_file)
     print("Done.")
 
@@ -350,12 +347,12 @@ def create(config, profile, accept, ppath, nogrids):
 
     my_config = os.path.join(config_path, "products.conf")
     old_line = r"topography\s*=\s*.*"
-    new_line = f"topography = {os.path.join(topo_path, ftp_topo)}"
+    new_line = f"topography = {topo_file_path}"
     replace(my_config, old_line, new_line)
 
     my_config = os.path.join(config_path, "model.conf")
     old_line = r"vs30file\s*=\s*.*"
-    new_line = f"vs30file = {os.path.join(vs30_path, ftp_vs30)}"
+    new_line = f"vs30file = {vs30_file_path}"
     replace(my_config, old_line, new_line)
 
     print("Done.")
