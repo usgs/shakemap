@@ -1080,6 +1080,10 @@ class StationList(object):
                 if ("intensity" in attributes) and (instrumented == 0):
                     if "mmi" not in compdict:
                         compdict["mmi"] = {"amps": {}, "attrs": {}}
+                    if "intensity_flag" in attributes:
+                        flag = attributes["intensity_flag"]
+                    else:
+                        flag = "0"
                     if "intensity_stddev" in attributes:
                         stddev = float(attributes["intensity_stddev"])
                     else:
@@ -1094,7 +1098,7 @@ class StationList(object):
                         "value": float(attributes["intensity"]),
                         "stddev": stddev,
                         "nresp": nresp,
-                        "flag": "0",
+                        "flag": flag,
                         "units": "intensity",
                     }
                     imtset.add("MMI")
