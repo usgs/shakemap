@@ -1217,26 +1217,32 @@ def _draw_license(fig, adict):
     """
     logo_text = adict.get("license_text")
     if logo_text:
-        lax = fig.add_axes([0.1, -0.05, 0.89, 0.04])
+        logo_text = str(logo_text).strip()
+        # Increase vertical space if license text has a lot of lines:
+        height = max(.04, sum(.01 for x in logo_text if x == "\n"))
+        bottom = -0.04 - height
+        width = 0.8
+        left = 0.1
+        lax = fig.add_axes([left, bottom, width, height])
         logo_path = adict.get("license_logo")
-        xpos = 0
         if logo_path:
             logo = image.imread(logo_path)
             h, w, cc = logo.shape
-            ratio = w / h
-            lax.imshow(
-                logo, aspect="equal", extent=(0, ratio, 0, 1), interpolation="bilinear"
-            )
-            xpos = ratio + 0.25
-        lax.set_aspect("equal", adjustable="box")
-        lax.set_xlim(0, 20)
-        lax.set_ylim(0, 1.025)
+            logo_ratio = w / h
+            lax.imshow(logo, aspect="equal", extent=(0, logo_ratio, 0, 1),
+                       interpolation="bilinear")
+            text_left = logo_ratio + 0.25
+        else:
+            text_left = 0
+        lax.set_aspect("equal", adjustable="datalim")
+        lax.set_xlim(0, width/height)
+        lax.set_ylim(0, 1)
         lax.axis("off")
         from datetime import datetime
 
         year = datetime.now().strftime("%Y")
         text = logo_text.replace("%%YEAR%%", year)
-        lax.text(xpos, 0.5, text, fontsize=9, va="center")
+        lax.text(text_left, 0.5, text, fontsize=9, va="center")
 
 
 def draw_map(adict, override_scenario=False):
