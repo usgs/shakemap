@@ -20,7 +20,7 @@ TABLES = OrderedDict(
             OrderedDict(
                 (
                     ("id", "text primary key"),  # id is net.sta
-                    ("shortref", "text"),  # foreign "key" to reference table
+                    ("refid", "int"),  # foreign "key" to reference table
                     ("network", "text"),
                     ("code", "text"),
                     ("name", "text"),
@@ -30,6 +30,7 @@ TABLES = OrderedDict(
                     ("vs30", "float"),
                     ("stddev", "float"),
                     ("instrumented", "int"),
+                    ("source", "text"),
                 )
             ),
         ),
@@ -291,6 +292,8 @@ class StationList(object):
                 name = feature["properties"].get("name", None)
                 elev = feature["properties"].get("elev", None)
                 vs30 = feature["properties"].get("vs30", None)
+                source = feature["properties"].get("source", None)
+                refid = feature["properties"].get("refid", None)
                 stddev = 0
 
                 # is this an intensity observation or an instrument?
@@ -308,6 +311,8 @@ class StationList(object):
                         vs30,
                         stddev,
                         instrumented,
+                        source,
+                        refid,
                     )
                 )
 
@@ -434,8 +439,8 @@ class StationList(object):
         self.db.commit()
         self.cursor.executemany(
             "INSERT INTO station (id, network, code, name, lat, lon, "
-            "elev, vs30, stddev, instrumented) VALUES "
-            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "elev, vs30, stddev, instrumented, source, refid) VALUES "
+            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             station_rows,
         )
         self.db.commit()
@@ -444,23 +449,26 @@ class StationList(object):
 
     def getGeoJson(self):
         jdict = {"type": "FeatureCollection", "features": []}
-        query = "SELECT shortref, longref, description FROM reference"
+        query = "SELECT id, shortref, longref, description FROM reference"
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
         if len(rows):
             refdict = {}
             for row in rows:
-                shortref = row[0]
-                longref = row[1]
-                description = row[2]
-                refdict[shortref] = {
+                refid = row[0]
+                shortref = row[1]
+                longref = row[2]
+                description = row[3]
+                refdict[refid] = {
+                    "refid": refid,
                     "long_reference": longref,
+                    "short_reference": shortref,
                     "description": description,
                 }
             jdict["references"] = refdict
         self.cursor.execute(
             "SELECT id, network, code, name, lat, lon, elev, vs30, "
-            "instrumented from station"
+            "instrumented, source, refid from station"
         )
         sta_rows = self.cursor.fetchall()
 
@@ -471,8 +479,9 @@ class StationList(object):
                 "properties": {
                     "code": str(sta[2]),
                     "name": sta[3],
+                    "refid": sta[10],
                     "instrumentType": "UNK" if sta[8] == 1 else "OBSERVED",
-                    "source": sta[1],
+                    "source": sta[9],
                     "network": sta[1],
                     "commType": "UNK",
                     "location": "",
@@ -619,6 +628,8 @@ class StationList(object):
             elev = station_attributes.get("elev", None)
             vs30 = station_attributes.get("vs30", None)
             stddev = station_attributes.get("stddev", 0)
+            source = station_attributes.get("source", None)
+            refid = station_attributes.get("refid", None)
 
             instrumented = int(network.lower() not in CIIM_TUPLE)
 
@@ -634,13 +645,15 @@ class StationList(object):
                     vs30,
                     stddev,
                     instrumented,
+                    source,
+                    refid,
                 )
             )
 
         self.cursor.executemany(
             "INSERT INTO station (id, network, code, name, lat, lon, "
-            "elev, vs30, stddev, instrumented) VALUES "
-            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "elev, vs30, stddev, instrumented, source, refid) VALUES "
+            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             station_rows,
         )
         self.db.commit()
@@ -1021,6 +1034,23 @@ class StationList(object):
         imtset = set()
         root = it.root
         for sl in root.iter("stationlist"):
+            if "reference" in sl.attrib:
+                longref = sl.attrib["reference"]
+                shortref = ""
+                description = ""
+                query = (
+                    f"INSERT INTO reference "
+                    "(shortref, longref, description) VALUES "
+                    f'("{shortref}","{longref}","{description}")'
+                )
+                self.cursor.execute(query)
+                self.db.commit()
+                query = f"SELECT id FROM reference WHERE longref is " f'("{longref}")'
+                self.cursor.execute(query)
+                row = self.cursor.fetchall()
+                refid = row[0][0]
+            else:
+                refid = None
             for station in sl:
                 if station.tag != "station":
                     continue
@@ -1034,7 +1064,8 @@ class StationList(object):
                         netid = "unknown"
                 else:
                     netid = "unknown"
-                    attributes["netid"] = netid
+                attributes["netid"] = netid
+                attributes["refid"] = refid
                 instrumented = int(netid.lower() not in CIIM_TUPLE)
 
                 if "code" not in attributes:
