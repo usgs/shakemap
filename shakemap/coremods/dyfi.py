@@ -134,7 +134,6 @@ def _parse_dyfi_detail(detail, min_nresp):
     # files (1km or 10km) it has.  We're going to select the data from
     # whichever of the two has more entries with >= 3 responses,
     # preferring 1km if there is a tie.
-    df_10k = pd.DataFrame({"a": []})
     df_1k = pd.DataFrame({"a": []})
 
     # get 1km data set, if exists
@@ -143,11 +142,7 @@ def _parse_dyfi_detail(detail, min_nresp):
         df_1k = _parse_geocoded_json(bytes_1k, min_nresp)
         return df_1k, ""
 
-    # get 10km data set, if exists
-    if len(dyfi.getContentsMatching("dyfi_geo_10km.geojson")):
-        bytes_10k, _ = dyfi.getContentBytes("dyfi_geo_10km.geojson")
-        df_10k = _parse_geocoded_json(bytes_10k, min_nresp)
-        return None, "Only 10km dataset found, ignoring."
+    df = df_1k
 
     if not len(df):
         # try to get a text file data set
