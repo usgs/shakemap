@@ -288,7 +288,7 @@ class StationList(object):
                 lat = feature["geometry"]["coordinates"][1]
                 netid = feature["properties"]["network"]
                 code = sta_id.replace(netid + ".", "")
-                network = feature["properties"]["source"]
+                network = feature["properties"]["network"]
                 name = feature["properties"].get("name", None)
                 elev = feature["properties"].get("elev", None)
                 vs30 = feature["properties"].get("vs30", None)
