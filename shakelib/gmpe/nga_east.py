@@ -50,20 +50,9 @@ class NGAEast(GMPE):
     REQUIRES_DISTANCES = set(("rrup",))
 
     TABLE_PATHS = os.listdir(NGAEastUSGSGMPE.PATH)
-    this_module = os.path.dirname(__file__)
-    NGA_BASE_PATH = os.path.join(
-        this_module, "..", "..", "shakemap", "data", "nga_east_tables"
-    )
 
     NGA_EAST_USGS_WEIGHT = 0.667
     NGA_EAST_SEED_WEIGHT = 0.333
-
-    NGA_EAST_USGS = pd.read_csv(
-        os.path.join(NGA_BASE_PATH, "nga-east-usgs-weights.dat")
-    )
-    NGA_EAST_SEEDS = pd.read_csv(
-        os.path.join(NGA_BASE_PATH, "nga-east-seed-weights.dat")
-    )
 
     # Sigma models and their weights
     SIGMA_MODS = ["EPRI", "PANEL"]
@@ -83,14 +72,6 @@ class NGAEast(GMPE):
     # SIGMA_MODS = ["COLLAPSED"]
     # SIGMA_WEIGHTS = [1.0]
 
-    # Parse the periods of the columns
-    per_idx_start = 1
-    per_idx_end = -2
-    per_list_str = NGA_EAST_USGS.keys().tolist()[per_idx_start:per_idx_end]
-    per_array = np.array(
-        [float(p.replace("SA", "").replace("P", ".")) for p in per_list_str]
-    )
-
     def __init__(self):
         gmpes = []
         sigma_wts = []
@@ -104,6 +85,28 @@ class NGAEast(GMPE):
         self.gmpes = gmpes
         self.sigma_weights = np.array(sigma_wts)
         self.ALL_TABLE_PATHS = all_table_paths
+
+        this_module = os.path.dirname(__file__)
+        nga_base_path = os.path.join(
+            this_module, "..", "..", "shakemap", "data", "nga_east_tables"
+        )
+
+        self.NGA_EAST_USGS = pd.read_csv(
+            os.path.join(nga_base_path, "nga-east-usgs-weights.dat")
+        )
+        self.NGA_EAST_SEEDS = pd.read_csv(
+            os.path.join(nga_base_path, "nga-east-seed-weights.dat")
+        )
+
+        # Parse the periods of the columns
+        self.per_idx_start = 1
+        self.per_idx_end = -2
+        per_list_str = self.NGA_EAST_USGS.keys().tolist()[
+            self.per_idx_start : self.per_idx_end
+        ]
+        self.per_array = np.array(
+            [float(p.replace("SA", "").replace("P", ".")) for p in per_list_str]
+        )
 
     def get_mean_and_stddevs(self, sites, rx, dists, imt, stddev_types):
         # List of GMPE weights, which is the product of the the branch weights
