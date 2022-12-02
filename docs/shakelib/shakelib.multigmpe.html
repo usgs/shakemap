@@ -19,6 +19,8 @@
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.multiutils" href="shakelib.multiutils.html" />
+    <link rel="prev" title="shakelib.utils.utils" href="shakelib.utils.utils.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -302,10 +304,44 @@ tables.</p></li>
 
 
 <h3>Navigation</h3>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">Shakelib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">shakelib.multigmpe</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#shakelib.multigmpe.set_sites_depth_parameters"><code class="docutils literal notranslate"><span class="pre">set_sites_depth_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shakelib.multigmpe.stuff_context"><code class="docutils literal notranslate"><span class="pre">stuff_context()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shakelib.multigmpe.get_gmpe_from_name"><code class="docutils literal notranslate"><span class="pre">get_gmpe_from_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE"><code class="docutils literal notranslate"><span class="pre">MultiGMPE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE"><code class="docutils literal notranslate"><span class="pre">MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES"><code class="docutils literal notranslate"><span class="pre">MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT"><code class="docutils literal notranslate"><span class="pre">MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES"><code class="docutils literal notranslate"><span class="pre">MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS"><code class="docutils literal notranslate"><span class="pre">MultiGMPE.REQUIRES_SITES_PARAMETERS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS"><code class="docutils literal notranslate"><span class="pre">MultiGMPE.REQUIRES_RUPTURE_PARAMETERS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES"><code class="docutils literal notranslate"><span class="pre">MultiGMPE.REQUIRES_DISTANCES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs"><code class="docutils literal notranslate"><span class="pre">MultiGMPE.get_mean_and_stddevs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#shakelib.multigmpe.filter_gmpe_list"><code class="docutils literal notranslate"><span class="pre">filter_gmpe_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shakelib.multigmpe.get_gmpe_sa_periods"><code class="docutils literal notranslate"><span class="pre">get_gmpe_sa_periods()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shakelib.multigmpe.get_gmpe_coef_table"><code class="docutils literal notranslate"><span class="pre">get_gmpe_coef_table()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multiutils.html">shakelib.multiutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
