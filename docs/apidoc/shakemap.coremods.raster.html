@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.coremods.raster &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,34 +36,34 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.coremods.raster">
-<span id="shakemap-coremods-raster"></span><h1>shakemap.coremods.raster<a class="headerlink" href="#module-shakemap.coremods.raster" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-coremods-raster"></span><h1>shakemap.coremods.raster<a class="headerlink" href="#module-shakemap.coremods.raster" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
-<dt id="shakemap.coremods.raster.RasterModule">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">shakemap.coremods.raster.</span></code><code class="sig-name descname"><span class="pre">RasterModule</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/raster.html#RasterModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.raster.RasterModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
+<dt class="sig sig-object py" id="shakemap.coremods.raster.RasterModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.coremods.raster.</span></span><span class="sig-name descname"><span class="pre">RasterModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/raster.html#RasterModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.raster.RasterModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoreModule</span></code></a></p>
 <dl class="simple">
 <dt>raster – Generate GIS raster files of all IMT values from</dt><dd><p>shake_result.hdf.</p>
 </dd>
 </dl>
 <p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="py attribute">
-<dt id="shakemap.coremods.raster.RasterModule.command_name">
-<code class="sig-name descname"><span class="pre">command_name</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'raster'</span></em><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.command_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.raster.RasterModule.command_name">
+<span class="sig-name descname"><span class="pre">command_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'raster'</span></em><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="shakemap.coremods.raster.RasterModule.targets">
-<code class="sig-name descname"><span class="pre">targets</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['products/raster\\.zip']</span></em><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.targets" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.raster.RasterModule.targets">
+<span class="sig-name descname"><span class="pre">targets</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['products/raster\\.zip']</span></em><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.targets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="shakemap.coremods.raster.RasterModule.dependencies">
-<code class="sig-name descname"><span class="pre">dependencies</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[('products/shake_result.hdf',</span> <span class="pre">True)]</span></em><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.dependencies" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.raster.RasterModule.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('products/shake_result.hdf',</span> <span class="pre">True)]</span></em><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.coremods.raster.RasterModule.execute">
-<code class="sig-name descname"><span class="pre">execute</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/raster.html#RasterModule.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.execute" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.coremods.raster.RasterModule.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/raster.html#RasterModule.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write raster.zip file containing ESRI Raster files of all the IMTs
 in shake_result.hdf.</p>
 <dl class="field-list simple">
@@ -123,7 +125,16 @@ in shake_result.hdf.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.pointcsv.html">shakemap.coremods.pointcsv</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.raster</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.raster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.coremods.raster.RasterModule"><code class="docutils literal notranslate"><span class="pre">RasterModule</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.raster.RasterModule.command_name"><code class="docutils literal notranslate"><span class="pre">RasterModule.command_name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.raster.RasterModule.targets"><code class="docutils literal notranslate"><span class="pre">RasterModule.targets</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.raster.RasterModule.dependencies"><code class="docutils literal notranslate"><span class="pre">RasterModule.dependencies</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.coremods.raster.RasterModule.execute"><code class="docutils literal notranslate"><span class="pre">RasterModule.execute()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.save.html">shakemap.coremods.save</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.select.html">shakemap.coremods.select</a></li>
@@ -152,12 +163,12 @@ in shake_result.hdf.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

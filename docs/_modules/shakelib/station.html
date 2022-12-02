@@ -1,18 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>shakelib.station &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -53,7 +55,7 @@
             <span class="n">OrderedDict</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;text primary key&quot;</span><span class="p">),</span>  <span class="c1"># id is net.sta</span>
-                    <span class="p">(</span><span class="s2">&quot;shortref&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">),</span>  <span class="c1"># foreign &quot;key&quot; to reference table</span>
+                    <span class="p">(</span><span class="s2">&quot;refid&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">),</span>  <span class="c1"># foreign &quot;key&quot; to reference table</span>
                     <span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">),</span>
                     <span class="p">(</span><span class="s2">&quot;code&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">),</span>
                     <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">),</span>
@@ -63,6 +65,7 @@
                     <span class="p">(</span><span class="s2">&quot;vs30&quot;</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">),</span>
                     <span class="p">(</span><span class="s2">&quot;stddev&quot;</span><span class="p">,</span> <span class="s2">&quot;float&quot;</span><span class="p">),</span>
                     <span class="p">(</span><span class="s2">&quot;instrumented&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">),</span>
                 <span class="p">)</span>
             <span class="p">),</span>
         <span class="p">),</span>
@@ -320,10 +323,12 @@
                 <span class="n">lat</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;coordinates&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">netid</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;network&quot;</span><span class="p">]</span>
                 <span class="n">code</span> <span class="o">=</span> <span class="n">sta_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">netid</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-                <span class="n">network</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
+                <span class="n">network</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;network&quot;</span><span class="p">]</span>
                 <span class="n">name</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="n">elev</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;elev&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="n">vs30</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vs30&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">source</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">refid</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;refid&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
 
                 <span class="c1"># is this an intensity observation or an instrument?</span>
@@ -341,6 +346,8 @@
                         <span class="n">vs30</span><span class="p">,</span>
                         <span class="n">stddev</span><span class="p">,</span>
                         <span class="n">instrumented</span><span class="p">,</span>
+                        <span class="n">source</span><span class="p">,</span>
+                        <span class="n">refid</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
 
@@ -467,8 +474,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
             <span class="s2">&quot;INSERT INTO station (id, network, code, name, lat, lon, &quot;</span>
-            <span class="s2">&quot;elev, vs30, stddev, instrumented) VALUES &quot;</span>
-            <span class="s2">&quot;(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;elev, vs30, stddev, instrumented, source, refid) VALUES &quot;</span>
+            <span class="s2">&quot;(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;</span><span class="p">,</span>
             <span class="n">station_rows</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -477,23 +484,26 @@
 
 <div class="viewcode-block" id="StationList.getGeoJson"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.getGeoJson">[docs]</a>    <span class="k">def</span> <span class="nf">getGeoJson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">jdict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span> <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[]}</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT shortref, longref, description FROM reference&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT id, shortref, longref, description FROM reference&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
             <span class="n">refdict</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-                <span class="n">shortref</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">longref</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">description</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                <span class="n">refdict</span><span class="p">[</span><span class="n">shortref</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">refid</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">shortref</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">longref</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                <span class="n">refdict</span><span class="p">[</span><span class="n">refid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;refid&quot;</span><span class="p">:</span> <span class="n">refid</span><span class="p">,</span>
                     <span class="s2">&quot;long_reference&quot;</span><span class="p">:</span> <span class="n">longref</span><span class="p">,</span>
+                    <span class="s2">&quot;short_reference&quot;</span><span class="p">:</span> <span class="n">shortref</span><span class="p">,</span>
                     <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="n">jdict</span><span class="p">[</span><span class="s2">&quot;references&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">refdict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
             <span class="s2">&quot;SELECT id, network, code, name, lat, lon, elev, vs30, &quot;</span>
-            <span class="s2">&quot;instrumented from station&quot;</span>
+            <span class="s2">&quot;instrumented, source, refid from station&quot;</span>
         <span class="p">)</span>
         <span class="n">sta_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
 
@@ -504,8 +514,9 @@
                 <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
                     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                    <span class="s2">&quot;refid&quot;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span>
                     <span class="s2">&quot;instrumentType&quot;</span><span class="p">:</span> <span class="s2">&quot;UNK&quot;</span> <span class="k">if</span> <span class="n">sta</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;OBSERVED&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span>
                     <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                     <span class="s2">&quot;commType&quot;</span><span class="p">:</span> <span class="s2">&quot;UNK&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -652,6 +663,8 @@
             <span class="n">elev</span> <span class="o">=</span> <span class="n">station_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;elev&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">vs30</span> <span class="o">=</span> <span class="n">station_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vs30&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">stddev</span> <span class="o">=</span> <span class="n">station_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stddev&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">station_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">refid</span> <span class="o">=</span> <span class="n">station_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;refid&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
             <span class="n">instrumented</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CIIM_TUPLE</span><span class="p">)</span>
 
@@ -667,13 +680,15 @@
                     <span class="n">vs30</span><span class="p">,</span>
                     <span class="n">stddev</span><span class="p">,</span>
                     <span class="n">instrumented</span><span class="p">,</span>
+                    <span class="n">source</span><span class="p">,</span>
+                    <span class="n">refid</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
             <span class="s2">&quot;INSERT INTO station (id, network, code, name, lat, lon, &quot;</span>
-            <span class="s2">&quot;elev, vs30, stddev, instrumented) VALUES &quot;</span>
-            <span class="s2">&quot;(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;elev, vs30, stddev, instrumented, source, refid) VALUES &quot;</span>
+            <span class="s2">&quot;(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;</span><span class="p">,</span>
             <span class="n">station_rows</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -1054,6 +1069,23 @@
         <span class="n">imtset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">root</span>
         <span class="k">for</span> <span class="n">sl</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">iter</span><span class="p">(</span><span class="s2">&quot;stationlist&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;reference&quot;</span> <span class="ow">in</span> <span class="n">sl</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">longref</span> <span class="o">=</span> <span class="n">sl</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;reference&quot;</span><span class="p">]</span>
+                <span class="n">shortref</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;INSERT INTO reference &quot;</span>
+                    <span class="s2">&quot;(shortref, longref, description) VALUES &quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;(&quot;</span><span class="si">{</span><span class="n">shortref</span><span class="si">}</span><span class="s1">&quot;,&quot;</span><span class="si">{</span><span class="n">longref</span><span class="si">}</span><span class="s1">&quot;,&quot;</span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT id FROM reference WHERE longref is &quot;</span> <span class="sa">f</span><span class="s1">&#39;(&quot;</span><span class="si">{</span><span class="n">longref</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+                <span class="n">refid</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">refid</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">sl</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">station</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="s2">&quot;station&quot;</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -1067,7 +1099,8 @@
                         <span class="n">netid</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">netid</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
-                    <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;netid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">netid</span>
+                <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;netid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">netid</span>
+                <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;refid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">refid</span>
                 <span class="n">instrumented</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">netid</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CIIM_TUPLE</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="s2">&quot;code&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
@@ -1284,12 +1317,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

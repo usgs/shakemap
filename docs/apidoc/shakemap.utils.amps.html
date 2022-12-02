@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.utils.amps &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,23 +36,23 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.utils.amps">
-<span id="shakemap-utils-amps"></span><h1>shakemap.utils.amps<a class="headerlink" href="#module-shakemap.utils.amps" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-utils-amps"></span><h1>shakemap.utils.amps<a class="headerlink" href="#module-shakemap.utils.amps" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
-<dt id="shakemap.utils.amps.AmplitudeHandler">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></code><code class="sig-name descname"><span class="pre">AmplitudeHandler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">install_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></span><span class="sig-name descname"><span class="pre">AmplitudeHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">install_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Store and associate strong motion peak amplitudes with
 earthquake events.</p>
 <p>Instantiate amplitude handler with ShakeMap profile paths.</p>
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.commit">
-<code class="sig-name descname"><span class="pre">commit</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.commit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.commit">
+<span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.commit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Commit any operations to the database.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.insertEvent">
-<code class="sig-name descname"><span class="pre">insertEvent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.insertEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.insertEvent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.insertEvent">
+<span class="sig-name descname"><span class="pre">insertEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.insertEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.insertEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert an event into the database.</p>
 <p>A directory with name of event[‘id’] should exist in data_path.</p>
 <dl class="field-list simple">
@@ -86,8 +88,8 @@ insert a new event (False)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.getEvent">
-<code class="sig-name descname"><span class="pre">getEvent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.getEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.getEvent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.getEvent">
+<span class="sig-name descname"><span class="pre">getEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.getEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.getEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the event parameters for the specified event.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -105,8 +107,8 @@ returned if the event is not in the database.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.deleteEvent">
-<code class="sig-name descname"><span class="pre">deleteEvent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.deleteEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.deleteEvent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.deleteEvent">
+<span class="sig-name descname"><span class="pre">deleteEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.deleteEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.deleteEvent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete the event from the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -122,8 +124,8 @@ returned if the event is not in the database.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.getRepeats">
-<code class="sig-name descname"><span class="pre">getRepeats</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.getRepeats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.getRepeats" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.getRepeats">
+<span class="sig-name descname"><span class="pre">getRepeats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.getRepeats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.getRepeats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return all the rows from the event table where the ‘repeats’ column
 is not NULL.</p>
 <dl class="field-list simple">
@@ -140,8 +142,8 @@ is not NULL.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.associateAll">
-<code class="sig-name descname"><span class="pre">associateAll</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretty_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.associateAll"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.associateAll" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.associateAll">
+<span class="sig-name descname"><span class="pre">associateAll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretty_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.associateAll"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.associateAll" title="Permalink to this definition">¶</a></dt>
 <dd><p>Associate peak ground motions with appropriate events,
 write station XML to file system.</p>
 <p>Ground motion records associated with events will be deleted
@@ -163,8 +165,8 @@ were found.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.associateOne">
-<code class="sig-name descname"><span class="pre">associateOne</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretty_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.associateOne"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.associateOne" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.associateOne">
+<span class="sig-name descname"><span class="pre">associateOne</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretty_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.associateOne"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.associateOne" title="Permalink to this definition">¶</a></dt>
 <dd><p>Associate peak ground motions with the specified event,
 write station XML to file system.</p>
 <p>Ground motion records associated with events will be deleted
@@ -189,8 +191,8 @@ by default.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.associate">
-<code class="sig-name descname"><span class="pre">associate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eqtime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqlat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqlon</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.associate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.associate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.associate">
+<span class="sig-name descname"><span class="pre">associate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eqtime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqlat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqlon</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.associate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.associate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find peak ground motion records associated with input event info.</p>
 <p>Ground motion records associated with input event are deleted from the
 database. Note that in the case of duplicate stations, the amps from
@@ -231,8 +233,8 @@ list has the following columns:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.writeXML">
-<code class="sig-name descname"><span class="pre">writeXML</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretty_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.writeXML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.writeXML" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.writeXML">
+<span class="sig-name descname"><span class="pre">writeXML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretty_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.writeXML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.writeXML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the list of tuples as an XML file in the event’s
 current directory.</p>
 <dl class="field-list simple">
@@ -271,8 +273,8 @@ somewhat slower.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.insertAmps">
-<code class="sig-name descname"><span class="pre">insertAmps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xmlfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.insertAmps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.insertAmps" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.insertAmps">
+<span class="sig-name descname"><span class="pre">insertAmps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xmlfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.insertAmps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.insertAmps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert data from amps file into database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -282,8 +284,8 @@ somewhat slower.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.cleanAmps">
-<code class="sig-name descname"><span class="pre">cleanAmps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.cleanAmps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.cleanAmps" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.cleanAmps">
+<span class="sig-name descname"><span class="pre">cleanAmps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.cleanAmps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.cleanAmps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean out amplitude data that is older than the threshold
 number of days.</p>
 <dl class="field-list simple">
@@ -301,8 +303,8 @@ the database.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.cleanEvents">
-<code class="sig-name descname"><span class="pre">cleanEvents</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">365</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.cleanEvents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.cleanEvents" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.cleanEvents">
+<span class="sig-name descname"><span class="pre">cleanEvents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">365</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.cleanEvents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.cleanEvents" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean out event data that is older than the threshold number
 of days.</p>
 <dl class="field-list simple">
@@ -319,8 +321,8 @@ of days.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakemap.utils.amps.AmplitudeHandler.getStats">
-<code class="sig-name descname"><span class="pre">getStats</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.getStats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.getStats" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.AmplitudeHandler.getStats">
+<span class="sig-name descname"><span class="pre">getStats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#AmplitudeHandler.getStats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.AmplitudeHandler.getStats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get summary statistics about the database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -356,18 +358,18 @@ of days.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.utils.amps.dt_to_timestamp">
-<code class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></code><code class="sig-name descname"><span class="pre">dt_to_timestamp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#dt_to_timestamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.dt_to_timestamp" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.dt_to_timestamp">
+<span class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></span><span class="sig-name descname"><span class="pre">dt_to_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#dt_to_timestamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.dt_to_timestamp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.utils.amps.timestr_to_timestamp">
-<code class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></code><code class="sig-name descname"><span class="pre">timestr_to_timestamp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#timestr_to_timestamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.timestr_to_timestamp" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.timestr_to_timestamp">
+<span class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></span><span class="sig-name descname"><span class="pre">timestr_to_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#timestr_to_timestamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.timestr_to_timestamp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.utils.amps.prettify">
-<code class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></code><code class="sig-name descname"><span class="pre">prettify</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#prettify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.prettify" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.amps.prettify">
+<span class="sig-prename descclassname"><span class="pre">shakemap.utils.amps.</span></span><span class="sig-name descname"><span class="pre">prettify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/amps.html#prettify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.amps.prettify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a pretty-printed XML string.</p>
 </dd></dl>
 
@@ -402,7 +404,28 @@ of days.</p>
 <li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.1 API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.amps</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.amps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.commit"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.commit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.insertEvent"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.insertEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.getEvent"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.getEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.deleteEvent"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.deleteEvent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.getRepeats"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.getRepeats()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.associateAll"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.associateAll()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.associateOne"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.associateOne()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.associate"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.associate()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.writeXML"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.writeXML()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.insertAmps"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.insertAmps()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.cleanAmps"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.cleanAmps()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.cleanEvents"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.cleanEvents()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakemap.utils.amps.AmplitudeHandler.getStats"><code class="docutils literal notranslate"><span class="pre">AmplitudeHandler.getStats()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.amps.dt_to_timestamp"><code class="docutils literal notranslate"><span class="pre">dt_to_timestamp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.amps.timestr_to_timestamp"><code class="docutils literal notranslate"><span class="pre">timestr_to_timestamp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.amps.prettify"><code class="docutils literal notranslate"><span class="pre">prettify()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dataframe.html">shakemap.utils.dataframe</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
@@ -426,12 +449,12 @@ of days.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

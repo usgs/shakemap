@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakelib.correlation.ccf_base &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,18 +34,18 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.correlation.ccf_base">
-<span id="shakelib-correlation-ccf-base"></span><h1>shakelib.correlation.ccf_base<a class="headerlink" href="#module-shakelib.correlation.ccf_base" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-correlation-ccf-base"></span><h1>shakelib.correlation.ccf_base<a class="headerlink" href="#module-shakelib.correlation.ccf_base" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
-<dt id="shakelib.correlation.ccf_base.CrossCorrelationBase">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">shakelib.correlation.ccf_base.</span></code><code class="sig-name descname"><span class="pre">CrossCorrelationBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/ccf_base.html#CrossCorrelationBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.ccf_base.CrossCorrelationBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<dt class="sig sig-object py" id="shakelib.correlation.ccf_base.CrossCorrelationBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.correlation.ccf_base.</span></span><span class="sig-name descname"><span class="pre">CrossCorrelationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">periods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/ccf_base.html#CrossCorrelationBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.ccf_base.CrossCorrelationBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
 <p>The abstract base class of cross-correlation functions.</p>
 <p>The derived class should take an array of periods as its single
 argument. These are the periods to which the index arrays of the
 getCorrelation() method will refer.</p>
 <dl class="py method">
-<dt id="shakelib.correlation.ccf_base.CrossCorrelationBase.getCorrelation">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">getCorrelation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ix1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/ccf_base.html#CrossCorrelationBase.getCorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.ccf_base.CrossCorrelationBase.getCorrelation" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.correlation.ccf_base.CrossCorrelationBase.getCorrelation">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getCorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ix1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/ccf_base.html#CrossCorrelationBase.getCorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.correlation.ccf_base.CrossCorrelationBase.getCorrelation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the correlation between two periods and a separation distance
 of h km. ix1 and ix2 give the indices into the array of periods that
 is provided to the class constructor. The code is implemented in this
@@ -113,12 +115,12 @@ array will have the same shape as the inputs.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>2.5. ShakeMap Processing &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -37,9 +39,9 @@
 <p class="admonition-title">Important</p>
 <p>This ShakeMap 3.5 Manual is deprecated. Please see the <a class="reference external" href="http://cbworden.github.io/shakemap/index.html">ShakeMap 4
 Manual</a>.</p>
-</aside>
+</div>
 <section id="shakemap-processing">
-<span id="sec-shakemap-processing"></span><h1><span class="section-number">2.5. </span>ShakeMap Processing<a class="headerlink" href="#shakemap-processing" title="Permalink to this headline">¶</a></h1>
+<span id="sec-shakemap-processing"></span><h1><span class="section-number">2.5. </span>ShakeMap Processing<a class="headerlink" href="#shakemap-processing" title="Permalink to this heading">¶</a></h1>
 <p>As discussed in the <a class="reference internal" href="users_guide.html#users-guide"><span class="std std-ref">User’s Guide</span></a>, ShakeMap produces a range of output products.
 However, ShakeMap’s primary outputs are grids of interpolated ground motions, from
 which the other grids, contours, and maps are derived. Interpolated grids are produced for
@@ -82,16 +84,16 @@ a schematic of the key processing steps.</p>
 </ol>
 </li>
 </ol>
-<figure class="align-left" id="figure-1">
+<figure class="align-left" id="id2">
 <span id="figure-processing"></span><a class="reference internal image-reference" href="../_images/ProcessingFigure.png"><img alt="../_images/ProcessingFigure.png" src="../_images/ProcessingFigure.png" style="width: 650px;" /></a>
 <figcaption>
-<p><span class="caption-text">Figure 1: A schematic of the basic ShakeMap ground motion interpolation scheme.</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text">Figure 1: A schematic of the basic ShakeMap ground motion interpolation scheme.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>The sections that follow provide a more complete description of the processing steps outlined
 above.</p>
 <section id="data-preparation">
-<h2><span class="section-number">2.5.1. </span>Data preparation<a class="headerlink" href="#data-preparation" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.1. </span>Data preparation<a class="headerlink" href="#data-preparation" title="Permalink to this heading">¶</a></h2>
 <p>The first step in processing is the preparation of the parametric data. As discussed in the
 <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>, ground motion amplitudes are provided to ShakeMap in the form of
 Extended Markup Language (XML) files. Note that we describe here the behavior of
@@ -139,7 +141,7 @@ amplitude of each ground-motion parameter is used by ShakeMap.</p>
 input data. Please see the relevant section of the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>
 for complete information.</p>
 <section id="flagged-stations">
-<h3><span class="section-number">2.5.1.1. </span>Flagged Stations<a class="headerlink" href="#flagged-stations" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.1.1. </span>Flagged Stations<a class="headerlink" href="#flagged-stations" title="Permalink to this heading">¶</a></h3>
 <p>If the “flag” attribute of any amplitude in the input XML is non-null and non-zero, then
 all components of that station are flagged as unusable. The reasoning here is that for a
 given data stream, the typical network errors (telemetry glitch, incomplete data, off-scale
@@ -154,7 +156,7 @@ open, unfilled triangles on maps and on regression plots. In contrast, unflagged
 are color coded by network or, optionally, by their amplitudes via their converted intensity
 value, as shown in <a class="pageref" href="#figure1-2">Figure  2</a>. Flagged stations are also indicated as such within tables
 produced for ShakeMap webpage consumption, e.g., the <em>stations.xml</em> file.</p>
-<figure class="align-left" id="figure-2">
+<figure class="align-left" id="id3">
 <span id="figure1-2"></span><a class="reference internal image-reference" href="../_images/Figure_1_2.png"><img alt="../_images/Figure_1_2.png" src="../_images/Figure_1_2.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 2: Peak acceleration ShakeMap from the Aug. 24, 2014, M6.0 American Canyon (Napa
@@ -163,12 +165,12 @@ color-coded according to their intensity value, either as observed (for macrosei
 converted by <a class="reference internal" href="../manual4_0/sm4_references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> as shown in the legend.
 The north-south black line
 indicates the fault location, which nucleated near the epicenter (red star). Note: Map Version
-Number reflects separate offline processing for this Manual.</span><a class="headerlink" href="#figure-2" title="Permalink to this image">¶</a></p>
+Number reflects separate offline processing for this Manual.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="converting-mmi-to-pgm-and-pgm-to-mmi">
-<h3><span class="section-number">2.5.1.2. </span>Converting MMI to PGM and PGM to MMI<a class="headerlink" href="#converting-mmi-to-pgm-and-pgm-to-mmi" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.1.2. </span>Converting MMI to PGM and PGM to MMI<a class="headerlink" href="#converting-mmi-to-pgm-and-pgm-to-mmi" title="Permalink to this heading">¶</a></h3>
 <p>Once the input data have been read and peak amplitudes assigned for each station (which
 may be null if the data are flagged), intensities are derived from the peak
 amplitudes and peak amplitudes are derived from the intensities using the GMICEs
@@ -179,7 +181,7 @@ these low intensities introduced a significant source of error in the interpolat
 due to the very wide range (and overlap) of ground motions that can produce MMIs lower than III or IV.</p>
 </section>
 <section id="site-corrections">
-<h3><span class="section-number">2.5.1.3. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.1.3. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this heading">¶</a></h3>
 <p>Near-surface conditions can have a substantial effect on ground motions. Ground motions
 at soft-soil sites, for instance, will typically be amplified relative to sites on bedrock.
 Because we wish to interpolate sparse data to a grid over which site characteristics may
@@ -194,7 +196,7 @@ convention and use Vs30-based amplification terms to account for site amplificat
 In <a class="reference internal" href="future_directions.html#future-directions"><span class="std std-ref">Future Directions</span></a>, we suggest alternative approaches that require additional
 site information beyond Vs30.</p>
 <section id="site-characterization-map">
-<h4><span class="section-number">2.5.1.3.1. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">2.5.1.3.1. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this heading">¶</a></h4>
 <p>Each region wishing to implement ShakeMap should have a Vs30 map that covers the
 entire area they wish to map.  Using the Jan. 17, 1994, M6.7 Northridge, California
 earthquake ShakeMap as an example (<a class="pageref" href="#figure1-4">Figure  3</a>), we present,
@@ -212,23 +214,23 @@ Mexico, we have continued the trend of the Imperial Valley and Peninsular Ranges
 of the border by approximating the geology based on the topography; classification BC
 was assigned to sites above 100m in elevation and CD was assigned to those below 100m.
 This results in continuity of our site correction across the international border.</p>
-<figure class="align-left" id="figure-3">
+<figure class="align-left" id="id4">
 <span id="figure1-4"></span><a class="reference internal image-reference" href="../_images/Figure_1_4.png"><img alt="../_images/Figure_1_4.png" src="../_images/Figure_1_4.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 3: PGA ShakeMap reprocessed with data from the 1994 M6.7 Northridge, CA earthquake with a finite
 fault (red rectangle), strong motion data (triangles), and intensity data (circles). Stations and
 macroseismic data are color-coded according to their intensity value, either as observed (for
 macroseismic data) or as converted by <a class="reference internal" href="../manual4_0/sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> and indicated by the scale
-shown.</span><a class="headerlink" href="#figure-3" title="Permalink to this image">¶</a></p>
+shown.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-<figure class="align-left" id="figure-4">
+<figure class="align-left" id="id5">
 <span id="figure1-5"></span><a class="reference internal image-reference" href="../_images/vs30.png"><img alt="../_images/vs30.png" src="../_images/vs30.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 4: Vs30 Map produced as a byproduct of ShakeMap for the 1994 M6.7 Northridge, CA earthquake. The
 finite fault is shown as a red rectangle; strong motion data (triangles) and intensity data (circles)
 are transparent to see site conditions. The legend indicates the range of color-coded Vs30 values
-in m/sec.</span><a class="headerlink" href="#figure-4" title="Permalink to this image">¶</a></p>
+in m/sec.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Other ShakeMap operators have employed existing geotechnically- or geologically-based
@@ -246,12 +248,12 @@ variations seen in the Vs30 data (<a class="reference internal" href="../manual4
 California using this approach is provided in <a class="pageref" href="#figure1-6">Figure  5</a>. Thompson et al. describe how
 differences among Vs30 base maps translate into variations in site amplification in
 ShakeMap.</p>
-<figure class="align-left" id="figure-5">
+<figure class="align-left" id="id6">
 <span id="figure1-6"></span><a class="reference internal image-reference" href="../_images/Figure_1_6.png"><img alt="../_images/Figure_1_6.png" src="../_images/Figure_1_6.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 5: Revised California Vs30 Map (<a class="reference internal" href="../manual4_0/sm4_references.html#thompson2014"><span class="std std-ref">Thompson et al., 2014</span></a>). This map combines geology,
 topographic slope, and constraints of map values near Vs30 observations using kriging-with-a-trend.
-Inset shows Los Angeles region, with Los Angeles Basin indicating low Vs30 velocities.</span><a class="headerlink" href="#figure-5" title="Permalink to this image">¶</a></p>
+Inset shows Los Angeles region, with Los Angeles Basin indicating low Vs30 velocities.</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p><a class="reference internal" href="../manual4_0/sm4_references.html#worden2015"><span class="std std-ref">Worden et al. (2015)</span></a> further consolidate readily available Vs30 map grids used for
@@ -263,7 +265,7 @@ anticipated that aggregated Vs30 data provided by
 <a class="reference internal" href="../manual4_0/sm4_references.html#yong2015"><span class="std std-ref">Yong et al. (2015)</span></a> will facilitate further map development of other portions of the U.S.</p>
 </section>
 <section id="amplification-factors">
-<h4><span class="section-number">2.5.1.3.2. </span>Amplification Factors<a class="headerlink" href="#amplification-factors" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">2.5.1.3.2. </span>Amplification Factors<a class="headerlink" href="#amplification-factors" title="Permalink to this heading">¶</a></h4>
 <p>ShakeMap provides two operator-selectable methods for determining the factors used to
 amplify and de-amplify ground motions based on Vs30. The first is to apply the
 frequency- and amplitude-dependent factors, such as those determined by
@@ -276,7 +278,7 @@ choices and their behavior with respect to other user-configurable parameters ar
 discussed in the <a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a>.</p>
 </section>
 <section id="correct-data-to-rock">
-<h4><span class="section-number">2.5.1.3.3. </span>Correct Data to “Rock”<a class="headerlink" href="#correct-data-to-rock" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">2.5.1.3.3. </span>Correct Data to “Rock”<a class="headerlink" href="#correct-data-to-rock" title="Permalink to this heading">¶</a></h4>
 <p>If, as is usually the case, the operator has opted to apply site amplification (via the <em>-qtm</em>
 option to <em>grind</em>), the ground-motion observations are corrected (de-amplified) to “rock”.
 (The Vs30 of “rock” is specified with the parameter ‘smVs30default’ in <em>grind.conf</em>.) See
@@ -302,22 +304,22 @@ the correlation of amplitudes with the Vs30 map (and also topography) are more
 apparent. This distinction is important: often complexity in ShakeMap’s peak ground
 motions and intensity patterns are driven by site terms, rather than variability due to
 shaking observations.</p>
-<figure class="align-left" id="figure-6">
+<figure class="align-left" id="id7">
 <span id="figure1-7"></span><a class="reference internal image-reference" href="../_images/Figure_1_7.png"><img alt="../_images/Figure_1_7.png" src="../_images/Figure_1_7.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 6: ShakeMap peak ground acceleration maps for the 1994 M6.7 Northridge, CA earthquake without
 strong motion or intensity data. A) Hypocenter only, without site amplification; B) Hypocenter,
 site amplification added; C) Hypocenter only, but with median distance correction added; and D)
-Finite fault (red rectangle) added.</span><a class="headerlink" href="#figure-6" title="Permalink to this image">¶</a></p>
+Finite fault (red rectangle) added.</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-<figure class="align-left" id="figure-7">
+<figure class="align-left" id="id8">
 <span id="figure1-8"></span><a class="reference internal image-reference" href="../_images/Figure_1_8.png"><img alt="../_images/Figure_1_8.png" src="../_images/Figure_1_8.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 7: ShakeMap intensity maps for the 1994 M6.7 Northridge, CA earthquake without strong
 motion or intensity data. A) Hypocenter only, without site amplification; B) Hypocenter, site
 amplification added; C) Hypocenter only, but with median distance correction added; and D)
-Finite fault (red rectangle) added.</span><a class="headerlink" href="#figure-7" title="Permalink to this image">¶</a></p>
+Finite fault (red rectangle) added.</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>As the final step in correcting the observations to “rock,” if basin amplification is
@@ -327,7 +329,7 @@ data. Currently, basin amplifications are not applied to MMI.</p>
 </section>
 </section>
 <section id="event-bias">
-<span id="sec-event-bias"></span><h2><span class="section-number">2.5.2. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this headline">¶</a></h2>
+<span id="sec-event-bias"></span><h2><span class="section-number">2.5.2. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this heading">¶</a></h2>
 <p>ShakeMap uses ground motion prediction equations (GMPEs) and, optionally, intensity prediction
 equations (IPEs) to supplement sparse data in its interpolation and estimation of ground
 motions. If sufficient data are available, we compute an event bias that effectively
@@ -362,24 +364,24 @@ of bias correction. Overall, the ground motions for the Northridge earthquake ex
 average estimates of existing GMPEs—in other words, it has a significant positive
 inter-event bias term (see <a class="pageref" href="#nr-pga-regr">Figure  8</a> and <a class="pageref" href="#nr-pgv-regr">Figure  9</a>,
 which show PGA and PGV, respectively).</p>
-<figure class="align-left" id="figure-8">
+<figure class="align-left" id="id9">
 <span id="nr-pga-regr"></span><a class="reference internal image-reference" href="../_images/northridge_pga_regr.png"><img alt="../_images/northridge_pga_regr.png" src="../_images/northridge_pga_regr.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 8: Plot of Northridge earthquake PGAs as a function of distance. The triangles
 show recorded ground motions; the red line shows the unbiased <a class="reference internal" href="../manual4_0/sm4_references.html#ba2008"><span class="std std-ref">Boore and Atkinson
 (2008)</span></a> (BA08) GMPE; the dark green lines show BA08 following the bias
 correction described in the text; the faint green lines show the bias-adjusted GMPE +/- three
-standard deviations.</span><a class="headerlink" href="#figure-8" title="Permalink to this image">¶</a></p>
+standard deviations.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-<figure class="align-left" id="figure-9">
+<figure class="align-left" id="id10">
 <span id="nr-pgv-regr"></span><a class="reference internal image-reference" href="../_images/northridge_pgv_regr.png"><img alt="../_images/northridge_pgv_regr.png" src="../_images/northridge_pgv_regr.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 9: Plot of Northridge earthquake PGVs as a function of distance. The triangles
 show recorded ground motions; the red line shows the unbiased <a class="reference internal" href="../manual4_0/sm4_references.html#ba2008"><span class="std std-ref">Boore and Atkinson
 (2008)</span></a> (BA08) GMPE; the dark green lines show BA08 following the bias
 correction described in the text; the faint green lines show the bias-adjusted GMPE +/- three
-standard deviations.</span><a class="headerlink" href="#figure-9" title="Permalink to this image">¶</a></p>
+standard deviations.</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>The ShakeMap bias correction accommodates this behavior once a
@@ -389,7 +391,7 @@ show before and after bias correction, respectively). The addition of
 the stations provides direct shaking constraints at those
 locations; the bias correction additionally
 affects the map wherever ground motion estimates dominate (i.e., away from the stations).</p>
-<figure class="align-left" id="figure-10">
+<figure class="align-left" id="id11">
 <span id="figure1-9"></span><a class="reference internal image-reference" href="../_images/Figure_1_9.png"><img alt="../_images/Figure_1_9.png" src="../_images/Figure_1_9.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 10: PGA ShakeMaps for the Northridge earthquake, showing effects of adding
@@ -397,10 +399,10 @@ strong motion and intensity data. A) Finite fault only (red rectangle), no data;
 stations (triangles) only; C) Finite Fault and strong motion stations (triangles); D) Finite Fault
 strong motion stations (triangles) and macroseismic data (circles). Notes: Stations and
 macroseismic observations are color-coded to their equivalent intensity using <a class="reference internal" href="../manual4_0/sm4_references.html#worden2012"><span class="std std-ref">Worden et al.
-(2012)</span></a>.</span><a class="headerlink" href="#figure-10" title="Permalink to this image">¶</a></p>
+(2012)</span></a>.</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-<figure class="align-left" id="figure-11">
+<figure class="align-left" id="id12">
 <span id="figure1-10"></span><a class="reference internal image-reference" href="../_images/Figure_1_10.png"><img alt="../_images/Figure_1_10.png" src="../_images/Figure_1_10.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 11: Intensity ShakeMaps for the Northridge earthquake, showing effects of
@@ -410,12 +412,12 @@ Fault strong motion stations (triangles) and macroseismic data (circles). Notes:
 possible constrained representation for this earthquake. The finite fault model without data (A) is not
 bias-corrected; for the Northridge earthquake, the inter-event biases are positive, indicating higher
 than average ground shaking for M6.7; thus, the unbiased map (A) tends to under-predict shaking
-shown in the data-rich, best-constrained map (D).</span><a class="headerlink" href="#figure-11" title="Permalink to this image">¶</a></p>
+shown in the data-rich, best-constrained map (D).</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="interpolation">
-<span id="sec-interpolation"></span><h2><span class="section-number">2.5.3. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h2>
+<span id="sec-interpolation"></span><h2><span class="section-number">2.5.3. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this heading">¶</a></h2>
 <p>The interpolation procedure is described in detail in <a class="reference internal" href="../manual4_0/sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2010)</span></a>. Here we
 summarize it only briefly.</p>
 <p>To compute an estimate of ground motion at a given point in the latitude-longitude grid,
@@ -443,27 +445,27 @@ primary observations.</p>
 contributing observation, the observation is scaled by the ratio of the GMPE (or IPE)
 estimates at the output point and the observation point:</p>
 <div class="math" id="equation-equation1">
-<p><span class="eqno">(1)<a class="headerlink" href="#equation-equation1" title="Permalink to this equation">¶</a></span><img src="../_images/math/527c5ceb7127b64a50435432703363424435e2b9.png" alt="Y_{obs,xy} = Y_{obs} \times \left(\frac{Y_{\text{GMPE},xy}}{Y_{\text{GMPE},obs}}\right),"/></p>
-</div><p>where <img class="math" src="../_images/math/053bd3a2f691662f2d1344386d8a5526a97effb6.png" alt="Y_{obs}"/> is the observation, and <img class="math" src="../_images/math/7069baf991b7989190fcd857f8e32bd493602775.png" alt="Y_{\text{GMPE},obs}"/> and <img class="math" src="../_images/math/715ca9c7d2cc9e331751b8643b169d436b79189a.png" alt="Y_{\text{GMPE},xy}"/> are the ground-motion predictions
+<p><span class="eqno">(1)<a class="headerlink" href="#equation-equation1" title="Permalink to this equation">¶</a></span><img src="_images/math/527c5ceb7127b64a50435432703363424435e2b9.png" alt="Y_{obs,xy} = Y_{obs} \times \left(\frac{Y_{\text{GMPE},xy}}{Y_{\text{GMPE},obs}}\right),"/></p>
+</div><p>where <img class="math" src="_images/math/053bd3a2f691662f2d1344386d8a5526a97effb6.png" alt="Y_{obs}"/> is the observation, and <img class="math" src="_images/math/7069baf991b7989190fcd857f8e32bd493602775.png" alt="Y_{\text{GMPE},obs}"/> and <img class="math" src="_images/math/715ca9c7d2cc9e331751b8643b169d436b79189a.png" alt="Y_{\text{GMPE},xy}"/> are the ground-motion predictions
 at the observation point and the point (<em>x</em>,*y*), respectively. This scaling is also applied to
 the converted observations with the obvious substitutions. Note that the application of
 this term also accounts for any geometric terms (such as directivity or source geometry)
 that the ground-motion estimates may include.</p>
 <p>The formula for the estimated ground motion at a point (<em>x</em>,*y*) is then given by:</p>
 <div class="math" id="equation-equation2">
-<p><span class="eqno">(2)<a class="headerlink" href="#equation-equation2" title="Permalink to this equation">¶</a></span><img src="../_images/math/04d280c7550d014fb642210e7806c1c74f47dd81.png" alt="\overline{Y_{xy}} = \frac{\displaystyle\frac{Y_{\text{GMPE},xy}}{\sigma_{\text{GMPE}}^2} + \displaystyle\sum_{i=1}^{n}\frac{Y_{obs,xy,i}}{\sigma_{obs,xy,i}^2} + \displaystyle\sum_{j=1}^{n}\frac{Y_{conv,xy,j}}{\sigma_{conv,xy,j}^2}}{\displaystyle\frac{1}{\sigma_{\text{GMPE}}^2} + \displaystyle\sum_{i=1}^{n}\frac{1}{\sigma_{obs,xy,i}^2} + \displaystyle\sum_{j=1}^{n}\frac{1}{\sigma_{conv,xy,j}^2}},"/></p>
-</div><p>where <img class="math" src="../_images/math/715ca9c7d2cc9e331751b8643b169d436b79189a.png" alt="Y_{\text{GMPE},xy}"/> and <img class="math" src="../_images/math/5819ba261201af85ea3d291ac440b0b86f9b8e67.png" alt="\sigma_{\text{GMPE}}^2"/> are the amplitude and variance, respectively, at the point (<em>x</em>,*y*)
-as given by the GMPE, <img class="math" src="../_images/math/9ec9806e96a143aa8ef7118aa1ebe427a62fad03.png" alt="Y_{obs,xy,i}"/> are the observed amplitudes scaled to the point (<em>x</em>,*y*),
-<img class="math" src="../_images/math/858457ca3036bbc0c4ac443d61dabab97a2d417a.png" alt="\sigma_{obs,xy,i}^2"/> is the variance associated with observation <em>i</em> at the point (<em>x</em>,*y*), <img class="math" src="../_images/math/085f769047667028f39cd2b1e9e61cd7ba31a0ef.png" alt="Y_{conv,xy,j}"/> are the
-converted amplitudes scaled to the point (<em>x</em>,*y*), and <img class="math" src="../_images/math/0a268577135378efc1879e232dbe0753e2d3db99.png" alt="\sigma_{conv,xy,j}^2"/> is the variance associated
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-equation2" title="Permalink to this equation">¶</a></span><img src="_images/math/04d280c7550d014fb642210e7806c1c74f47dd81.png" alt="\overline{Y_{xy}} = \frac{\displaystyle\frac{Y_{\text{GMPE},xy}}{\sigma_{\text{GMPE}}^2} + \displaystyle\sum_{i=1}^{n}\frac{Y_{obs,xy,i}}{\sigma_{obs,xy,i}^2} + \displaystyle\sum_{j=1}^{n}\frac{Y_{conv,xy,j}}{\sigma_{conv,xy,j}^2}}{\displaystyle\frac{1}{\sigma_{\text{GMPE}}^2} + \displaystyle\sum_{i=1}^{n}\frac{1}{\sigma_{obs,xy,i}^2} + \displaystyle\sum_{j=1}^{n}\frac{1}{\sigma_{conv,xy,j}^2}},"/></p>
+</div><p>where <img class="math" src="_images/math/715ca9c7d2cc9e331751b8643b169d436b79189a.png" alt="Y_{\text{GMPE},xy}"/> and <img class="math" src="_images/math/5819ba261201af85ea3d291ac440b0b86f9b8e67.png" alt="\sigma_{\text{GMPE}}^2"/> are the amplitude and variance, respectively, at the point (<em>x</em>,*y*)
+as given by the GMPE, <img class="math" src="_images/math/9ec9806e96a143aa8ef7118aa1ebe427a62fad03.png" alt="Y_{obs,xy,i}"/> are the observed amplitudes scaled to the point (<em>x</em>,*y*),
+<img class="math" src="_images/math/858457ca3036bbc0c4ac443d61dabab97a2d417a.png" alt="\sigma_{obs,xy,i}^2"/> is the variance associated with observation <em>i</em> at the point (<em>x</em>,*y*), <img class="math" src="_images/math/085f769047667028f39cd2b1e9e61cd7ba31a0ef.png" alt="Y_{conv,xy,j}"/> are the
+converted amplitudes scaled to the point (<em>x</em>,*y*), and <img class="math" src="_images/math/0a268577135378efc1879e232dbe0753e2d3db99.png" alt="\sigma_{conv,xy,j}^2"/> is the variance associated
 with converted observation <em>j</em> at the point (<em>x</em>,*y*).</p>
 <p>We can then compute the estimated IM (Equation <a class="reference internal" href="#equation-equation2">(2)</a>) for every point in the output grid. Note that the
 reciprocal of the denominator of Equation <a class="reference internal" href="#equation-equation2">(2)</a> is the total variance at each point—a useful
 byproduct of the interpolation process. Again, <a class="reference internal" href="../manual4_0/sm4_references.html#worden2010"><span class="std std-ref">Worden et al. (2010)</span></a> provides additional
 details.</p>
 </section>
-<section id="amplify-ground-motions-1">
-<span id="amplify-ground-motions"></span><h2><span class="section-number">2.5.4. </span>Amplify Ground Motions<a class="headerlink" href="#amplify-ground-motions-1" title="Permalink to this headline">¶</a></h2>
+<section id="amplify-ground-motions">
+<span id="id1"></span><h2><span class="section-number">2.5.4. </span>Amplify Ground Motions<a class="headerlink" href="#amplify-ground-motions" title="Permalink to this heading">¶</a></h2>
 <p>At this point, ShakeMap has produced interpolated grids of ground motions (and
 intensities) at a site class specified as “rock.” If the operator has specified the <em>-basement</em>
 option to <em>grind</em> (and supplied the necessary depth-to-basement file), a
@@ -471,7 +473,7 @@ basin amplification function (currently <a class="reference internal" href="../m
 specified <em>-qtm</em>, site amplifications are applied to the grids, creating the final output.</p>
 </section>
 <section id="differences-in-handling-mmi">
-<h2><span class="section-number">2.5.5. </span>Differences in Handling MMI<a class="headerlink" href="#differences-in-handling-mmi" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.5. </span>Differences in Handling MMI<a class="headerlink" href="#differences-in-handling-mmi" title="Permalink to this heading">¶</a></h2>
 <p>The processing of MMI is designed to be identical to the processing of PGM; however, a
 few differences remain:</p>
 <ol class="arabic simple">
@@ -513,7 +515,7 @@ available are also those within which station density is great
 </ol>
 </section>
 <section id="fault-considerations">
-<h2><span class="section-number">2.5.6. </span>Fault Considerations<a class="headerlink" href="#fault-considerations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.6. </span>Fault Considerations<a class="headerlink" href="#fault-considerations" title="Permalink to this heading">¶</a></h2>
 <p>Small-to-moderate earthquakes can be effectively characterized as a point source, with
 distances being calculated from the hypocenter (or epicenter, depending on the GMPE).
 But accurate prediction of ground motions from larger earthquakes requires knowledge of
@@ -527,7 +529,7 @@ distance calculation to accommodate the unknown fault geometry. We also allow th
 operator to specify a finite fault, as discussed in sections <a class="reference internal" href="#sec-fault-dimensions"><span class="std std-ref">Fault Dimensions</span></a>
 and <a class="reference internal" href="#sec-directivity"><span class="std std-ref">Directivity</span></a>.</p>
 <section id="median-distance-and-finite-faults">
-<span id="sec-median-distance"></span><h3><span class="section-number">2.5.6.1. </span>Median Distance and Finite Faults<a class="headerlink" href="#median-distance-and-finite-faults" title="Permalink to this headline">¶</a></h3>
+<span id="sec-median-distance"></span><h3><span class="section-number">2.5.6.1. </span>Median Distance and Finite Faults<a class="headerlink" href="#median-distance-and-finite-faults" title="Permalink to this heading">¶</a></h3>
 <p>As discussed in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>, the user may specify a
 finite fault to guide the
 estimates of the GMPE, but often a fault model is not available for some time following
@@ -581,7 +583,7 @@ Northridge earthquake, the dimensions of the rupture are constrained from analys
 the earthquake source (e.g., <a class="reference internal" href="../manual4_0/sm4_references.html#wald1996"><span class="std std-ref">Wald et al., 1996</span></a>).</p>
 </section>
 <section id="fault-dimensions">
-<span id="sec-fault-dimensions"></span><h3><span class="section-number">2.5.6.2. </span>Fault Dimensions<a class="headerlink" href="#fault-dimensions" title="Permalink to this headline">¶</a></h3>
+<span id="sec-fault-dimensions"></span><h3><span class="section-number">2.5.6.2. </span>Fault Dimensions<a class="headerlink" href="#fault-dimensions" title="Permalink to this heading">¶</a></h3>
 <p>The <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a> describes the format for specifying a
 fault. Essentially, ShakeMap
 faults are one or more (connected or disconnected) planar quadrilaterals. The fault
@@ -606,7 +608,7 @@ influence of the estimated ground motion at each grid point, obviating the need 
 fault geometries in such estimates.</p>
 </section>
 <section id="directivity">
-<span id="sec-directivity"></span><h3><span class="section-number">2.5.6.3. </span>Directivity<a class="headerlink" href="#directivity" title="Permalink to this headline">¶</a></h3>
+<span id="sec-directivity"></span><h3><span class="section-number">2.5.6.3. </span>Directivity<a class="headerlink" href="#directivity" title="Permalink to this heading">¶</a></h3>
 <p>Another way in which a finite fault may affect the estimated ground motions is through
 directivity. Where a finite fault has been defined in ShakeMap, one may choose to apply
 a correction for rupture directivity. We use the approach developed
@@ -627,25 +629,25 @@ the intermediate grids produced and stored in the ShakeMap output
 directory. In general, longer-period IMs (PGV, PSA1.0 and PSA3.0,
 and MMI) are more strongly affected by the directivity function
 employed.</p>
-<figure class="align-left" id="figure-12">
+<figure class="align-left" id="id13">
 <span id="figure1-13"></span><a class="reference internal image-reference" href="../_images/Figure_1_13.png"><img alt="../_images/Figure_1_13.png" src="../_images/Figure_1_13.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 12: ShakeMap scenario intensity (top) and PGV (bottom) maps for the hypothetical M7.05
 Hayward Fault, CA, earthquake: A) Intensity, No directivity; B) Intensity, Directivity added; C)
-PGV, No Directivity; and D) PGV, Directivity added.</span><a class="headerlink" href="#figure-12" title="Permalink to this image">¶</a></p>
+PGV, No Directivity; and D) PGV, Directivity added.</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 </section>
 <section id="additional-considerations">
-<h2><span class="section-number">2.5.7. </span>Additional Considerations<a class="headerlink" href="#additional-considerations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.7. </span>Additional Considerations<a class="headerlink" href="#additional-considerations" title="Permalink to this heading">¶</a></h2>
 <p>There are a great number of details and options when running <em>grind</em>. Operators should
 familiarize themselves with <em>grind</em> ’s behavior by reading the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>,
 the configuration file (<em>grind.conf</em>), and the program’s
 self-documentation (run “<em>grind -help</em>”).
 Below are a few other characteristics of <em>grind</em> that the operator should be familiar with.</p>
 <section id="user-supplied-estimate-grids">
-<h3><span class="section-number">2.5.7.1. </span>User-supplied Estimate Grids<a class="headerlink" href="#user-supplied-estimate-grids" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.7.1. </span>User-supplied Estimate Grids<a class="headerlink" href="#user-supplied-estimate-grids" title="Permalink to this heading">¶</a></h3>
 <p>Much of the discussion above was centered on the use of GMPEs (and IPEs) and getting
 the best set of estimates from them (through bias, basin corrections, finite faults, and directivity).
 But the users may also supply their own grids of estimates for any or all of the ground motion
@@ -664,7 +666,7 @@ visualize and employ familiar ShakeMap products. For instance, see the
 ShakeCast scenario described in <a class="reference internal" href="shakemap_applications.html#sec-shakemap-applications"><span class="std std-ref">Applications of ShakeMap</span></a>.</p>
 </section>
 <section id="uncertainty">
-<h3><span class="section-number">2.5.7.2. </span>Uncertainty<a class="headerlink" href="#uncertainty" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.5.7.2. </span>Uncertainty<a class="headerlink" href="#uncertainty" title="Permalink to this heading">¶</a></h3>
 <p>As mentioned above, some of the products of <em>grind</em> are grids of uncertainty for each
 parameter. This uncertainty is the result of a weighted average combination of the
 uncertainties of the various inputs (observations, converted observations, and estimates)
@@ -676,7 +678,7 @@ the total ShakeMap uncertainty to the GMPE uncertainty. For the purposes of comp
 this uncertainty ratio, we use PGA as the reference IM.</p>
 <p>Continuing with the Northridge earthquake ShakeMap example, <a class="pageref" href="#figure1-12">Figure  13</a> presents the
 uncertainty maps for a variety of constraints.</p>
-<figure class="align-left" id="figure-13">
+<figure class="align-left" id="id14">
 <span id="figure1-12"></span><a class="reference internal image-reference" href="../_images/Figure_1_12.png"><img alt="../_images/Figure_1_12.png" src="../_images/Figure_1_12.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 13: ShakeMap uncertainty maps for the Northridge earthquake showing
@@ -687,7 +689,7 @@ distance is constrained); C) Hypocenter and strong motion stations (triangles) o
 reduces overall uncertainty); and D) Finite fault and strong motion stations. Note: Average
 uncertainty is computed by averaging uncertainty at grids that lie within the MMI = VI contour
 (bold contour line), so panel (D) is marginally higher than (C) despite added constraint (fault model).
-For more details see <a class="reference internal" href="../manual4_0/sm4_references.html#wald2008"><span class="std std-ref">Wald et al. (2008)</span></a> and <a class="reference internal" href="../manual4_0/sm4_references.html#worden2010"><span class="std std-ref">Worden et al. (2010)</span></a>.</span><a class="headerlink" href="#figure-13" title="Permalink to this image">¶</a></p>
+For more details see <a class="reference internal" href="../manual4_0/sm4_references.html#wald2008"><span class="std std-ref">Wald et al. (2008)</span></a> and <a class="reference internal" href="../manual4_0/sm4_references.html#worden2010"><span class="std std-ref">Worden et al. (2010)</span></a>.</span><a class="headerlink" href="#id14" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>For a purely predictive map (of small magnitude), the uncertainty ratio will be 1.0
@@ -753,7 +755,7 @@ system described in the <a class="reference internal" href="users_guide.html#use
 </li>
 <li class="toctree-l4"><a class="reference internal" href="#event-bias">2.5.2. Event Bias</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#interpolation">2.5.3. Interpolation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#amplify-ground-motions-1">2.5.4. Amplify Ground Motions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#amplify-ground-motions">2.5.4. Amplify Ground Motions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#differences-in-handling-mmi">2.5.5. Differences in Handling MMI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#fault-considerations">2.5.6. Fault Considerations</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#median-distance-and-finite-faults">2.5.6.1. Median Distance and Finite Faults</a></li>
@@ -788,12 +790,12 @@ system described in the <a class="reference internal" href="users_guide.html#use
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

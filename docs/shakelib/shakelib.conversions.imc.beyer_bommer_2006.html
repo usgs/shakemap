@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakelib.conversions.imc.beyer_bommer_2006 &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,13 +34,13 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.conversions.imc.beyer_bommer_2006">
-<span id="shakelib-conversions-imc-beyer-bommer-2006"></span><h1>shakelib.conversions.imc.beyer_bommer_2006<a class="headerlink" href="#module-shakelib.conversions.imc.beyer_bommer_2006" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-conversions-imc-beyer-bommer-2006"></span><h1>shakelib.conversions.imc.beyer_bommer_2006<a class="headerlink" href="#module-shakelib.conversions.imc.beyer_bommer_2006" title="Permalink to this heading">¶</a></h1>
 <p>Module implements BeyerBommer2006 class to convert between various
 horizontal intensity measure components.</p>
 <dl class="py class">
-<dt id="shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">shakelib.conversions.imc.beyer_bommer_2006.</span></code><code class="sig-name descname"><span class="pre">BeyerBommer2006</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imc_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imc_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/beyer_bommer_2006.html#BeyerBommer2006"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter" title="shakelib.conversions.convert_imc.ComponentConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.convert_imc.ComponentConverter</span></code></a></p>
+<dt class="sig sig-object py" id="shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.imc.beyer_bommer_2006.</span></span><span class="sig-name descname"><span class="pre">BeyerBommer2006</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imc_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imc_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/beyer_bommer_2006.html#BeyerBommer2006"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter" title="shakelib.conversions.convert_imc.ComponentConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentConverter</span></code></a></p>
 <p>Implements conversion for various “Intensity Measure
 Components” (IMCs) per Beyer and Bommer (2006).</p>
 <p>IMC equivalencies:</p>
@@ -94,8 +96,8 @@ of America, 96(4A), 1512-1522.
 <a class="reference external" href="http://www.bssaonline.org/content/96/4A/1512.short">[link]</a></p>
 </div></blockquote>
 <dl class="py method">
-<dt id="shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce">
-<code class="sig-name descname"><span class="pre">convertAmpsOnce</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/beyer_bommer_2006.html#BeyerBommer2006.convertAmpsOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce">
+<span class="sig-name descname"><span class="pre">convertAmpsOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/beyer_bommer_2006.html#BeyerBommer2006.convertAmpsOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns amps converted from one IMC to another.</p>
 <p><strong>Important</strong>:</p>
 <blockquote>
@@ -128,8 +130,8 @@ Ignored by this method.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertSigmasOnce">
-<code class="sig-name descname"><span class="pre">convertSigmasOnce</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigmas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/beyer_bommer_2006.html#BeyerBommer2006.convertSigmasOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertSigmasOnce">
+<span class="sig-name descname"><span class="pre">convertSigmasOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigmas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/beyer_bommer_2006.html#BeyerBommer2006.convertSigmasOnce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns standard deviations converted from one IMC to another.</p>
 <p><strong>Important</strong>:</p>
 <blockquote>
@@ -198,12 +200,12 @@ PGV, or SA) <a class="reference external" href="http://docs.openquake.org/oq-haz
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

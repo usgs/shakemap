@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakelib.station &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,10 +34,10 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.station">
-<span id="shakelib-station"></span><h1>shakelib.station<a class="headerlink" href="#module-shakelib.station" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-station"></span><h1>shakelib.station<a class="headerlink" href="#module-shakelib.station" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
-<dt id="shakelib.station.StationList">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">shakelib.station.</span></code><code class="sig-name descname"><span class="pre">StationList</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.StationList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.station.</span></span><span class="sig-name descname"><span class="pre">StationList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A class to facilitate reading ShakeMap formatted XML fies of peak
 amplitudes and MMI, and
@@ -53,7 +55,7 @@ sequentially.)
 This will create a database at the location specified by the
 <code class="docutils literal notranslate"><span class="pre">dbfile</span></code> parameter to <code class="xref py py-meth docutils literal notranslate"><span class="pre">fromXML()</span></code>. Subsequent programs
 can use the default constructor to simply load <code class="docutils literal notranslate"><span class="pre">dbfile</span></code>.</p>
-</aside>
+</div>
 <p>The default constructor reads a pre-built SQLite database of
 station data.</p>
 <dl class="field-list simple">
@@ -66,8 +68,8 @@ station data.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="shakelib.station.StationList.loadFromSQL">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">loadFromSQL</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">':memory:'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.loadFromSQL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.loadFromSQL" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.StationList.loadFromSQL">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loadFromSQL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">':memory:'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.loadFromSQL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.loadFromSQL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new object from saved SQL code (see <a class="reference internal" href="#shakelib.station.StationList.dumpToSQL" title="shakelib.station.StationList.dumpToSQL"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dumpToSQL()</span></code></a>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -84,8 +86,8 @@ The default is ‘:memory:’ for an in-memory database.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.station.StationList.dumpToSQL">
-<code class="sig-name descname"><span class="pre">dumpToSQL</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.dumpToSQL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.dumpToSQL" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.StationList.dumpToSQL">
+<span class="sig-name descname"><span class="pre">dumpToSQL</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.dumpToSQL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.dumpToSQL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dump the database as a string of SQL code (see <a class="reference internal" href="#shakelib.station.StationList.loadFromSQL" title="shakelib.station.StationList.loadFromSQL"><code class="xref py py-meth docutils literal notranslate"><span class="pre">loadFromSQL()</span></code></a>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -99,14 +101,14 @@ database.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.station.StationList.loadFromFiles">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">loadFromFiles</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_nresp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">':memory:'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.loadFromFiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.loadFromFiles" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.StationList.loadFromFiles">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loadFromFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_nresp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">':memory:'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.loadFromFiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.loadFromFiles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a StationList object by reading one or more ShakeMap XML or
 JSON input files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filelist</strong> (<em>sequence of str</em>) – Sequence of ShakeMap XML and/or JSON input files to read.</p></li>
+<li><p><strong>filelist</strong> (<em>sequence</em><em> of </em><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Sequence of ShakeMap XML and/or JSON input files to read.</p></li>
 <li><p><strong>min_nresp</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The minimum number of DYFI observations required to form and valid
 observation. Default is 3.</p></li>
 <li><p><strong>dbfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to a file into which to write the SQLite database.
@@ -120,8 +122,8 @@ The default is ‘:memory:’ for an in-memory database.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.station.StationList.addData">
-<code class="sig-name descname"><span class="pre">addData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_nresp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.addData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.addData" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.StationList.addData">
+<span class="sig-name descname"><span class="pre">addData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_nresp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.addData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.addData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add data from XML or JSON files to the existing StationList.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -141,13 +143,13 @@ observation.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.station.StationList.getGeoJson">
-<code class="sig-name descname"><span class="pre">getGeoJson</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getGeoJson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.getGeoJson" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.StationList.getGeoJson">
+<span class="sig-name descname"><span class="pre">getGeoJson</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getGeoJson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.getGeoJson" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.station.StationList.getIMTtypes">
-<code class="sig-name descname"><span class="pre">getIMTtypes</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getIMTtypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.getIMTtypes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.StationList.getIMTtypes">
+<span class="sig-name descname"><span class="pre">getIMTtypes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getIMTtypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.getIMTtypes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a set of IMT types found in the database</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -160,8 +162,8 @@ observation.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.station.StationList.getStationDictionary">
-<code class="sig-name descname"><span class="pre">getStationDictionary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrumented</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_nresp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getStationDictionary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.getStationDictionary" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.StationList.getStationDictionary">
+<span class="sig-name descname"><span class="pre">getStationDictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrumented</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_nresp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getStationDictionary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.StationList.getStationDictionary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of the instrumented or non-instrumented
 stations. The keys describe the parameter, the values are Numpy
 arrays of the parameter in question.</p>
@@ -203,8 +205,8 @@ the IMTs found in the dictionary.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakelib.station.get_imt_period">
-<code class="sig-prename descclassname"><span class="pre">shakelib.station.</span></code><code class="sig-name descname"><span class="pre">get_imt_period</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#get_imt_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.get_imt_period" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.station.get_imt_period">
+<span class="sig-prename descclassname"><span class="pre">shakelib.station.</span></span><span class="sig-name descname"><span class="pre">get_imt_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#get_imt_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.station.get_imt_period" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the period from a string like psa3p0, psa3.0, or psa30 (the first
 being favored). Return the floating point period.</p>
 <dl class="field-list simple">
@@ -260,12 +262,12 @@ assuming that the people who send us data aren’t idiots.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
