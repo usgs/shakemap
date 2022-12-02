@@ -30,7 +30,7 @@ COMMAND="/home/shake/miniconda/envs/shakemap/bin/sm_queue"
 #   - you only want to run a single instance of this command
 #   - you can find the command in ps output by grep ing for command with arguments
 #
-# Jeremy Fee <jmfee@usgs.gov>
+# Jeremy Fee
 # Version 0.4 2010/04/12
 #
 

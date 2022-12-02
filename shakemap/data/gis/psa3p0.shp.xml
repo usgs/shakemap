@@ -56,7 +56,7 @@
      <postal>80401</postal>
     </cntaddr>
     <cntvoice></cntvoice>
-    <cntemail>cbworden@usgs.gov</cntemail>
+    <cntemail>cbworden@contractor.usgs.gov</cntemail>
    </cntinfo>
   </ptcontac>
   <native>Environment as of Metadata Creation: Microsoft Windows 7 Version 6.1 (Build 7601) Service Pack 1; Esri ArcGIS 10.3.1 (Build 4959) Service Pack N/A (Build N/A)</native>
@@ -194,7 +194,7 @@
      <postal>80401</postal>
     </cntaddr>
     <cntvoice></cntvoice>
-    <cntemail>cbworden@usgs.gov</cntemail>
+    <cntemail>cbworden@contractor.usgs.gov</cntemail>
    </cntinfo>
   </distrib>
   <distliab>Distributor assumes no liability for misuse of data.</distliab>
@@ -232,7 +232,7 @@
      <postal>80401</postal>
     </cntaddr>
     <cntvoice></cntvoice>
-    <cntemail>cbworden@usgs.gov</cntemail>
+    <cntemail>cbworden@contractor.usgs.gov</cntemail>
    </cntinfo>
   </metc>
   <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
