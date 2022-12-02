@@ -59,12 +59,20 @@ class NGAEast(GMPE):
     SIGMA_WEIGHTS = [0.8, 0.2]
 
     # For small magnitude extrapolation
-    PATH = os.path.join(os.path.dirname(__file__), "nga_east_small_mag")
-    SMALL_M_SLOPE = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slopes.txt"))
-    SMALL_M_SLOPE_PGA = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slope_pga.txt"))
-    SMALL_M_SLOPE_PGV = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slope_pgv.txt"))
-    SMALL_M_DIST = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slope_distances.txt"))
-    SMALL_M_PER = np.loadtxt(os.path.join(PATH, "nga-east-smallM_slope_periods.txt"))
+    __path__ = os.path.join(os.path.dirname(__file__), "nga_east_small_mag")
+    SMALL_M_SLOPE = np.loadtxt(os.path.join(__path__, "nga-east-smallM_slopes.txt"))
+    SMALL_M_SLOPE_PGA = np.loadtxt(
+        os.path.join(__path__, "nga-east-smallM_slope_pga.txt")
+    )
+    SMALL_M_SLOPE_PGV = np.loadtxt(
+        os.path.join(__path__, "nga-east-smallM_slope_pgv.txt")
+    )
+    SMALL_M_DIST = np.loadtxt(
+        os.path.join(__path__, "nga-east-smallM_slope_distances.txt")
+    )
+    SMALL_M_PER = np.loadtxt(
+        os.path.join(__path__, "nga-east-smallM_slope_periods.txt")
+    )
 
     # -------------------------------------------------------------------------
     # To simplify, use the COLLAPSED branch, but cannot get inter and intra
