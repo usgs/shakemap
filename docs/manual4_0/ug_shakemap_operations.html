@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>3.2. ShakeMap Operations &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,7 +36,7 @@
           <div class="body" role="main">
             
   <section id="shakemap-operations">
-<span id="ug-sec-shakemap-operations-4"></span><h1><span class="section-number">3.2. </span>ShakeMap Operations<a class="headerlink" href="#shakemap-operations" title="Permalink to this headline">¶</a></h1>
+<span id="ug-sec-shakemap-operations-4"></span><h1><span class="section-number">3.2. </span>ShakeMap Operations<a class="headerlink" href="#shakemap-operations" title="Permalink to this heading">¶</a></h1>
 <p>In the U.S., ShakeMaps are generated via independent systems running at
 ANSS Regional Seismic Systems (RSNs) in Northern California, Southern
 California, the Pacific Northwest, Utah, Nevada, and Alaska. For the rest
@@ -54,7 +56,7 @@ collected by these regional systems. For example, Puerto Rico significantly
 upgraded the seismic network in 2020 but not all strong motion stations
 are yet telemetered in real-time.</p>
 <section id="shakemap-triggering-thresholds">
-<h2><span class="section-number">3.2.1. </span>ShakeMap Triggering Thresholds<a class="headerlink" href="#shakemap-triggering-thresholds" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">3.2.1. </span>ShakeMap Triggering Thresholds<a class="headerlink" href="#shakemap-triggering-thresholds" title="Permalink to this heading">¶</a></h2>
 <p>Global ShakeMap (GSM) is triggered by any earthquake of M5.4 or larger
 globally as determined from earthquake parameters by the Earthquake
 Information Center (NEIC). Additionally, GSM is generated at lowering
@@ -69,14 +71,14 @@ if the event is of interest, whether widely felt, damaging, or is of
 scientific interest.</p>
 </section>
 <section id="shakemap-sources-authoritativeness-and-versions">
-<span id="subsec-sources-versions"></span><h2><span class="section-number">3.2.2. </span>ShakeMap Sources, Authoritativeness, and Versions<a class="headerlink" href="#shakemap-sources-authoritativeness-and-versions" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-sources-versions"></span><h2><span class="section-number">3.2.2. </span>ShakeMap Sources, Authoritativeness, and Versions<a class="headerlink" href="#shakemap-sources-authoritativeness-and-versions" title="Permalink to this heading">¶</a></h2>
 <p>Since there are potentially multiple ShakeMaps, users must use caution
 in their use. An earthquake may have alternative ShakeMaps generate by
 different sources such as GSM, or an RSN. Additionally, ShakeMaps evolve
 over time, particularly in the minutes and hours immediately after an
 earthquake; these generate new ShakeMap versions.</p>
 <section id="shakemap-sources-and-authoritativeness">
-<h3><span class="section-number">3.2.2.1. </span>ShakeMap Sources and Authoritativeness<a class="headerlink" href="#shakemap-sources-and-authoritativeness" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.2.1. </span>ShakeMap Sources and Authoritativeness<a class="headerlink" href="#shakemap-sources-and-authoritativeness" title="Permalink to this heading">¶</a></h3>
 <p>All events are likely to have GSM-generated ShakeMap (source=US). Global
 earthquakes have only one source: GSM. However, for an earthquake in,
 say, Northern California, one ShakeMap will be produced by GSM and anther
@@ -112,24 +114,24 @@ maps particularly for events that have more DYFI data than seismic
 stations. The influence of the DYFI data affect different ShakeMap IM
 layers more or less depending on a number of factors related to their
 uncertainties (See <a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al., 2018</span></a>).</p>
-</aside>
+</div>
 <p>This warrants an addition disclaimer: Any ShakeMap is simply a model of
 the ground shaking field; different data sets or different processing
 assumptions will result in different models; there is no unique solution
 nor ShakeMap. Upon request, USGS can regenerate a ShakeMap with or
 without DYFI, for example, and we may begin generating two sets of maps
 systematically if there is sufficient demand to do so.</p>
-<figure class="align-left" id="figure-1">
+<figure class="align-left" id="id1">
 <span id="figure-authoritativeness"></span><a class="reference internal image-reference" href="../_images/utah_event_authoritative.png"><img alt="../_images/utah_event_authoritative.png" src="../_images/utah_event_authoritative.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 1: Portion of a
 <a class="reference external" href="https://earthquake.usgs.gov/earthquakes/eventpage/uu60363602/shakemap/">ShakeMap webpage</a>
-showing the Utah (uu) and NEIC/GSM (us) versions of the event.</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
+showing the Utah (uu) and NEIC/GSM (us) versions of the event.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="shakemap-versions">
-<h3><span class="section-number">3.2.2.2. </span>ShakeMap Versions<a class="headerlink" href="#shakemap-versions" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.2.2. </span>ShakeMap Versions<a class="headerlink" href="#shakemap-versions" title="Permalink to this heading">¶</a></h3>
 <p>In addition to multiple possible sources of ShakeMaps for a given event,
 each source will likely update the ShakeMaps in the immediate minutes
 and hours after an earthquake. For global earthquakes, GSM (“US”) will
@@ -152,7 +154,7 @@ ComCat database (see <a class="reference internal" href="ug_products.html#subsec
 </section>
 </section>
 <section id="shakemap-updating-policy">
-<h2><span class="section-number">3.2.3. </span>ShakeMap Updating Policy<a class="headerlink" href="#shakemap-updating-policy" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">3.2.3. </span>ShakeMap Updating Policy<a class="headerlink" href="#shakemap-updating-policy" title="Permalink to this heading">¶</a></h2>
 <p>ShakeMaps are preliminary in nature and will be updated as data arrive
 from a variety of distributed sources. Our strategy is to update ShakeMaps
 as warranted from a scientific perspective. We reserve the option to
@@ -281,6 +283,7 @@ be archived in ComCat (see <a class="reference internal" href="ug_products.html#
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">Shakelib API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -289,12 +292,12 @@ be archived in ComCat (see <a class="reference internal" href="ug_products.html#
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

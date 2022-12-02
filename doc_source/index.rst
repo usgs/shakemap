@@ -15,6 +15,7 @@ ShakeMap 4 Manual
    ShakeMap 4.1 Manual <manual4_0/index>
    ShakeMap 4.1 Command Line Interface <programs/programs>
    ShakeMap 4.1 API  <apidoc/shakemap>
+   Shakelib API <shakelib/shakelib>
    ShakeMap 3.5 Manual (Deprecated) <manual3_5/index>
 
 

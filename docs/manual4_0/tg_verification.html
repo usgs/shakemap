@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>2.5. Verification &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,7 +36,7 @@
           <div class="body" role="main">
             
   <section id="verification">
-<span id="sec-verification-4"></span><h1><span class="section-number">2.5. </span>Verification<a class="headerlink" href="#verification" title="Permalink to this headline">¶</a></h1>
+<span id="sec-verification-4"></span><h1><span class="section-number">2.5. </span>Verification<a class="headerlink" href="#verification" title="Permalink to this heading">¶</a></h1>
 <p>The results produced by the ShakeMap <strong>model</strong> module are the product of
 an interpolation scheme based on the statistics of multivariate
 normal distributions (MVN). See <a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>
@@ -78,7 +80,7 @@ not work on all systems. The plots can be found in
 <em>tests/data/eventdata/verification_test_XXXX/current/products</em> (where
 “<em>XXXX</em>” is the number of the test).</p>
 <section id="test-0001">
-<h2><span class="section-number">2.5.1. </span>Test 0001<a class="headerlink" href="#test-0001" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.1. </span>Test 0001<a class="headerlink" href="#test-0001" title="Permalink to this heading">¶</a></h2>
 <p><a class="pageref" href="#verification-test-one">Figure  1</a> shows the results of Test 0001. This
 test places two observation points along a line.
 As discussed above, the GMPE evaluates to 0 (in log units) everywhere.
@@ -93,7 +95,7 @@ of the bias is applied to the within-event uncertainty.
 These are the expected results, are consistent with our hand calculations,
 and provide some confidence that the
 MVN implementation is not introducing a bias or other anomalies.</p>
-<figure class="align-left" id="figure-1">
+<figure class="align-left" id="id1">
 <span id="verification-test-one"></span><a class="reference internal image-reference" href="../_images/verification_test_0001_PGA.png"><img alt="../_images/verification_test_0001_PGA.png" src="../_images/verification_test_0001_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 1: Verification Test 0001. Two observations along a line have
@@ -101,12 +103,12 @@ amplitudes of 0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
-standard deviation (lower plot).</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
+standard deviation (lower plot).</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0002">
-<h2><span class="section-number">2.5.2. </span>Test 0002<a class="headerlink" href="#test-0002" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.2. </span>Test 0002<a class="headerlink" href="#test-0002" title="Permalink to this heading">¶</a></h2>
 <p>Test 0002 is shown in <a class="pageref" href="#verification-test-two">Figure  2</a>. In this test,
 one observation has an amplitude of +1.0, the other is –1.0. Because of
 the offsetting observations, the bias is again 0. The figure shows that
@@ -115,7 +117,7 @@ observation points, and approach 0 at distances far from the
 observations. As with Test 0001, the standard deviation is 0 at
 the observations and reaches a maximum somewhere between 0.8 and 1.0
 at great distance from the observations.</p>
-<figure class="align-left" id="figure-2">
+<figure class="align-left" id="id2">
 <span id="verification-test-two"></span><a class="reference internal image-reference" href="../_images/verification_test_0002_PGA.png"><img alt="../_images/verification_test_0002_PGA.png" src="../_images/verification_test_0002_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 2: Verification Test 0002. Two observations along a line have
@@ -123,57 +125,57 @@ amplitudes of +1.0 and –1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the
-conditional standard deviation (lower plot).</span><a class="headerlink" href="#figure-2" title="Permalink to this image">¶</a></p>
+conditional standard deviation (lower plot).</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0003">
-<h2><span class="section-number">2.5.3. </span>Test 0003<a class="headerlink" href="#test-0003" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.3. </span>Test 0003<a class="headerlink" href="#test-0003" title="Permalink to this heading">¶</a></h2>
 <p>Verification Test 0003 has a single observation with an amplitude of +1.0
 along a line (see <a class="pageref" href="#verification-test-three">Figure  3</a>).
 We start with equations 12 and 13 of
 <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a> (see <a class="reference internal" href="tg_processing.html#sec-processing-4"><span class="std std-ref">Data Processing</span></a> for
 additional discussion of the equations presented below):</p>
 <div class="math">
-<p><img src="../_images/math/03c7f520799da0c965085a508ae57e2d34bb2451.png" alt="\sigma_{H|y_2}^2 =
+<p><img src="_images/math/03c7f520799da0c965085a508ae57e2d34bb2451.png" alt="\sigma_{H|y_2}^2 =
     \frac{1}{1 + \mathbf{\tau_2^T \Sigma_{{W_2}{W_2}}^{-1}\tau_2}},"/></p>
 </div><p>and</p>
 <div class="math">
-<p><img src="../_images/math/eccd04177a34ae2c2fec86c71a4d803bd734cb2c.png" alt="\mu_{H|y_2} =
+<p><img src="_images/math/eccd04177a34ae2c2fec86c71a4d803bd734cb2c.png" alt="\mu_{H|y_2} =
     \mathbf{\tau_2^T \Sigma_{{W_2}{W_2}}^{-1}
     \left(y_2-\mu_{y_2}\right)}
     \sigma_{H|y_2}^2."/></p>
 </div><p>In the bivariate case, these reduce to:</p>
 <div class="math">
-<p><img src="../_images/math/65f298fed9f75b372c2bb79c86a6de86796847c1.png" alt="\sigma_{H|y_2}^2 =
+<p><img src="_images/math/65f298fed9f75b372c2bb79c86a6de86796847c1.png" alt="\sigma_{H|y_2}^2 =
     \frac{1}{1 + \frac{\tau^2}{\phi^2 + \sigma_\epsilon^2}},"/></p>
 </div><p>and</p>
 <div class="math">
-<p><img src="../_images/math/f802493898a81e26d1ab8abf20e7b63ea261aab6.png" alt="\mu_{H|y_2} =
+<p><img src="_images/math/f802493898a81e26d1ab8abf20e7b63ea261aab6.png" alt="\mu_{H|y_2} =
     \frac{\tau}{\sigma^2 + \sigma_\epsilon^2}
     \left(y_2-\mu_{y_2}\right)
     \sigma_{H|y_2}^2."/></p>
 </div><p>In our case the GMPE mean is 0 and the observation is 1.
-The within-event standard deviation (<img class="math" src="../_images/math/6f126c303e689f2500a88bfd08000a4c1c16f0b2.png" alt="\phi"/>) is 0.8,
-and the between-event standard deviation (<img class="math" src="../_images/math/d33773852e2d7caa6af4ffca8da90a2a56d1d40a.png" alt="\tau"/>) is 0.6.
-The term <img class="math" src="../_images/math/77ade8fd455d392ef4f963e7a65af9ae801c402f.png" alt="\sigma_\epsilon"/> is the standard deviation of an
+The within-event standard deviation (<img class="math" src="_images/math/6f126c303e689f2500a88bfd08000a4c1c16f0b2.png" alt="\phi"/>) is 0.8,
+and the between-event standard deviation (<img class="math" src="_images/math/d33773852e2d7caa6af4ffca8da90a2a56d1d40a.png" alt="\tau"/>) is 0.6.
+The term <img class="math" src="_images/math/77ade8fd455d392ef4f963e7a65af9ae801c402f.png" alt="\sigma_\epsilon"/> is the standard deviation of an
 observation when the observation is uncertain. In this case
-<img class="math" src="../_images/math/8df3a27325822f69b6a426ce481a3b657615fe7b.png" alt="\sigma_\epsilon=0"/>, however in later tests it will become
+<img class="math" src="_images/math/8df3a27325822f69b6a426ce481a3b657615fe7b.png" alt="\sigma_\epsilon=0"/>, however in later tests it will become
 important.  Thus we have:</p>
 <div class="math" id="equation-var-h-y2">
-<p><span class="eqno">(1)<a class="headerlink" href="#equation-var-h-y2" title="Permalink to this equation">¶</a></span><img src="../_images/math/a7f7c8504d0df2c125cba1ba5178c1b1bc9f2f7e.png" alt="\sigma_{H|y_2}^2 =
+<p><span class="eqno">(1)<a class="headerlink" href="#equation-var-h-y2" title="Permalink to this equation">¶</a></span><img src="_images/math/a7f7c8504d0df2c125cba1ba5178c1b1bc9f2f7e.png" alt="\sigma_{H|y_2}^2 =
      \frac{1}{1 + \frac{0.6^2}{0.8^2 + 0.0^2}}
      = 0.64,"/></p>
 </div><p>and</p>
 <div class="math" id="equation-mu-h-y2">
-<p><span class="eqno">(2)<a class="headerlink" href="#equation-mu-h-y2" title="Permalink to this equation">¶</a></span><img src="../_images/math/75322c075db3328a63114e943137d71e8f0e9fa6.png" alt="\mu_{H|y_2} =
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-mu-h-y2" title="Permalink to this equation">¶</a></span><img src="_images/math/75322c075db3328a63114e943137d71e8f0e9fa6.png" alt="\mu_{H|y_2} =
      \frac{0.6}{0.8^2 + 0.0^2}
      \left(1.0-0.0\right)
      0.64
      = 0.6."/></p>
 </div><p>The bias is then given by Engler et al. equation 14:</p>
 <div class="math" id="equation-mu-bk-y2">
-<p><span class="eqno">(3)<a class="headerlink" href="#equation-mu-bk-y2" title="Permalink to this equation">¶</a></span><img src="../_images/math/aa13cd0426ff5c708a342992ef0d5b265cfda139.png" alt="\mathbf{\mu_{B_k|y_2}} = \mathbf{\tau_k}\mu_{H|y_2}
+<p><span class="eqno">(3)<a class="headerlink" href="#equation-mu-bk-y2" title="Permalink to this equation">¶</a></span><img src="_images/math/aa13cd0426ff5c708a342992ef0d5b265cfda139.png" alt="\mathbf{\mu_{B_k|y_2}} = \mathbf{\tau_k}\mu_{H|y_2}
      = \tau\mu_{H|y_2} = 0.6 \times 0.6 = 0.36"/></p>
 </div><p>Thus, the bias is 0.36, as seen in <a class="pageref" href="#verification-test-three">Figure  3</a>
 (solid black line) at distance from the observation.</p>
@@ -181,87 +183,87 @@ important.  Thus we have:</p>
 mean and covariance are given by <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>
 equations 19 and 20:</p>
 <div class="math" id="equation-engler-cond-mean-verif">
-<p><span class="eqno">(4)<a class="headerlink" href="#equation-engler-cond-mean-verif" title="Permalink to this equation">¶</a></span><img src="../_images/math/491a6c1575d587a0e137567c32eec81c965560f7.png" alt="\mathbf{\mu_{Y_1|y_2}} =
+<p><span class="eqno">(4)<a class="headerlink" href="#equation-engler-cond-mean-verif" title="Permalink to this equation">¶</a></span><img src="_images/math/491a6c1575d587a0e137567c32eec81c965560f7.png" alt="\mathbf{\mu_{Y_1|y_2}} =
      \mathbf{\mu_{Y_1}} +
      \mathbf{\mu_{B_1|y_2}} +
      \mathbf{\Sigma_{{W_1}{W_2}}\Sigma_{{W_2}{W_2}}^{-1}
          \left(y_2 - \mu_{y_2} - \mu_{B_2|y_2}\right)},"/></p>
 </div><p>and the total covariance:</p>
 <div class="math" id="equation-engler-cond-covariance-verif">
-<p><span class="eqno">(5)<a class="headerlink" href="#equation-engler-cond-covariance-verif" title="Permalink to this equation">¶</a></span><img src="../_images/math/5124cedd7e92e521cb523c1d29c13595e6c94a51.png" alt="\mathbf{\Sigma_{{Y_1}{Y_1}|y_2}} =
+<p><span class="eqno">(5)<a class="headerlink" href="#equation-engler-cond-covariance-verif" title="Permalink to this equation">¶</a></span><img src="_images/math/5124cedd7e92e521cb523c1d29c13595e6c94a51.png" alt="\mathbf{\Sigma_{{Y_1}{Y_1}|y_2}} =
      \mathbf{\Sigma_{{W_1}{W_1}|w_2}} +
      \mathbf{cc^T}\sigma_{H|y_2}^2,"/></p>
 </div><p>where</p>
 <div class="math">
-<p><img src="../_images/math/b4947c443909dc660e174ee08837f7d79298b21b.png" alt="\mathbf{c} =
+<p><img src="_images/math/b4947c443909dc660e174ee08837f7d79298b21b.png" alt="\mathbf{c} =
     \mathbf{\tau_1} -
     \mathbf{\Sigma_{{W_1}{W_2}}\Sigma_{{W_2}{W_2}}^{-1}\tau_2},"/></p>
 </div><p>and</p>
 <div class="math">
-<p><img src="../_images/math/a06f1a2b17444bcec113626f0c15e51257614689.png" alt="\mathbf{\Sigma_{{W_1}{W_1}|w_2}} =
+<p><img src="_images/math/a06f1a2b17444bcec113626f0c15e51257614689.png" alt="\mathbf{\Sigma_{{W_1}{W_1}|w_2}} =
     \mathbf{\Sigma_{{W_1}{W_1}}} -
     \mathbf{\Sigma_{{W_1}{W_2}}
             \Sigma_{{W_2}{W_2}}^{-1}
             \Sigma_{{W_2}{W_1}}}."/></p>
 </div><p>In the bivariate case, these equations reduce to, respecively:</p>
 <div class="math" id="equation-mu-given-y2">
-<p><span class="eqno">(6)<a class="headerlink" href="#equation-mu-given-y2" title="Permalink to this equation">¶</a></span><img src="../_images/math/86ba3e7899c00ddcce8303f780df354e3d7f41ce.png" alt="\mu|y_2 =
+<p><span class="eqno">(6)<a class="headerlink" href="#equation-mu-given-y2" title="Permalink to this equation">¶</a></span><img src="_images/math/86ba3e7899c00ddcce8303f780df354e3d7f41ce.png" alt="\mu|y_2 =
      \mu +
      \mu_{B_1|y_2} +
      \frac{\sigma_{{W_1}{W_2}}^2}{\phi^2+\sigma_\epsilon^2}
          \left(y_2 - \mu_{y_2} - \mu_{B_2|y_2}\right),"/></p>
 </div><div class="math" id="equation-var-given-y2">
-<p><span class="eqno">(7)<a class="headerlink" href="#equation-var-given-y2" title="Permalink to this equation">¶</a></span><img src="../_images/math/85ac3945e9e923e9e497c3bdc29f4ba462ef00e6.png" alt="\sigma^2|y_2 =
+<p><span class="eqno">(7)<a class="headerlink" href="#equation-var-given-y2" title="Permalink to this equation">¶</a></span><img src="_images/math/85ac3945e9e923e9e497c3bdc29f4ba462ef00e6.png" alt="\sigma^2|y_2 =
      \sigma^2|w_2 +
      c^2\sigma_{H|y_2}^2,"/></p>
 </div><div class="math" id="equation-c-bivariate">
-<p><span class="eqno">(8)<a class="headerlink" href="#equation-c-bivariate" title="Permalink to this equation">¶</a></span><img src="../_images/math/268db7c9f0cf2ac11d26b978c57aeb525dfa5a4b.png" alt="c =
+<p><span class="eqno">(8)<a class="headerlink" href="#equation-c-bivariate" title="Permalink to this equation">¶</a></span><img src="_images/math/268db7c9f0cf2ac11d26b978c57aeb525dfa5a4b.png" alt="c =
      \tau -
      \frac{\sigma_{{W_1}{W_2}}^2}{\phi^2+\sigma_\epsilon^2} \tau,"/></p>
 </div><div class="math" id="equation-var-given-w2">
-<p><span class="eqno">(9)<a class="headerlink" href="#equation-var-given-w2" title="Permalink to this equation">¶</a></span><img src="../_images/math/92e46fa6e29fa2511653c685b9db65e38c3c36bd.png" alt="\sigma^2|w_2 =
+<p><span class="eqno">(9)<a class="headerlink" href="#equation-var-given-w2" title="Permalink to this equation">¶</a></span><img src="_images/math/92e46fa6e29fa2511653c685b9db65e38c3c36bd.png" alt="\sigma^2|w_2 =
      \phi^2 -
      \frac{\sigma_{{W_1}{W_2}}^4}{\phi^2+\sigma_\epsilon^2}."/></p>
-</div><p>where the term <img class="math" src="../_images/math/331f74a65c1613f6c192f632981ebf98839715f1.png" alt="\sigma_{{W_1}{W_2}}^2"/> is a cross-covariance term.
+</div><p>where the term <img class="math" src="_images/math/331f74a65c1613f6c192f632981ebf98839715f1.png" alt="\sigma_{{W_1}{W_2}}^2"/> is a cross-covariance term.
 When the output point is located at the observation point, the correlation
-is 1, and <img class="math" src="../_images/math/20af1d24667e8e025d85a37acd652e03a2622108.png" alt="\sigma_{{W_1}{W_2}}^2 = \phi^2"/>. When the output
+is 1, and <img class="math" src="_images/math/20af1d24667e8e025d85a37acd652e03a2622108.png" alt="\sigma_{{W_1}{W_2}}^2 = \phi^2"/>. When the output
 point is distant from the observation point, the correlation is zero, and
-<img class="math" src="../_images/math/bd3173c3a8ea05bf37d2d8a8f51a421ab70282fe.png" alt="\sigma_{{W_1}{W_2}}^2 = 0"/>. Thus, at the observation point, we have:</p>
+<img class="math" src="_images/math/bd3173c3a8ea05bf37d2d8a8f51a421ab70282fe.png" alt="\sigma_{{W_1}{W_2}}^2 = 0"/>. Thus, at the observation point, we have:</p>
 <div class="math">
-<p><img src="../_images/math/412f6dd382c6aa8916e12df79e7e077b63a8b589.png" alt="\mu|y_2 =
+<p><img src="_images/math/412f6dd382c6aa8916e12df79e7e077b63a8b589.png" alt="\mu|y_2 =
     0 + 0.36 + \frac{0.8^2}{0.8^2 + 0.0}\left(1.0 - 0.0 - 0.36\right)
     = 1.0"/></p>
 </div><div class="math">
-<p><img src="../_images/math/52f2b3afdc1ef9a47478322abea725b32d7e9ded.png" alt="c =
+<p><img src="_images/math/52f2b3afdc1ef9a47478322abea725b32d7e9ded.png" alt="c =
     0.6 - \frac{0.8^2}{0.8^2 + 0.0} 0.6 = 0"/></p>
 </div><div class="math">
-<p><img src="../_images/math/82415626a68dae87b61c1ceba0c8b031b870ccc8.png" alt="\sigma^2|w_2 =
+<p><img src="_images/math/82415626a68dae87b61c1ceba0c8b031b870ccc8.png" alt="\sigma^2|w_2 =
     0.8^2 - \frac{0.8^4}{0.8^2 + 0.0} = 0"/></p>
 </div><div class="math">
-<p><img src="../_images/math/a3525aa339d13cb6f99624ae39f2bd3e41ced0bd.png" alt="\sigma^2|y_2 = 0 + 0^2 \times 0.64 = 0"/></p>
+<p><img src="_images/math/a3525aa339d13cb6f99624ae39f2bd3e41ced0bd.png" alt="\sigma^2|y_2 = 0 + 0^2 \times 0.64 = 0"/></p>
 </div><p>As we see in <a class="pageref" href="#verification-test-three">Figure  3</a>, at the observation
 point, the mean is 1.0 (top), and the standard deviation is 0.0 (bottom).</p>
-<p>At distance from the observation (where <img class="math" src="../_images/math/bd3173c3a8ea05bf37d2d8a8f51a421ab70282fe.png" alt="\sigma_{{W_1}{W_2}}^2 = 0"/>),
+<p>At distance from the observation (where <img class="math" src="_images/math/bd3173c3a8ea05bf37d2d8a8f51a421ab70282fe.png" alt="\sigma_{{W_1}{W_2}}^2 = 0"/>),
 we have:</p>
 <div class="math">
-<p><img src="../_images/math/3a201a6af3affd95aec3807730cb5dedc0d4b467.png" alt="\mu|y_2 =
+<p><img src="_images/math/3a201a6af3affd95aec3807730cb5dedc0d4b467.png" alt="\mu|y_2 =
     0 + 0.36 + \frac{0.0^2}{0.8^2 + 0.0}\left(1.0 - 0.0 - 0.36\right)
     = 0.36"/></p>
 </div><div class="math">
-<p><img src="../_images/math/c123e268676f84d48c4459d626bd323fcf6d3127.png" alt="c =
+<p><img src="_images/math/c123e268676f84d48c4459d626bd323fcf6d3127.png" alt="c =
     0.6 - \frac{0.0^2}{0.8^2 + 0.0} 0.6 = 0.6"/></p>
 </div><div class="math">
-<p><img src="../_images/math/86219c8f2f590806dfc7ba17ba6e1bfd9bdf2b32.png" alt="\sigma^2|w_2 =
+<p><img src="_images/math/86219c8f2f590806dfc7ba17ba6e1bfd9bdf2b32.png" alt="\sigma^2|w_2 =
     0.8^2 - \frac{0.0^4}{0.8^2 + 0.0} = 0.8^2"/></p>
 </div><div class="math">
-<p><img src="../_images/math/36828c3d19fea822badc298148955d5a22a994f5.png" alt="\sigma^2|y_2 = 0.8^2 + 0.6^2 \times 0.64 = 0.8704
+<p><img src="_images/math/36828c3d19fea822badc298148955d5a22a994f5.png" alt="\sigma^2|y_2 = 0.8^2 + 0.6^2 \times 0.64 = 0.8704
 
 \sigma|y_2 = \sqrt{0.8704} = 0.93295"/></p>
 </div><p>Again, in <a class="pageref" href="#verification-test-three">Figure  3</a> we see at distance from the
 observation point, the mean is 0.36 (top), and the standard deviation is
 about 0.933 (bottom), verifying that our implementation of the MVN appears
 to be working as intended.</p>
-<figure class="align-left" id="figure-3">
+<figure class="align-left" id="id3">
 <span id="verification-test-three"></span><a class="reference internal image-reference" href="../_images/verification_test_0003_PGA.png"><img alt="../_images/verification_test_0003_PGA.png" src="../_images/verification_test_0003_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 3: Verification Test 0003. A single observation along a line with
@@ -269,12 +271,12 @@ an amplitude of +1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
-standard deviation (lower plot).</span><a class="headerlink" href="#figure-3" title="Permalink to this image">¶</a></p>
+standard deviation (lower plot).</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0004">
-<h2><span class="section-number">2.5.4. </span>Test 0004<a class="headerlink" href="#test-0004" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.4. </span>Test 0004<a class="headerlink" href="#test-0004" title="Permalink to this heading">¶</a></h2>
 <p>Test 0004 uses an identical set up to Test 0003, except there
 are two observations (of amplitude +1.0) at the same location.
 Because the observations are co-located and of the same period,
@@ -284,7 +286,7 @@ effect of a single observation. The result, illustrated in
 <a class="pageref" href="#verification-test-four">Figure  4</a> (which has two observations)
 is identical to <a class="pageref" href="#verification-test-three">Figure  3</a> (which
 has only one observation).</p>
-<figure class="align-left" id="figure-4">
+<figure class="align-left" id="id4">
 <span id="verification-test-four"></span><a class="reference internal image-reference" href="../_images/verification_test_0004_PGA.png"><img alt="../_images/verification_test_0004_PGA.png" src="../_images/verification_test_0004_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 4: Verification Test 0004. Two observations at the same
@@ -294,12 +296,12 @@ The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
 standard deviation (lower plot). Compare with
-<a class="pageref" href="#verification-test-three">Figure  3</a>.</span><a class="headerlink" href="#figure-4" title="Permalink to this image">¶</a></p>
+<a class="pageref" href="#verification-test-three">Figure  3</a>.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0004b">
-<h2><span class="section-number">2.5.5. </span>Test 0004b<a class="headerlink" href="#test-0004b" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.5. </span>Test 0004b<a class="headerlink" href="#test-0004b" title="Permalink to this heading">¶</a></h2>
 <p>Test 0004b uses an identical set up to Test 0004, except that the
 two observations (of amplitude +1.0) have been separated by 1
 degree of longitude. Thus, they are no longer highly correlated
@@ -314,7 +316,7 @@ uncertainty at distance from the observations is slightly less
 in Test 0004b than in Test 0004 because the two essentially
 independent observations have reduced the uncertainty of the
 bias, which lowers the overall uncertainty.</p>
-<figure class="align-left" id="figure-5">
+<figure class="align-left" id="id5">
 <span id="verification-test-four-b"></span><a class="reference internal image-reference" href="../_images/verification_test_0004b_PGA.png"><img alt="../_images/verification_test_0004b_PGA.png" src="../_images/verification_test_0004b_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 5: Verification Test 0004b. Two observations at different
@@ -323,12 +325,12 @@ The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
 standard deviation (lower plot). Compare with
-<a class="pageref" href="#verification-test-four">Figure  4</a>.</span><a class="headerlink" href="#figure-5" title="Permalink to this image">¶</a></p>
+<a class="pageref" href="#verification-test-four">Figure  4</a>.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0005">
-<h2><span class="section-number">2.5.6. </span>Test 0005<a class="headerlink" href="#test-0005" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.6. </span>Test 0005<a class="headerlink" href="#test-0005" title="Permalink to this heading">¶</a></h2>
 <p>Test 0005 also has two co-located observations (see Verification
 Test 0004, above), but here they have
 opposite amplitudes of +1.0 and –1.0. The result, shown in
@@ -336,7 +338,7 @@ opposite amplitudes of +1.0 and –1.0. The result, shown in
 and standard deviation behave as if there were only a single
 observation with the mean amplitude of the two observations (i.e.,
 0).</p>
-<figure class="align-left" id="figure-6">
+<figure class="align-left" id="id6">
 <span id="verification-test-five"></span><a class="reference internal image-reference" href="../_images/verification_test_0005_PGA.png"><img alt="../_images/verification_test_0005_PGA.png" src="../_images/verification_test_0005_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 6: Verification Test 0005. Two observations at the same
@@ -344,12 +346,12 @@ location along a line, with amplitudes of +1.0 and –1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the
-conditional standard deviation (lower plot).</span><a class="headerlink" href="#figure-6" title="Permalink to this image">¶</a></p>
+conditional standard deviation (lower plot).</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0006">
-<h2><span class="section-number">2.5.7. </span>Test 0006<a class="headerlink" href="#test-0006" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.7. </span>Test 0006<a class="headerlink" href="#test-0006" title="Permalink to this heading">¶</a></h2>
 <p><a class="pageref" href="#verification-test-six">Figure  7</a> illustrates Verification Test 0006.
 Forty evenly-spaced observations, all with amplitudes of +1.0 are used.
 Most of the observations are to the left of center of the plot (and
@@ -359,7 +361,7 @@ compared with a single observation as in
 <a class="pageref" href="#verification-test-three">Figure  3</a>), and the conditional
 standard deviation at distance has decreased toward the within-event
 value of 0.8.</p>
-<figure class="align-left" id="figure-7">
+<figure class="align-left" id="id7">
 <span id="verification-test-six"></span><a class="reference internal image-reference" href="../_images/verification_test_0006_PGA.png"><img alt="../_images/verification_test_0006_PGA.png" src="../_images/verification_test_0006_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 7: Verification Test 0006. Forty evenly-space observations along
@@ -368,12 +370,12 @@ extend some distance off the left edge of the figure).
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
-standard deviation (lower plot).</span><a class="headerlink" href="#figure-7" title="Permalink to this image">¶</a></p>
+standard deviation (lower plot).</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0007">
-<h2><span class="section-number">2.5.8. </span>Test 0007<a class="headerlink" href="#test-0007" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.8. </span>Test 0007<a class="headerlink" href="#test-0007" title="Permalink to this heading">¶</a></h2>
 <p>Verification Test 0007 uses a single observation with an amplitude
 of +1.0. The observation is of spectral acceleration (SA) at a
 period of 1.0 s. The conditional mean SA was
@@ -388,7 +390,7 @@ bias approaches 0 and its standard deviation approaches the
 between-event standard deviation, thus the conditional standard
 deviation approaches the combined between-event and within-event
 standard deviation (which, in our tests is 1.0).</p>
-<figure class="align-left" id="figure-8">
+<figure class="align-left" id="id8">
 <span id="verification-test-seven"></span><a class="reference internal image-reference" href="../_images/verification_test_0007_spectra_plot.png"><img alt="../_images/verification_test_0007_spectra_plot.png" src="../_images/verification_test_0007_spectra_plot.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 8: Verification Test 0007. A single observation of spectral
@@ -398,83 +400,83 @@ at periods from 0.1 s to 10.0 s.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the
-conditional standard deviation (lower plot).</span><a class="headerlink" href="#figure-8" title="Permalink to this image">¶</a></p>
+conditional standard deviation (lower plot).</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0008">
-<h2><span class="section-number">2.5.9. </span>Test 0008<a class="headerlink" href="#test-0008" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.9. </span>Test 0008<a class="headerlink" href="#test-0008" title="Permalink to this heading">¶</a></h2>
 <p>Verification Test 0008 demonstrates the effect of uncertainty in the
 value at the observation point. If we consider equations
 <a class="reference internal" href="#equation-mu-given-y2">(6)</a> and <a class="reference internal" href="#equation-var-given-y2">(7)</a>, and the supporting equations
 <a class="reference internal" href="#equation-c-bivariate">(8)</a> and <a class="reference internal" href="#equation-var-given-w2">(9)</a> from Test 0003, the additional
-uncertainty is represented by the term <img class="math" src="../_images/math/77ade8fd455d392ef4f963e7a65af9ae801c402f.png" alt="\sigma_\epsilon"/>.
+uncertainty is represented by the term <img class="math" src="_images/math/77ade8fd455d392ef4f963e7a65af9ae801c402f.png" alt="\sigma_\epsilon"/>.
 <a class="pageref" href="#verification-test-eight">Figure  9</a>
 illustrates five separate cases to show
-the effect of five values of <img class="math" src="../_images/math/77ade8fd455d392ef4f963e7a65af9ae801c402f.png" alt="\sigma_\epsilon"/>: 0.0, 0.75,
+the effect of five values of <img class="math" src="_images/math/77ade8fd455d392ef4f963e7a65af9ae801c402f.png" alt="\sigma_\epsilon"/>: 0.0, 0.75,
 1.5, 3.0, and 6.0 on an observation with an amplitude of 1.0 (as in
 Test 0003).  As we did with Test 0003, we can compute the bias and
 the adjusted within-event standard deviation for each of the five cases.
-The case for <img class="math" src="../_images/math/49d7dc84931bc95aa55ce94870f11b8926cac01c.png" alt="\sigma_\epsilon=0.0"/> was demonstrated in Test 0003.
-Here we will demonstrate <img class="math" src="../_images/math/cd47bb737a259d8cff55da7f9995259e24531362.png" alt="\sigma_\epsilon=0.75"/>.</p>
+The case for <img class="math" src="_images/math/49d7dc84931bc95aa55ce94870f11b8926cac01c.png" alt="\sigma_\epsilon=0.0"/> was demonstrated in Test 0003.
+Here we will demonstrate <img class="math" src="_images/math/cd47bb737a259d8cff55da7f9995259e24531362.png" alt="\sigma_\epsilon=0.75"/>.</p>
 <p>First we recompute the bias variance and the bias:</p>
 <div class="math">
-<p><img src="../_images/math/fb1b4a7e761ae63f7ea59530546b5953d8e3e6ff.png" alt="\sigma_{H|y_2}^2 =
+<p><img src="_images/math/fb1b4a7e761ae63f7ea59530546b5953d8e3e6ff.png" alt="\sigma_{H|y_2}^2 =
     \frac{1}{1 + \frac{0.6^2}{0.8^2 + 0.75^2}}
     = 0.7696"/></p>
 </div><div class="math">
-<p><img src="../_images/math/9074605ea216887e739d24a6aef51e5e9b7d27d5.png" alt="\mu_{H|y_2} =
+<p><img src="_images/math/9074605ea216887e739d24a6aef51e5e9b7d27d5.png" alt="\mu_{H|y_2} =
     \frac{0.6}{0.8^2 + 0.75^2}
     \left(1.0-0.0\right)
     0.7696
     = 0.384"/></p>
 </div><div class="math">
-<p><img src="../_images/math/3ec6d4066e83d2a6a9b8e5be59d35f7a63fb4c9e.png" alt="\mu_{B_k|y_2} =
+<p><img src="_images/math/3ec6d4066e83d2a6a9b8e5be59d35f7a63fb4c9e.png" alt="\mu_{B_k|y_2} =
     \tau\mu_{H|y_2} = 0.6 \times 0.384 = 0.2304"/></p>
 </div><p>At the observation point, we have:</p>
 <div class="math">
-<p><img src="../_images/math/3abe2657361daba6394a704ecd9f135fd9e34e9a.png" alt="\mu|y_2 =
+<p><img src="_images/math/3abe2657361daba6394a704ecd9f135fd9e34e9a.png" alt="\mu|y_2 =
     0 + 0.2304 +
         \frac{0.8^2}{0.8^2 + 0.75^2}\left(1.0 - 0.0 - 0.2304\right)
     = 0.64"/></p>
 </div><div class="math">
-<p><img src="../_images/math/e8a058a0c0920cb8e0fd75fcc4ecbd4ce73c400b.png" alt="c =
+<p><img src="_images/math/e8a058a0c0920cb8e0fd75fcc4ecbd4ce73c400b.png" alt="c =
     0.6 - \frac{0.8^2}{0.8^2 + 0.75^2} 0.6 = 0.2807"/></p>
 </div><div class="math">
-<p><img src="../_images/math/ecf47dcd92d5fb2e51296c9ab83a7951771369b6.png" alt="\sigma^2|w_2 =
+<p><img src="_images/math/ecf47dcd92d5fb2e51296c9ab83a7951771369b6.png" alt="\sigma^2|w_2 =
     0.8^2 - \frac{0.8^4}{0.8^2 + 0.75^2} = 0.2994"/></p>
 </div><div class="math">
-<p><img src="../_images/math/87eee1d61ed3708c82c07ca133a29f5d441d29be.png" alt="\sigma^2|y_2 = 0.2994 + 0.2887^2 \times 0.7696 = 0.36
+<p><img src="_images/math/87eee1d61ed3708c82c07ca133a29f5d441d29be.png" alt="\sigma^2|y_2 = 0.2994 + 0.2887^2 \times 0.7696 = 0.36
 
 \sigma|y_2 = \sqrt{0.36} = 0.6"/></p>
 </div><p>As we see in <a class="pageref" href="#verification-test-three">Figure  3</a>, at the observation
-point, for the <img class="math" src="../_images/math/cd47bb737a259d8cff55da7f9995259e24531362.png" alt="\sigma_\epsilon=0.75"/> line, the mean is 0.64 (top),
+point, for the <img class="math" src="_images/math/cd47bb737a259d8cff55da7f9995259e24531362.png" alt="\sigma_\epsilon=0.75"/> line, the mean is 0.64 (top),
 and the standard deviation is 0.6 (bottom)</p>
 <p>At distance from the observation we have:</p>
 <div class="math">
-<p><img src="../_images/math/61582d64031391d44e1829f4ea95201a0099012a.png" alt="\mu|y_2 =
+<p><img src="_images/math/61582d64031391d44e1829f4ea95201a0099012a.png" alt="\mu|y_2 =
     0 + 0.2304 +
         \frac{0.0^2}{0.8^2 + 0.75^2}\left(1.0 - 0.0 - 0.2304\right)
     = 0.2304"/></p>
 </div><div class="math">
-<p><img src="../_images/math/6e07c26303db418dbae9bed71261d565ec1236d9.png" alt="c =
+<p><img src="_images/math/6e07c26303db418dbae9bed71261d565ec1236d9.png" alt="c =
     0.6 - \frac{0.0^2}{0.8^2 + 0.75^2} 0.6 = 0.6"/></p>
 </div><div class="math">
-<p><img src="../_images/math/279d793c3f72204c3d97a355422728f0384983e4.png" alt="\sigma^2|w_2 =
+<p><img src="_images/math/279d793c3f72204c3d97a355422728f0384983e4.png" alt="\sigma^2|w_2 =
     0.8^2 - \frac{0.0^4}{0.8^2 + 0.75^2} = 0.8^2"/></p>
 </div><div class="math">
-<p><img src="../_images/math/356654fc2ee2c7a8b78b7f7978ae98d2b9332984.png" alt="\sigma^2|y_2 = 0.8^2 + 0.6^2 \times 0.7696 = 0.9171
+<p><img src="_images/math/356654fc2ee2c7a8b78b7f7978ae98d2b9332984.png" alt="\sigma^2|y_2 = 0.8^2 + 0.6^2 \times 0.7696 = 0.9171
 
 \sigma|y_2 = \sqrt{0.9171} = 0.9576"/></p>
 </div><p>In <a class="pageref" href="#verification-test-three">Figure  3</a>, at distance from the observation
-point, for the <img class="math" src="../_images/math/cd47bb737a259d8cff55da7f9995259e24531362.png" alt="\sigma_\epsilon=0.75"/> line, the mean is about 0.23
+point, for the <img class="math" src="_images/math/cd47bb737a259d8cff55da7f9995259e24531362.png" alt="\sigma_\epsilon=0.75"/> line, the mean is about 0.23
 (top), and the standard deviation is about 0.96 (bottom).</p>
-<p>Doing these calculations for all five cases of <img class="math" src="../_images/math/77ade8fd455d392ef4f963e7a65af9ae801c402f.png" alt="\sigma_\epsilon"/> we
+<p>Doing these calculations for all five cases of <img class="math" src="_images/math/77ade8fd455d392ef4f963e7a65af9ae801c402f.png" alt="\sigma_\epsilon"/> we
 find the mean at the observation point to be about (1.0, 0.64, 0.31, 0.1,
 0.03), with standard deviations (0.0, 0.6, 0.83, 0.95, 0.99). At distance,
 the means are (0.36, 0.23, 0.11, 0.04, 0.01) with standard deviations
 (0.93, 0.96, 0.98, 0.99, 1.0).</p>
-<figure class="align-left" id="figure-9">
+<figure class="align-left" id="id9">
 <span id="verification-test-eight"></span><a class="reference internal image-reference" href="../_images/verification_test_0008_PGA.png"><img alt="../_images/verification_test_0008_PGA.png" src="../_images/verification_test_0008_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 9: Verification Test 0008. Five separates runs of ShakeMap
@@ -483,12 +485,12 @@ amplitude of +1.0, but with increasing uncertainty.
 The upper plot (solid lines) shows the conditional means,
 and the lower plot (dashed lines) shows the conditional standard
 deviations. The black lines should be identical to their
-counterparts in <a class="pageref" href="#verification-test-three">Figure  3</a>.</span><a class="headerlink" href="#figure-9" title="Permalink to this image">¶</a></p>
+counterparts in <a class="pageref" href="#verification-test-three">Figure  3</a>.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0009">
-<h2><span class="section-number">2.5.10. </span>Test 0009<a class="headerlink" href="#test-0009" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.10. </span>Test 0009<a class="headerlink" href="#test-0009" title="Permalink to this heading">¶</a></h2>
 <p>Test 0009 (see
 <a class="pageref" href="#verification-test-nine">Figure  10</a>) has five observations:
 the central observation has an amplitude of 0.75, while the
@@ -500,7 +502,7 @@ location of the central observation,
 but despite that influence its conditional mean should approach
 the observational amplitude (0.75) from below, but not reach or
 exceed it.</p>
-<figure class="align-left" id="figure-10">
+<figure class="align-left" id="id10">
 <span id="verification-test-nine"></span><a class="reference internal image-reference" href="../_images/verification_test_0009_PGA.png"><img alt="../_images/verification_test_0009_PGA.png" src="../_images/verification_test_0009_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 10: Verification Test 0009. Five observations: the central
@@ -510,12 +512,12 @@ a standard deviation of 0.2.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the
-conditional standard deviation (lower plot).</span><a class="headerlink" href="#figure-10" title="Permalink to this image">¶</a></p>
+conditional standard deviation (lower plot).</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0010">
-<h2><span class="section-number">2.5.11. </span>Test 0010<a class="headerlink" href="#test-0010" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.11. </span>Test 0010<a class="headerlink" href="#test-0010" title="Permalink to this heading">¶</a></h2>
 <p>Like Test 0009, Test 0010 (see
 <a class="pageref" href="#verification-test-ten">Figure  11</a>) has five observations:
 the central observation has an amplitude of 0.75, while the
@@ -527,7 +529,7 @@ the location of
 the central observation would approach the assigned amplitude
 from above. The amplitude should not (quite) reach the
 observational value (0.75), or go below it.</p>
-<figure class="align-left" id="figure-11">
+<figure class="align-left" id="id11">
 <span id="verification-test-ten"></span><a class="reference internal image-reference" href="../_images/verification_test_0010_PGA.png"><img alt="../_images/verification_test_0010_PGA.png" src="../_images/verification_test_0010_PGA.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 11: Verification Test 0010. Five observations: the central
@@ -538,12 +540,12 @@ The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation (upper plot), and the red line shows the conditional
 standard deviation (lower plot). Compare with
-<a class="pageref" href="#verification-test-nine">Figure  10</a>.</span><a class="headerlink" href="#figure-11" title="Permalink to this image">¶</a></p>
+<a class="pageref" href="#verification-test-nine">Figure  10</a>.</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-0011">
-<h2><span class="section-number">2.5.12. </span>Test 0011<a class="headerlink" href="#test-0011" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5.12. </span>Test 0011<a class="headerlink" href="#test-0011" title="Permalink to this heading">¶</a></h2>
 <p>The purpose of this test is to verify the orientation of the Vs30
 grid and the generic amplification factors. The origin and magnitude
 are those of the January 17, 1994, Northridge, California earthquake.
@@ -560,7 +562,7 @@ amplification factors of 1.0, and the southeast quadrant has an
 amplification of 0.0. The figure demonstrates that the combined
 amplifications are working correctly and are in the proper
 orientation.</p>
-<figure class="align-left" id="figure-12">
+<figure class="align-left" id="id12">
 <span id="verification-test-eleven"></span><a class="reference internal image-reference" href="../_images/verification_test_0011_PSA3p0.png"><img alt="../_images/verification_test_0011_PSA3p0.png" src="../_images/verification_test_0011_PSA3p0.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 12: Verification Test 0011. 3 s PSA  map using the epicenter and magnitude
@@ -568,7 +570,7 @@ of the January 17, 1994, Northridge, California earthquake. The
 coastline and other background features are the result of
 site amplification from the Vs30 file. The major north-south and
 east-west divisions are the result of generic amplification
-factors.</span><a class="headerlink" href="#figure-12" title="Permalink to this image">¶</a></p>
+factors.</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
@@ -631,6 +633,7 @@ factors.</span><a class="headerlink" href="#figure-12" title="Permalink to this 
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">Shakelib API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -639,12 +642,12 @@ factors.</span><a class="headerlink" href="#figure-12" title="Permalink to this 
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

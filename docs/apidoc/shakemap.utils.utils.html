@@ -1,23 +1,25 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakemap.utils.utils &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ShakeMap 3.5 Manual" href="../manual3_5/index.html" />
+    <link rel="next" title="shakelib" href="../shakelib/shakelib.html" />
     <link rel="prev" title="shakemap.utils.queue" href="shakemap.utils.queue.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -34,10 +36,10 @@
           <div class="body" role="main">
             
   <section id="module-shakemap.utils.utils">
-<span id="shakemap-utils-utils"></span><h1>shakemap.utils.utils<a class="headerlink" href="#module-shakemap.utils.utils" title="Permalink to this headline">¶</a></h1>
+<span id="shakemap-utils-utils"></span><h1>shakemap.utils.utils<a class="headerlink" href="#module-shakemap.utils.utils" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
-<dt id="shakemap.utils.utils.migrate_gmpe">
-<code class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></code><code class="sig-name descname"><span class="pre">migrate_gmpe</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_gmpe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#migrate_gmpe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.migrate_gmpe" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.utils.migrate_gmpe">
+<span class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></span><span class="sig-name descname"><span class="pre">migrate_gmpe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_gmpe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#migrate_gmpe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.migrate_gmpe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the GMPE that should be used to replace SM3.5 GMPE</p>
 <p>By default, this uses the migrate.conf file found in the ShakeMap
 repository. Users can optionally pass in their own config.</p>
@@ -58,13 +60,13 @@ repository. Users can optionally pass in their own config.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.utils.utils.set_gmpe">
-<code class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></code><code class="sig-name descname"><span class="pre">set_gmpe</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#set_gmpe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.set_gmpe" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.utils.set_gmpe">
+<span class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></span><span class="sig-name descname"><span class="pre">set_gmpe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gmpe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eventid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#set_gmpe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.set_gmpe" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.utils.utils.get_network_name">
-<code class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></code><code class="sig-name descname"><span class="pre">get_network_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">netid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_network_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.get_network_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.utils.get_network_name">
+<span class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></span><span class="sig-name descname"><span class="pre">get_network_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">netid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_network_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.get_network_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a string representing a name of a network given its ID.</p>
 <p>Note: Uses an internet connection to ComCat.</p>
 <dl class="field-list simple">
@@ -81,8 +83,8 @@ repository. Users can optionally pass in their own config.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.utils.utils.get_object_from_config">
-<code class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></code><code class="sig-name descname"><span class="pre">get_object_from_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_object_from_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.get_object_from_config" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.utils.get_object_from_config">
+<span class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></span><span class="sig-name descname"><span class="pre">get_object_from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_object_from_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.get_object_from_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function for things (ipe, gmice, ccf) that don’t have a
 fromConfig() constructor yet. Instantiates an instance of a
 class from config entry, ‘name’, that has a corresponding
@@ -113,8 +115,8 @@ of the thing being instantiated.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="shakemap.utils.utils.query_yes_no">
-<code class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></code><code class="sig-name descname"><span class="pre">query_yes_no</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'yes'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#query_yes_no"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.query_yes_no" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakemap.utils.utils.query_yes_no">
+<span class="sig-prename descclassname"><span class="pre">shakemap.utils.utils.</span></span><span class="sig-name descname"><span class="pre">query_yes_no</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'yes'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#query_yes_no"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakemap.utils.utils.query_yes_no" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ask a yes/no question via raw_input() and return their answer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -176,11 +178,19 @@ an answer is required of the user).</p></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.utils</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.utils.migrate_gmpe"><code class="docutils literal notranslate"><span class="pre">migrate_gmpe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.utils.set_gmpe"><code class="docutils literal notranslate"><span class="pre">set_gmpe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.utils.get_network_name"><code class="docutils literal notranslate"><span class="pre">get_network_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.utils.get_object_from_config"><code class="docutils literal notranslate"><span class="pre">get_object_from_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakemap.utils.utils.query_yes_no"><code class="docutils literal notranslate"><span class="pre">query_yes_no()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">Shakelib API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -189,12 +199,12 @@ an answer is required of the user).</p></li>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

@@ -1,22 +1,26 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakelib.conversions.convert_imt &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.correlation" href="shakelib.correlation.html" />
+    <link rel="prev" title="shakelib.conversions.convert_imc" href="shakelib.conversions.convert_imc.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,16 +36,16 @@
           <div class="body" role="main">
             
   <section id="module-shakelib.conversions.convert_imt">
-<span id="shakelib-conversions-convert-imt"></span><h1>shakelib.conversions.convert_imt<a class="headerlink" href="#module-shakelib.conversions.convert_imt" title="Permalink to this headline">¶</a></h1>
+<span id="shakelib-conversions-convert-imt"></span><h1>shakelib.conversions.convert_imt<a class="headerlink" href="#module-shakelib.conversions.convert_imt" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
-<dt id="shakelib.conversions.convert_imt.IMTConverter">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">shakelib.conversions.convert_imt.</span></code><code class="sig-name descname"><span class="pre">IMTConverter</span></code><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<dt class="sig sig-object py" id="shakelib.conversions.convert_imt.IMTConverter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shakelib.conversions.convert_imt.</span></span><span class="sig-name descname"><span class="pre">IMTConverter</span></span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
 <p>Base class for implementing conversions between intensity
 measurement types (IMT).</p>
 <dl class="py method">
-<dt id="shakelib.conversions.convert_imt.IMTConverter.convertAmps">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">convertAmps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.convertAmps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.convertAmps" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.conversions.convert_imt.IMTConverter.convertAmps">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convertAmps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.convertAmps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.convertAmps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of converted IMT amplitude values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -67,8 +71,8 @@ ground motions. Valid IMTs are PGV, and SA.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.conversions.convert_imt.IMTConverter.getConversionFactor">
-<code class="sig-name descname"><span class="pre">getConversionFactor</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.getConversionFactor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.getConversionFactor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.conversions.convert_imt.IMTConverter.getConversionFactor">
+<span class="sig-name descname"><span class="pre">getConversionFactor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.getConversionFactor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.getConversionFactor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method that returns the conversion factor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -81,8 +85,8 @@ ground motions. Valid IMTs are PGV, and SA.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="shakelib.conversions.convert_imt.IMTConverter.getInputIMT">
-<code class="sig-name descname"><span class="pre">getInputIMT</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.getInputIMT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.getInputIMT" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="shakelib.conversions.convert_imt.IMTConverter.getInputIMT">
+<span class="sig-name descname"><span class="pre">getInputIMT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imt_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.getInputIMT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.getInputIMT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get valid input IMT types that can be converted to the specified
 imt_out.</p>
 <dl class="field-list simple">
@@ -129,10 +133,39 @@ imt_out.</p>
 
 
 <h3>Navigation</h3>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">Shakelib API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.imc.html">shakelib.conversions.imc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.imt.html">shakelib.conversions.imt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.convert_imc.html">shakelib.conversions.convert_imc</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.conversions.convert_imt</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#shakelib.conversions.convert_imt.IMTConverter"><code class="docutils literal notranslate"><span class="pre">IMTConverter</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#shakelib.conversions.convert_imt.IMTConverter.convertAmps"><code class="docutils literal notranslate"><span class="pre">IMTConverter.convertAmps()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakelib.conversions.convert_imt.IMTConverter.getConversionFactor"><code class="docutils literal notranslate"><span class="pre">IMTConverter.getConversionFactor()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shakelib.conversions.convert_imt.IMTConverter.getInputIMT"><code class="docutils literal notranslate"><span class="pre">IMTConverter.getInputIMT()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multiutils.html">shakelib.multiutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -141,12 +174,12 @@ imt_out.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

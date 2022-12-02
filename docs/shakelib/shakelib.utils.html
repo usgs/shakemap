@@ -1,22 +1,26 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>shakelib.utils &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.utils.containers" href="shakelib.utils.containers.html" />
+    <link rel="prev" title="shakelib.plotting.plotrupture" href="shakelib.plotting.plotrupture.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,14 +36,41 @@
           <div class="body" role="main">
             
   <section id="shakelib-utils">
-<h1>shakelib.utils<a class="headerlink" href="#shakelib-utils" title="Permalink to this headline">¶</a></h1>
+<h1>shakelib.utils<a class="headerlink" href="#shakelib-utils" title="Permalink to this heading">¶</a></h1>
 <p>Submodules</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="shakelib.utils.containers.html">shakelib.utils.containers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="shakelib.utils.exception.html">shakelib.utils.exception</a></li>
-<li class="toctree-l1"><a class="reference internal" href="shakelib.utils.imt_string.html">shakelib.utils.imt_string</a></li>
-<li class="toctree-l1"><a class="reference internal" href="shakelib.utils.utils.html">shakelib.utils.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shakelib.utils.containers.html">shakelib.utils.containers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.createFromInput"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer.createFromInput()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.setRupture"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer.setRupture()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.getRuptureObject"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer.getRuptureObject()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.setStationList"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer.setStationList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.getStationList"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer.getStationList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.setStationData"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer.setStationData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.addStationData"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer.addStationData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.updateRupture"><code class="docutils literal notranslate"><span class="pre">ShakeMapInputContainer.updateRupture()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="shakelib.utils.exception.html">shakelib.utils.exception</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.exception.html#shakelib.utils.exception.ShakeLibException"><code class="docutils literal notranslate"><span class="pre">ShakeLibException</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="shakelib.utils.imt_string.html">shakelib.utils.imt_string</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.imt_string.html#shakelib.utils.imt_string.oq_to_file"><code class="docutils literal notranslate"><span class="pre">oq_to_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.imt_string.html#shakelib.utils.imt_string.file_to_oq"><code class="docutils literal notranslate"><span class="pre">file_to_oq()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="shakelib.utils.utils.html">shakelib.utils.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.utils.html#shakelib.utils.utils.replace_dyfi"><code class="docutils literal notranslate"><span class="pre">replace_dyfi()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.utils.html#shakelib.utils.utils.get_extent"><code class="docutils literal notranslate"><span class="pre">get_extent()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.utils.html#shakelib.utils.utils.thirty_sec_min"><code class="docutils literal notranslate"><span class="pre">thirty_sec_min()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.utils.html#shakelib.utils.utils.thirty_sec_max"><code class="docutils literal notranslate"><span class="pre">thirty_sec_max()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.utils.html#shakelib.utils.utils.is_stable"><code class="docutils literal notranslate"><span class="pre">is_stable()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 <p>Module contents</p>
@@ -68,10 +99,31 @@
 
 
 <h3>Navigation</h3>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../manual4_0/index.html">ShakeMap 4.1 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">Shakelib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">shakelib.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.containers.html">shakelib.utils.containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.exception.html">shakelib.utils.exception</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.imt_string.html">shakelib.utils.imt_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.utils.html">shakelib.utils.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multiutils.html">shakelib.multiutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -80,12 +132,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>

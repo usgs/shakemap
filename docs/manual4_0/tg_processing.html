@@ -1,19 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>2.3. Data Processing &#8212; ShakeMap Documentation  documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,7 +36,7 @@
           <div class="body" role="main">
             
   <section id="data-processing">
-<span id="sec-processing-4"></span><h1><span class="section-number">2.3. </span>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">¶</a></h1>
+<span id="sec-processing-4"></span><h1><span class="section-number">2.3. </span>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this heading">¶</a></h1>
 <p>The <strong>model</strong> module is ShakeMap’s primary data processing module. It
 gathers data, performs quality control, and interpolates ground motions
 to a grid or pre-selected set of points.</p>
@@ -47,9 +49,9 @@ specifics of ShakeMap’s implementation of this method are described below.</p>
 <p>Note, this document applies to ShakeMap v4.1 and later. For v4.0.x, see
 <a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al., 2018</span></a>.</p>
 <section id="ground-motion-prediction">
-<span id="subsec-ground-motion-prediction-4"></span><h2><span class="section-number">2.3.1. </span>Ground-Motion Prediction<a class="headerlink" href="#ground-motion-prediction" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-ground-motion-prediction-4"></span><h2><span class="section-number">2.3.1. </span>Ground-Motion Prediction<a class="headerlink" href="#ground-motion-prediction" title="Permalink to this heading">¶</a></h2>
 <section id="ground-motion-models">
-<h3><span class="section-number">2.3.1.1. </span>Ground Motion Models<a class="headerlink" href="#ground-motion-models" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.1. </span>Ground Motion Models<a class="headerlink" href="#ground-motion-models" title="Permalink to this heading">¶</a></h3>
 <p>ShakeMap uses ground-motion prediction equations (GMPEs) to provide the
 initial estimates of ground motions. The GMPEs are drawn from the set
 of GMPEs implemented by the GEM OpenQuake project. The full list of
@@ -67,7 +69,7 @@ environments, as well as consistency with the methodology of other
 projects, such as the <a class="reference external" href="https://www.usgs.gov/natural-hazards/earthquake-hazards/hazards/">USGS National Seismic Hazard Model</a>.</p>
 </section>
 <section id="ground-motion-model-sets">
-<h3><span class="section-number">2.3.1.2. </span>Ground Motion Model Sets<a class="headerlink" href="#ground-motion-model-sets" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.2. </span>Ground Motion Model Sets<a class="headerlink" href="#ground-motion-model-sets" title="Permalink to this heading">¶</a></h3>
 <p>By default, ShakeMap comes with a few GMPE sets pre-configured, and we review a
 few of the important ones here. One example is the “active_crustal_nshmp2014,”
 which combines four NGA West2 GMPEs using equal weights. This is used by the
@@ -81,11 +83,11 @@ use with magnitudes less than 4. Our implementation includes an extension of the
 model to smaller magnitudes that extrapolates the small-magnitude scaling of
 ground motions. The slope of this adustment varies with period and distance,
 as illustrated in .</p>
-<figure class="align-left" id="figure-1">
+<figure class="align-left" id="id1">
 <span id="nga-east-sope"></span><a class="reference internal image-reference" href="../_images/nga-east_smallM_slopes.png"><img alt="../_images/nga-east_smallM_slopes.png" src="../_images/nga-east_smallM_slopes.png" style="width: 500px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 1: Estimated small-magnitue scaling of the NGA-East median ground motion model
-as a function of period and distance.</span><a class="headerlink" href="#figure-1" title="Permalink to this image">¶</a></p>
+as a function of period and distance.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>Another issue with the NGA East models is that some of the seed models
@@ -98,32 +100,32 @@ earthquake in question. This treatment is consistent with the approach
 used by NSHM.</p>
 </section>
 <section id="uncertainty-from-multiple-models">
-<h3><span class="section-number">2.3.1.3. </span>Uncertainty from Multiple Models<a class="headerlink" href="#uncertainty-from-multiple-models" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.3. </span>Uncertainty from Multiple Models<a class="headerlink" href="#uncertainty-from-multiple-models" title="Permalink to this heading">¶</a></h3>
 <p>The MultiGMPE module uses a list of GMPEs and their weights to
 produce a weighted mean at each location. If we treat the outputs of the
-GMPEs as random variables, then we can define a variable <img class="math" src="../_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/> as a
-column vector of <img class="math" src="../_images/math/f6a40c9b50ae0429590c89379f5f97b1c38da3d3.png" alt="n"/> random variables <img class="math" src="../_images/math/4ef063fb505764df7da2ee19de08ef61e48920e3.png" alt="X_1,...,X_n"/>. If the
-weights are given by <img class="math" src="../_images/math/e63a151aeec210be2087e872ce4d4f87156ef061.png" alt="w"/>, a column vector with elements
-<img class="math" src="../_images/math/9fe0b7600d3d961f11cdb0d84f506ccecf19357c.png" alt="w_1,...,w_n"/>, then the weighted mean, <img class="math" src="../_images/math/1cd38254ca5e480c6da949f0ab5a5b96aef5a215.png" alt="\mu"/> is given by:</p>
+GMPEs as random variables, then we can define a variable <img class="math" src="_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/> as a
+column vector of <img class="math" src="_images/math/f6a40c9b50ae0429590c89379f5f97b1c38da3d3.png" alt="n"/> random variables <img class="math" src="_images/math/4ef063fb505764df7da2ee19de08ef61e48920e3.png" alt="X_1,...,X_n"/>. If the
+weights are given by <img class="math" src="_images/math/e63a151aeec210be2087e872ce4d4f87156ef061.png" alt="w"/>, a column vector with elements
+<img class="math" src="_images/math/9fe0b7600d3d961f11cdb0d84f506ccecf19357c.png" alt="w_1,...,w_n"/>, then the weighted mean, <img class="math" src="_images/math/1cd38254ca5e480c6da949f0ab5a5b96aef5a215.png" alt="\mu"/> is given by:</p>
 <div class="math">
-<p><img src="../_images/math/8efb48f3e5b2d2ff6086f5105c1083bc79274af1.png" alt="\mu = w^{T}X"/></p>
+<p><img src="_images/math/8efb48f3e5b2d2ff6086f5105c1083bc79274af1.png" alt="\mu = w^{T}X"/></p>
 </div><p>The variance of this mean can then be expressed as:</p>
 <div class="math">
-<p><img src="../_images/math/9a26c34c741735c71593fb93c23082e26ccbbd9f.png" alt="\mathrm{Var}\left( w^{T}X \right) = w^{T}\Sigma w,"/></p>
-</div><p>in which <img class="math" src="../_images/math/e6a57cc3ed9f2fcb38f6e7e2c45cd54c58781d11.png" alt="\Sigma"/> is the covariance matrix of <img class="math" src="../_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/>. This
+<p><img src="_images/math/9a26c34c741735c71593fb93c23082e26ccbbd9f.png" alt="\mathrm{Var}\left( w^{T}X \right) = w^{T}\Sigma w,"/></p>
+</div><p>in which <img class="math" src="_images/math/e6a57cc3ed9f2fcb38f6e7e2c45cd54c58781d11.png" alt="\Sigma"/> is the covariance matrix of <img class="math" src="_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/>. This
 covariance matrix is derived from the stated standard deviations of
 the GMPEs (which may be heteroscedastic), and the computed correlations
-among the elements of <img class="math" src="../_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/>, as follows. The GMPE-defined standard
-deviations supply a vector <img class="math" src="../_images/math/916196b2f573f29d79cfda57bb619f5cc8436921.png" alt="\sigma"/> with elements
-<img class="math" src="../_images/math/9a3853c9ccd47007fc170a5ecda1506282ddf4c3.png" alt="\sigma_1,...,\sigma_n"/> corresponding to the elements of <img class="math" src="../_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/>
-above. The correlation matrix, <img class="math" src="../_images/math/81d7522ed4dee1ad5996916d61205d51137caa51.png" alt="P"/>, is computed from all of the
+among the elements of <img class="math" src="_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/>, as follows. The GMPE-defined standard
+deviations supply a vector <img class="math" src="_images/math/916196b2f573f29d79cfda57bb619f5cc8436921.png" alt="\sigma"/> with elements
+<img class="math" src="_images/math/9a3853c9ccd47007fc170a5ecda1506282ddf4c3.png" alt="\sigma_1,...,\sigma_n"/> corresponding to the elements of <img class="math" src="_images/math/d723cd4dba785d464672b7bd408ae5cf5d1e2f37.png" alt="X"/>
+above. The correlation matrix, <img class="math" src="_images/math/81d7522ed4dee1ad5996916d61205d51137caa51.png" alt="P"/>, is computed from all of the
 values provided by each GMPE for a given execution of the MultiGMPE (if
 fewer than ten elements are computed for a given execution, then a
 correlation matrix is approximated). The covariance matrix is then
 given by:</p>
 <div class="math">
-<p><img src="../_images/math/b1929aefb7f82215453d1b7b1419b9dda1039887.png" alt="\Sigma = \sigma\sigma^T * P"/></p>
-</div><p>in which <img class="math" src="../_images/math/578fa22c21e86bcf581a81a83a2d9c3bec130988.png" alt="*"/> represents element-by-element multiplication. Since
+<p><img src="_images/math/b1929aefb7f82215453d1b7b1419b9dda1039887.png" alt="\Sigma = \sigma\sigma^T * P"/></p>
+</div><p>in which <img class="math" src="_images/math/578fa22c21e86bcf581a81a83a2d9c3bec130988.png" alt="*"/> represents element-by-element multiplication. Since
 the standard deviations provided by the various GMPEs may be
 heteroscedastic, the variance must be computed for each point in the
 output. This variance calculation is applied to the within-event,
@@ -140,21 +142,21 @@ somewhat lower value near the source than at distance.
 Upon inspection of the cross-section plots and scale, however,
 we find that the variation is very small in amplitude. This
 variation is due to the heteroscedastic nature of the GMPEs.</p>
-<figure class="align-left" id="figure-2">
+<figure class="align-left" id="id2">
 <span id="gmpe-test-mean"></span><a class="reference internal image-reference" href="../_images/gmpe_test_PSA3p0.png"><img alt="../_images/gmpe_test_PSA3p0.png" src="../_images/gmpe_test_PSA3p0.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 2: The mean ground motion field for a 50-50 combination of the
 <a class="reference internal" href="sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
-<a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs.</span><a class="headerlink" href="#figure-2" title="Permalink to this image">¶</a></p>
+<a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-<figure class="align-left" id="figure-3">
+<figure class="align-left" id="id3">
 <span id="gmpe-test-sd"></span><a class="reference internal image-reference" href="../_images/gmpe_test_PSA3p0_sd.png"><img alt="../_images/gmpe_test_PSA3p0_sd.png" src="../_images/gmpe_test_PSA3p0_sd.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 3: The standard deviation of the ground motion field for a 50-50
 combination of the
 <a class="reference internal" href="sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
-<a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs.</span><a class="headerlink" href="#figure-3" title="Permalink to this image">¶</a></p>
+<a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p>If the requested IMT is PGV, and some of the selected GMPEs do not
@@ -168,7 +170,7 @@ a spectral acceleration period appropriate to the earthquake magnitude.</p>
 to use beyond a specified distance.</p>
 </section>
 <section id="site-corrections">
-<span id="subsec-site-amplification-4"></span><h3><span class="section-number">2.3.1.4. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this headline">¶</a></h3>
+<span id="subsec-site-amplification-4"></span><h3><span class="section-number">2.3.1.4. </span>Site Corrections<a class="headerlink" href="#site-corrections" title="Permalink to this heading">¶</a></h3>
 <p>Near-surface conditions can have a substantial effect on ground motions.
 Ground motions at soft-soil sites, for instance, will typically be amplified
 relative to sites on bedrock.  Because we wish to interpolate sparse data
@@ -184,7 +186,7 @@ site amplification proxy parameter in current-genereation GMPEs, the latter
 approach usually applies.</p>
 </section>
 <section id="site-characterization-map">
-<h3><span class="section-number">2.3.1.5. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.5. </span>Site Characterization Map<a class="headerlink" href="#site-characterization-map" title="Permalink to this heading">¶</a></h3>
 <p>In general, site amplifications are computed using a Vs30 grid supplied
 by the operator (see the Vs30 parameters <code class="docutils literal notranslate"><span class="pre">vs30file</span></code> and <code class="docutils literal notranslate"><span class="pre">vs30default</span></code>
 in the <code class="docutils literal notranslate"><span class="pre">data</span></code> section of <em>model.conf</em> for configuration information.)
@@ -211,13 +213,13 @@ An example of Vs30 for California using this approach is provided in
 <a class="pageref" href="#thompson-vs30">Figure  4</a>. Thompson et al. describe how
 differences among Vs30 base maps translate into variations in site
 amplification in ShakeMap.</p>
-<figure class="align-left" id="figure-4">
+<figure class="align-left" id="id4">
 <span id="thompson-vs30"></span><a class="reference internal image-reference" href="../_images/thompson_vs30.png"><img alt="../_images/thompson_vs30.png" src="../_images/thompson_vs30.png" style="width: 650px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 4: Revised California Vs30 Map (<a class="reference internal" href="sm4_references.html#thompson2014"><span class="std std-ref">Thompson et al., 2014</span></a>).
 This map combines geology, topographic slope, and constraints of map
 values near Vs30 observations using kriging-with-a-trend.  Inset shows
-Los Angeles region, with Los Angeles Basin indicating low Vs30 velocities.</span><a class="headerlink" href="#figure-4" title="Permalink to this image">¶</a></p>
+Los Angeles region, with Los Angeles Basin indicating low Vs30 velocities.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <p><a class="reference internal" href="sm4_references.html#worden2015"><span class="std std-ref">Worden et al. (2015)</span></a> and
@@ -228,7 +230,7 @@ consistently scaled mosaic of <a class="reference external" href="https://github
 with smooth transitions from tile to tile.</p>
 </section>
 <section id="generic-amplification-factors">
-<h3><span class="section-number">2.3.1.6. </span>Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.1.6. </span>Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this heading">¶</a></h3>
 <p>Shakemap does not currently support operator-supplied basin
 depths. Some modern GMPEs use basin depths (typically “Z1.0” or “Z2.5”)
 as an additional site amplification term. These GMPEs typically also
@@ -248,7 +250,7 @@ factors.</p>
 </section>
 </section>
 <section id="ground-motion-to-intensity-conversions">
-<span id="subsec-gmice"></span><h2><span class="section-number">2.3.2. </span>Ground Motion to Intensity Conversions<a class="headerlink" href="#ground-motion-to-intensity-conversions" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-gmice"></span><h2><span class="section-number">2.3.2. </span>Ground Motion to Intensity Conversions<a class="headerlink" href="#ground-motion-to-intensity-conversions" title="Permalink to this heading">¶</a></h2>
 <p>While ideally we would have cross-correlation functions available
 between macroseismic intenstiy and other IMTs (see
 <a class="reference internal" href="#subsec-cross-correlation"><span class="std std-ref">Cross-correlation Functions</span></a>), no such functions
@@ -276,7 +278,7 @@ and configured with the <code class="docutils literal notranslate"><span class="
 of <em>model.conf</em>.</p>
 </section>
 <section id="intensity-prediction-equations">
-<h2><span class="section-number">2.3.3. </span>Intensity Prediction Equations<a class="headerlink" href="#intensity-prediction-equations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.3. </span>Intensity Prediction Equations<a class="headerlink" href="#intensity-prediction-equations" title="Permalink to this heading">¶</a></h2>
 <p>A small number of intensity prediction equations (IPEs) are currently
 available. The available IPEs are for active tectonic and stable
 tectonic regions. If a suitable IPE is not available, the operator may
@@ -290,17 +292,17 @@ greater uncertainty in the predicted intensity values than the available
 IPEs. In particular, the standard deviation of a predicted intensity as
 given by the rules of error propagation (see <a class="reference internal" href="sm4_references.html#ku1966"><span class="std std-ref">Ku (1966)</span></a> is:</p>
 <div class="math">
-<p><img src="../_images/math/dec0d754e73286a515e4911a81bfc4c5df8021dc.png" alt="\sigma_{\text{MMI}} = \sqrt{\left(\sigma_{\ln(Y)}
+<p><img src="_images/math/dec0d754e73286a515e4911a81bfc4c5df8021dc.png" alt="\sigma_{\text{MMI}} = \sqrt{\left(\sigma_{\ln(Y)}
     \frac{\delta \text{MMI}}{\delta \ln(Y)}\right)^2 +
     \sigma^2_{\text{MMI}|\ln(Y)}},"/></p>
 </div><p>where
-<img class="math" src="../_images/math/84a3de2673e03bbf5a881881e238d13a215cdd74.png" alt="\sigma_{\ln(Y)}"/>
+<img class="math" src="_images/math/84a3de2673e03bbf5a881881e238d13a215cdd74.png" alt="\sigma_{\ln(Y)}"/>
 is the standard deviation of the natural log of the ground motion as
 given by the GMPE,
-<img class="math" src="../_images/math/a6474e2f6ce7c582029da4b08408a75630f99a66.png" alt="\frac{\delta \text{MMI}}{\delta \ln(Y)}"/>
+<img class="math" src="_images/math/a6474e2f6ce7c582029da4b08408a75630f99a66.png" alt="\frac{\delta \text{MMI}}{\delta \ln(Y)}"/>
 is the derivative of the GMICE at the value of
-<img class="math" src="../_images/math/57638d3dd191ea1bbfb0d850dacee960da8d39d8.png" alt="\ln(Y)"/> from the GMPE, and
-<img class="math" src="../_images/math/9e1950efed9680553ffcc085631dd42ad0b5c38e.png" alt="\sigma_{\text{MMI}|\ln(Y)}"/>
+<img class="math" src="_images/math/57638d3dd191ea1bbfb0d850dacee960da8d39d8.png" alt="\ln(Y)"/> from the GMPE, and
+<img class="math" src="_images/math/9e1950efed9680553ffcc085631dd42ad0b5c38e.png" alt="\sigma_{\text{MMI}|\ln(Y)}"/>
 is the standard deviation of the ground motion to MMI conversion as given
 by the GMICE.</p>
 <p>Because many GMICEs are bilinear (see, for example,
@@ -319,32 +321,32 @@ displays a dramatic drop in the standard deviation at the
 point where the two lines of the bi-linear relationship meet.
 Neither of these features is likely physical, but are a
 consequence of the bilinear form of the GMICE.</p>
-<figure class="align-left" id="figure-5">
+<figure class="align-left" id="id5">
 <span id="wgrw12-pgv-mmi"></span><a class="reference internal image-reference" href="../_images/wgrw12_figure_6.png"><img alt="../_images/wgrw12_figure_6.png" src="../_images/wgrw12_figure_6.png" style="width: 550px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 5: MMI vs. PGV for the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>
 GMICE. Note the bi-linear relationship of the three GMICE
-plotted. (Figure from <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>.)</span><a class="headerlink" href="#figure-5" title="Permalink to this image">¶</a></p>
+plotted. (Figure from <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>.)</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-<figure class="align-left" id="figure-6">
+<figure class="align-left" id="id6">
 <span id="gmice-test-mean"></span><a class="reference internal image-reference" href="../_images/gmpe_test_MMI.png"><img alt="../_images/gmpe_test_MMI.png" src="../_images/gmpe_test_MMI.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 6: The mean MMI field for a VirtualIPE comprised of a 50-50
 combination of the
 <a class="reference internal" href="sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs, and
-the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> GMICE.</span><a class="headerlink" href="#figure-6" title="Permalink to this image">¶</a></p>
+the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> GMICE.</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-<figure class="align-left" id="figure-7">
+<figure class="align-left" id="id7">
 <span id="gmice-test-sd"></span><a class="reference internal image-reference" href="../_images/gmpe_test_MMI_sd.png"><img alt="../_images/gmpe_test_MMI_sd.png" src="../_images/gmpe_test_MMI_sd.png" style="width: 700px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 7: The standard deviation of the MMI field for a VirtualIPE
 comprised of a 50-50 combination of the
 <a class="reference internal" href="sm4_references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="sm4_references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs, and
-the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> GMICE.</span><a class="headerlink" href="#figure-7" title="Permalink to this image">¶</a></p>
+the <a class="reference internal" href="sm4_references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> GMICE.</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <div class="line-block">
@@ -352,7 +354,7 @@ the <a class="reference internal" href="sm4_references.html#worden2012"><span cl
 </div>
 </section>
 <section id="cross-correlation-functions">
-<span id="subsec-cross-correlation"></span><h2><span class="section-number">2.3.4. </span>Cross-correlation Functions<a class="headerlink" href="#cross-correlation-functions" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-cross-correlation"></span><h2><span class="section-number">2.3.4. </span>Cross-correlation Functions<a class="headerlink" href="#cross-correlation-functions" title="Permalink to this heading">¶</a></h2>
 <p>There is, as yet, a very limited number of cross-correlation functions
 in the literature.
 Currently, ShakeMap depends primarily on the cross-correlation functions
@@ -381,7 +383,7 @@ correlated with PGV.</p>
 for additional IMTs, we will incorporate them into ShakeMap.</p>
 </section>
 <section id="data-handling-and-outliers">
-<h2><span class="section-number">2.3.5. </span>Data Handling and Outliers<a class="headerlink" href="#data-handling-and-outliers" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.5. </span>Data Handling and Outliers<a class="headerlink" href="#data-handling-and-outliers" title="Permalink to this heading">¶</a></h2>
 <p>As a general rule, ShakeMap assumes that by the time data reach
 <strong>model</strong> they have undergone fairly rigorous quality control.
 It is assumed that the seismic networks that produce the data
@@ -421,22 +423,22 @@ parameter is flagged (e.g., if PGV is flagged, then the MMI derived
 from it is also flagged).</p>
 </section>
 <section id="interpolation">
-<h2><span class="section-number">2.3.6. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.6. </span>Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this heading">¶</a></h2>
 <p><a class="reference internal" href="sm4_references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> discusses the application of
 the MVN to the interpolation of ground motions.
 <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a> updates and improves upon this
 approach. Here, we
 discuss some specific details of their implementation within ShakeMap.</p>
 <section id="computation">
-<span id="subsubsec-mvn-computation"></span><h3><span class="section-number">2.3.6.1. </span>Computation<a class="headerlink" href="#computation" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-mvn-computation"></span><h3><span class="section-number">2.3.6.1. </span>Computation<a class="headerlink" href="#computation" title="Permalink to this heading">¶</a></h3>
 <p>The conditional MVN can be summarized as a case in which we have a
-random variable of interest <img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/> where we wish to compute
+random variable of interest <img class="math" src="_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/> where we wish to compute
 predictions
-at a set of <em>M</em> ordinates (<img class="math" src="../_images/math/20400cf2e5f567e5cd2d5e1679a6214953221b63.png" alt="\bm{Y}_1"/>) conditioned upon a set of
-<em>N</em> observations (<img class="math" src="../_images/math/3292d7b7bc5facf1e4f707ff524304e247a9dc2b.png" alt="\bm{Y}_2"/>). We can treat these as a vector with
+at a set of <em>M</em> ordinates (<img class="math" src="_images/math/20400cf2e5f567e5cd2d5e1679a6214953221b63.png" alt="\bm{Y}_1"/>) conditioned upon a set of
+<em>N</em> observations (<img class="math" src="_images/math/3292d7b7bc5facf1e4f707ff524304e247a9dc2b.png" alt="\bm{Y}_2"/>). We can treat these as a vector with
 two components:</p>
 <div class="math">
-<p><img src="../_images/math/d4047912f1d1917505ab0e7a2a84f7618a6a1614.png" alt="\mathbf{Y} =
+<p><img src="_images/math/d4047912f1d1917505ab0e7a2a84f7618a6a1614.png" alt="\mathbf{Y} =
     \left\{
         \begin{array}{c}
             \mathbf{Y_1} \\ \hdashline[2pt/2pt]
@@ -445,7 +447,7 @@ two components:</p>
     \right\},"/></p>
 </div><p>with mean:</p>
 <div class="math">
-<p><img src="../_images/math/ad038339235189dc529fbc718e481ba7c4acff48.png" alt="\bm{\mu_Y} =
+<p><img src="_images/math/ad038339235189dc529fbc718e481ba7c4acff48.png" alt="\bm{\mu_Y} =
 \left\{
     \begin{array}{c}
         \bm{\mu}_{\mathbf{Y_1}} \\ \hdashline[2pt/2pt]
@@ -454,7 +456,7 @@ two components:</p>
 \right\},"/></p>
 </div><p>and covariance:</p>
 <div class="math">
-<p><img src="../_images/math/fe2940194cb1ccd4891be855363f687e80fb81d7.png" alt="\bm{\Sigma_Y} =
+<p><img src="_images/math/fe2940194cb1ccd4891be855363f687e80fb81d7.png" alt="\bm{\Sigma_Y} =
     \left[
         \begin{array}{ c;{2pt/2pt}c }
             \underset{M\times M}{\mathbf{\Sigma_{Y_1Y_1}}} &amp;
@@ -464,105 +466,105 @@ two components:</p>
             \underset{N\times N}{\mathbf{\Sigma_{Y_2Y_2}}}
         \end{array}
     \right]."/></p>
-</div><p>where <img class="math" src="../_images/math/3f8a8dd7e4ad14aa78b604995970a96aea83bed2.png" alt="M \times M"/>, <img class="math" src="../_images/math/950508a6d3d497eaf069578cd21a96a7f884cecf.png" alt="M \times N"/>, <img class="math" src="../_images/math/647a6ba7f8980014dc1b9d145acc363cb2b4e241.png" alt="N \times M"/>, and
-<img class="math" src="../_images/math/e50881b48961b9238e27e7b7094a4ca31ee7aa3a.png" alt="N \times N"/> give the dimensions of the partitioned matrices. The
+</div><p>where <img class="math" src="_images/math/3f8a8dd7e4ad14aa78b604995970a96aea83bed2.png" alt="M \times M"/>, <img class="math" src="_images/math/950508a6d3d497eaf069578cd21a96a7f884cecf.png" alt="M \times N"/>, <img class="math" src="_images/math/647a6ba7f8980014dc1b9d145acc363cb2b4e241.png" alt="N \times M"/>, and
+<img class="math" src="_images/math/e50881b48961b9238e27e7b7094a4ca31ee7aa3a.png" alt="N \times N"/> give the dimensions of the partitioned matrices. The
 mean values may be taken from a GMPE or other ground motion model.</p>
 <p>The residuals are treated as a linear mixed effects model:</p>
 <div class="math">
-<p><img src="../_images/math/0838eca21e5703e793cebcbf725896eb8897612f.png" alt="Y_i=\mu_{Y_i}+B_i+W_i"/></p>
-</div><p>where “math”<cite>B_i</cite> is the between-event residual and <img class="math" src="../_images/math/b0abfd9bb0f90564b47cb4e7616d66b8b3046ecc.png" alt="W_i"/> is the
+<p><img src="_images/math/0838eca21e5703e793cebcbf725896eb8897612f.png" alt="Y_i=\mu_{Y_i}+B_i+W_i"/></p>
+</div><p>where “math”<cite>B_i</cite> is the between-event residual and <img class="math" src="_images/math/b0abfd9bb0f90564b47cb4e7616d66b8b3046ecc.png" alt="W_i"/> is the
 within-event residual. The within-event residual is assumed to be a spatially
 varying random process, and the between-event residual is assumed to be a
 perfectly correlated random process.  The elements of the covariance matrix
 are given by:</p>
 <div class="math">
-<p><img src="../_images/math/50c2b82063cfa812e93699c7809302027a34a1fc.png" alt="\Sigma_{{Y_i},{Y_j}} =
+<p><img src="_images/math/50c2b82063cfa812e93699c7809302027a34a1fc.png" alt="\Sigma_{{Y_i},{Y_j}} =
     \rho_{{Y_i},{Y_j}}\phi_{Y_i}\phi_{Y_j} + \tau_{Y_i}\tau{Y_j},"/></p>
 </div><p>where
-<img class="math" src="../_images/math/245afb82d762d62adb23dbd17c80178102466f7b.png" alt="\Sigma_{{Y_i},{Y_j}}"/> is the element of the covariance matrix at
+<img class="math" src="_images/math/245afb82d762d62adb23dbd17c80178102466f7b.png" alt="\Sigma_{{Y_i},{Y_j}}"/> is the element of the covariance matrix at
 position <em>(i, j)</em> in the matrix,
-<img class="math" src="../_images/math/0eb89c34afc0414d2d9d09bbbc9a84bfe4920840.png" alt="\rho_{{Y_i},{Y_j}}"/> is the correlation between
-<img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/> of the vector <img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/>,
-<img class="math" src="../_images/math/64521bfb78baef3acea7c9e1f24689c2a79b7f4f.png" alt="\phi_{Y_i}"/> and <img class="math" src="../_images/math/ed3009af01a05eccbbc61d08d5e4d100f5d9cfba.png" alt="\phi_{Y_j}"/> are the within-event standard
-deviations of the elements <img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/>, and
-<img class="math" src="../_images/math/e6b03b6fac9dd8d9b5abecd14561d6aaef3ce31b.png" alt="\tau_{Y_i}"/> and <img class="math" src="../_images/math/491598b87912a90e7a2bd5aeaeec2bffe0926bea.png" alt="\tau_{Y_j}"/> are the between-event standard
-deviations of the elements <img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/>.
+<img class="math" src="_images/math/0eb89c34afc0414d2d9d09bbbc9a84bfe4920840.png" alt="\rho_{{Y_i},{Y_j}}"/> is the correlation between
+<img class="math" src="_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/> of the vector <img class="math" src="_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/>,
+<img class="math" src="_images/math/64521bfb78baef3acea7c9e1f24689c2a79b7f4f.png" alt="\phi_{Y_i}"/> and <img class="math" src="_images/math/ed3009af01a05eccbbc61d08d5e4d100f5d9cfba.png" alt="\phi_{Y_j}"/> are the within-event standard
+deviations of the elements <img class="math" src="_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/>, and
+<img class="math" src="_images/math/e6b03b6fac9dd8d9b5abecd14561d6aaef3ce31b.png" alt="\tau_{Y_i}"/> and <img class="math" src="_images/math/491598b87912a90e7a2bd5aeaeec2bffe0926bea.png" alt="\tau_{Y_j}"/> are the between-event standard
+deviations of the elements <img class="math" src="_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/>.
 Note that the
-correlation between <img class="math" src="../_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="../_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/> may be a function of
+correlation between <img class="math" src="_images/math/5631970a574089aed709d37fa48e7c4819889923.png" alt="Y_i"/> and <img class="math" src="_images/math/b09849c452b0c59e745cf15250c9814ab5fc17e6.png" alt="Y_j"/> may be a function of
 distance: either physical separation, spectral separation, or both.</p>
-<p>Given a set of observations <img class="math" src="../_images/math/3839b2f8dc512b2de250bf7fb0c594b9abf43800.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, and
-their (usually predicted) means <img class="math" src="../_images/math/a19478b3569e22969467b4a313a02918508b17cc.png" alt="\bm{\mu}_{\mathbf{Y_2}}"/>, we define
+<p>Given a set of observations <img class="math" src="_images/math/3839b2f8dc512b2de250bf7fb0c594b9abf43800.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, and
+their (usually predicted) means <img class="math" src="_images/math/a19478b3569e22969467b4a313a02918508b17cc.png" alt="\bm{\mu}_{\mathbf{Y_2}}"/>, we define
 a vector of residuals</p>
 <div class="math">
-<p><img src="../_images/math/ea20b7923435842fc40141d957f3b38dc1a0fdf5.png" alt="\bm{\zeta} =
+<p><img src="_images/math/ea20b7923435842fc40141d957f3b38dc1a0fdf5.png" alt="\bm{\zeta} =
     \mathbf{y}_2 - \bm{\mu}_{\mathbf{Y_2}}."/></p>
-</div><p>The distribution of <img class="math" src="../_images/math/a63ad1d3e4e30056fe4c1ddf2917db94cd6f70c7.png" alt="\mathbf{Y_1}"/>, given that
-<img class="math" src="../_images/math/3839b2f8dc512b2de250bf7fb0c594b9abf43800.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, is multivariate normal with mean</p>
+</div><p>The distribution of <img class="math" src="_images/math/a63ad1d3e4e30056fe4c1ddf2917db94cd6f70c7.png" alt="\mathbf{Y_1}"/>, given that
+<img class="math" src="_images/math/3839b2f8dc512b2de250bf7fb0c594b9abf43800.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, is multivariate normal with mean</p>
 <div class="math" id="equation-cond-mean">
-<p><span class="eqno">(1)<a class="headerlink" href="#equation-cond-mean" title="Permalink to this equation">¶</a></span><img src="../_images/math/19067df3b2f501db0a6d63c28a5aba5917bc9d24.png" alt="\bm{\mu}_{\mathbf{Y_1}|\mathbf{y_2}} =
+<p><span class="eqno">(1)<a class="headerlink" href="#equation-cond-mean" title="Permalink to this equation">¶</a></span><img src="_images/math/19067df3b2f501db0a6d63c28a5aba5917bc9d24.png" alt="\bm{\mu}_{\mathbf{Y_1}|\mathbf{y_2}} =
      \bm{\mu}_{\mathbf{Y_1}} +
          \mathbf{\Sigma_{Y_1Y_2}}
          \mathbf{\Sigma^{-1}_{Y_2Y_2}}\bm{\zeta}\text{,}"/></p>
 </div><p>and covariance</p>
 <div class="math" id="equation-cond-covariance">
-<p><span class="eqno">(2)<a class="headerlink" href="#equation-cond-covariance" title="Permalink to this equation">¶</a></span><img src="../_images/math/1c6adb39b7f5d5b150125f5765c2bf4381d0d387.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}} =
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-cond-covariance" title="Permalink to this equation">¶</a></span><img src="_images/math/1c6adb39b7f5d5b150125f5765c2bf4381d0d387.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}} =
      \mathbf{\Sigma_{Y_1Y_1}} -
          \mathbf{\Sigma_{Y_1Y_2}}
          \mathbf{\Sigma^{-1}_{Y_2Y_2}}
          \mathbf{\Sigma_{Y_2Y_1}}."/></p>
-</div><p>The constituents of <img class="math" src="../_images/math/80ae1a10616f968c357e755c369d3ae588b58db7.png" alt="\bm{Y_1}"/> may be a particular IMT at multiple
+</div><p>The constituents of <img class="math" src="_images/math/80ae1a10616f968c357e755c369d3ae588b58db7.png" alt="\bm{Y_1}"/> may be a particular IMT at multiple
 locations, multiple IMTs at a given location, or both: multiple IMTs at
 multiple locations. In a ShakeMap, we may have an output grid of Q
 locations and wish to compute this output grid for P different IMTs.
-Thus, <img class="math" src="../_images/math/bb96997216792555702133d7496846c79bf9346c.png" alt="M = P \times Q"/>. Similarly, the N constituents of
-<img class="math" src="../_images/math/24ed365d090c2cea88cbc755774a893058082a8d.png" alt="\bm{Y_2}"/> consist of a number of IMTs at each of a number of
+Thus, <img class="math" src="_images/math/bb96997216792555702133d7496846c79bf9346c.png" alt="M = P \times Q"/>. Similarly, the N constituents of
+<img class="math" src="_images/math/24ed365d090c2cea88cbc755774a893058082a8d.png" alt="\bm{Y_2}"/> consist of a number of IMTs at each of a number of
 observation locations. Thus, as long as the elements of the covariance
-matrix <img class="math" src="../_images/math/5cdead2a5f67b60545ada171aa21982d2988999f.png" alt="\bm{\Sigma_Y}"/> can be computed, Equations <a class="reference internal" href="#equation-cond-mean">(1)</a>
+matrix <img class="math" src="_images/math/5cdead2a5f67b60545ada171aa21982d2988999f.png" alt="\bm{\Sigma_Y}"/> can be computed, Equations <a class="reference internal" href="#equation-cond-mean">(1)</a>
 and <a class="reference internal" href="#equation-cond-covariance">(2)</a> could be computed just once to provide the
 complete grids for all of the output IMTs. In most cases, however,
 this approach is impractical and inefficient.</p>
 <p>We note that in Equation <a class="reference internal" href="#equation-cond-mean">(1)</a> there is no interdependence
-on the computed elements of <img class="math" src="../_images/math/4dfe72bf147d58ee3a4060beea105aa3113d191e.png" alt="\bm{\mu}_{\mathbf{Y_1}|\mathbf{y_2}}"/>.
-That is, the vector of output ordinates <img class="math" src="../_images/math/80ae1a10616f968c357e755c369d3ae588b58db7.png" alt="\bm{Y_1}"/> may be
+on the computed elements of <img class="math" src="_images/math/4dfe72bf147d58ee3a4060beea105aa3113d191e.png" alt="\bm{\mu}_{\mathbf{Y_1}|\mathbf{y_2}}"/>.
+That is, the vector of output ordinates <img class="math" src="_images/math/80ae1a10616f968c357e755c369d3ae588b58db7.png" alt="\bm{Y_1}"/> may be
 divided in any
 convenient way, the elements of
-<img class="math" src="../_images/math/39769d3d846571bc4fb9bafdbf6e947800278a39.png" alt="\bm{\mu_Y}"/> and <img class="math" src="../_images/math/5cdead2a5f67b60545ada171aa21982d2988999f.png" alt="\bm{\Sigma_Y}"/> adjusted accordingly,
+<img class="math" src="_images/math/39769d3d846571bc4fb9bafdbf6e947800278a39.png" alt="\bm{\mu_Y}"/> and <img class="math" src="_images/math/5cdead2a5f67b60545ada171aa21982d2988999f.png" alt="\bm{\Sigma_Y}"/> adjusted accordingly,
 and the computations can proceed independently. The
 same cannot be said for Equation <a class="reference internal" href="#equation-cond-covariance">(2)</a>, where the full
 matrices must be used in order to compute the full covariance matrix
-<img class="math" src="../_images/math/e8e04e1ddd7e755d8c2372d473dd721f0ce09e3b.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}"/>.</p>
+<img class="math" src="_images/math/e8e04e1ddd7e755d8c2372d473dd721f0ce09e3b.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}"/>.</p>
 <p>For even a small Shake map of 200 by 300 grid points, the
-matrix <img class="math" src="../_images/math/f59b0b74da65499430a852dafbd7e4e6b138e4f7.png" alt="\mathbf{\Sigma_{Y_1Y_1}}"/> becomes 60,000 by 60,000
+matrix <img class="math" src="_images/math/f59b0b74da65499430a852dafbd7e4e6b138e4f7.png" alt="\mathbf{\Sigma_{Y_1Y_1}}"/> becomes 60,000 by 60,000
 elements. In a typical ShakeMap run, at least 6 output IMTs are
 computed, making this matrix 36 times larger. This large size makes
 the computation of
-<img class="math" src="../_images/math/e8e04e1ddd7e755d8c2372d473dd721f0ce09e3b.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}"/> impractical for
+<img class="math" src="_images/math/e8e04e1ddd7e755d8c2372d473dd721f0ce09e3b.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}"/> impractical for
 most situations. For ShakeMap uses, however, we are only interested
 in the diagonal
-elements of <img class="math" src="../_images/math/e8e04e1ddd7e755d8c2372d473dd721f0ce09e3b.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}"/>,
+elements of <img class="math" src="_images/math/e8e04e1ddd7e755d8c2372d473dd721f0ce09e3b.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}"/>,
 that is, the variances of the conditional means. In this case, we
 can modify Equation <a class="reference internal" href="#equation-cond-covariance">(2)</a> by making the following
 definitions:</p>
 <div class="math">
-<p><img src="../_images/math/3d2c8c1a5251f16f485bfdaf857323df81dc2fce.png" alt="\bm{\sigma_{Y_1}}^2 = \text{diag}\left(\mathbf{\Sigma_{Y_1Y_1}}\right),"/></p>
-</div><p>(that is, <img class="math" src="../_images/math/f87f9988b7ee5e3ca96f88b2dd3ec11557a5d535.png" alt="\bm{\sigma_{Y_1}}^2"/> is a column vector formed from the
-diagonal elements of <img class="math" src="../_images/math/f59b0b74da65499430a852dafbd7e4e6b138e4f7.png" alt="\mathbf{\Sigma_{Y_1Y_1}}"/>) and</p>
+<p><img src="_images/math/3d2c8c1a5251f16f485bfdaf857323df81dc2fce.png" alt="\bm{\sigma_{Y_1}}^2 = \text{diag}\left(\mathbf{\Sigma_{Y_1Y_1}}\right),"/></p>
+</div><p>(that is, <img class="math" src="_images/math/f87f9988b7ee5e3ca96f88b2dd3ec11557a5d535.png" alt="\bm{\sigma_{Y_1}}^2"/> is a column vector formed from the
+diagonal elements of <img class="math" src="_images/math/f59b0b74da65499430a852dafbd7e4e6b138e4f7.png" alt="\mathbf{\Sigma_{Y_1Y_1}}"/>) and</p>
 <div class="math">
-<p><img src="../_images/math/8e8a733f078cf3e529b57bf4c8e9a5e56ab82ea5.png" alt="\mathbf{\Phi} = \mathbf{\Sigma_{Y_1Y_2}} \mathbf{\Sigma^{-1}_{Y_2Y_2}}
+<p><img src="_images/math/8e8a733f078cf3e529b57bf4c8e9a5e56ab82ea5.png" alt="\mathbf{\Phi} = \mathbf{\Sigma_{Y_1Y_2}} \mathbf{\Sigma^{-1}_{Y_2Y_2}}
     \odot \mathbf{\Sigma^T_{Y_2Y_1}},"/></p>
-</div><p>where <img class="math" src="../_images/math/fb580c37cff2db0bc8e9452eb4d6f54d24d25274.png" alt="\odot"/> represents the element-by-element product.</p>
+</div><p>where <img class="math" src="_images/math/fb580c37cff2db0bc8e9452eb4d6f54d24d25274.png" alt="\odot"/> represents the element-by-element product.</p>
 <p>Then the conditional variances may be found by:</p>
 <div class="math">
-<p><img src="../_images/math/050902c887eef9176d32dea1d459dca916331ac9.png" alt="\bm{\sigma}_{\mathbf{Y_1}|\mathbf{y_2}}^2 =
+<p><img src="_images/math/050902c887eef9176d32dea1d459dca916331ac9.png" alt="\bm{\sigma}_{\mathbf{Y_1}|\mathbf{y_2}}^2 =
     \bm{\sigma_{Y_1}}^2 - \mathbf{\Phi}\bm{J}"/></p>
-</div><p>where <img class="math" src="../_images/math/e9a30f82ca89aa713ac65376e76f7c0f9f65f157.png" alt="\bm{J}"/> is a column vector of ones.</p>
+</div><p>where <img class="math" src="_images/math/e9a30f82ca89aa713ac65376e76f7c0f9f65f157.png" alt="\bm{J}"/> is a column vector of ones.</p>
 <p>As with the conditional mean, this formulation is insensitive to any
-particular partitioning of the <img class="math" src="../_images/math/80ae1a10616f968c357e755c369d3ae588b58db7.png" alt="\bm{Y_1}"/> vector. For ShakeMap
+particular partitioning of the <img class="math" src="_images/math/80ae1a10616f968c357e755c369d3ae588b58db7.png" alt="\bm{Y_1}"/> vector. For ShakeMap
 purposes, it is both convenient and computationally efficient to process
 each row of the output grid for each IMT separately.</p>
 </section>
 <section id="imt-selection">
-<span id="subsubsec-imt-selection"></span><h3><span class="section-number">2.3.6.2. </span>IMT Selection<a class="headerlink" href="#imt-selection" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-imt-selection"></span><h3><span class="section-number">2.3.6.2. </span>IMT Selection<a class="headerlink" href="#imt-selection" title="Permalink to this heading">¶</a></h3>
 <p>In a typical ShakeMap operational environment, it is common for each
 seismic station to produce a number of IMT observations, some of
 which may be flagged as outliers. In addition, in ShakeMap V4, the
@@ -603,7 +605,7 @@ no difference between the uncertainties. These figures were generated using the
 <a class="reference internal" href="sm4_references.html#baker2008"><span class="std std-ref">Baker and Jayaram (2008)</span></a> spectral correlation function.
 The odd kink in the mean plots at around 0.2 seconds is a result of the
 specifics of the correlation function.</p>
-<figure class="align-left" id="figure-8">
+<figure class="align-left" id="id8">
 <span id="cond-spectra-mean"></span><a class="reference internal image-reference" href="../_images/Figure_mu_compare.png"><img alt="../_images/Figure_mu_compare.png" src="../_images/Figure_mu_compare.png" style="width: 450px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 8: Conditional spectra for two sets of conditioning observations:
@@ -612,10 +614,10 @@ set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).
 The gray line is the spectrum of the GMM. The solid black line is
 the spectrum conditioned on 3 periods; the dashed line is the
 spectrum conditioned on 7 periods. The circles represent the periods
-and amplitudes of the conditioning observations.</span><a class="headerlink" href="#figure-8" title="Permalink to this image">¶</a></p>
+and amplitudes of the conditioning observations.</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
-<figure class="align-left" id="figure-9">
+<figure class="align-left" id="id9">
 <span id="cond-spectra-sd"></span><a class="reference internal image-reference" href="../_images/Figure_sigma_compare.png"><img alt="../_images/Figure_sigma_compare.png" src="../_images/Figure_sigma_compare.png" style="width: 450px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 9: The standard deviations of conditional spectra for two sets of
@@ -626,29 +628,29 @@ The gray line is the standard deviation of spectrum from the GMM. The
 solid black line is the standard deviation of the spectrum conditioned
 on 3 periods; the dashed line is the standard deviation of the
 spectrum conditioned on 7 periods. The circles represent the periods
-and amplitudes of the conditioning observations.</span><a class="headerlink" href="#figure-9" title="Permalink to this image">¶</a></p>
+and amplitudes of the conditioning observations.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="notation">
-<h3><span class="section-number">2.3.6.3. </span>Notation<a class="headerlink" href="#notation" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.6.3. </span>Notation<a class="headerlink" href="#notation" title="Permalink to this heading">¶</a></h3>
 <p>In this section we introduce some additional notation that will be
 used in the following sections. As discussed above, our vector
-<img class="math" src="../_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/> is broken into two parts, with part 1 being the elements we
+<img class="math" src="_images/math/ef477b668c534c2e9ec2774b1a3c179517379181.png" alt="\bm{Y}"/> is broken into two parts, with part 1 being the elements we
 want to predict, and part 2 being our observations. However, our
 implementation closely follows that of
 <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>, Appendix B, so we will use
-the notation found therein. Thus, the subscript <img class="math" src="../_images/math/4110a8d3e36e3743ebaacfc0e277ceaadc533335.png" alt="Y"/> denotes elements
-we wish to predict, while <img class="math" src="../_images/math/e2bb3efda8323fb5e02e3d31234224eeedc7a270.png" alt="D"/> denotes those with data.</p>
+the notation found therein. Thus, the subscript <img class="math" src="_images/math/4110a8d3e36e3743ebaacfc0e277ceaadc533335.png" alt="Y"/> denotes elements
+we wish to predict, while <img class="math" src="_images/math/e2bb3efda8323fb5e02e3d31234224eeedc7a270.png" alt="D"/> denotes those with data.</p>
 </section>
 <section id="weighting-of-residuals">
-<span id="subsubsec-weighting-residuals"></span><h3><span class="section-number">2.3.6.4. </span>Weighting of Residuals<a class="headerlink" href="#weighting-of-residuals" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-weighting-residuals"></span><h3><span class="section-number">2.3.6.4. </span>Weighting of Residuals<a class="headerlink" href="#weighting-of-residuals" title="Permalink to this heading">¶</a></h3>
 <p>In some situations (such as with seismic station data), our observations
 are treated as having no uncertainty. In other cases, however, the data
 are uncertain, that is, they may each be viewed as an element of a
 distribution having a mean and a standard deviation.
 The additional standard deviation of a residual (which we call
-<img class="math" src="../_images/math/d57101a2375bec32adb3616bdcd0469ae3f496c8.png" alt="\sigma_{\epsilon}"/>) can come from a number of
+<img class="math" src="_images/math/d57101a2375bec32adb3616bdcd0469ae3f496c8.png" alt="\sigma_{\epsilon}"/>) can come from a number of
 sources. Observations converted from one IMT to another (via, for example,
 the GMICE) will carry the additional uncertainty of the conversion process.
 Or non-native IMTs that are derived from native IMTs using conditional models
@@ -666,18 +668,18 @@ in the input file using the <em>ln_stddev</em> attribute of the amplitude tag.</
 can be accommodated in the MVN structure through the use of the “omega
 factors”. However, we have found it easier and simpler to add the
 additional variance to the diagonal of the covariance matrix of the
-residuals. If <img class="math" src="../_images/math/93afb2c278bff78e8d3cbebefbc2cd965597eb92.png" alt="\mathbf\sigma_{D,\epsilon}^2"/> is a vector of the additional
+residuals. If <img class="math" src="_images/math/93afb2c278bff78e8d3cbebefbc2cd965597eb92.png" alt="\mathbf\sigma_{D,\epsilon}^2"/> is a vector of the additional
 variance of the residuals (some elements of which may be zero), then
 the covariance of the residuals is modified:</p>
 <div class="math">
-<p><img src="../_images/math/1dbebe47cbd3c19cea78d969bf94f54c64aa955f.png" alt="diag\left(\mathbf{\Sigma_{{W_D}{W_D}}}\right) =
+<p><img src="_images/math/1dbebe47cbd3c19cea78d969bf94f54c64aa955f.png" alt="diag\left(\mathbf{\Sigma_{{W_D}{W_D}}}\right) =
     diag\left(\mathbf{\Sigma_{{W_D}{W_D}}}\right) +
     \mathbf\sigma_{D,\epsilon}^2"/></p>
-</div><p>This version of <img class="math" src="../_images/math/1787ff57e66be240e039e64472a771468579bdab.png" alt="\mathbf{\Sigma_{{W_D}{W_D}}}"/> is used in all of the
+</div><p>This version of <img class="math" src="_images/math/1787ff57e66be240e039e64472a771468579bdab.png" alt="\mathbf{\Sigma_{{W_D}{W_D}}}"/> is used in all of the
 calculations below.</p>
 </section>
 <section id="event-bias">
-<h3><span class="section-number">2.3.6.5. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.6.5. </span>Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this heading">¶</a></h3>
 <p>Once the native data have been prepared for a particular output IMT,
 ShakeMap computes an event term (the “bias”).
 <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>, Appendix B, discusses the
@@ -688,39 +690,39 @@ presence of a heterscedastic between-event standard deviation.</p>
 <p>Following Engler et al., equations B9 and B8, we define two convenient
 variables:</p>
 <div class="math" id="equation-var-hh-yd">
-<p><span class="eqno">(3)<a class="headerlink" href="#equation-var-hh-yd" title="Permalink to this equation">¶</a></span><img src="../_images/math/77224359ea5cba17d631bd6b3a9c610b6f6698f0.png" alt="\mathbf{\Sigma_{{H_D}{H_D}|y_D}}=
+<p><span class="eqno">(3)<a class="headerlink" href="#equation-var-hh-yd" title="Permalink to this equation">¶</a></span><img src="_images/math/77224359ea5cba17d631bd6b3a9c610b6f6698f0.png" alt="\mathbf{\Sigma_{{H_D}{H_D}|y_D}}=
      \left(\mathbf{T_D^T\Sigma_{{W_D}{W_D}}^{-1}T_D} +
      \mathbf{\Sigma_{{H_D}{H_D}}^{-1}}\right)^{-1}"/></p>
 </div><p>and</p>
 <div class="math" id="equation-mu-h-yd">
-<p><span class="eqno">(4)<a class="headerlink" href="#equation-mu-h-yd" title="Permalink to this equation">¶</a></span><img src="../_images/math/0e77cc337c51bfba822859b0fbce971ad7c8708e.png" alt="\mathbf{\mu_{{H_D}|y_D}}=
+<p><span class="eqno">(4)<a class="headerlink" href="#equation-mu-h-yd" title="Permalink to this equation">¶</a></span><img src="_images/math/0e77cc337c51bfba822859b0fbce971ad7c8708e.png" alt="\mathbf{\mu_{{H_D}|y_D}}=
      \mathbf{\Sigma_{{H_D}{H_D}|y_D}}
      \mathbf{T_D^T\Sigma_{{W_D}{W_D}}^{-1}\left(y_D-\mu_{Y_D}\right)}"/></p>
 </div><p>Note that because of our notation change,
-<img class="math" src="../_images/math/9d14a6b2a1eb68cf808ba031b9abd31659914c0e.png" alt="\mathbf{\Sigma_{{W_D}{W_D}}^{-1}}"/> is simply our familar
-<img class="math" src="../_images/math/4bfec5a020fb749df3a3fb82d890fabca4e70e6f.png" alt="\mathbf{\Sigma_{{2}{2}}^{-1}}"/>, the inverse of the data within-event
+<img class="math" src="_images/math/9d14a6b2a1eb68cf808ba031b9abd31659914c0e.png" alt="\mathbf{\Sigma_{{W_D}{W_D}}^{-1}}"/> is simply our familar
+<img class="math" src="_images/math/4bfec5a020fb749df3a3fb82d890fabca4e70e6f.png" alt="\mathbf{\Sigma_{{2}{2}}^{-1}}"/>, the inverse of the data within-event
 covariance matrix from earlier, arranged here so that the contributing IMTs
 are in a specific order. The Matrix
-<img class="math" src="../_images/math/eeec18f6b6e6e4e1b98d33a70f9b6ef24ec773b5.png" alt="\mathbf{\Sigma_{{H_D}{H_D}}^{-1}}"/> is a small matrix that is the
+<img class="math" src="_images/math/eeec18f6b6e6e4e1b98d33a70f9b6ef24ec773b5.png" alt="\mathbf{\Sigma_{{H_D}{H_D}}^{-1}}"/> is a small matrix that is the
 inverse of the covariance
 (correlation, really) of the IMTs contributing to the output IMT (again,
 in the same order), and</p>
 <div class="math">
-<p><img src="../_images/math/64b6cc73e3cf17354e70bb35be83feaf4c558da6.png" alt="\mathbf{T_D} = \mathbf{\left[\begin{matrix}
+<p><img src="_images/math/64b6cc73e3cf17354e70bb35be83feaf4c558da6.png" alt="\mathbf{T_D} = \mathbf{\left[\begin{matrix}
     \tau_N &amp; 0 &amp; \cdots &amp; 0 \\
     0 &amp; \tau_1 &amp; \ddots &amp; \vdots \\
     \vdots &amp; \ddots &amp; \ddots &amp; \vdots \\
     0 &amp; \cdots &amp; 0 &amp; \tau_M \\
     \end{matrix}\right]},"/></p>
-</div><p>where each <img class="math" src="../_images/math/161309afeae4a9dfdb01648e760762a6005edf08.png" alt="\tau_i"/> is a column vector of the between event
+</div><p>where each <img class="math" src="_images/math/161309afeae4a9dfdb01648e760762a6005edf08.png" alt="\tau_i"/> is a column vector of the between event
 standard deviations of intensity measure <em>i</em>, where IMT <em>N</em> is the native
 measure, and measures <em>1</em> through <em>M</em> are non-native..</p>
 <p>The event terms and covariance are then given by:</p>
 <div class="math" id="equation-deltab-yd">
-<p><span class="eqno">(5)<a class="headerlink" href="#equation-deltab-yd" title="Permalink to this equation">¶</a></span><img src="../_images/math/054caa4df252b8d134834fd9157c51b24d4d0c9b.png" alt="\mathbf{\delta B|{y_D}} = \mathbf{T_{D} \mu_{{H_D}|y_D}}"/></p>
+<p><span class="eqno">(5)<a class="headerlink" href="#equation-deltab-yd" title="Permalink to this equation">¶</a></span><img src="_images/math/054caa4df252b8d134834fd9157c51b24d4d0c9b.png" alt="\mathbf{\delta B|{y_D}} = \mathbf{T_{D} \mu_{{H_D}|y_D}}"/></p>
 </div><p>and</p>
 <div class="math" id="equation-cov-deltab-yd">
-<p><span class="eqno">(6)<a class="headerlink" href="#equation-cov-deltab-yd" title="Permalink to this equation">¶</a></span><img src="../_images/math/ba0de7aaf17fd149bdfbb6a0b1d7a277ee01a00e.png" alt="\mathbf{\Sigma_{{\delta B}|y_D}} =
+<p><span class="eqno">(6)<a class="headerlink" href="#equation-cov-deltab-yd" title="Permalink to this equation">¶</a></span><img src="_images/math/ba0de7aaf17fd149bdfbb6a0b1d7a277ee01a00e.png" alt="\mathbf{\Sigma_{{\delta B}|y_D}} =
      \mathbf{T_{D}\Sigma_{{H_D}{H_D}|y_D}T_{D}^T}"/></p>
 </div><p>Unlike the bias calculated by earlier versions of ShakeMap, this approach
 in non-iterative and does not seek to directly minimize the misfit of the
@@ -732,7 +734,7 @@ is only one residual. <a class="pageref" href="#event-term-number-obs">Figure  1
 illustrates this effect using a uniform set
 of residuals. The event term only approaches the mean of the residuals as
 the number of observations becomes large.</p>
-<figure class="align-left" id="figure-10">
+<figure class="align-left" id="id10">
 <span id="event-term-number-obs"></span><a class="reference internal image-reference" href="../_images/event_term_number_obs.png"><img alt="../_images/event_term_number_obs.png" src="../_images/event_term_number_obs.png" style="width: 450px;" /></a>
 <figcaption>
 <p><span class="caption-text">Figure 10: The event term as a function of the number of residuals. Here all
@@ -742,12 +744,12 @@ The blue dots indicate the event term computed given a particular
 number of residuals, and the black bars indicate the uncertainty
 of the event term (i.e., +/- one standard deviation). As the number
 of observations increases, the event term approaches the mean of
-the residuals, and the standard deviation decreases.</span><a class="headerlink" href="#figure-10" title="Permalink to this image">¶</a></p>
+the residuals, and the standard deviation decreases.</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="computing-the-mvn">
-<span id="subsubsec-engler-mvn-computation-4"></span><h3><span class="section-number">2.3.6.6. </span>Computing the MVN<a class="headerlink" href="#computing-the-mvn" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-engler-mvn-computation-4"></span><h3><span class="section-number">2.3.6.6. </span>Computing the MVN<a class="headerlink" href="#computing-the-mvn" title="Permalink to this heading">¶</a></h3>
 <p>While <a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a> describes the basic MVN process,
 we follow the more advanced techniques described in
 <a class="reference internal" href="sm4_references.html#engler2022"><span class="std std-ref">Engler et al. (2022)</span></a>, Appendix B, in order to produce
@@ -757,37 +759,37 @@ within-event and between-event standard deviations in the presence of
 heteroscedastic between-event standard deviation. Engler et al. show that
 the conditional mean is given by:</p>
 <div class="math" id="equation-engler-cond-mean">
-<p><span class="eqno">(7)<a class="headerlink" href="#equation-engler-cond-mean" title="Permalink to this equation">¶</a></span><img src="../_images/math/1671f559433215e0e3c9a1e3c82110b360dbf867.png" alt="\mathbf{\mu_{Y|y_D}} =
+<p><span class="eqno">(7)<a class="headerlink" href="#equation-engler-cond-mean" title="Permalink to this equation">¶</a></span><img src="_images/math/1671f559433215e0e3c9a1e3c82110b360dbf867.png" alt="\mathbf{\mu_{Y|y_D}} =
      \mathbf{\mu_{Y}} +
      \mathbf{C\mu_{H_D|y_D}} +
      \mathbf{\Sigma_{{W_Y}{W_D}}\Sigma_{{W_D}{W_D}}^{-1}
          \left(y_D - \mu_{y_D}\right)},"/></p>
 </div><p>and the total covariance:</p>
 <div class="math" id="equation-engler-cond-covariance">
-<p><span class="eqno">(8)<a class="headerlink" href="#equation-engler-cond-covariance" title="Permalink to this equation">¶</a></span><img src="../_images/math/e57de12c3f92553d994ed123f1573e291bda1859.png" alt="\mathbf{\Sigma_{{Y}{Y}|y_D}} =
+<p><span class="eqno">(8)<a class="headerlink" href="#equation-engler-cond-covariance" title="Permalink to this equation">¶</a></span><img src="_images/math/e57de12c3f92553d994ed123f1573e291bda1859.png" alt="\mathbf{\Sigma_{{Y}{Y}|y_D}} =
      \mathbf{\Sigma_{{W_Y}{W_Y}|w_D}} +
      \mathbf{C\Sigma_{{H_D}{H_D}|y_D}C^T},"/></p>
 </div><p>where</p>
 <div class="math">
-<p><img src="../_images/math/88ad5dbc5c0b4d579d06cdd1870f46d342b69718.png" alt="\mathbf{\Sigma_{{W_Y}{W_Y}|w_D}} =
+<p><img src="_images/math/88ad5dbc5c0b4d579d06cdd1870f46d342b69718.png" alt="\mathbf{\Sigma_{{W_Y}{W_Y}|w_D}} =
     \mathbf{\Sigma_{{W_Y}{W_Y}}} -
     \mathbf{\Sigma_{{W_Y}{W_D}}
             \Sigma_{{W_D}{W_D}}^{-1}
             \Sigma_{{W_D}{W_Y}}}."/></p>
 </div><p>and</p>
 <div class="math">
-<p><img src="../_images/math/1c984640b9b2895042a5eeb737f6777b7d158a72.png" alt="\mathbf{C} =
+<p><img src="_images/math/1c984640b9b2895042a5eeb737f6777b7d158a72.png" alt="\mathbf{C} =
     \mathbf{T_{Y0}} -
     \mathbf{\Sigma_{{W_Y}{W_D}}\Sigma_{{W_D}{W_D}}^{-1}T_D},"/></p>
 </div><p>with</p>
 <div class="math">
-<p><img src="../_images/math/a81aae8a5b8c78a9e684b99d0b5dad3ff8b144d2.png" alt="\mathbf{T_{Y0}} = \mathbf{\left[\begin{matrix}
+<p><img src="_images/math/a81aae8a5b8c78a9e684b99d0b5dad3ff8b144d2.png" alt="\mathbf{T_{Y0}} = \mathbf{\left[\begin{matrix}
     \tau_{Y_1} &amp; 0 &amp; \cdots &amp; 0 \\
     \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
     \tau_{Y_K} &amp; 0 &amp; \cdots &amp; 0 \\
     \end{matrix}\right]}."/></p>
-</div><p>Note that <img class="math" src="../_images/math/8052afa025e6f18db6acdfc55a4e689af7956003.png" alt="\mathbf{\Sigma_{{W_Y}{W_Y}|w_D}}"/> is the conditional
-within-event covariance, and <img class="math" src="../_images/math/07e4b8509228649b55d525165d05a426d64a6624.png" alt="\mathbf{C\Sigma_{{H_D}{H_D}|y_D}C^T}"/>
+</div><p>Note that <img class="math" src="_images/math/8052afa025e6f18db6acdfc55a4e689af7956003.png" alt="\mathbf{\Sigma_{{W_Y}{W_Y}|w_D}}"/> is the conditional
+within-event covariance, and <img class="math" src="_images/math/07e4b8509228649b55d525165d05a426d64a6624.png" alt="\mathbf{C\Sigma_{{H_D}{H_D}|y_D}C^T}"/>
 is the conditional between-event covariance.
 Thus, to compute the total, within-, and between-event covariances, one
 only need compute two of the three terms of equation
@@ -797,19 +799,19 @@ of computational practicality only the diagonal terms of the covariance
 matrices are computed.</p>
 </section>
 <section id="summary">
-<h3><span class="section-number">2.3.6.7. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.6.7. </span>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">¶</a></h3>
 <p>The interpolation process begins with the collectior or calculation of the
 native data for the output IMT in question. Next, the bias is calculated,
-where the covariance matrix, <img class="math" src="../_images/math/0b1ee5a8c58d05e6f1f400f0b5c28ed8b6c8f81b.png" alt="\mathbf{\Sigma_{{W_2}{W_2}}}"/> is
+where the covariance matrix, <img class="math" src="_images/math/0b1ee5a8c58d05e6f1f400f0b5c28ed8b6c8f81b.png" alt="\mathbf{\Sigma_{{W_2}{W_2}}}"/> is
 assembled.
 With the bias terms, the adjusted residuals and GMM predictions can be
 calculated. We can then iterate piecemeal through the rows of
-<img class="math" src="../_images/math/a656d24d1a350c0a51f830d7ddfc21cdd205e9cd.png" alt="\mathbf{\Sigma_{{W_1}{W_2}}}"/> to build the outputs of equations
+<img class="math" src="_images/math/a656d24d1a350c0a51f830d7ddfc21cdd205e9cd.png" alt="\mathbf{\Sigma_{{W_1}{W_2}}}"/> to build the outputs of equations
 <a class="reference internal" href="#equation-engler-cond-mean">(7)</a> and <a class="reference internal" href="#equation-engler-cond-covariance">(8)</a>.</p>
 </section>
 </section>
 <section id="finite-rupture-approximations">
-<span id="sec-point-source"></span><h2><span class="section-number">2.3.7. </span>Finite-rupture Approximations<a class="headerlink" href="#finite-rupture-approximations" title="Permalink to this headline">¶</a></h2>
+<span id="sec-point-source"></span><h2><span class="section-number">2.3.7. </span>Finite-rupture Approximations<a class="headerlink" href="#finite-rupture-approximations" title="Permalink to this heading">¶</a></h2>
 <p>In situations where no finite rupture model has been specified,
 ShakeMap will approximate distances (and adjust the uncertainties
 of predicted ground motions)
@@ -817,7 +819,7 @@ using the point-source to finite-rupture equations developed
 by <a class="reference internal" href="sm4_references.html#thompson2018"><span class="std std-ref">Thompson and Worden (2018)</span></a></p>
 </section>
 <section id="output-points-vs-grids">
-<h2><span class="section-number">2.3.8. </span>Output: Points vs. Grids<a class="headerlink" href="#output-points-vs-grids" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.8. </span>Output: Points vs. Grids<a class="headerlink" href="#output-points-vs-grids" title="Permalink to this heading">¶</a></h2>
 <p>The typical application of ShakeMap is to compute ground motions
 over a gridded region. The grid is centered on the epicenter of
 the earthquake, and its extent is set automatically. The default
@@ -838,9 +840,9 @@ the <code class="docutils literal notranslate"><span class="pre">prediction_loca
 of <em>model.conf</em>.</p>
 </section>
 <section id="performance-considerations">
-<h2><span class="section-number">2.3.9. </span>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3.9. </span>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this heading">¶</a></h2>
 <section id="multithreading">
-<h3><span class="section-number">2.3.9.1. </span>Multithreading<a class="headerlink" href="#multithreading" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.9.1. </span>Multithreading<a class="headerlink" href="#multithreading" title="Permalink to this heading">¶</a></h3>
 <p>The run time of ShakeMap is most strongly controlled by the number
 of input seismic stations (and macroseismic observations), the size
 of the output grid, and the number of output IMTs. While the Numpy
@@ -864,7 +866,7 @@ compile BLAS libraries that are reentrant-safe – a topic which is
 far beyond the scope of this manual.)</p>
 </section>
 <section id="grid-size">
-<h3><span class="section-number">2.3.9.2. </span>Grid Size<a class="headerlink" href="#grid-size" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.3.9.2. </span>Grid Size<a class="headerlink" href="#grid-size" title="Permalink to this heading">¶</a></h3>
 <p>At a given grid resolution (as specified in <em>model.conf</em>), the number
 of points in the grid can grow very large for maps that cover several
 degrees of latitude and longitude. ShakeMap’s automatic scaling
@@ -958,6 +960,7 @@ their needs.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.1 Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.1 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">Shakelib API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual (Deprecated)</a></li>
 </ul>
 
@@ -966,12 +969,12 @@ their needs.</p>
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
