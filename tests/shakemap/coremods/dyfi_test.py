@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import tempfile
 import os.path
 import shutil
+import tempfile
 
-import vcr
 import numpy as np
-from shakemap.coremods.dyfi import _get_dyfi_dataframe
-from libcomcat.search import get_event_by_id
+import vcr
+from shakemap.coremods.dyfi import _get_dyfi_dataframe, get_detail_json
 
 
 def get_datadir():
@@ -23,23 +22,23 @@ def test_geocoded():
     datadir = get_datadir()
     tape_file1 = os.path.join(datadir, "vcr_event1.yaml")
 
-    with vcr.use_cassette(tape_file1):
-        detail = get_event_by_id(eventid)
-        df, msg = _get_dyfi_dataframe(detail, min_nresp=3)
+    with vcr.use_cassette(tape_file1, record_mode="new_episodes"):
+        detail_json = get_detail_json(eventid)
+        df, msg = _get_dyfi_dataframe(detail_json, min_nresp=3)
 
-    np.testing.assert_almost_equal(df["INTENSITY"].sum(), 3610.4)
-    np.testing.assert_almost_equal(df["STDDEV"].sum(), 254.265)
+    np.testing.assert_almost_equal(df["INTENSITY"].sum(), 3563.1)
+    np.testing.assert_almost_equal(df["STDDEV"].sum(), 250.984)
 
     # next, test event with only geocoded (?) resolution text data
     eventid = "ci14745580"
     tape_file2 = os.path.join(datadir, "vcr_event2.yaml")
 
     with vcr.use_cassette(tape_file2):
-        detail = get_event_by_id(eventid)
-        df, msg = _get_dyfi_dataframe(detail, min_nresp=3)
+        detail_json = get_detail_json(eventid)
+        df, msg = _get_dyfi_dataframe(detail_json, min_nresp=3)
 
-    np.testing.assert_almost_equal(df["INTENSITY"].sum(), 2766.5)
-    np.testing.assert_almost_equal(df["STDDEV"].sum(), 217.096)
+    np.testing.assert_almost_equal(df["INTENSITY"].sum(), 2332.8)
+    np.testing.assert_almost_equal(df["STDDEV"].sum(), 182.338)
 
 
 def test_dyfi():
@@ -50,8 +49,8 @@ def test_dyfi():
         tape_file3 = os.path.join(datadir, "vcr_event3.yaml")
 
         with vcr.use_cassette(tape_file3):
-            detail = get_event_by_id(eventid)
-            dataframe, msg = _get_dyfi_dataframe(detail, min_nresp=3)
+            detail_json = get_detail_json(eventid)
+            dataframe, msg = _get_dyfi_dataframe(detail_json, min_nresp=3)
 
     except Exception:
         assert 1 == 2

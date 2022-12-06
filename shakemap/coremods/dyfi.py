@@ -1,16 +1,15 @@
 # stdlib imports
+import json
 import os.path
 from io import StringIO
-import json
 
 # third party imports
-from libcomcat.search import get_event_by_id
-from libcomcat.classes import DetailEvent
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 # local imports
-from .base import CoreModule
+from shakemap.coremods.base import CoreModule
+from shakemap.utils.comcat import get_bytes, get_detail_json
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.dataframe import dataframe_to_xml
 
@@ -74,8 +73,8 @@ class DYFIModule(CoreModule):
 
         # try to find the event by our event id
         try:
-            detail = get_event_by_id(self._eventid)
-            dataframe, msg = _get_dyfi_dataframe(detail)
+            detail_json = get_detail_json(self._eventid)
+            dataframe, msg = _get_dyfi_dataframe(detail_json)
         except Exception as e:
             fmt = 'Could not retrieve DYFI data for %s - error "%s"'
             self.logger.warning(fmt % (self._eventid, str(e)))
@@ -91,7 +90,7 @@ class DYFIModule(CoreModule):
         self.logger.info("Wrote %i DYFI records to %s" % (len(dataframe), xmlfile))
 
 
-def _get_dyfi_dataframe(detail_or_url, inputfile=None, min_nresp=MIN_RESPONSES):
+def _get_dyfi_dataframe(detail_json, inputfile=None, min_nresp=MIN_RESPONSES):
 
     if inputfile:
         with open(inputfile, "rb") as f:
@@ -104,12 +103,7 @@ def _get_dyfi_dataframe(detail_or_url, inputfile=None, min_nresp=MIN_RESPONSES):
             msg = f"Could not read file {inputfile}"
 
     else:
-        if isinstance(detail_or_url, str):
-            detail = DetailEvent(detail_or_url)
-        else:
-            detail = detail_or_url
-
-        df, msg = _parse_dyfi_detail(detail, min_nresp)
+        df, msg = _parse_dyfi_detail(detail_json, min_nresp)
 
     if df is None:
         return None, msg
@@ -121,14 +115,14 @@ def _get_dyfi_dataframe(detail_or_url, inputfile=None, min_nresp=MIN_RESPONSES):
     return (df, "")
 
 
-def _parse_dyfi_detail(detail, min_nresp):
+def _parse_dyfi_detail(detail_json, min_nresp):
 
-    if not detail.hasProduct("dyfi"):
-        msg = f"{detail.url} has no DYFI product at this time."
+    if "dyfi" not in detail_json["properties"]["products"]:
+        msg = f"Detail for {detail_json['properties']['url']} has no DYFI product at this time."
         dataframe = None
         return (dataframe, msg)
 
-    dyfi = detail.getProducts("dyfi")[0]
+    dyfi = detail_json["properties"]["products"]["dyfi"][0]
 
     # search the dyfi product, see which of the geocoded
     # files (1km or 10km) it has.  We're going to select the data from
@@ -137,8 +131,9 @@ def _parse_dyfi_detail(detail, min_nresp):
     df_1k = pd.DataFrame({"a": []})
 
     # get 1km data set, if exists
-    if len(dyfi.getContentsMatching("dyfi_geo_1km.geojson")):
-        bytes_1k, _ = dyfi.getContentBytes("dyfi_geo_1km.geojson")
+    if "dyfi_geo_1km.geojson" in dyfi["contents"]:
+        url = dyfi["contents"]["dyfi_geo_1km.geojson"]["url"]
+        bytes_1k = get_bytes(url)
         df_1k = _parse_geocoded_json(bytes_1k, min_nresp)
         return df_1k, ""
 
@@ -146,10 +141,10 @@ def _parse_dyfi_detail(detail, min_nresp):
 
     if not len(df):
         # try to get a text file data set
-        if not len(dyfi.getContentsMatching("cdi_geo.txt")):
+        if "cdi_geo.txt" not in dyfi["contents"]:
             return (None, "No geocoded datasets are available for this event.")
-
-        bytes_geo, _ = dyfi.getContentBytes("cdi_geo.txt")
+        url = dyfi["contents"]["dyfi_geo_1km.geojson"]["url"]
+        bytes_geo = get_bytes(url)
         df = _parse_geocoded_csv(bytes_geo, min_nresp)
         return None, "Only cdi_geo.txt found, ignoring."
 

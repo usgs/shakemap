@@ -4,9 +4,12 @@
 import argparse
 import json
 from collections import OrderedDict
+
+# third party imports
 import pandas as pd
 
-from libcomcat.search import get_event_by_id
+# local imports
+from shakemap.utils.comcat import get_bytes, get_detail_json
 
 
 def main():
@@ -17,12 +20,10 @@ def main():
     evid = args.eventid
 
     # Download stationlist
-    event = get_event_by_id(evid)
-    shakemap = event.getProducts("shakemap")[0]
-    json_file = evid + "_stationlist.json"
-    shakemap.getContent("stationlist.json", json_file)
-    with open(json_file) as f:
-        station_dict = json.load(f)
+    detail_json = get_detail_json(evid)
+    shakemap = detail_json["properties"]["products"]["shakemap"][0]
+    url = shakemap["contents"]["download/stationlist.json"]["url"]
+    station_dict = json.loads(get_bytes(url).decode("utf8"))
 
     # Extract info in tabular form
     out_dict = OrderedDict()
