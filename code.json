@@ -2,19 +2,19 @@
     {
         "name": "shakemap",
         "description": "Near-real-time maps of ground motion and shaking intensity",
-        "version": "v4.1.4",
+        "version": "v4.1.5",
         "status": "Development",
         "organization": "U.S. Geological Survey",
         "vcs": "git",
         "repositoryURL": "https://code.usgs.gov/ghsc/esi/shakemap.git",
         "homepageURL": "https://code.usgs.gov/ghsc/esi/shakemap",
-        "downloadURL": "https://code.usgs.gov/ghsc/esi/shakemap/-/archive/v4.1.4/shakemap-v4.1.4.zip",
-        "disclaimerURL": "https://code.usgs.gov/ghsc/esi/shakemap/-/raw/v4.1.4/DISCLAIMER.md",
+        "downloadURL": "https://code.usgs.gov/ghsc/esi/shakemap/-/archive/v4.1.5/shakemap-v4.1.5.zip",
+        "disclaimerURL": "https://code.usgs.gov/ghsc/esi/shakemap/-/raw/v4.1.5/DISCLAIMER.md",
         "permissions": {
             "licenses": [
                 {
                     "name": "Public Domain, CC0-1.0",
-                    "URL": "https://code.usgs.gov/ghsc/esi/shakemap/-/raw/v4.1.4/LICENSE.md"
+                    "URL": "https://code.usgs.gov/ghsc/esi/shakemap/-/raw/v4.1.5/LICENSE.md"
                 }
             ],
             "usageType": "openSource",
@@ -37,7 +37,7 @@
             "email": "cbworden@contractor.usgs.gov"
         },
         "date": {
-            "metadataLastUpdated": "2022-11-17"
+            "metadataLastUpdated": "2022-12-12"
         }
     },
     {
