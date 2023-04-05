@@ -1,6 +1,0 @@
-This test has two stations with the same amp at different locations.
-It should produce a bias that is somewhat greater than that of
-test 0003 and 0004.
-
-Plot with xtestplot.
-

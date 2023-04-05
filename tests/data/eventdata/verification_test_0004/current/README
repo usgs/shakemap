@@ -1,6 +1,0 @@
-This test has two stations with the same amp at the same location.
-It should produce the same result (bias, stddev, etc.) as when only
-one of the stations is used (i.e., test 0003).
-
-Plot with xtestplot.
-

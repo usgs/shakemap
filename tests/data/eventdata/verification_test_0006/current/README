@@ -1,5 +1,0 @@
-This test has forty evenly-spaced stations all with an amp of 1.0, 
-mostly to the west of center. It should be sane-looking, with
-a nominal bias of 0.701696 nominal bias stddev of 0.163852.
-
-Plot with xtestplot.

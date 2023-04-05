@@ -1,6 +1,0 @@
-This test has a several stations with an amp of 1.0 surrounding a station
-with an amp of 0.25, and all have a nonzero sigma. It checks that the
-influence of nearby stations does not cause the lower amp to "overshoot"
-the mark.
-
-Plot with xtestplot.

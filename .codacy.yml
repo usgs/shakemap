@@ -1,7 +1,0 @@
-exclude_paths:
-  - doc_source/**
-  - docs/**
-  - tests/**
-  - versioneer.py
-  - setup.cfg
-  - _version.py

@@ -1,4 +1,0 @@
-Test with two stations, both with ln(PGA) of 0. Plot should be symmetric, zero
-bias, etc.
-
-Plot with xtestplot.
